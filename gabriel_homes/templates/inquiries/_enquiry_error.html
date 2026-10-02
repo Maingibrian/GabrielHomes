@@ -1,0 +1,8 @@
+{% comment %}
+  Error partial — returned on rate-limit or other non-form-validation errors.
+{% endcomment %}
+<div id="enquiry-form-container">
+  <div class="enquiry-error">
+    {{ error|default:"Something went wrong. Please try again." }}
+  </div>
+</div>

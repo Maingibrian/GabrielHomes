@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% load static core_tags %}
+
+{% block title %}Saved properties — {{ SITE_NAME }}{% endblock %}
+{% block meta_description %}Your saved properties on Gabriel Homes.{% endblock %}
+
+{% block styles %}
+  <link rel="stylesheet" href="{% static 'css/search.css' %}">
+  <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<div class="container" style="padding-block: 2rem 4rem;">
+  <nav class="breadcrumbs" aria-label="Breadcrumb">
+    <ol>
+      <li><a href="/">Home</a></li>
+      <li><a href="/account/">Account</a></li>
+      <li>Saved properties</li>
+    </ol>
+  </nav>
+
+  <div class="dashboard-header">
+    <div>
+      <h1 class="dashboard-header__title">Saved properties</h1>
+      <p class="dashboard-header__subtitle">[ YOUR SHORTLIST ]</p>
+    </div>
+    <a class="btn btn--outline btn--sm" href="/">Browse more →</a>
+  </div>
+
+  {% if saved_properties %}
+    <div class="results-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.5rem;">
+      {% for sp in saved_properties %}
+        <div>{% include "includes/_listing_card.html" with property=sp.property index=forloop.counter %}</div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="dashboard-empty">
+      <p class="dashboard-empty__title">No saved properties yet.</p>
+      <p class="dashboard-empty__body">
+        Tap the heart icon on any listing to save it here for later.
+      </p>
+      <a class="btn btn--primary" href="/">Browse properties</a>
+    </div>
+  {% endif %}
+</div>
+
+{% endblock %}

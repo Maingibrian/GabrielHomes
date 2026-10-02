@@ -1,0 +1,63 @@
+{% load static %}
+<header class="site-header" role="banner" data-site-header>
+  <div class="container site-header__inner">
+    <a class="site-header__brand" href="/">
+      Gabriel&nbsp;<span>Homes</span>
+    </a>
+
+    {# Desktop nav (≥1200px) — numbered links per §8.1 #}
+    <nav class="site-header__nav" aria-label="Primary">
+      <a class="nav-link" href="/about/"><span class="nav-link__index">01</span> About</a>
+      <a class="nav-link" href="/#featured"><span class="nav-link__index">02</span> Properties</a>
+      <a class="nav-link" href="/#stays"><span class="nav-link__index">03</span> Stays</a>
+      <a class="nav-link" href="/#services"><span class="nav-link__index">04</span> Services</a>
+      <a class="nav-link" href="/#contact"><span class="nav-link__index">05</span> Contact</a>
+    </nav>
+
+    {# Desktop contact (≥1200px) — phone + email #}
+    <div class="site-header__contact">
+      <a href="tel:+254712345678">+254 712 345 678</a>
+      <a href="mailto:hello@gabrielhomes.co.ke">hello@gabrielhomes.co.ke</a>
+    </div>
+
+    <div class="site-header__actions">
+      <a class="btn btn--primary btn--sm site-header__cta" href="/#contact">
+        Enquire
+        <span class="btn__arrow" aria-hidden="true">&rarr;</span>
+      </a>
+      {# Hamburger (<1200px) opens the full-screen menu #}
+      <button class="site-header__hamburger" type="button"
+              aria-label="Open menu" data-mobile-menu-open>
+        <span class="site-header__hamburger-icon" aria-hidden="true">
+          <span></span><span></span><span></span>
+        </span>
+        Menu
+      </button>
+    </div>
+  </div>
+</header>
+
+{# Full-screen mobile menu (slides down from the top) #}
+<div class="mobile-menu" data-mobile-menu aria-hidden="true">
+  <div class="mobile-menu__header">
+    <a class="site-header__brand" href="/">
+      Gabriel&nbsp;<span style="color: var(--burnt);">Homes</span>
+    </a>
+    <button class="mobile-menu__close" type="button"
+            aria-label="Close menu" data-mobile-menu-close>
+      Close
+    </button>
+  </div>
+  <nav class="mobile-menu__nav" aria-label="Mobile primary">
+    <a class="mobile-menu__link" href="/about/"><span style="font-family: var(--font-mono); font-size: 0.4em; color: var(--burnt); margin-right: 0.5em;">01</span>About</a>
+    <a class="mobile-menu__link" href="/#featured"><span style="font-family: var(--font-mono); font-size: 0.4em; color: var(--burnt); margin-right: 0.5em;">02</span>Properties</a>
+    <a class="mobile-menu__link" href="/#stays"><span style="font-family: var(--font-mono); font-size: 0.4em; color: var(--burnt); margin-right: 0.5em;">03</span>Stays</a>
+    <a class="mobile-menu__link" href="/#services"><span style="font-family: var(--font-mono); font-size: 0.4em; color: var(--burnt); margin-right: 0.5em;">04</span>Services</a>
+    <a class="mobile-menu__link" href="/#contact"><span style="font-family: var(--font-mono); font-size: 0.4em; color: var(--burnt); margin-right: 0.5em;">05</span>Contact</a>
+  </nav>
+  <div class="mobile-menu__contact">
+    <a href="tel:+254712345678">+254 712 345 678</a>
+    <a href="mailto:hello@gabrielhomes.co.ke">hello@gabrielhomes.co.ke</a>
+    <span>Nyali Centre · Links Road · Mombasa</span>
+  </div>
+</div>
