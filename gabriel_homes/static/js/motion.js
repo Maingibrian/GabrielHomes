@@ -140,10 +140,14 @@
 
     var open = function () {
       menu.classList.add("is-open");
+      menu.setAttribute("aria-hidden", "false");
+      openBtn.setAttribute("aria-expanded", "true");
       document.body.style.overflow = "hidden";
     };
     var close = function () {
       menu.classList.remove("is-open");
+      menu.setAttribute("aria-hidden", "true");
+      openBtn.setAttribute("aria-expanded", "false");
       document.body.style.overflow = "";
     };
     openBtn.addEventListener("click", open);

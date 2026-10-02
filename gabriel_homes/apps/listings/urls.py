@@ -27,6 +27,23 @@ urlpatterns = [
     # Location autocomplete (JSON) — used by the hero search bar
     path("search/locations/", views.location_autocomplete, name="location_autocomplete"),
 
+    # All-types, no location — target of the hero search bar's no-JS fallback
+    # (and of the breadcrumbs/canonical builder for all-types pages). These
+    # must come before the generic <type>-for-* patterns so "property" is not
+    # matched as a type_slug.
+    path(
+        "property-for-sale/",
+        views.search,
+        {"listing_type": "sale", "type_slug": None},
+        name="search_all_sale",
+    ),
+    path(
+        "property-for-rent/",
+        views.search,
+        {"listing_type": "rent", "type_slug": None},
+        name="search_all_rent",
+    ),
+
     # All-types + location (must come before the generic <type>-for-* patterns
     # so "property" doesn't get matched as a type_slug).
     path(

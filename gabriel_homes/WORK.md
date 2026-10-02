@@ -341,6 +341,70 @@ pytest -q
 Append newest entries at the top. Format: `YYYY-MM-DD | Phase | What changed | Checks run | Next`.
 
 ```
+2026-10-02 | Verification & troubleshooting pass ("is the site sufficient?") | Full
+audit: pytest 231/231, smoke 58/58, functional 46/46, live browser E2E. Found and
+fixed 7 real site bugs + rewrote stale test-script expectations.
+  - FIXED — missing all-types search routes: /property-for-sale/ and
+    /property-for-rent/ (no location) returned 404. These were the target of the
+    hero search bar's no-JS fallback AND of buildAction() in motion.js whenever
+    the user searched with "All types" selected — i.e. the DEFAULT search click
+    404'd. Added both routes in apps/listings/urls.py (before the <type>-for-*
+    patterns) and made views.search() fall back to GET params (type /
+    location_slug) only when the path didn't provide them. Canonical URLs stay
+    clean (built from resolved type+location).
+  - FIXED — dead links on home: the whole "Browse by location / by property
+    type" section linked to href="/" (home itself), and the featured "View all"
+    button too. Now: counties -> /property-for-sale/<slug>/, types ->
+    /<type-slug-plural>-for-sale/, View all -> /property-for-sale/.
+  - FIXED — CRITICAL: the enquiry form on the listing detail page rendered
+    WITHOUT its fields (only csrf + submit button). Root cause:
+    listings/detail.html included inquiries/_enquiry_form.html without binding
+    the form — the view puts it in context as `enquiry_form` but the partial
+    reads `form`. HTMX error paths passed `form` correctly, which is why API
+    tests (and all 231 pytest tests) missed it. Only real browser users hit it.
+    Fixed with `{% include ... with form=enquiry_form %}` + regression tests
+    (pytest asserts id_name/id_email/id_message present; functional script too).
+  - FIXED — footer dead links: /careers/ and /cookies/ had no pages (404).
+    Cookies -> /privacy/, Careers -> /contact/ (no careers page in §8 scope).
+  - FIXED — nav anchors pointed at brochure sections that don't exist on the
+    portal home (/#stays, /#services): Stays -> /property-for-rent/, Services
+    -> /agents/, Contact -> /contact/ (desktop nav + mobile menu).
+  - FIXED — no visible account entry points anywhere: added Sign in (anon) /
+    Saved + Dashboard (agents) + Sign out (POST form, allauth requires POST)
+    to the header actions and the mobile menu, styled with .nav-link.
+  - FIXED — /favicon.ico 404: created static/img/favicon.svg (brand: espresso
+    rounded square, cream G, burnt dot), added <link rel="icon"> to base.html;
+    the existing RedirectView now lands on a real file (200, image/svg+xml).
+  - FIXED — a11y: the full-screen mobile menu never updated aria-hidden when
+    opened (stayed "true", hiding it from assistive tech and making its links
+    unreachable in the a11y tree). motion.js open/close now toggles
+    aria-hidden + aria-expanded on the hamburger; button got
+    aria-expanded/aria-controls, menu got id="mobile-menu".
+  - Test scripts (scripts/smoke_test.sh, scripts/functional_test.sh) updated:
+    wrong autocomplete path (/search/suggest/ -> /search/locations/), stale
+    enquiry endpoint (/enquiry/<slug>-<pk>/ -> /listing/<slug>-<pk>/enquire/),
+    redirect-following expectations (302 -> 200), unencoded space in the bogus
+    sort URL, cookie-jar ordering (CSRF cookie now captured from the detail
+    GET), section-tag grep patterns ([ STORY ] with spaces), login assertion
+    case-insensitivity, enquiry POST data (messages >= 10 chars per
+    clean_message; create POST now sends parking_spaces which the model
+    requires — default=0 but no blank=True; browser users get it from the
+    form), test-inquiry cleanup at start so the 3/min rate limiter resets
+    between runs, and a regression assert that the detail page renders the
+    actual enquiry fields.
+  - Checks: pytest 231/231 · smoke_test.sh 58/58 · functional_test.sh 46/46 ·
+    live browser E2E (desktop + iPhone 14): hero search with autocomplete ->
+    results, enquiry submit -> success partial, agent login -> dashboard ->
+    new-listing form -> sign out, mobile menu open/close/navigate — zero
+    console/page errors. check --deploy prod: only the expected W009 (no real
+    SECRET_KEY in this env).
+  - Known cosmetic (not fixed, low priority): bare-route no-JS searches always
+    submit listing_type=sale (JS-less users can't switch to Rent); sticky
+    detail gallery still uses CSS background-image; newsletter form has no
+    backend handler (renders + reloads only).
+```
+
+```
 2026-10-02 | Phase 7 — Hardening and deployment notes | check --deploy clean, upload validation, auth rate limiting, DEPLOY.md, Makefile, 97% coverage all landed.
   - check --deploy: 0 warnings with prod settings + proper SECRET_KEY.
     The 6 W-warnings (W004/W008/W009/W012/W016/W018) only appear under

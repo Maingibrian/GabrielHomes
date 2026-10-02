@@ -152,6 +152,15 @@ def search(request, type_slug: str | None = None, location_slug: str | None = No
     # ------------------------------------------------------------------
     # Resolve URL context
     # ------------------------------------------------------------------
+    # No-JS hero-search fallback: when JavaScript is unavailable the hero
+    # form submits GET params (listing_type / type / location_slug) to the
+    # bare /property-for-<sale|rent>/ route. Honour those params only when
+    # the URL path didn't already provide them, so SEO URLs are unaffected.
+    if type_slug is None:
+        type_slug = request.GET.get("type") or None
+    if location_slug is None:
+        location_slug = request.GET.get("location_slug") or None
+
     ptype = None
     if type_slug:
         ptype = get_object_or_404(PropertyType, slug_plural=type_slug)

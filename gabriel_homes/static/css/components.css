@@ -92,6 +92,16 @@
 }
 .nav-link:hover { opacity: 1; color: var(--burnt); }
 
+/* Sign-out is a <button> inside a form but must look like a nav link. */
+.nav-signout { display: inline-flex; }
+.nav-link--button {
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  text-align: left;
+}
+
 
 /* ============================================================
    3. Section tag + eyebrow

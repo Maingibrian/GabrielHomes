@@ -246,9 +246,9 @@
           {% endif %}
         </div>
 
-        {# Enquiry form (HTMX target) #}
+        {# Enquiry form (HTMX target) — the partial reads `form`, so bind it explicitly #}
         <div id="enquiry-form-container">
-          {% include "inquiries/_enquiry_form.html" %}
+          {% include "inquiries/_enquiry_form.html" with form=enquiry_form %}
         </div>
       </div>
     </aside>

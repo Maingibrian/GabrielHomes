@@ -27,18 +27,27 @@ print('AGENT_EMAIL=' + u.email)
 AGENT_EMAIL=$(grep AGENT_EMAIL= /home/z/my-project/scripts/agent_email.txt | cut -d= -f2)
 echo "Agent: $AGENT_EMAIL"
 
+# Reset test inquiries so the 3/min rate limiter doesn't carry over between runs.
+.venv/bin/python manage.py shell -c "
+from apps.inquiries.models import Inquiry
+n = Inquiry.objects.filter(email__regex=r'@(test|spam)\.com$').delete()
+print('cleaned test inquiries')
+" 2>/dev/null | tail -1
+
 echo "=== 1. Anonymous visitor: search & detail content ==="
 curl -s "$BASE/" > /tmp/home.html
 assert_contains "Home renders headline" /tmp/home.html "Real estate with a human point of view"
 assert_contains "Home hero search form present" /tmp/home.html "search"
-assert_contains "Home featured listings section" /tmp/home.html "[001]"
+assert_contains "Home featured listings section" /tmp/home.html "listing-card"
 assert_contains "Home stats counter" /tmp/home.html "data-count"
-assert_contains "Home story section" /tmp/home.html "\[STORY\]"
-assert_contains "Home numbers section" /tmp/home.html "\[NUMBERS\]"
-assert_contains "Home agents section" /tmp/home.html "\[AGENTS\]"
-assert_contains "Home philosophy section" /tmp/home.html "\[001-UNDERSTAND\]"
+# Section tags render with inner spaces: [ STORY ], [ NUMBERS ], ...
+assert_contains "Home story section" /tmp/home.html "\[ STORY \]"
+assert_contains "Home numbers section" /tmp/home.html "\[ NUMBERS \]"
+assert_contains "Home agents section" /tmp/home.html "\[ AGENTS \]"
+assert_contains "Home philosophy section" /tmp/home.html "\[ 001 — UNDERSTAND \]"
 assert_contains "Home footer wordmark" /tmp/home.html "Homes"
 assert_contains "Home links to search URLs" /tmp/home.html "flats-apartments-for-sale"
+assert_contains "Home browse links point to search" /tmp/home.html 'browse__link" href="/property-for-sale/'
 
 curl -s "$BASE/flats-apartments-for-sale/mombasa/" > /tmp/search.html
 assert_contains "Search H1 generated" /tmp/search.html "Flats &amp; Apartments for Sale in Mombasa"
@@ -50,11 +59,13 @@ if grep -qi "error\|Traceback\|Exception" /tmp/bogussort.html; then bad "Bogus s
 
 LISTING_URL=$(grep -o '/listing/[a-z0-9-]*-[0-9]*/' /tmp/search.html | head -1)
 echo "  (listing url: $LISTING_URL)"
-curl -s "$BASE$LISTING_URL" > /tmp/detail.html
+curl -s -c "$JAR" "$BASE$LISTING_URL" > /tmp/detail.html
 assert_contains "Detail JSON-LD present" /tmp/detail.html 'application/ld+json'
 assert_contains "Detail canonical" /tmp/detail.html 'rel="canonical"'
 assert_contains "Detail OG tags" /tmp/detail.html 'property="og:title"'
 assert_contains "Detail enquiry form" /tmp/detail.html "enquiry"
+# Regression: rendered form must contain the actual input fields.
+assert_contains "Detail enquiry fields rendered" /tmp/detail.html 'id="id_message"'
 assert_contains "Detail WhatsApp link" /tmp/detail.html "wa.me"
 assert_contains "Detail map div" /tmp/detail.html "leaflet"
 assert_contains "Detail price present" /tmp/detail.html "KES"
@@ -67,7 +78,7 @@ SLUG=$(echo "$LISTING_URL" | sed 's|/listing/||;s|/$||' | sed 's/-[0-9]*$//')
 PK=$(echo "$LISTING_URL" | grep -o '[0-9]*' | tail -1)
 curl -s -b "$JAR" -H "X-CSRFToken: $CSRF_COOKIE" -H "HX-Request: true" \
   -d "csrfmiddlewaretoken=$CSRF_TOKEN&name=Test Buyer&email=buyer@test.com&phone=+254700111222&message=Is this still available?&website=" \
-  "$BASE/enquiry/$SLUG-$PK/" -o /tmp/enquiry_resp.html -w "%{http_code}" > /tmp/enquiry_code.txt
+  "$BASE/listing/$SLUG-$PK/enquire/" -o /tmp/enquiry_resp.html -w "%{http_code}" > /tmp/enquiry_code.txt
 CODE=$(cat /tmp/enquiry_code.txt)
 if [[ "$CODE" == "200" ]]; then ok "Enquiry POST returns 200"; else bad "Enquiry POST" "code $CODE"; fi
 assert_contains "Enquiry success partial" /tmp/enquiry_resp.html "Thank"
@@ -77,8 +88,8 @@ if grep -q "New enquiry" "$LOG"; then ok "Agent email sent (console backend)"; e
 
 echo "=== 3. Honeypot catches spam ==="
 curl -s -b "$JAR" -H "X-CSRFToken: $CSRF_COOKIE" -H "HX-Request: true" \
-  -d "csrfmiddlewaretoken=$CSRF_TOKEN&name=SpamBot&email=bot@spam.com&phone=123&message=buy now&website=http://spam.com" \
-  "$BASE/enquiry/$SLUG-$PK/" -o /tmp/honeypot.html -w "%{http_code}" > /tmp/honeypot_code.txt
+  -d "csrfmiddlewaretoken=$CSRF_TOKEN&name=SpamBot&email=bot@spam.com&phone=123&message=Buy this amazing deal right now&website=http://spam.com" \
+  "$BASE/listing/$SLUG-$PK/enquire/" -o /tmp/honeypot.html -w "%{http_code}" > /tmp/honeypot_code.txt
 CODE=$(cat /tmp/honeypot_code.txt)
 if [[ "$CODE" == "200" ]]; then ok "Honeypot returns fake success"; else bad "Honeypot" "code $CODE"; fi
 SPAM_COUNT=$(.venv/bin/python manage.py shell -c "from apps.inquiries.models import Inquiry; print(Inquiry.objects.filter(honeypot__gt='').count())" 2>/dev/null | tail -1)
@@ -87,12 +98,12 @@ if [[ "$SPAM_COUNT" -ge 1 ]]; then ok "Spam inquiry saved with honeypot flag"; e
 echo "=== 4. Enquiry rate limit (3/min per IP) ==="
 for i in 1 2 3; do
   curl -s -b "$JAR" -H "X-CSRFToken: $CSRF_COOKIE" -H "HX-Request: true" \
-    -d "csrfmiddlewaretoken=$CSRF_TOKEN&name=RL$i&email=rl$i@test.com&phone=1&message=hi&website=" \
-    -o /dev/null "$BASE/enquiry/$SLUG-$PK/"
+    -d "csrfmiddlewaretoken=$CSRF_TOKEN&name=RL$i&email=rl$i@test.com&phone=1&message=Is this listing still available?&website=" \
+    -o /dev/null "$BASE/listing/$SLUG-$PK/enquire/"
 done
 CODE=$(curl -s -b "$JAR" -H "X-CSRFToken: $CSRF_COOKIE" -H "HX-Request: true" \
-  -d "csrfmiddlewaretoken=$CSRF_TOKEN&name=RL4&email=rl4@test.com&phone=1&message=hi&website=" \
-  -o /tmp/ratelimit.html -w "%{http_code}" "$BASE/enquiry/$SLUG-$PK/")
+  -d "csrfmiddlewaretoken=$CSRF_TOKEN&name=RL4&email=rl4@test.com&phone=1&message=Is this listing still available?&website=" \
+  -o /tmp/ratelimit.html -w "%{http_code}" "$BASE/listing/$SLUG-$PK/enquire/")
 if [[ "$CODE" == "429" ]]; then ok "4th enquiry rate-limited with 429"; else bad "Rate limit" "code $CODE (want 429)"; fi
 
 echo "=== 5. Agent login + dashboard end-to-end ==="
@@ -102,7 +113,7 @@ CSRF_COOKIE=$(grep csrftoken "$JAR" | awk '{print $NF}')
 curl -s -b "$JAR" -c "$JAR" -H "X-CSRFToken: $CSRF_COOKIE" -L \
   -d "csrfmiddlewaretoken=$CSRF_TOKEN&login=$AGENT_EMAIL&password=TestPass123!" \
   "$BASE/account/login/" -o /tmp/login_post.html -w "%{http_code}" > /tmp/login_code.txt
-if grep -q "dashboard\|Sign Out\|Logout" /tmp/login_post.html; then ok "Agent login succeeds"; else bad "Agent login" "no dashboard marker"; fi
+if grep -qi "sign out\|signout\|dashboard" /tmp/login_post.html; then ok "Agent login succeeds"; else bad "Agent login" "no dashboard marker"; fi
 
 CODE=$(curl -s -b "$JAR" -o /tmp/dash.html -w "%{http_code}" "$BASE/dashboard/")
 if [[ "$CODE" == "200" ]]; then ok "Dashboard 200 for agent"; else bad "Dashboard" "code $CODE"; fi
@@ -116,7 +127,7 @@ LOC_ID=$(.venv/bin/python manage.py shell -c "from apps.locations.models import 
 PT_ID=$(.venv/bin/python manage.py shell -c "from apps.listings.models import PropertyType; print(PropertyType.objects.filter(slug_plural='flats-apartments').first().id)" 2>/dev/null | tail -1)
 AM_ID=$(.venv/bin/python manage.py shell -c "from apps.listings.models import Amenity; print(Amenity.objects.first().id)" 2>/dev/null | tail -1)
 curl -s -b "$JAR" -H "X-CSRFToken: $CSRF_COOKIE" -L \
-  -d "csrfmiddlewaretoken=$CSRF_TOKEN&title=Agent Test Apartment Nyali&listing_type=sale&property_type=$PT_ID&location=$LOC_ID&price=12500000&price_period=total&bedrooms=3&bathrooms=2&furnishing=unfurnished&status=published&description=A test listing created by the E2E functional test.&amenities=$AM_ID" \
+  -d "csrfmiddlewaretoken=$CSRF_TOKEN&title=Agent Test Apartment Nyali&listing_type=sale&property_type=$PT_ID&location=$LOC_ID&price=12500000&price_period=total&bedrooms=3&bathrooms=2&size_sqm=150&parking_spaces=1&furnishing=unfurnished&status=published&description=A test listing created by the E2E functional test.&amenities=$AM_ID" \
   "$BASE/dashboard/listings/new/" -o /tmp/create_resp.html -w "%{http_code}" > /tmp/create_code.txt
 NEW_ID=$(.venv/bin/python manage.py shell -c "from apps.listings.models import Property; p=Property.objects.filter(title='Agent Test Apartment Nyali').first(); print(p.pk if p else 'MISSING')" 2>/dev/null | tail -1)
 if [[ "$NEW_ID" != "MISSING" && -n "$NEW_ID" ]]; then ok "Listing created (id $NEW_ID)"; else bad "Listing create" "not in DB"; fi

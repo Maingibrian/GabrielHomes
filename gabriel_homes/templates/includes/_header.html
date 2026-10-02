@@ -9,9 +9,9 @@
     <nav class="site-header__nav" aria-label="Primary">
       <a class="nav-link" href="/about/"><span class="nav-link__index">01</span> About</a>
       <a class="nav-link" href="/#featured"><span class="nav-link__index">02</span> Properties</a>
-      <a class="nav-link" href="/#stays"><span class="nav-link__index">03</span> Stays</a>
-      <a class="nav-link" href="/#services"><span class="nav-link__index">04</span> Services</a>
-      <a class="nav-link" href="/#contact"><span class="nav-link__index">05</span> Contact</a>
+      <a class="nav-link" href="/property-for-rent/"><span class="nav-link__index">03</span> Stays</a>
+      <a class="nav-link" href="/agents/"><span class="nav-link__index">04</span> Services</a>
+      <a class="nav-link" href="/contact/"><span class="nav-link__index">05</span> Contact</a>
     </nav>
 
     {# Desktop contact (≥1200px) — phone + email #}
@@ -21,13 +21,27 @@
     </div>
 
     <div class="site-header__actions">
+      {# Account links — anonymous visitors get Sign in; signed-in users get #}
+      {# Saved + (agents) Dashboard + a POST sign-out (allauth requires POST). #}
+      {% if request.user.is_authenticated %}
+        <a class="nav-link" href="/account/saved/">Saved</a>
+        {% if request.user.is_agent %}
+          <a class="nav-link" href="/dashboard/">Dashboard</a>
+        {% endif %}
+        <form class="nav-signout" method="post" action="/account/logout/">{% csrf_token %}
+          <button type="submit" class="nav-link nav-link--button">Sign out</button>
+        </form>
+      {% else %}
+        <a class="nav-link" href="/account/login/">Sign in</a>
+      {% endif %}
       <a class="btn btn--primary btn--sm site-header__cta" href="/#contact">
         Enquire
         <span class="btn__arrow" aria-hidden="true">&rarr;</span>
       </a>
       {# Hamburger (<1200px) opens the full-screen menu #}
       <button class="site-header__hamburger" type="button"
-              aria-label="Open menu" data-mobile-menu-open>
+              aria-label="Open menu" aria-expanded="false" aria-controls="mobile-menu"
+              data-mobile-menu-open>
         <span class="site-header__hamburger-icon" aria-hidden="true">
           <span></span><span></span><span></span>
         </span>
@@ -38,7 +52,7 @@
 </header>
 
 {# Full-screen mobile menu (slides down from the top) #}
-<div class="mobile-menu" data-mobile-menu aria-hidden="true">
+<div class="mobile-menu" id="mobile-menu" data-mobile-menu aria-hidden="true">
   <div class="mobile-menu__header">
     <a class="site-header__brand" href="/">
       Gabriel&nbsp;<span style="color: var(--burnt);">Homes</span>
@@ -51,9 +65,21 @@
   <nav class="mobile-menu__nav" aria-label="Mobile primary">
     <a class="mobile-menu__link" href="/about/"><span style="font-family: var(--font-mono); font-size: 0.4em; color: var(--burnt); margin-right: 0.5em;">01</span>About</a>
     <a class="mobile-menu__link" href="/#featured"><span style="font-family: var(--font-mono); font-size: 0.4em; color: var(--burnt); margin-right: 0.5em;">02</span>Properties</a>
-    <a class="mobile-menu__link" href="/#stays"><span style="font-family: var(--font-mono); font-size: 0.4em; color: var(--burnt); margin-right: 0.5em;">03</span>Stays</a>
-    <a class="mobile-menu__link" href="/#services"><span style="font-family: var(--font-mono); font-size: 0.4em; color: var(--burnt); margin-right: 0.5em;">04</span>Services</a>
-    <a class="mobile-menu__link" href="/#contact"><span style="font-family: var(--font-mono); font-size: 0.4em; color: var(--burnt); margin-right: 0.5em;">05</span>Contact</a>
+    <a class="mobile-menu__link" href="/property-for-rent/"><span style="font-family: var(--font-mono); font-size: 0.4em; color: var(--burnt); margin-right: 0.5em;">03</span>Stays</a>
+    <a class="mobile-menu__link" href="/agents/"><span style="font-family: var(--font-mono); font-size: 0.4em; color: var(--burnt); margin-right: 0.5em;">04</span>Services</a>
+    <a class="mobile-menu__link" href="/contact/"><span style="font-family: var(--font-mono); font-size: 0.4em; color: var(--burnt); margin-right: 0.5em;">05</span>Contact</a>
+    {% if request.user.is_authenticated %}
+      <a class="mobile-menu__link" href="/account/saved/">Saved</a>
+      {% if request.user.is_agent %}
+        <a class="mobile-menu__link" href="/dashboard/">Dashboard</a>
+      {% endif %}
+      <form method="post" action="/account/logout/">{% csrf_token %}
+        <button type="submit" class="mobile-menu__link nav-link--button"
+                style="width: 100%; text-align: left;">Sign out</button>
+      </form>
+    {% else %}
+      <a class="mobile-menu__link" href="/account/login/">Sign in</a>
+    {% endif %}
   </nav>
   <div class="mobile-menu__contact">
     <a href="tel:+254712345678">+254 712 345 678</a>

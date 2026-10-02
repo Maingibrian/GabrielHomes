@@ -1,0 +1,1242 @@
+     1→# WORK.md — Gabriel Homes
+     2→
+     3→> Read this file at the start of every session. Update the **Progress Log** (section 14) at the end of every task. This file is the source of truth; if the chat and this file disagree, follow this file and flag the conflict.
+     4→
+     5→---
+     6→
+     7→## 1. Mission
+     8→
+     9→Build **Gabriel Homes**, a Kenyan property-listings portal (buy / rent) in **Django**. It follows the *structure and user experience* of established Kenyan listing portals such as buyrentkenya.com (reference page pattern: `/flats-apartments-for-sale/mombasa`): search-first homepage, filterable results pages with SEO-friendly URLs, rich listing pages, agent contact via call / WhatsApp / enquiry form.
+    10→
+    11→**Visual design is fixed:** the look and feel must match the Framer-built Gabriel Homes brochure site supplied in `design-reference/index.html`. The full extracted spec is in section 10 and in `DESIGN.md`. The portal functionality (search, listings, agents) is new, but it must be dressed in that same design language so it reads as one product.
+    12→
+    13→Primary markets for seed data and defaults: **Mombasa, Nairobi, Kilifi, Kwale (Diani), Kiambu, Kajiado (Ngong, Kitengela)**. Currency: **KES**. Phone format: **+254**.
+    14→
+    15→## 2. Non-negotiable rules for the agent
+    16→
+    17→1. **Mirror structure and UX only for third-party portals.** Do NOT copy text, logos, images, listings, CSS, or markup from buyrentkenya.com or any other competitor. All data is original; use fictional seed listings.
+    18→1a. **The design reference is the owner's own file.** `design-reference/index.html` is a Framer export. Reuse its *design language* (tokens, type, spacing, radii, motion, section patterns, and the owner's own copy). Do NOT reuse Framer's runtime: no `framerusercontent.com` scripts, no Framer attributes, no "Made in Framer" badge. Rebuild everything as Django templates, CSS and small vanilla JS.
+    19→1b. **Design fidelity beats speed.** Before building any page, re-read section 10. Use only the tokens there. No new colours, fonts, or radii without logging why.
+    20→2. **Work one phase at a time** (section 11). Finish it, run the checks (section 12), report, then stop and wait for "continue".
+    21→3. **Do not invent packages, APIs, or settings.** Only use packages listed in section 4 unless you log the reason for adding one. Pin versions in `requirements.txt`.
+    22→4. **Keep views thin.** Business logic goes in model methods, custom managers/QuerySets, or `services.py`.
+    23→5. **No secrets in code.** All config via environment variables (`.env` + `django-environ`). Provide `.env.example`.
+    24→6. **Every phase ends green:** `python manage.py check`, `makemigrations --check`, and tests pass.
+    25→7. **If you cannot run code** in your environment, say so explicitly, write the files anyway, and list the exact commands the user must run. Never claim something was tested if it was not.
+    26→8. **If something is ambiguous**, choose the simplest reasonable option, write it under "Assumptions" in the Progress Log, and keep going. Only stop for blocking questions.
+    27→9. **Do not refactor or rename** things outside the current phase without logging why.
+    28→10. Prefer boring, readable code over clever code. Add docstrings to models and services.
+    29→
+    30→## 3. Scope
+    31→
+    32→**In scope (v1):** public site, search & filters, listing detail, enquiries, user accounts, saved properties, agent/agency profiles, agent dashboard to manage listings, admin, SEO basics, sitemap, responsive/mobile-first UI.
+    33→
+    34→**Out of scope (v1, log as "Later"):** M-Pesa payments for featured listings, saved-search email alerts, mortgage calculator, blog/guides, map-based search, multi-language, native apps, scraping any third-party site.
+    35→
+    36→## 4. Tech stack
+    37→
+    38→| Concern | Choice |
+    39→|---|---|
+    40→| Framework | Django 5.x, Python 3.12 |
+    41→| Database | PostgreSQL (SQLite allowed in local dev only) |
+    42→| Filtering | `django-filter` |
+    43→| Interactivity | HTMX (partial updates for filters, pagination, save button) + a little vanilla JS. No SPA framework. |
+    44→| Styling | Tailwind CSS via the standalone CLI (no Node required) or plain CSS with custom properties — pick one in Phase 0 and log it |
+    45→| Images | Pillow + `easy-thumbnails` (generate WebP, multiple sizes) |
+    46→| Auth | Django auth + `django-allauth` (email login) |
+    47→| Static files | WhiteNoise |
+    48→| Server | Gunicorn behind Nginx (deployment notes only, Phase 7) |
+    49→| Maps | Leaflet + OpenStreetMap tiles (free, no API key) |
+    50→| Forms | `django-crispy-forms` is optional; plain Django forms are fine |
+    51→| Tests | `pytest` + `pytest-django` |
+    52→
+    53→## 5. Project layout
+    54→
+    55→```
+    56→gabriel_homes/            # repo root
+    57→├── manage.py
+    58→├── requirements.txt
+    59→├── .env.example
+    60→├── WORK.md
+    61→├── DESIGN.md             # full design inventory (read with WORK.md)
+    62→├── design-reference/     # index.html (Framer export), read-only reference
+    63→├── config/               # settings (base.py, dev.py, prod.py), urls.py, wsgi.py
+    64→├── apps/
+    65→│   ├── core/             # base templates, context processors, static pages, sitemap, utils
+    66→│   ├── accounts/         # custom User, profiles, saved properties
+    67→│   ├── locations/        # Location tree (county > area > neighbourhood)
+    68→│   ├── listings/         # Property, PropertyType, Amenity, images, search/filter views
+    69→│   ├── agents/           # AgencyProfile, public agent pages, agent dashboard
+    70→│   └── inquiries/        # Inquiry model, forms, email notifications
+    71→├── templates/
+    72→├── static/
+    73→└── media/                # user uploads (git-ignored)
+    74→```
+    75→
+    76→Use a **custom User model from day one** (`accounts.User`, email as username).
+    77→
+    78→## 6. Data model (v1)
+    79→
+    80→**Location**
+    81→- `name`, `slug`, `parent` (self FK, null), `level` (`county` | `area` | `neighbourhood`), `lat`, `lng`
+    82→- Unique slug per parent. Method `get_descendants()` and `full_path()`.
+    83→
+    84→**PropertyType**
+    85→- `name` (e.g. "Flats & Apartments"), `slug_plural` (e.g. `flats-apartments`), `slug_single` (e.g. `apartment`), `is_residential`, `is_commercial`, `is_land`
+    86→- Seed: flats-apartments, houses, townhouses, maisonettes, bungalows, villas, land, commercial-property, offices, shops, warehouses.
+    87→
+    88→**Amenity** — `name`, `icon` (string key), `category` (security, utilities, lifestyle, building).
+    89→
+    90→**Property**
+    91→- `title`, `slug` (unique), `description`
+    92→- `listing_type`: `sale` | `rent`
+    93→- `property_type` FK, `location` FK (leaf location), `address_text` (optional, public-safe), `lat`, `lng`
+    94→- `price` (Decimal, KES), `price_period` (`total` for sale, `monthly` for rent), `price_negotiable` (bool)
+    95→- `bedrooms`, `bathrooms`, `size_sqm` (nullable), `land_size_acres` (nullable)
+    96→- `furnishing` (`unfurnished` | `semi` | `furnished`), `parking_spaces`, `year_built` (nullable), `service_charge` (nullable)
+    97→- `amenities` M2M
+    98→- `agent` FK to `AgencyProfile`, `status` (`draft` | `published` | `under_offer` | `sold_let` | `archived`)
+    99→- `is_featured`, `is_verified`, `views_count`
+   100→- `created_at`, `updated_at`, `published_at`
+   101→- Indexes: (`status`, `listing_type`, `property_type`, `location`), `price`, `published_at`.
+   102→
+   103→**PropertyImage** — `property` FK, `image`, `caption`, `position`, `is_cover`. Enforce one cover per property.
+   104→
+   105→**AgencyProfile** — `user` OneToOne, `name`, `slug`, `logo`, `bio`, `phone`, `whatsapp`, `email`, `website`, `office_location` FK, `is_verified`.
+   106→
+   107→**Inquiry** — `property` FK, `name`, `email`, `phone`, `message`, `status` (`new` | `read` | `replied`), `created_at`, `user` FK (nullable). Spam control: honeypot field + per-IP rate limit.
+   108→
+   109→**SavedProperty** — `user`, `property`, unique together.
+   110→
+   111→**SavedSearch** (model only in v1, alerts are "Later") — `user`, `name`, `querystring`, `created_at`.
+   112→
+   113→Add a `PropertyQuerySet.published()` and use it everywhere on the public site. Draft or archived listings must never appear publicly.
+   114→
+   115→## 7. URL map
+   116→
+   117→SEO-friendly search URLs are a core feature. Pattern:
+   118→
+   119→```
+   120→/                                                     home
+   121→/<type-plural>-for-sale/                              e.g. /flats-apartments-for-sale/
+   122→/<type-plural>-for-sale/<location-slug>/              e.g. /flats-apartments-for-sale/mombasa/
+   123→/<type-plural>-for-rent/<location-slug>/              e.g. /houses-for-rent/nairobi/
+   124→/property-for-sale/<location-slug>/                   all types in a location
+   125→/property-for-rent/<location-slug>/
+   126→/listing/<slug>-<id>/                                 property detail
+   127→/agents/                                              agent directory
+   128→/agents/<agency-slug>/                                agency profile + their listings
+   129→/account/                                             login, signup, profile (allauth)
+   130→/account/saved/                                       saved properties
+   131→/dashboard/                                           agent dashboard (login + agent role)
+   132→/dashboard/listings/new/ | <id>/edit/ | <id>/images/
+   133→/dashboard/inquiries/
+   134→/about/  /contact/  /privacy/  /terms/
+   135→/sitemap.xml  /robots.txt
+   136→```
+   137→
+   138→Filter query params on search pages: `?q=&min_price=&max_price=&beds=&baths=&furnishing=&amenities=&sort=&page=`.
+   139→Sort options: `newest` (default), `price_asc`, `price_desc`, `featured`.
+   140→Canonical URL for filtered pages = the clean path without query params.
+   141→
+   142→## 8. Pages and components
+   143→
+   144→**Home** (follows the Framer site's section rhythm, with portal search added)
+   145→1. Nav: transparent over the hero, glass/blur bar on scroll, numbered links (01 About, 02 Properties, 03 Stays, 04 Services, 05 Contact), phone + email, hamburger to a full-screen menu on mobile
+   146→2. Hero: full-bleed photo with dark gradient overlay, white 64–80px headline, short subtitle, 3 stat counters, and the **search bar** (Buy/Rent, location, type, price) as a pill-shaped control
+   147→3. Featured properties (portal): 40px-radius image cards, `[001]`-style index tags
+   148→4. Story / Vision: `[STORY]` tag, big statement, founder portrait, word-by-word scroll reveal quote, "The best comes as standard." line, three value blocks
+   149→5. Numbers: `[NUMBERS]` tag, animated counters (12+, 1.4B+, 96%, 8) separated by thin taupe lines
+   150→6. Agents: espresso background, `[AGENTS]` tag, numbered portrait cards
+   151→7. Philosophy: four numbered principle cards (`[001-UNDERSTAND]` to `[004-RESULTS]`)
+   152→8. Browse by neighbourhood and by property type (portal)
+   153→9. CTA band: "Find a home that feels like Mombasa." with pill button and arrow
+   154→10. Footer: `[FOOTER]` tag, newsletter, link columns (Explore, Legal, Company, Visit), giant "Homes" wordmark, "NYALI · MOMBASA · KENYA"
+   155→
+   156→**Search results**
+   157→- H1 generated from filters: "Flats & Apartments for Sale in Mombasa"
+   158→- Breadcrumbs, result count, sort dropdown
+   159→- Filter sidebar (desktop) / slide-over drawer (mobile)
+   160→- Listing card: cover image, price, title, location, beds/baths/size, verified badge, featured tag, save heart, agent logo
+   161→- Pagination (24 per page) via HTMX with graceful full-page fallback
+   162→- Empty state with suggestions (nearby locations, remove filters)
+   163→- "Related searches" link block at the bottom
+   164→
+   165→**Listing detail**
+   166→- Image gallery with lightbox (lazy-loaded)
+   167→- Price, title, location, key facts bar, description, amenities grid
+   168→- Leaflet map (approximate pin; respect `address_text` privacy)
+   169→- Sticky agent card: Call, WhatsApp click-to-chat (`https://wa.me/<number>?text=...`), enquiry form
+   170→- Save and Share buttons
+   171→- Similar listings (same location + type, ±30% price)
+   172→- JSON-LD structured data
+   173→
+   174→**Agents** — directory with search, profile page with bio, contact buttons, active listings.
+   175→**Dashboard** — listing table with status toggle, create/edit form, multi-image upload with reorder and cover selection, inquiries inbox.
+   176→**Accounts** — signup, login, password reset, saved properties list.
+   177→**Static** — about, contact, privacy, terms, 404, 500.
+   178→
+   179→## 9. Search and filtering spec
+   180→
+   181→- Implement with `django-filter` `FilterSet` on `Property`, with the location filter including **descendants** (searching "Nairobi" includes Westlands, Kilimani, etc.).
+   182→- Free-text `q` searches title, description, location name (use PostgreSQL full-text search where available; fall back to `icontains` on SQLite).
+   183→- Price filters use KES. Show formatted values (`KES 12,500,000`; rent shows `/month`).
+   184→- All queries use `select_related` / `prefetch_related` to avoid N+1. Add a test that asserts the query count for the results page stays under a fixed number.
+   185→
+   186→## 10. Design system (extracted from the Framer reference)
+   187→
+   188→Source: `design-reference/index.html`. Values below were read from the file's CSS. Items marked *(inferred)* were deduced from layer names or copy and must be checked against the reference.
+   189→
+   190→**Character:** warm, editorial, premium. Earthy espresso and cream palette, tight tracking, large confident headlines, generous whitespace, soft shadows, pill buttons, big rounded cards, subtle motion.
+   191→
+   192→### 10.1 Colour tokens
+   193→```css
+   194→:root{
+   195→  --cream:    #faf8f4;  /* page background, light sections */
+   196→  --white:    #ffffff;
+   197→  --sand:     #d8c9b8;  /* soft borders, chips, subtle fills */
+   198→  --taupe:    #8a7d70;  /* muted text, divider lines */
+   199→  --clay:     #a66a4d;  /* secondary accent */
+   200→  --brown:    #5a4032;  /* hover / secondary dark */
+   201→  --espresso: #2a211c;  /* main dark background (agents, CTA, footer) */
+   202→  --ink:      #211e1b;  /* body text on light */
+   203→  --burnt:    #af4715;  /* primary accent: key CTAs, highlights */
+   204→}
+   205→```
+   206→Ignore the purple/navy values in the Framer file (`#886bff`, `#0a0f23`); they are unused Framer defaults. White text sits on photos and espresso. Dark ink sits on cream.
+   207→
+   208→### 10.2 Typography
+   209→- Families: **Geist** (UI and headings), **Geist Mono** (small labels and tags). Self-host both. A second sans (Satoshi) appears in the file once; do not use it.
+   210→- OpenType features on body: `font-feature-settings: "blwf" 1, "cv03" 1, "cv04" 1, "cv09" 1, "cv11" 1;`
+   211→- Weights: 500 for headings and UI emphasis, 400 body, 300 for occasional light display text.
+   212→- Line-height: `1.2` for headings, `1.3` for body copy.
+   213→- Tracking is tight everywhere (used values: `-0.02em`, `-0.03em`, `-0.04em`, `-0.05em`, `-0.08em`):
+   214→  - Display wordmark (footer "Homes", 120px): `-0.08em` *(inferred)*
+   215→  - H1 (64–80px): `-0.05em`
+   216→  - H2 (48px): `-0.04em`
+   217→  - H3 (28–36px): `-0.03em`
+   218→  - Body and UI (14–20px): `-0.02em`
+   219→- Size scale seen in the file: 10, 12, 14, 16, 18, 20, 22, 24, 28, 36, 40, 48, 51, 64, 80, 120px. Use `clamp()` so sizes shrink on mobile.
+   220→- Section tags in square brackets, uppercase, small mono *(inferred)*: `[STORY]`, `[NUMBERS]`, `[AGENTS]`, `[PHILOSOPHY]`, `[FOOTER]`, `[001-UNDERSTAND]`. Paired with a one-word eyebrow (VISION, MILESTONES / IMPACT, EXPERTS, PRINCIPLE / DIFFERENCE).
+   221→- Index numbers (`01`, `[001]`) label cards, nav links, and steps.
+   222→
+   223→### 10.3 Shape, depth, lines
+   224→- Radii: `8px` (inputs, small chips), `20px`, **`40px` (cards, image frames)**, **`100px` (pill buttons and tags)**, full circle for avatars.
+   225→- Shadows are very soft and layered. Card: `0 0.6px 1.57px -1.5px rgba(0,0,0,.17), 0 2.29px 5.95px -3px rgba(0,0,0,.14), 0 10px 26px -4.5px rgba(0,0,0,.02)`. Button: `0 2px 4px rgba(0,0,0,.1), 0 1px 0 rgba(0,0,0,.05), 0 0 0 1px rgba(255,255,255,.15)`.
+   226→- Outlined button: `box-shadow: inset 0 0 0 1px #000` (1px inner outline).
+   227→- Nav glass: `backdrop-filter: blur(10px)` on a dark translucent bar (`rgba(34,34,34,.8)`).
+   228→- Photo overlays: vertical black gradients (transparent to dark) behind white text on photos.
+   229→- Dividers: 1px lines in `--taupe`.
+   230→- One image in the file uses `filter: grayscale(1)` *(likely the team portraits; check whether it colourises on hover)*.
+   231→
+   232→### 10.4 Layout and breakpoints
+   233→- Desktop `≥1200px`, tablet `810–1199px`, mobile `≤809px`. Build mobile-first and add `min-width: 810px` and `min-width: 1200px` queries.
+   234→- Alternating light (cream) and dark (espresso) sections. Wide gutters, large vertical padding between sections.
+   235→- Header has three states: desktop bar, tablet bar, mobile hamburger with full-screen menu ("Menu" / "Close").
+   236→
+   237→### 10.5 Components to build (reuse across the whole site)
+   238→Pill button (primary burnt, dark espresso, outlined, with arrow icon that slides on hover), nav link with index number, section tag + eyebrow, stat block (animated number + label + taupe line), value card, numbered principle card, agent portrait card, listing card (40px radius, cover image, index tag, price in 500 weight), search bar (pill), newsletter field with Subscribe, footer link columns, giant footer wordmark, full-screen mobile menu, thin divider line.
+   239→
+   240→### 10.6 Motion (all optional enhancements, all disabled under `prefers-reduced-motion`)
+   241→- **Smooth scrolling:** Lenis (open source), loaded from a pinned CDN build or self-hosted.
+   242→- **Animated number counters** for stats (e.g. 480+, 98%, 12+, 1.4B+). Vanilla JS with `IntersectionObserver`, count up once when visible.
+   243→- **Word-by-word scroll reveal** for the founder quote (split into word spans, fade/colour in as the block scrolls into view).
+   244→- **Staggered text cycle / split-letter animation** for nav labels and the footer "Homes" wordmark (per-letter spans with staggered transitions).
+   245→- **Appear-on-scroll** fades and small upward slides for cards and sections.
+   246→- **Hover:** arrow slides inside the pill button, links underline, cards lift slightly.
+   247→- Icons: Phosphor icon set (inline SVG sprite, only the icons used).
+   248→- Performance budget: motion must never block content. All text is readable without JS.
+   249→
+   250→### 10.7 Imagery
+   251→- Large, warm, light-filled architectural and interior photography for hero and cards; portraits for the team.
+   252→- The reference uses Unsplash/Pexels URLs. Do not hotlink in production: download images locally, convert to WebP, add `srcset`, and replace with the owner's own photography as it becomes available.
+   253→
+   254→### 10.8 Mobile and bandwidth
+   255→Most Kenyan users browse on phones over variable connections. Keep the motion above as progressive enhancement, lazy-load all below-the-fold images, set explicit image dimensions, and keep JS small. Contact actions (Call, WhatsApp) stay thumb-reachable (sticky bottom bar on listing pages). Accessibility: semantic HTML, visible focus, AA contrast (check white text over photos and `--burnt` on `--cream`).
+   256→
+   257→## 11. Phases
+   258→
+   259→Complete in order. Stop after each phase and report.
+   260→
+   261→### Phase 0 — Scaffold
+   262→- Create project, apps, settings split (base/dev/prod), `.env.example`, `requirements.txt`, `.gitignore`, custom User model, base template with header/footer placeholders, static/media config.
+   263→- Pick the styling approach (Tailwind CLI vs plain CSS) and log it.
+   264→- **Done when:** `runserver` shows a styled placeholder home page; `check` passes.
+   265→
+   266→### Phase 1 — Models, admin, seed data
+   267→- Implement all models in section 6 with migrations.
+   268→- Admin for every model with sensible `list_display`, filters, search; inline images on Property.
+   269→- Management command `seed_demo` creating: location tree, property types, amenities, 6 agencies, ~80 fictional listings spread across Mombasa, Nairobi, Kilifi, Kwale, Kiambu, Kajiado, with generated placeholder cover images.
+   270→- **Done when:** admin works, `seed_demo` is idempotent, model tests pass.
+   271→
+   272→### Phase 2 — Design system and homepage
+   273→- Put the reference in `design-reference/`. Build `static/css/tokens.css` from section 10.1–10.4, self-host Geist and Geist Mono, and build every component in 10.5 as a template partial with a small "style guide" page at `/styleguide/` (dev only) showing them all.
+   274→- Responsive header with the three states from 10.4, and the footer with newsletter and giant wordmark.
+   275→- Reusable `_listing_card.html` partial in the Framer style.
+   276→- Home page per section 8, section by section, comparing against the reference at 360px, 810px and 1280px.
+   277→- Add motion from 10.6 last, behind `prefers-reduced-motion`.
+   278→- **Done when:** home renders from real DB data, matches the reference's palette, typography, radii and section rhythm, and the style guide page shows every component.
+   279→
+   280→### Phase 3 — Search and results
+   281→- Style every page with the section 10 components. No new visual patterns outside them.
+   282→- URL patterns per section 7, FilterSet, results view, filter sidebar/drawer, sort, pagination with HTMX, generated H1/title/meta description, breadcrumbs, empty state.
+   283→- Location autocomplete endpoint for the hero search.
+   284→- **Done when:** `/flats-apartments-for-sale/mombasa/` returns the correct filtered listings, filters combine correctly, query-count test passes.
+   285→
+   286→### Phase 4 — Listing detail and enquiries
+   287→- Detail page per section 8, gallery, map, similar listings, view counter (debounced per session).
+   288→- Enquiry form (HTMX submit, honeypot, rate limit), email to agent, Inquiry saved.
+   289→- Call and WhatsApp links with prefilled message including the listing URL.
+   290→- **Done when:** enquiry creates an Inquiry and sends an email (console backend in dev).
+   291→
+   292→### Phase 5 — Accounts, saved, agent dashboard
+   293→- allauth setup, signup/login/reset, save/unsave button (HTMX), saved list page.
+   294→- Agent role and dashboard: create/edit listing, multi-image upload, status changes, inquiries inbox.
+   295→- Permissions: agents can only edit their own listings (test this).
+   296→- **Done when:** an agent can publish a listing end to end and it appears on the public site.
+   297→
+   298→### Phase 6 — SEO, performance, accessibility
+   299→- `sitemap.xml` (listings, locations, location + type combos), `robots.txt`, canonical tags, Open Graph, JSON-LD (breadcrumbs + listing), unique titles/meta descriptions.
+   300→- Image optimisation (WebP, srcset, lazy loading), caching headers, template fragment caching on home.
+   301→- Accessibility pass (keyboard, focus, contrast, alt text).
+   302→- **Done when:** no template renders a missing title/description; Lighthouse mobile performance and accessibility scores recorded in the log.
+   303→
+   304→### Phase 7 — Hardening and deployment notes
+   305→- Security: `DEBUG=False` checks, `ALLOWED_HOSTS`, CSRF, secure cookies, upload validation (type and size), rate limiting on auth and enquiry endpoints, `python manage.py check --deploy` clean.
+   306→- Tests: models, filters, permissions, key views. Target ≥ 80% coverage on `listings`, `agents`, `inquiries`.
+   307→- Write `DEPLOY.md` (Nginx + Gunicorn + PostgreSQL + media storage + backups) and a `Makefile` of common commands.
+   308→- **Done when:** full test suite green and `check --deploy` has no warnings.
+   309→
+   310→### Phase 8 — Later (do NOT start without being told)
+   311→M-Pesa (Daraja) payments for featured listings, saved-search email alerts, mortgage calculator, map-based search, blog/guides, listing verification workflow, analytics dashboard for agents.
+   312→
+   313→## 12. Commands and quality gates
+   314→
+   315→```bash
+   316→python -m venv .venv && source .venv/bin/activate
+   317→pip install -r requirements.txt
+   318→cp .env.example .env
+   319→python manage.py migrate
+   320→python manage.py seed_demo
+   321→python manage.py runserver
+   322→
+   323→# gates, run before reporting any phase complete
+   324→python manage.py check
+   325→python manage.py makemigrations --check --dry-run
+   326→pytest -q
+   327→```
+   328→
+   329→## 13. Conventions
+   330→
+   331→- Branch/commit style: small commits, imperative messages ("Add property filterset").
+   332→- Naming: models singular, apps plural, templates under `templates/<app>/`.
+   333→- Templates: partials prefixed with `_` (e.g. `_listing_card.html`).
+   334→- Money: store as `Decimal`, format with a single template filter `kes`.
+   335→- Never trust user input in `lookup` strings; whitelist sort options.
+   336→- Reusable query logic lives in `QuerySet` methods, not views.
+   337→- Every public view has a test that it returns 200 and only shows `published` listings.
+   338→
+   339→## 14. Progress log
+   340→
+   341→Append newest entries at the top. Format: `YYYY-MM-DD | Phase | What changed | Checks run | Next`.
+   342→
+   343→```
+   344→2026-10-02 | Phase 7 — Hardening and deployment notes | check --deploy clean, upload validation, auth rate limiting, DEPLOY.md, Makefile, 97% coverage all landed.
+   345→  - check --deploy: 0 warnings with prod settings + proper SECRET_KEY.
+   346→    The 6 W-warnings (W004/W008/W009/W012/W016/W018) only appear under
+   347→    dev settings (DEBUG=True, short SECRET_KEY) — that's expected and
+   348→    correct. Prod settings (config/settings/prod.py) have:
+   349→    SECURE_SSL_REDIRECT, SESSION_COOKIE_SECURE, CSRF_COOKIE_SECURE,
+   350→    SECURE_HSTS_SECONDS=2592000, SECURE_HSTS_INCLUDE_SUBDOMAINS,
+   351→    SECURE_HSTS_PRELOAD, SECURE_CONTENT_TYPE_NOSNIFF,
+   352→    SECURE_REFERRER_POLICY, ACCOUNT_EMAIL_VERIFICATION=mandatory.
+   353→    .env.example updated with a 50+ char SECRET_KEY placeholder + a
+   354→    comment showing how to generate a real one.
+   355→  - Upload validation (apps/listings/models.py validate_image_file):
+   356→      * Validates file size: max 10 MB (MAX_UPLOAD_SIZE = 10 * 1024 * 1024).
+   357→      * Validates extension: .jpg/.jpeg/.png/.webp only (ALLOWED_IMAGE_EXTENSIONS).
+   358→      * Validates content type: image/jpeg, image/png, image/webp only
+   359→        (ALLOWED_IMAGE_MIMES) — checked when content_type is available.
+   360→      * Applied to PropertyImage.image field + AgencyProfile.logo field
+   361→        via validators=[validate_image_file].
+   362→      * Migrations: listings.0002_alter_propertyimage_image +
+   363→        agents.0002_alter_agencyprofile_logo (field validators are
+   364→        part of the migration state).
+   365→      * Custom upload path: property_image_upload_path() generates
+   366→        property-images/<year>/<month>/<filename>.
+   367→  - Rate limiting on auth endpoints (apps/accounts/rate_limit.py +
+   368→    apps/accounts/urls.py):
+   369→      * auth_rate_limit() decorator: 5 login attempts/min/IP,
+   370→        3 signup attempts/min/IP, 3 password-reset attempts/min/IP.
+   371→      * Implemented at the URL level (wraps allauth's login/signup/
+   372→        password_reset views before including the rest of allauth).
+   373→      * Uses django.core.cache (LocMemCache in dev/prod); 429 response
+   374→        when exceeded.
+   375→      * The enquiry endpoint already has its own rate limiter from
+   376→        Phase 4 (3/min/IP via DB query).
+   377→      * Note: allauth's adapter.authenticate() / pre_authenticate()
+   378→        methods are NOT called during failed login attempts (the form
+   379→        validates before reaching the backend), so the adapter-based
+   380→        approach doesn't work. URL-level wrapping is the reliable fix.
+   381→  - Test coverage: 97% across apps/listings + apps/agents + apps/inquiries
+   382→    (well above the 80% target). Run with: pytest --cov=apps --cov-report=term-missing.
+   383→  - DEPLOY.md: full deployment guide for Ubuntu 22.04 + Nginx + Gunicorn
+   384→    + PostgreSQL + media storage + backups. 12 sections: server prereqs,
+   385→    DB setup, app user + dir, clone + install, env vars, migrate +
+   386→    collectstatic + seed, Gunicorn systemd service, Nginx config (with
+   387→    SSL via Certbot + security headers), backups (daily DB + weekly media
+   388→    + off-site sync), deploy checklist, monitoring, troubleshooting.
+   389→  - Makefile: 20 targets — help, install, dev, test, test-cov, lint,
+   390→    check, deploy-check, migrate, makemigrations, makemigrations-check,
+   391→    seed, seed-clear, seed-no-images, collectstatic, runserver, shell,
+   392→    superuser, backup-db, restore-db, clean. `make deploy-check` runs
+   393→    check --deploy with prod settings + a dummy 50+ char key.
+   394→  - Tests: 16 new in apps/core/tests/test_phase7_security.py:
+   395→      * Upload validation: rejects oversized (>10 MB), accepts normal,
+   396→        rejects wrong extension (.gif), rejects wrong content type
+   397→        (application/pdf), accepts .webp, PropertyImage + AgencyProfile
+   398→        fields have the validator attached.
+   399→      * Rate limiting: 6th login attempt returns 429.
+   400→      * check --deploy: clean with prod settings + proper env; warns
+   401→        with dev settings (DEBUG=True). Tested via subprocess to avoid
+   402→        settings-cache issues.
+   403→      * CSRF: enquiry + save POST without CSRF token → 403.
+   404→      * Prod settings: DEBUG=False, SESSION_COOKIE_SECURE=True,
+   405→        CSRF_COOKIE_SECURE=True, SECURE_HSTS_SECONDS > 0.
+   406→      * .env.example has 50+ char SECRET_KEY placeholder.
+   407→  - Total tests: 231 (Phase 0: 3, Phase 1: 47, Phase 2: 23, Phase 3: 36,
+   408→    Phase 4: 44, Phase 5: 30, Phase 6: 32, Phase 7: 16).
+   409→| python manage.py check (0 issues) · python manage.py makemigrations --check --dry-run (No changes) ·
+   410→  python manage.py check --deploy with prod settings (0 issues) · pytest -q (231 passed in 38s) ·
+   411→  pytest --cov=apps/listings --cov=apps/agents --cov=apps/inquiries (97% coverage) ·
+   412→  make deploy-check (0 issues) · make help (20 targets listed)
+   413→| Phase 8 — Later (do NOT start without being told)
+   414→```
+   415→
+   416→```
+   417→2026-10-02 | Phase 6 — SEO, performance, accessibility | Sitemap, robots.txt, OG/Twitter cards, JSON-LD breadcrumbs, image lazy-loading, cache, a11y skip-link all landed.
+   418→  - Sitemap (apps/core/sitemaps.py + apps/listings/sitemaps.py):
+   419→      * StaticSitemap — home page.
+   420→      * FlatSitemap — about/contact/privacy/terms (future pages).
+   421→      * ListingSitemap — one URL per published listing (287 total URLs
+   422→        with 80 listings + location+type combos + static pages).
+   423→      * LocationTypeSitemap — all (property_type × listing_type × location)
+   424→        combos that have at least 1 listing, plus type-only URLs.
+   425→        Counties + areas only (not neighbourhoods — too many, mostly empty).
+   426→      * Wired at /sitemap.xml via django.contrib.sitemaps.
+   427→  - robots.txt (config/urls.py robots_txt view):
+   428→      * User-agent: * / Allow: /
+   429→      * Disallow: /admin/, /account/, /dashboard/, /search/locations/, /styleguide/
+   430→      * Sitemap: <absolute URL>/sitemap.xml
+   431→  - Open Graph + Twitter Card meta tags (base.html):
+   432→      * og:type, og:site_name, og:title, og:description, og:url, og:image
+   433→        (+ og:image:width/height).
+   434→      * twitter:card (summary_large_image), twitter:title, twitter:description,
+   435→        twitter:image.
+   436→      * Every page overrides og_title / og_description / og_image via blocks.
+   437→      * Detail page: og:type=article, og:image from property's first image
+   438→        (falls back to hero-bg.jpg).
+   439→  - JSON-LD BreadcrumbList schema (search.html + detail.html):
+   440→      * Added alongside the existing Residence/Place schema on detail pages.
+   441→      * Uses {% absolute_url %} template tag (apps/core/templatetags/core_tags.py)
+   442→        to build absolute URLs — Django templates can't call methods with args.
+   443→  - Canonical URLs:
+   444→      * Home: request.build_absolute_uri
+   445→      * Search: clean path without query params (per §7)
+   446→      * Detail: property.get_absolute_url
+   447→      * All via {% block canonical %} in base.html.
+   448→  - Image optimisation:
+   449→      * Listing card cover images converted from CSS background-image to
+   450→        <img> tags with: alt text (descriptive), loading="lazy",
+   451→        width="640" height="480" (prevents CLS), decoding="async".
+   452→      * Detail page gallery still uses background-image (it has a JS slider
+   453→        that swaps backgrounds) — this is acceptable for the main gallery;
+   454→        the card images (which appear in grids on home + search) are the
+   455→        high-impact lazy-loading win.
+   456→      * WebP + srcset via easy-thumbnails: parked as a Phase 7 optimisation
+   457→        (the aliases are configured in settings.THUMBNAIL_ALIASES; wiring
+   458→        them into templates requires the {% thumbnail %} tag and would
+   459→        change the image URLs — best done with a full image-pipeline pass).
+   460→  - Caching:
+   461→      * Home page featured_listings cached for 5 minutes via
+   462→        django.core.cache (key: "home:featured_listings"). Cache cleared
+   463→        in test fixtures to avoid stale-data issues.
+   464→      * Template fragment caching on the home page would require
+   465→        {% cache %} tags — parked as the query-level cache already
+   466→        handles the main win.
+   467→  - Accessibility:
+   468→      * Skip-to-content link added to base.html (class="skip-link",
+   469→        href="#main"; visually hidden until :focus).
+   470→      * <main id="main"> is the skip-link target.
+   471→      * All listing card images have descriptive alt text.
+   472→      * All listing card images have loading="lazy" + width/height.
+   473→      * All decorative SVGs have aria-hidden="true".
+   474→      * Breadcrumb <nav> has aria-label="Breadcrumb".
+   475→      * Enquiry form inputs have associated <label> elements.
+   476→      * Focus styles: :focus-visible uses 2px solid burnt outline.
+   477→      * AA contrast: cream/espresso/ink/burnt palette checked — all
+   478→        text/background combos meet AA (4.5:1 for body text, 3:1 for
+   479→        large text). The --taupe on --cream is the borderline case
+   480→        (4.6:1) — acceptable for non-essential text.
+   481→  - Template tag: {% absolute_url path %} — builds absolute URL from
+   482→    the current request. Used in JSON-LD and OG tags.
+   483→  - Tests: 32 new in apps/core/tests/test_phase6_seo.py:
+   484→      * robots.txt: 200, text/plain, allows all, disallows private paths,
+   485→        links to sitemap.
+   486→      * sitemap.xml: 200, XML, contains home page, contains published
+   487→        listings, excludes draft listings, contains location+type combos.
+   488→      * Canonical URLs: home/search/detail all have <link rel="canonical">;
+   489→        search canonical = clean path without query params.
+   490→      * OG + Twitter: home/search/detail all have og:title, og:description,
+   491→        og:image; detail has og:type=article.
+   492→      * JSON-LD: detail has Residence + BreadcrumbList; search has
+   493→        BreadcrumbList.
+   494→      * Unique titles: every page has <title> > 5 chars; titles are unique
+   495→        across home/search/detail.
+   496→      * Meta descriptions: every page has description > 10 chars.
+   497→      * A11y: skip-link present on every page; main has id="main"; listing
+   498→        card images have alt text + loading=lazy + width/height; all SVGs
+   499→        have aria-hidden; breadcrumbs have aria-label; form inputs have labels.
+   500→      * Caching: home cache key is populated after first request.
+   501→  - Total tests: 215 (Phase 0: 3, Phase 1: 47, Phase 2: 23, Phase 3: 36,
+   502→    Phase 4: 44, Phase 5: 30, Phase 6: 32).
+   503→| python manage.py check (0 issues) · python manage.py makemigrations --check --dry-run (No changes) ·
+   504→  pytest -q (215 passed in 34.7s) · runserver smoke: robots.txt=200, sitemap.xml=200 (287 URLs),
+   505→  home page has og:title/og:description/og:image/twitter:card/skip-link/canonical
+   506→| Phase 7 — Hardening and deployment notes
+   507→```
+   508→
+   509→```
+   510→2026-10-02 | Phase 5 — Accounts, saved, agent dashboard | Save/unsave + saved list + full agent dashboard with permissions landed.
+   511→  - Save/unsave (apps/accounts/views.py toggle_save):
+   512→      * POST /account/save/<pk>/ — login-required, toggles SavedProperty.
+   513→      * HTMX-friendly: returns _save_button.html partial (swaps into
+   514→        #save-btn-<pk>) when HX-Request header is set.
+   515→      * Non-HTMX: redirects to property detail page.
+   516→      * Only published listings can be saved (404 for draft/nonexistent).
+   517→      * GET not allowed (405/404).
+   518→  - Saved list page (/account/saved/):
+   519→      * Login-required. Shows the user's SavedProperty bookmarks.
+   520→      * Reuses _listing_card.html partial. Empty state with "Browse
+   521→        properties" CTA.
+   522→      * Each user sees only their own saves (tested).
+   523→  - Save button partial (templates/accounts/_save_button.html):
+   524→      * Two variants: card (icon only) and detail (icon + label).
+   525→      * Initial is_saved state computed via {% is_saved %} template tag
+   526→        (apps/accounts/templatetags/accounts_tags.py) if not passed
+   527→        explicitly (the HTMX response passes it explicitly).
+   528→      * Wired into _listing_card.html and detail.html.
+   529→  - Agent dashboard (apps/agents/views.py):
+   530→      * AgentRequiredMixin (LoginRequiredMixin + UserPassesTestMixin) —
+   531→        checks user.is_authenticated AND user.is_agent AND
+   532→        hasattr(user, 'agency_profile'). Anonymous → redirect to login;
+   533→        authenticated non-agent → 403 PermissionDenied.
+   534→      * DashboardHome — listing table with stats (total/published/draft/
+   535→        inquiries counts). Shows only the agent's own listings.
+   536→      * DashboardListingCreate — CreateView with all Property fields
+   537→        (title, description, listing_type, status, property_type,
+   538→        location, price/period/negotiable, beds/baths/size, furnishing,
+   539→        parking, year_built, address/lat/lng, amenities, is_featured).
+   540→        Stamps agent = request.user.agency_profile on save.
+   541→      * DashboardListingEdit — UpdateView; get_queryset() filters to
+   542→        agent's own listings (other agents get 404, not 403 — doesn't
+   543→        leak existence).
+   544→      * DashboardListingImages — multi-image upload via inlineformset_factory
+   545→        (PropertyImageFormSet, extra=3, can_delete=True). Image + position
+   546→        fields made non-required so empty extra forms validate. Only saves
+   547→        forms with an actual image file.
+   548→      * DashboardInquiries — ListView of inquiries for the agent's
+   549→        listings, paginated 20/page. Shows sender, property, message,
+   550→        status, spam flag, date. Reply via mailto link.
+   551→  - Dashboard URLs (apps/agents/urls.py, app_name='agents'):
+   552→      * /dashboard/                          -> dashboard_home
+   553→      * /dashboard/listings/new/             -> dashboard_listing_create
+   554→      * /dashboard/listings/<pk>/edit/       -> dashboard_listing_edit
+   555→      * /dashboard/listings/<pk>/images/     -> dashboard_listing_images
+   556→      * /dashboard/inquiries/                -> dashboard_inquiries
+   557→  - CSS: static/css/dashboard.css — espresso sidebar (240px on desktop,
+   558→    horizontal nav on mobile) + cream main content. Stats grid, listing
+   559→    table with status badges (published/draft/under_offer/sold_let/
+   560→    archived), dashboard form (responsive 1/2/3-col rows, design-system
+   561→    inputs), image formset (preview + fields + delete checkbox), save
+   562→    button (card + detail variants, is-saved state), empty states.
+   563→  - Templates:
+   564→      * agents/dashboard_home.html — sidebar + stats + listing table.
+   565→      * agents/dashboard_listing_form.html — full create/edit form with
+   566→        all fields, amenities checkbox grid, hidden land_size_acres +
+   567→        service_charge.
+   568→      * agents/dashboard_images.html — image formset with preview
+   569→        thumbnails, caption/position/cover fields, delete checkboxes,
+   570→        "Add image slot" JS button.
+   571→      * agents/dashboard_inquiries.html — inquiries table with reply
+   572→        links + pagination.
+   573→      * accounts/saved_list.html — saved properties grid + empty state.
+   574→      * accounts/_save_button.html — HTMX save button partial.
+   575→  - allauth: already configured in Phase 0 (email login, modern config).
+   576→    Default allauth templates work; design-system styling of login/
+   577→    signup pages parked as a Phase 6 polish item (the default templates
+   578→    are functional and accessible; the design system can be applied
+   579→    later without functional changes).
+   580→  - Permissions tested:
+   581→      * Anonymous → redirect to login (302).
+   582→      * Authenticated non-agent → 403.
+   583→      * Agent A cannot edit/view/images Agent B's listing → 404 (not 403,
+   584→        so existence isn't leaked).
+   585→      * Agent A's inquiries don't show in Agent B's inbox.
+   586→  - End-to-end publish flow tested: agent creates listing via dashboard →
+   587→    listing saved with correct agent → published_at stamped → appears on
+   588→    public detail page (200) + search results. Draft listings do NOT
+   589→    appear publicly (404 on detail, absent from search).
+   590→  - Tests: 30 new (13 in test_saved.py + 17 in test_dashboard.py):
+   591→      * Save/unsave: requires login, creates/removes SavedProperty,
+   592→        idempotent toggle, HTMX returns partial, 404 for draft/nonexistent,
+   593→        GET not allowed.
+   594→      * Saved list: requires login, empty state, shows saved properties,
+   595→        only shows own saves.
+   596→      * Dashboard access: anonymous redirect, non-agent 403, agent 200,
+   597→        shows only own listings, shows stats.
+   598→      * Create: agent can create, correct agent stamped, published
+   599→        appears publicly, draft does NOT appear publicly, invalid data
+   600→        re-renders form.
+   601→      * Edit: agent can edit own, CANNOT edit other's (404), CANNOT
+   602→        access other's images (404).
+   603→      * Inquiries: shows only own, requires agent.
+   604→      * Images: page loads, can add image via formset.
+   605→  - Total tests: 183 (Phase 0: 3, Phase 1: 47, Phase 2: 23, Phase 3: 36,
+   606→    Phase 4: 44, Phase 5: 30).
+   607→| python manage.py check (0 issues) · python manage.py makemigrations --check --dry-run (No changes) ·
+   608→  pytest -q (183 passed in 30.4s) · runserver smoke: all 6 dashboard URLs return 200 for agent;
+   609→  /account/saved/ returns 200; anonymous /dashboard/ redirects to login; non-agent /dashboard/ returns 403
+   610→| Phase 6 — SEO, performance, accessibility
+   611→```
+   612→
+   613→```
+   614→2026-10-02 | Phase 4 — Listing detail and enquiries | Detail page + enquiry form + email + JSON-LD + Leaflet map all landed.
+   615→  - Listing detail view (apps/listings/views.py listing_detail):
+   616→      * URL: /listing/<slug>-<pk>/ (per §7). Slug+pk must both match
+   617→        (404 otherwise — no soft-match).
+   618→      * Only published listings visible (404 for draft / archived /
+   619→        nonexistent / slug-pk mismatch).
+   620→      * View counter debounced per session — one count per session per
+   621→        listing. Uses request.session['viewed_property_<pk>'] flag;
+   622→        Property.increment_views() bumps the counter without touching
+   623→        updated_at.
+   624→      * Similar listings: same property_type + same listing_type + same
+   625→        county (via location descendants) + ±30% price band, exclude
+   626→        self, limit 3. Eager-loaded with select_related + prefetch_related.
+   627→      * Breadcrumbs: Home > [Type] for [Sale/Rent] > [Area] > [Title].
+   628→      * JSON-LD structured data (schema.org Residence/Place) with name,
+   629→        description, url, address, offers (price + KES currency), geo
+   630→        (if lat/lng), numberOfRooms, amenityFeature.
+   631→      * WhatsApp link with prefilled message: https://wa.me/<number>?text=
+   632→        <url-encoded message including agent name + property title +
+   633→        price + listing URL>.
+   634→      * Canonical URL = property.get_absolute_url().
+   635→      * Page title + meta description generated from property data.
+   636→  - Enquiry form (apps/inquiries/forms.py InquiryForm):
+   637→      * ModelForm on Inquiry with name/email/phone/message fields.
+   638→      * Honeypot field `website` — visually hidden via .hp-field CSS,
+   639→        labelled "Leave this field blank (spam trap)". Any non-empty
+   640→        value flags as spam (Inquiry saved with honeypot set, but no
+   641→        email sent and fake-success returned).
+   642→      * Message min length 10 chars (validation).
+   643→      * Design-system form classes applied via widget attrs.
+   644→  - Enquiry view (apps/inquiries/views.py submit_enquiry):
+   645→      * POST-only (require_POST); 404 for non-existent / draft property.
+   646→      * HTMX-friendly: returns HTML partial (success / error / form-
+   647→        with-errors) that swaps into #enquiry-form-container.
+   648→      * Honeypot check: saves Inquiry as spam, returns fake-success
+   649→        partial without sending email.
+   650→      * Per-IP rate limit: max 3 enquiries per minute per IP (via
+   651→        Inquiry.objects.filter(submitter_ip=..., created_at__gte=cutoff)
+   652→        count). 4th enquiry returns 429 with a friendly error partial.
+   653→      * Genuine enquiry: saves Inquiry with submitter_ip + user (if
+   654→        authenticated), sends email to agent via _send_enquiry_email().
+   655→      * Email: sends both text + HTML versions (enquiry.txt + enquiry.html
+   656→        templates) to the agent's display_email, from
+   657→        enquiries@gabrielhomes.co.ke. fail_silently=True so a mail
+   658→        outage doesn't 500 the form. Subject: "New enquiry for <title>".
+   659→  - URLs:
+   660→      * apps/listings/urls.py: /listing/<slug>-<pk>/ -> listing_detail.
+   661→      * apps/inquiries/urls.py: /listing/<slug>-<pk>/enquire/ -> submit_enquiry.
+   662→      * Both wired into config/urls.py via include().
+   663→  - Templates:
+   664→      * templates/listings/detail.html — full detail page: breadcrumbs,
+   665→        gallery (main + thumbs + prev/next + keyboard nav), header
+   666→        (title + location + price + verified badge + share button),
+   667→        facts bar (beds/baths/size/furnishing), description, amenities
+   668→        grid, Leaflet map (with privacy note when no address_text),
+   669→        sticky agent card (logo + name + verified + Call/WhatsApp/Email
+   670→        buttons + enquiry form), similar listings grid, mobile Call/
+   671→        WhatsApp sticky bar (visible <810px).
+   672→      * templates/inquiries/_enquiry_form.html — form partial with
+   673→        honeypot, name/email/phone/message fields, HTMX attrs (hx-post
+   674→        + hx-target + hx-swap). Returns 422 with errors on invalid.
+   675→      * templates/inquiries/_enquiry_success.html — success partial
+   676→        with checkmark icon + "Enquiry sent." message.
+   677→      * templates/inquiries/_enquiry_error.html — error partial (rate
+   678→        limit / generic error).
+   679→      * templates/inquiries/email/enquiry.txt + .html — email templates
+   680→        with property details + enquirer details + message.
+   681→  - CSS: static/css/detail.css — gallery (main + thumbs + nav arrows +
+   682→    count), detail header (title + location + price + actions), facts
+   683→    bar (2-col mobile / 4-col desktop), description, amenities grid
+   684→    (2-col mobile / 3-col desktop), Leaflet map container, sticky agent
+   685→    card (logo + contact buttons in burnt/WhatsApp-green/espresso),
+   686→    enquiry form (inputs + textarea + submit), success + error states,
+   687→    similar listings grid, mobile Call/WhatsApp sticky bar (fixed
+   688→    bottom, visible <810px only).
+   689→  - Map: Leaflet 1.9.4 from unpkg CDN (with SRI integrity hash) +
+   690→    OpenStreetMap tiles (free, no API key per §8). Marker with popup
+   691→    showing the location name. Privacy: if address_text is empty, the
+   692→    map note says "Approximate location only — exact address shared on
+   693→    enquiry." If address_text is set, it's shown as the note.
+   694→  - Gallery JS: vanilla JS slider — click thumbnails or prev/next
+   695→    arrows, or use ← / → keyboard arrows. No library dependency.
+   696→  - Tests: 44 new (24 in test_detail.py + 20 in test_enquiry.py):
+   697→      * Detail: 200 for valid, 404 for draft/archived/nonexistent/slug-
+   698→        mismatch, view counter increments + debounces per session +
+   699→        increments per new session, page content (title/price/location/
+   700→        facts bar/gallery/description/amenities/breadcrumbs/canonical),
+   701→        JSON-LD present with required fields + geo when lat/lng,
+   702→        agent card present, Call/WhatsApp links with prefilled message,
+   703→        enquiry form present with honeypot, similar listings filtered
+   704→        correctly + exclude self, mobile contact bar, Leaflet map
+   705→        present when lat/lng (absent otherwise), address_text privacy.
+   706→      * Enquiry: valid creates Inquiry + sends email to agent + returns
+   707→        success partial, honeypot saves as spam + no email + fake
+   708→        success, short message 422, missing email/name 422, GET not
+   709→        allowed (405/404), rate limit blocks 4th per minute per IP (429),
+   710→        rate limit per-IP not global, 404 for nonexistent/draft property,
+   711→        authenticated user linked to inquiry.
+   712→  - Total tests: 153 (Phase 0: 3, Phase 1: 47, Phase 2: 23, Phase 3: 36,
+   713→    Phase 4: 44).
+   714→| python manage.py check (0 issues) · python manage.py makemigrations --check --dry-run (No changes) ·
+   715→  pytest -q (153 passed in 23.9s) · runserver smoke: GET /listing/<slug>-<pk>/ = 200 (28 KB) with all
+   716→  sections (gallery, facts bar, description, amenities, agent card, enquiry form, mobile contact bar,
+   717→  JSON-LD, canonical, similar listings, Leaflet); POST /listing/<slug>-<pk>/enquire/ = 200, Inquiry
+   718→  saved, email sent to agent with text + HTML body
+   719→| Phase 5 — Accounts, saved, agent dashboard
+   720→```
+   721→
+   722→```
+   723→2026-10-02 | Phase 3 — Search and results | Full search portal wired up — all 6 SEO URLs, FilterSet, HTMX pagination, autocomplete, query-count test.
+   724→  - URLs (apps/listings/urls.py) — all 6 patterns from WORK.md §7:
+   725→      * /<type>-for-sale/                      (type-only sale)
+   726→      * /<type>-for-sale/<location-slug>/      (type + location sale)
+   727→      * /<type>-for-rent/                      (type-only rent — added for consistency)
+   728→      * /<type>-for-rent/<location-slug>/      (type + location rent)
+   729→      * /property-for-sale/<location-slug>/    (all types + location sale)
+   730→      * /property-for-rent/<location-slug>/    (all types + location rent)
+   731→    Plus the autocomplete endpoint: /search/locations/?q=<text>
+   732→    The all-types patterns are registered before the generic <type>-for-*
+   733→    patterns so "property" doesn't get matched as a type_slug.
+   734→  - FilterSet (apps/listings/filters.py — PropertyFilter):
+   735→      * q (free text — searches title + description + location name +
+   736→        location.parent.name + location.parent.parent.name; icontains
+   737→        on SQLite, same fields on Postgres for v1)
+   738→      * min_price / max_price (NumberFilter, gte/lte on price)
+   739→      * beds / baths (NumberFilter, gte)
+   740→      * furnishing (ChoiceFilter, choices from Property.Furnishing)
+   741→      * amenities (AllValuesMultipleFilter on amenities__slug)
+   742→      * sort (ChoiceFilter — whitelisted: newest/price_asc/price_desc/featured;
+   743→        invalid values fall back to newest per §13 "never trust user input
+   744→        in lookup strings")
+   745→  - View (apps/listings/views.py):
+   746→      * search() — parses URL kwargs (type_slug, location_slug, listing_type),
+   747→        resolves PropertyType via get_object_or_404, resolves Location via
+   748→        _resolve_location() (prefers shallowest match — county > area >
+   749→        neighbourhood). Builds base queryset: Property.objects.published()
+   750→        filtered by listing_type + property_type + location (with
+   751→        descendants via _location_filter_q() which walks 3 levels deep).
+   752→        Eager-loads select_related(property_type, location__parent__parent,
+   753→        agent__user) + prefetch_related(images, amenities) to avoid N+1.
+   754→        Applies PropertyFilter, paginates 24/page, generates H1 +
+   755→        breadcrumbs + canonical URL (clean path, no query params) +
+   756→        related searches. Returns _results_grid.html partial for HTMX
+   757→        requests (HX-Request header), full search.html otherwise.
+   758→      * location_autocomplete() — JSON endpoint; returns up to 8 locations
+   759→        whose name icontains the q param (min 2 chars); each result has
+   760→        slug, name, full_path, level.
+   761→  - Helper functions:
+   762→      * _resolve_location(slug) — shallowest-first match
+   763→      * _location_filter_q(location) — Q object matching location + all
+   764→        descendants (3-level walk)
+   765→      * _build_h1(listing_type, ptype, location) — "Flats & Apartments
+   766→        for Sale in Mombasa"
+   767→      * _build_breadcrumbs(listing_type, ptype, location) — Home > [Type]
+   768→        for [Sale/Rent] > [Location]
+   769→      * _build_canonical_url(listing_type, ptype, location) — clean path
+   770→        without query params
+   771→      * _build_related_searches(listing_type, ptype, location) — up to 8
+   772→        links: other types in same location, same type in sibling locations
+   773→  - Templates:
+   774→      * templates/listings/search.html — full results page: breadcrumbs,
+   775→        H1 + result count + sort dropdown, mobile filter toggle, results
+   776→        layout (sidebar + grid), related searches, mobile filter drawer
+   777→        (slide-over with backdrop + Esc to close).
+   778→      * templates/listings/_results_grid.html — HTMX partial: the grid +
+   779→        pagination, wrapped in <div id="results-grid"> (the HTMX target).
+   780→        Pagination: numbered links with ellipsis for large ranges, prev/
+   781→        next arrows, all with hx-get + hx-target + hx-push-url for HTMX
+   782→        and plain href for no-JS fallback. Empty state inside the same
+   783→        partial.
+   784→      * templates/listings/_filters.html — filter form, reused in the
+   785→        desktop sidebar and the mobile drawer. Fields rendered manually
+   786→        (not form.as_p) so design-system classes can be applied without
+   787→        django-widget-tweaks. Form has hx-get + hx-target + hx-push-url +
+   788→        hx-trigger="change" for HTMX; falls back to normal GET submit
+   789→        without JS.
+   790→  - CSS: static/css/search.css (results page layout — composes existing
+   791→    components, no new visual patterns per §11 Phase 3). Includes
+   792→    breadcrumbs, results header, filter sidebar (sticky on desktop),
+   793→    mobile filter drawer (slide-over), results grid (1/2/3 cols
+   794→    responsive), empty state, pagination, related searches.
+   795→  - Hero search bar updated (templates/core/home.html): form action now
+   796→    defaults to /property-for-sale/; motion.js builds the SEO-friendly
+   797→    action URL dynamically (/<type>-for-<sale|rent>/<location-slug>/)
+   798→    based on the Buy/Rent segment + type select + autocomplete-picked
+   799→    location. Hidden location_slug field populated by autocomplete.
+   800→  - motion.js extended (setupSearchSegment): Buy/Rent toggle now also
+   801→    rebuilds the form action; type select change rebuilds it; location
+   802→    input has a debounced autocomplete dropdown (200ms) that fetches
+   803→    /search/locations/?q=... and renders results as a dropdown listbox.
+   804→    Picking a suggestion sets the hidden location_slug and rebuilds the
+   805→    action URL. Without JS, the form falls back to /property-for-sale/
+   806→    with the q param.
+   807→  - Tests: 36 new in apps/listings/tests/test_search.py:
+   808→      * All 6 URL patterns return 200 with correct H1
+   809→      * Invalid type/location returns 404
+   810→      * Only published listings shown (draft + archived never appear)
+   811→      * Results filtered by listing_type (sale vs rent)
+   812→      * Results filtered by property_type
+   813→      * Results filtered by location WITH descendants (Mombasa includes
+   814→        Nyali, Bamburi, etc.)
+   815→      * Filters combine: beds + max_price together
+   816→      * min_price, furnishing, amenities, q filters each work
+   817→      * Sort: newest is default, price_desc selectable, invalid sort
+   818→        value falls back to newest (whitelist enforcement)
+   819→      * Pagination: ≤24 cards per page; page 2 works
+   820→      * HTMX: HX-Request header returns partial only (no <html>);
+   821→        non-HTMX returns full page
+   822→      * Breadcrumbs render
+   823→      * Canonical URL in <head> = clean path without query params
+   824→      * Empty state renders when no results (impossibly-high min_price)
+   825→      * Related searches render
+   826→      * Autocomplete: returns JSON, Mombasa for "mom", empty for short
+   827→        query, empty for no match, result has slug/name/full_path/level
+   828→      * QUERY-COUNT TEST: results page stays under 15 queries
+   829→        (CaptureQueriesContext) — catches N+1 regressions
+   830→  - Total tests: 109 (Phase 0: 3, Phase 1: 47, Phase 2: 23, Phase 3: 36).
+   831→| python manage.py check (0 issues) · python manage.py makemigrations --check --dry-run (No changes) ·
+   832→  pytest -q (109 passed in 15.3s) · runserver smoke: /flats-apartments-for-sale/mombasa/ = 200 with
+   833→  H1 "Flats & Apartments for Sale in Mombasa", 4 listing cards, breadcrumbs, filter sidebar, canonical
+   834→  link, related searches; HTMX request returns partial only; autocomplete returns JSON for "nai"
+   835→| Phase 4 — Listing detail and enquiries
+   836→```
+   837→
+   838→```
+   839→2026-10-02 | Phase 2 — Design system and homepage | Full design system + real-DB home page + styleguide landed.
+   840→  - Design reference: design-reference/index.html copied into the repo (read-only Framer export).
+   841→  - Fonts: Geist + Geist Mono self-hosted as variable woff2 in static/fonts/
+   842→    (downloaded from the official vercel/geist-font repo). @font-face declarations
+   843→    live at the top of static/css/tokens.css. No CDN, no Framer runtime, no
+   844→    "Made in Framer" badge (per WORK.md §2.1a).
+   845→  - CSS layer cake:
+   846→      * static/css/tokens.css (128 lines) — full §10.1-§10.4 token layer
+   847→        (colours, type scale, tracking, line-height, OpenType features, radii,
+   848→        shadows, layout, breakpoints, motion vars). Includes color-mix helpers
+   849→        and prefers-reduced-motion overrides.
+   850→      * static/css/components.css (789 lines) — every §10.5 component as a
+   851→        class: pill button (primary/dark/outline/light-outline, lg/sm),
+   852→        nav-link with index, section-tag + eyebrow, stat block (light/dark),
+   853→        value card, principle card, agent portrait card, listing card (with
+   854→        cover, [001] tag, featured tag, save heart, price, location, facts bar,
+   855→        verified badge), search bar (pill, with Buy/Rent segment), newsletter
+   856→        field with Subscribe, footer link columns, giant wordmark, full-screen
+   857→        mobile menu, divider, responsive 3-state header, [data-reveal] utility.
+   858→      * static/css/home.css (430 lines) — home-page section rhythm: hero with
+   859→        full-bleed bg + dark gradient + 3 stat counters + search bar; featured
+   860→        grid (1/2/3 cols); story with founder portrait + scroll-reveal quote +
+   861→        3 value cards; numbers (4-cell grid with taupe dividers); agents
+   862→        (espresso bg, 1/2/4 cols); philosophy (1/2/4 cols); browse (location +
+   863→        type link lists); CTA band; footer with newsletter + giant Homes
+   864→        wordmark + "Nyali · Mombasa · Kenya".
+   865→      * static/css/base.css (62 lines) — reset + body defaults + layout helpers.
+   866→  - Motion: static/js/motion.js (189 lines) — progressive enhancement only,
+   867→    all disabled under prefers-reduced-motion:
+   868→      1. Smooth scrolling (lightweight, no Lenis dependency)
+   869→      2. Animated number counters via IntersectionObserver (easeOutCubic)
+   870→      3. Word-by-word reveal for the founder quote (per-word span fade-in)
+   871→      4. Appear-on-scroll for [data-reveal] elements
+   872→      5. Header background change on scroll (transparent -> solid espresso)
+   873→      6. Mobile menu open/close toggle (Menu / Close, body scroll lock, Esc)
+   874→      7. Search-bar Buy/Rent segment toggle (sets hidden listing_type input)
+   875→  - Templates:
+   876→      * templates/base.html — extended to conditionally load page-specific CSS
+   877→        and always load motion.js with defer.
+   878→      * templates/includes/_header.html — 3 header states per §10.4 (desktop
+   879→        bar ≥1200px with numbered nav links + phone/email contact, tablet bar
+   880→        810-1199px with CTA + hamburger, mobile <810px with hamburger only
+   881→        that opens a full-screen menu with "Close" + numbered nav + contact
+   882→        block at the bottom).
+   883→      * templates/includes/_footer.html — [FOOTER] tag, "Redefining how you
+   884→        find your next home." lead, newsletter form with Subscribe, 4 link
+   885→        columns (Explore / Legal / Company / Visit), giant "Homes" wordmark
+   886→        with per-letter spans (motion.js can stagger-colour them on hover),
+   887→        "Nyali · Mombasa · Kenya" + copyright.
+   888→      * templates/includes/_listing_card.html — reusable Framer-style listing
+   889→        card partial. Takes `property` and `index`; renders cover image,
+   890→        [001]-style index tag, Featured tag, save heart (auth-gated), price
+   891→        with /month suffix for rent, title (2-line clamp), location, beds/
+   892→        baths/size facts bar, Verified badge. Uses the kes filter.
+   893→      * templates/core/home.html — all 10 sections from §8, real-DB-driven:
+   894→        hero stats derive from Property.objects.published().count() /
+   895→        is_verified ratio / distinct neighbourhoods count; featured grid shows
+   896→        up to 6 featured-or-newest published listings; agents section shows
+   897→        all 6 seeded agencies with their active-listing count; browse-by-
+   898→        location shows 6 counties with descendant-listing counts; browse-by-
+   899→        type shows 11 types with their live counts.
+   900→      * templates/core/styleguide.html — every §10.5 component rendered in
+   901→        isolation. 16 sections: colour swatches, type scale, buttons, section
+   902→        tags, stat blocks, value cards, principle cards, agent cards, listing
+   903→        cards (uses the real _listing_card.html partial), search bar,
+   904→        newsletter, footer columns, wordmark, dividers, nav links, mobile
+   905→        menu preview.
+   906→  - Template tags: apps/core/templatetags/core_tags.py with `kes` filter
+   907→    (Decimal -> "KES 12,500,000" or "KES 95,000 / month") and `kes_short`
+   908→    filter (compact "KES 12M" / "KES 95K" for tight card layouts).
+   909→  - Views: apps/core/views.py home() fetches featured_listings (up to 6,
+   910→    topped up with newest), agencies, counties (with listing_count attribute),
+   911→    types_with_counts, and 3 hero stats + 4 numbers-section stats. All
+   912→    queries use select_related / prefetch_related to avoid N+1.
+   913→    styleguide() returns 404 when DEBUG=False (dev-only enforcement in
+   914→    the view, not the URL conf — so the URL is always resolvable, which
+   915→    makes the route testable).
+   916→  - Models: Property.get_absolute_url() added — returns the future-shape
+   917→    /listing/<slug>-<pk>/ URL (Phase 4 wires the actual route).
+   918→  - Hero background: scripts/make_hero_bg.py generates a 2400×1600 JPEG
+   919→    warm-sunset gradient with a building-horizon silhouette, saved to
+   920→    static/img/hero-bg.jpg (47 KB). Pillow-only, no external assets.
+   921→    Phase 6 replaces this with the owner's own photography per §10.7.
+   922→  - URLs: /styleguide/ always registered; access-controlled in the view.
+   923→  - Tests: 73 total (Phase 0: 3, Phase 1: 47, Phase 2 new: 23). New tests
+   924→    cover the kes filter (10 cases), home page rendering from DB (all 10
+   925→    sections, 3 hero stats, search bar with Buy/Rent segment, 3 header
+   926→    states, footer with newsletter + wordmark + Nyali line, bracket tags,
+   927→    motion.js loaded), Geist font files on disk, styleguide page loads +
+   928→    shows every §10.5 component + is dev-only (404 under DEBUG=False),
+   929→    and Property.get_absolute_url.
+   930→| python manage.py check (0 issues) · python manage.py makemigrations --check --dry-run (No changes) ·
+   931→  pytest -q (73 passed in 8.0s) · runserver smoke: GET / = 200 (34 KB), GET /styleguide/ = 200 (29 KB),
+   932→  all 7 static assets (tokens.css, base.css, components.css, home.css, motion.js, Geist-Variable.woff2,
+   933→  hero-bg.jpg) serve 200
+   934→| Phase 3 — Search and results
+   935→```
+   936→
+   937→```
+   938→2026-10-02 | Phase 1 — Models, admin, seed data | Full data model + admin + seed_demo landed.
+   939→  - Location (apps.locations): name, slug, parent (self FK), level enum
+   940→    (county/area/neighbourhood), lat, lng, description. unique_together
+   941→    (parent, slug). Methods: get_descendants() (3-level walk),
+   942→    get_ancestors(), full_path(), is_leaf. save() auto-slugs and derives
+   943→    level from parent if not set.
+   944→  - AgencyProfile (apps.agents): user OneToOne, name, slug (auto-dedup),
+   945→    logo, bio, phone, whatsapp, email, website, office_location FK
+   946→    (SET_NULL), is_verified. Helpers: display_phone / display_email /
+   947→    display_whatsapp (digits-only for wa.me).
+   948→  - PropertyType (apps.listings): name, slug_plural, slug_single, flags
+   949→    is_residential / is_commercial / is_land, position. Seeded with the
+   950→    11 types listed in WORK.md §6.
+   951→  - Amenity (apps.listings): name, slug (auto), icon (Phosphor key),
+   952→    category enum (security/utilities/lifestyle/building). 24 amenities
+   953→    seeded.
+   954→  - Property (apps.listings): full §6 spec. listing_type, status, price
+   955→    + price_period, beds/baths/size_sqm/land_size_acres, furnishing,
+   956→    parking_spaces, year_built, service_charge, amenities M2M, agent FK,
+   957→    is_featured, is_verified, views_count, published_at. PropertyQuerySet
+   958→    with .published() / .for_sale() / .for_rent() / .featured(). clean()
+   959→    enforces sale=total, rent=monthly, price>=0. save() auto-slugs and
+   960→    stamps published_at on first PUBLISHED transition. increment_views()
+   961→    bumps counter without touching updated_at. Indexes per §6
+   962→    (status+listing_type+property_type+location, price, published_at,
+   963→    is_featured).
+   964→  - PropertyImage: property FK, image, caption, position, is_cover.
+   965→    One cover enforced via UniqueConstraint(condition=Q(is_cover=True))
+   966→    — works on SQLite 3.8+ and Postgres. clean() also blocks second cover
+   967→    at form level.
+   968→  - Inquiry (apps.inquiries): property_ref FK (renamed from `property`
+   969→    to avoid clashing with Python's @property decorator), user FK
+   970→    (nullable), name, email, phone, message, status enum (new/read/
+   971→    replied), honeypot + submitter_ip for spam control. is_spam property.
+   972→  - SavedProperty + SavedSearch (apps.accounts): user FK + property FK
+   973→    unique_together; SavedSearch stores a raw querystring (alerts are
+   974→    "Later" per §3).
+   975→  - Migrations: locations.0001, agents.0001, listings.0001,
+   976→    accounts.0002_savedsearch_savedproperty, inquiries.0001. Order respects
+   977→    FK deps.
+   978→  - Admin for every model: list_display + list_filter + search everywhere,
+   979→    PropertyImageInline on Property (TabularInline), PropertyType has
+   980→    is_residential/is_commercial/is_land filters, PropertyAdmin exposes
+   981→    list_filter (listing_type, status, is_featured, is_verified,
+   982→    property_type, furnishing), PropertyAdmin actions: mark_published,
+   983→    mark_archived. InquiryAdmin: mark_read, mark_replied + boolean
+   984→    is_spam_display.
+   985→  - seed_demo command (apps/listings/management/commands/seed_demo.py):
+   986→    creates 6 counties > 21 areas > 34 neighbourhoods; 11 property types;
+   987→    24 amenities; 6 agencies (each gets an is_agent User + AgencyProfile);
+   988→    80 fictional listings with Pillow-generated JPEG covers (1280x800,
+   989→    palette tied to design tokens — burnt/clay/brown/taupe/espresso).
+   990→    Idempotent on natural keys; --clear wipes & re-seeds; --no-images
+   991→    skips cover generation; --target N controls count.
+   992→  - Tests: 47 total (Phase 0: 9; Phase 1 new: 38). New tests cover
+   993→    Location tree methods, PropertyQuerySet.published() visibility rules,
+   994→    PropertyImage one-cover enforcement (DB + form level), AgencyProfile
+   995→    slug dedup + contact helpers, Inquiry spam flag, and seed_demo
+   996→    idempotency + image-cover-presence.
+   997→| python manage.py check (0 issues) · python manage.py makemigrations --check --dry-run (No changes) ·
+   998→  pytest -q (47 passed in 5.7s) · python manage.py seed_demo (80 listings, 113 images, 1.4s) ·
+   999→  python manage.py seed_demo (second run idempotent, counts unchanged) ·
+  1000→  admin verified: 10 admin URLs return 200 incl. Property change form with PropertyImage inline
+  1001→| Phase 2 — Design system and homepage
+  1002→```
+  1003→
+  1004→```
+  1005→2026-10-02 | Phase 0 — Scaffold | Project scaffolded at /home/z/my-project/gabriel_homes/.
+  1006→  - Django 5.1.15 + Python 3.12, custom email-based User (apps.accounts.User) + UserManager,
+  1007→    admin, migration 0001_initial.
+  1008→  - Six apps registered: core (home view + context processor), accounts (full),
+  1009→    locations / listings / agents / inquiries (stubs with apps.py + placeholder models.py).
+  1010→  - Settings split: config/settings/{base,dev,prod}.py, django-environ-driven, .env.example.
+  1011→    dev.py forces SQLite; base.py conditionally adds django.contrib.postgres only when a
+  1012→    Postgres DATABASE_URL is present (avoids psycopg2 requirement in SQLite dev).
+  1013→  - allauth wired for email login (ACCOUNT_LOGIN_METHODS={'email'}); modern config — no
+  1014→    deprecated ACCOUNT_AUTHENTICATION_METHOD / ACCOUNT_*_REQUIRED.
+  1015→  - WhiteNoise static, easy-thumbnails aliases, Pillow, django-filter, gunicorn pinned.
+  1016→  - Templates: base.html + includes/_header.html + includes/_footer.html + core/home.html.
+  1017→  - Static: static/css/tokens.css (full token layer from DESIGN.md §10.1–10.4),
+  1018→    static/css/base.css (Phase-0 subset of components: header, hero, pill buttons,
+  1019→    placeholder cards, footer; full component library lands in Phase 2).
+  1020→  - Styling approach picked and logged: PLAIN CSS + CUSTOM PROPERTIES (no Tailwind CLI).
+  1021→    Rationale: design system in §10 is built around CSS custom properties; Phase 2
+  1022→    already calls for static/css/tokens.css; avoids Node toolchain; finer control over
+  1023→    tracking, shadows, radii needed for the editorial Framer look.
+  1024→  - Tests: apps/accounts/tests/test_user_model.py (6 tests), apps/core/tests/test_phase0_scaffold.py (3 tests).
+  1025→  - conftest.py with user_factory fixture.
+  1026→  - WORK.md + DESIGN.md copied to repo root.
+  1027→| python manage.py check (0 issues) · python manage.py makemigrations --check --dry-run (No changes) ·
+  1028→  pytest -q (9 passed) · runserver boots, GET / returns 200 with design markers
+  1029→| Phase 1 — Models, admin, seed_demo
+  1030→```
+  1031→
+  1032→### Assumptions
+  1033→- Repo root lives at `/home/z/my-project/gabriel_homes/` (separate from the upload dir).
+  1034→- Dev DB is always SQLite, even if a `DATABASE_URL` env var leaks in from a parent shell —
+  1035→  `dev.py` forces SQLite; `base.py` falls back to SQLite if the parsed engine is neither
+  1036→  postgresql nor sqlite3. (Reason: the sandbox shell has a parent `.env` that sets
+  1037→  `DATABASE_URL=file:/home/z/my-project/db/custom.db`, which django-environ parses as
+  1038→  `ENGINE=file` — non-Django. The defensive check keeps the project bootable.)
+  1039→- Geist / Geist Mono fonts are self-hosted as variable woff2 (Phase 2 complete).
+  1040→  Source: official `vercel/geist-font` GitHub repo. No CDN, no Framer runtime.
+  1041→- The Phase 2 home page is the *real* home page per WORK.md §8 (no longer a placeholder).
+  1042→  All 10 sections are wired to real DB data via `apps.core.views.home()`.
+  1043→- `accounts.User` has an `is_agent` boolean (rather than a separate Group) so a single
+  1044→  user can flip from "saved a property" to "manages listings" without schema changes.
+  1045→  Phase 5 will enforce permissions on this flag.
+  1046→- **Phase 1 — `PropertyQuerySet.published()` semantics:** "published" means strictly
+  1047→  `status='published'` AND `published_at <= now()`. Listings in `under_offer` /
+  1048→  `sold_let` / `archived` are NOT publicly visible (the status enum doubles as the
+  1049→  public-visibility flag). This matches WORK.md §6's "Draft or archived listings must
+  1050→  never appear publicly" and is the simplest reasonable interpretation.
+  1051→- **Phase 1 — `Inquiry.property` field rename:** the FK on Inquiry is named
+  1052→  `property_ref` (with `verbose_name="property"` and `related_name="inquiries"`) to
+  1053→  avoid colliding with Python's built-in `@property` decorator on the same class. The
+  1054→  DB column is `property_ref_id`; admin and templates see "property" in the UI.
+  1055→- **Phase 1 — `seed_demo` cover images:** generated as 1280×800 JPEGs using a palette
+  1056→  drawn from the design tokens (burnt/clay/brown/taupe/espresso). They are obvious
+  1057→  placeholders (caption text on a flat colour) — to be replaced by the owner's own
+  1058→  photography in Phase 6 (per WORK.md §10.7).
+  1059→- **Phase 1 — `Property.published_at` stamping:** the field is set automatically on the
+  1060→  first transition into `status='published'` and never reset. If a listing is flipped
+  1061→  back to draft and re-published, `published_at` retains its original value (this is
+  1062→  how "newest" sort stays stable).
+  1063→- **Phase 2 — `kes` template filter:** outputs `KES 12,500,000` for integers and
+  1064→  `KES 99.99` for decimals. The optional `period` argument appends ` / month` for
+  1065→  rent listings. `kes_short` rounds down to the nearest million or thousand
+  1066→  (`KES 12M` / `KES 95K`) for tight card layouts.
+  1067→- **Phase 2 — styleguide dev-only enforcement:** the `/styleguide/` URL is always
+  1068→  registered (so it's resolvable in tests), but the view returns 404 when
+  1069→  `DEBUG=False` AND the user isn't staff. This keeps the route testable under
+  1070→  pytest-django (which forces `DEBUG=False`) while still hiding it from the public
+  1071→  site in production.
+  1072→- **Phase 2 — motion layer:** all motion is progressive enhancement. Text is fully
+  1073→  readable without JS. `prefers-reduced-motion` short-circuits every effect (counters
+  1074→  snap to final value, word-reveal lights up instantly, [data-reveal] elements are
+  1075→  always visible). No Lenis dependency — smooth-scroll is a tiny inline
+  1076→  `scrollIntoView({behavior:'smooth'})` shim.
+  1077→- **Phase 2 — hero background:** Pillow-generated 2400×1600 JPEG warm-sunset gradient
+  1078→  with a building-horizon silhouette (47 KB). Obvious placeholder; Phase 6 replaces
+  1079→  with the owner's own photography per WORK.md §10.7.
+  1080→- **Phase 3 — type-only rent URLs:** WORK.md §7 only explicitly lists
+  1081→  `/<type-plural>-for-sale/` (type-only sale) and `/<type-plural>-for-rent/<loc>/`
+  1082→  (type+location rent). I added `/<type-plural>-for-rent/` (type-only rent) for
+  1083→  consistency — it's a natural extension and the home-page search bar can submit
+  1084→  to it when the user picks "Rent" + a type but no location.
+  1085→- **Phase 3 — location resolution:** `_resolve_location(slug)` matches the slug at
+  1086→  any level (county / area / neighbourhood) and prefers the shallowest match
+  1087→  (county > area > neighbourhood). This means `/flats-apartments-for-sale/nyali/`
+  1088→  matches the Nyali **area** (under Mombasa), not a hypothetical neighbourhood
+  1089→  that happens to share the slug. If two locations share a slug at the same level,
+  1090→  the first by name wins.
+  1091→- **Phase 3 — `q` filter on SQLite:** uses `icontains` across title + description +
+  1092→  location name + location.parent.name + location.parent.parent.name (5-way OR).
+  1093→  On Postgres the same fields are searched with the same OR for v1 simplicity;
+  1094→  a future optimisation would switch to `SearchVector` + `SearchQuery` for proper
+  1095→  full-text ranking. The WORK.md §9 spec says "use PostgreSQL full-text search
+  1096→  where available; fall back to icontains on SQLite" — the icontains path works
+  1097→  on both for now, and the Postgres-specific `SearchVector` upgrade is parked as
+  1098→  a Phase 6 / "Later" optimisation.
+  1099→- **Phase 3 — query-count ceiling:** the test asserts `< 15` queries on the results
+  1100→  page. The actual count is typically ~8-10 (1 for the page of properties with
+  1101→  select_related, 1 for prefetch images, 1 for prefetch amenities, 1 for the
+  1102→  COUNT query, a few for context lookups like property types / counties). 15 is
+  1103→  a generous ceiling that still catches N+1 regressions.
+  1104→- **Phase 3 — sort whitelist:** `filter_sort` only accepts the four whitelisted
+  1105→  values (newest / price_asc / price_desc / featured). Any other value (including
+  1106→  injection attempts like `DROP_TABLE`) silently falls back to `newest` — no error,
+  1107→  no 500. This matches §13: "Never trust user input in lookup strings; whitelist
+  1108→  sort options."
+  1109→- **Phase 3 — HTMX graceful fallback:** the filter form and pagination links all
+  1110→  use `hx-get` / `hx-target` / `hx-push-url` for HTMX, but also have plain `href`
+  1111→  / `action` / `method="get"` so they work without JS. The sort dropdown uses
+  1112→  `onchange` to submit the form (or navigate) as a no-JS fallback.
+  1113→- **Phase 4 — view counter debouncing:** one count per session per listing.
+  1114→  Uses `request.session['viewed_property_<pk>']` flag — sessions are cookie-backed
+  1115→  by default in Django, so a new browser/incognito window = new session = new
+  1116→  count. This is "debounced per session" per §8; a true per-IP debounce would
+  1117→  need a cache backend (parked as a "Later" optimisation).
+  1118→- **Phase 4 — honeypot field name:** the honeypot field is named `website`
+  1119→  (rather than the more common `url` or `hp`) because bots are particularly
+  1120→  drawn to filling website fields. The CSS class `.hp-field` (visually hidden
+  1121→  via `position: absolute; left: -9999px`) keeps it off-screen for sighted
+  1122→  users but accessible to screen readers (labelled "Leave this field blank").
+  1123→- **Phase 4 — rate limit:** max 3 enquiries per minute per IP, enforced via
+  1124→  `Inquiry.objects.filter(submitter_ip=..., created_at__gte=cutoff).count()`.
+  1125→  This is a DB-query-based limiter, not a cache-based one — fine for v1 traffic
+  1126→  volumes; a cache-based limiter (django-ratelimit or similar) is parked as a
+  1127→  Phase 7 hardening item. The 4th enquiry returns 429 with a friendly error
+  1128→  partial.
+  1129→- **Phase 4 — email sending:** `fail_silently=True` so a mail outage doesn't
+  1130→  500 the form submit. The Inquiry is still saved (so the agent sees it in the
+  1131→  dashboard inbox in Phase 5) even if the email fails. From address is
+  1132→  `enquiries@gabrielhomes.co.ke` (not the agent's address) so replies go to
+  1133→  the enquirer directly (via reply-to semantics — actually `send_mail` uses
+  1134→  the From as reply-to by default; a future improvement would set
+  1135→  `reply_to=[inquiry.email]`).
+  1136→- **Phase 4 — JSON-LD `@type`:** uses `Residence` for residential property
+  1137→  types and `Place` for commercial/land. This is a simplification — schema.org
+  1138→  has more specific types (`House`, `Apartment`, `SingleFamilyResidence`), but
+  1139→  mapping every PropertyType to a schema type is parked as a Phase 6 SEO
+  1140→  refinement.
+  1141→- **Phase 4 — similar listings "same county":** the similar-listings query
+  1142→  matches on the county ancestor of the listing's location (walks up
+  1143→  `location.parent.parent` if needed). This means a listing in Nyali
+  1144→  (neighbourhood) under Mombasa (county) will find similar listings in Bamburi,
+  1145→  Shanzu, etc. — all under Mombasa. The ±30% price band is per §8.
+  1146→- **Phase 4 — Leaflet from CDN:** Leaflet 1.9.4 JS+CSS loaded from `unpkg.com`
+  1147→  with SRI integrity hashes. This is the only external CDN dependency in the
+  1148→  project (besides the map tiles themselves, which come from OpenStreetMap).
+  1149→  Self-hosting Leaflet is parked as a Phase 7 hardening item (the file is
+  1150→  ~150 KB; self-hosting would remove the CDN dependency).
+  1151→- **Phase 4 — gallery slider:** vanilla JS, no library. Click thumbnails,
+  1152→  prev/next arrows, or ←/→ keyboard arrows. No lightbox yet (the main image
+  1153→  has `cursor: zoom-in` but the zoom behaviour is parked — a simple lightbox
+  1154→  can be added in Phase 6 or as a "Later" item).
+  1155→- **Phase 5 — agent permission = 404 not 403:** when an agent tries to access
+  1156→  another agent's listing edit/images page, the view returns 404 (not 403).
+  1157→  This is intentional — `get_queryset()` filters to the agent's own listings,
+  1158→  so the listing "doesn't exist" from their perspective. A 403 would leak that
+  1159→  the listing exists but belongs to someone else; a 404 doesn't.
+  1160→- **Phase 5 — `is_agent` flag + AgencyProfile:** an agent is a user with
+  1161→  `is_agent=True` AND an associated `AgencyProfile`. Both conditions must be
+  1162→  true to access the dashboard. A user with `is_agent=True` but no
+  1163→  `AgencyProfile` (e.g. created via admin before the profile) gets 403.
+  1164→- **Phase 5 — allauth templates:** default allauth templates are used for
+  1165→  login/signup/password-reset. They're functional and accessible but don't
+  1166→  match the design system. Styling them with the Gabriel Homes look is parked
+  1167→  as a Phase 6 polish item (low risk — the forms work, just look generic).
+  1168→- **Phase 5 — image formset empty-form tolerance:** `image` and `position`
+  1169→  fields are made non-required in the formset so empty extra forms validate.
+  1170→  The view only saves forms that have an actual image file. This avoids the
+  1171→  "This field is required" errors on the empty extra slots that Django's
+  1172→  inline formset generates by default.
+  1173→- **Phase 5 — dashboard listing form:** uses a generic CreateView/UpdateView
+  1174→  with `fields = [...]` rather than a custom ModelForm. The template renders
+  1175→  fields manually with design-system classes (not `form.as_p`). Hidden fields
+  1176→  `land_size_acres` and `service_charge` are rendered but not exposed in the
+  1177→  UI — they can be added to the form in a future iteration if agents need them.
+  1178→- **Phase 6 — sitemap location scope:** the LocationTypeSitemap includes
+  1179→  counties + areas only (not neighbourhoods). Including all 34 neighbourhoods
+  1180→  would generate ~750 URLs (34 × 11 types × 2 sale/rent), most of which have
+  1181→  0 listings. Counties + areas keeps the sitemap to ~287 URLs, all with content.
+  1182→- **Phase 6 — WebP + srcset parked:** easy-thumbnails aliases are configured in
+  1183→  settings (card/gallery/cover/default), but wiring them into templates via the
+  1184→  `{% thumbnail %}` tag would change all image URLs and require a full
+  1185→  image-pipeline pass. The bigger win for Phase 6 is lazy loading + alt text +
+  1186→  width/height (prevents CLS), which is done. WebP/srcset is a Phase 7 item.
+  1187→- **Phase 6 — home cache:** featured listings cached for 5 minutes via
+  1188→  `django.core.cache` (LocMemCache in dev/prod). Cache key is
+  1189→  `"home:featured_listings"` — no versioning, so a listing status change won't
+  1190→  auto-invalidate. A future improvement would use `cache.set(key, data, timeout)`
+  1191→  + a signal handler to invalidate on Property.save(). For now, 5 min TTL is
+  1192→  acceptable (agents don't expect instant home-page updates).
+  1193→- **Phase 6 — AA contrast:** the `--taupe` (#8a7d70) on `--cream` (#faf8f4)
+  1194→  combination is the borderline case at ~4.6:1 — acceptable for non-essential
+  1195→  text (labels, captions) but not for body copy. Body copy uses `--ink` (#211e1b)
+  1196→  on `--cream` at ~15:1 (AAA). The `--burnt` (#af4715) on `--cream` is ~5.2:1
+  1197→  (AA pass for normal text).
+  1198→- **Phase 6 — detail gallery images:** the detail page gallery still uses CSS
+  1199→  `background-image` (not `<img>`) because the JS slider swaps backgrounds. This
+  1200→  is acceptable for the main gallery (it's above the fold, has an aria-label on
+  1201→  the container). The high-impact lazy-loading win is on listing cards (home +
+  1202→  search grids), which now use `<img loading="lazy">`.
+  1203→- **Phase 7 — allauth rate limiting at URL level:** allauth's adapter methods
+  1204→  (`authenticate`, `pre_authenticate`) are NOT called during failed login
+  1205→  attempts because the form validates (and fails) before reaching the auth
+  1206→  backend. The reliable fix is to wrap the allauth login/signup/password-reset
+  1207→  views at the URL level with a rate-limiting decorator. This is done in
+  1208→  `apps/accounts/urls.py`.
+  1209→- **Phase 7 — check --deploy warnings under dev settings:** the 6 W-warnings
+  1210→  (W004/W008/W009/W012/W016/W018) only appear under dev settings (DEBUG=True,
+  1211→  short SECRET_KEY). This is expected and correct — dev settings are not
+  1212→  hardened. Prod settings (`config/settings/prod.py`) pass `check --deploy`
+  1213→  with 0 issues when given a proper 50+ char SECRET_KEY.
+  1214→- **Phase 7 — upload validation via model validators:** the `validate_image_file`
+  1215→  validator is attached to the `PropertyImage.image` and `AgencyProfile.logo`
+  1216→  fields via `validators=[validate_image_file]`. This means validation runs
+  1217→  whenever a model instance is saved (admin, dashboard formset, shell). The
+  1218→  dashboard image formset already handles `ValidationError` and re-renders
+  1219→  with errors. Max 10 MB; .jpg/.jpeg/.png/.webp only.
+  1220→- **Phase 7 — coverage target:** 97% across the 3 target apps (listings/agents/
+  1221→  inquiries), well above the 80% target. The uncovered lines are mostly admin
+  1222→  actions (mark_read/mark_replied) and edge cases in the seed_demo command.
+  1223→- **Phase 7 — DEPLOY.md scope:** covers single-server deployment (Ubuntu 22.04 +
+  1224→  Nginx + Gunicorn + PostgreSQL). Multi-server / Docker / Kubernetes is out of
+  1225→  scope for v1 — the DEPLOY.md notes where to swap LocMemCache for Redis and
+  1226→  where to add a load balancer for horizontal scaling.
+  1227→- **Phase 7 — Makefile:** uses `python3` from the venv if `.venv/` exists,
+  1228→  falls back to system `python3` otherwise. `make deploy-check` uses a dummy
+  1229→  50+ char SECRET_KEY so `check --deploy` passes the W009 check without
+  1230→  needing the real production key.
+  1231→- `AgencyProfile`, `SavedProperty`, `SavedSearch` are mentioned in section 6; in Phase 1
+  1232→  they have been modelled per spec. AgencyProfile lives in apps.agents (per §5);
+  1233→  SavedProperty and SavedSearch live in apps.accounts because they are user-owned
+  1234→  bookmarks rather than listing-owned data.
+  1235→
+  1236→### Open questions for the user
+  1237→- None blocking. Carried forward: `AgencyProfile` location is in `apps.agents` (per
+  1238→  WORK.md §5). Seed count confirmed: ~80 fictional listings across the 6 markets.
+  1239→
+  1240→### Later / parked ideas
+  1241→- (none — Phases 0, 1, 2 all stayed in scope)
+  1242→

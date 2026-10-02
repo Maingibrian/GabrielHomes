@@ -281,6 +281,14 @@ def test_detail_page_has_enquiry_form():
     assert "Send enquiry" in body
     # Honeypot field present
     assert "website" in body
+    # Regression: the form must render its actual input fields, not just the
+    # CSRF token + submit button. Guards against the include-site passing the
+    # form under the wrong variable name (fields silently vanish).
+    assert 'name="name"' in body
+    assert 'name="email"' in body
+    assert 'name="message"' in body
+    assert 'id="id_name"' in body
+    assert 'id="id_message"' in body
 
 
 # ---------------------------------------------------------------------------
