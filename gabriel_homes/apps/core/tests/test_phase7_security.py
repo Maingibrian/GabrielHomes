@@ -110,6 +110,33 @@ def test_login_rate_limit_blocks_after_5_attempts():
     assert r.status_code in (403, 429)
 
 
+def test_login_get_is_never_rate_limited():
+    """GETs (page views) must never count toward the auth rate limit.
+
+    Regression: previously the limiter metered every method, so reloading
+    the login form 5+ times in a minute returned a bare 429 and the user
+    could not even see the form. Brute force happens on POST only.
+    """
+    from django.core.cache import cache
+    cache.clear()
+    c = Client()
+    for _ in range(10):
+        r = c.get("/account/login/")
+        assert r.status_code == 200
+    # A POST after many GETs is still metered correctly (GETs added nothing).
+    for _ in range(5):
+        r = c.post("/account/login/", {
+            "email": "nonexistent-x@test.com",
+            "password": "wrongpass",
+        })
+        assert r.status_code == 200
+    r = c.post("/account/login/", {
+        "email": "nonexistent-x@test.com",
+        "password": "wrongpass",
+    })
+    assert r.status_code in (403, 429)
+
+
 # ---------------------------------------------------------------------------
 # check --deploy
 # ---------------------------------------------------------------------------

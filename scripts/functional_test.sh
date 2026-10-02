@@ -34,6 +34,15 @@ n = Inquiry.objects.filter(email__regex=r'@(test|spam)\.com$').delete()
 print('cleaned test inquiries')
 " 2>/dev/null | tail -1
 
+# Purge listings created by previous runs of this script so this run starts
+# clean (leftovers pollute search results and false-pass the section-6 check).
+.venv/bin/python manage.py shell -c "
+from apps.listings.models import Property
+qs = Property.objects.filter(title__startswith='Agent Test ')
+n = qs.delete()
+print('cleaned test listings:', n)
+" 2>/dev/null | tail -1
+
 echo "=== 1. Anonymous visitor: search & detail content ==="
 curl -s "$BASE/" > /tmp/home.html
 assert_contains "Home renders headline" /tmp/home.html "Real estate with a human point of view"

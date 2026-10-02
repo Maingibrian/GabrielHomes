@@ -341,6 +341,37 @@ pytest -q
 Append newest entries at the top. Format: `YYYY-MM-DD | Phase | What changed | Checks run | Next`.
 
 ```
+2026-10-02 | Continuation pass — re-verification + auth rate-limit fix | After the
+session restart, re-ran every suite against the live dev server: pytest 232/232,
+smoke 58/58, functional 46/46 — twice back-to-back to prove idempotency.
+  - FOUND — auth limiter locked users out of the login PAGE: auth_rate_limit
+    metered every method, so the 6th GET of /account/login/ within a minute
+    returned a bare 429 with no form and no CSRF cookie; the next POST then
+    403'd on CSRF. Real-world impact: an office NAT (one IP, many colleagues)
+    or anyone reloading the login page 5x/min could not see the form at all.
+    Surfaced as 9 functional failures on the 2nd back-to-back run (login GET
+    429 -> login POST 403 -> dashboard/save cascade), not a session bug.
+  - FIXED — apps/accounts/rate_limit.py now meters only state-changing
+    methods (POST/PUT/PATCH/DELETE); GET/HEAD pass through untouched.
+    Brute-force protection is unchanged (credential guessing is POST-only —
+    the existing 6-POST security test still passes). The 429 response also
+    gained content_type=text/plain and a Retry-After header.
+  - TEST — new regression test test_login_get_is_never_rate_limited in
+    apps/core/tests/test_phase7_security.py: 10 GETs to /account/login/ all
+    return 200, and the POST budget is untouched by preceding GETs.
+  - FIXED — scripts/functional_test.sh is now idempotent: prep deletes
+    Property rows titled 'Agent Test *' so leftovers from a previous run can
+    no longer pollute search results or false-pass the section-6 DB check
+    (run 1 had false-passed via run 0's listing id 84).
+  - Post-test cleanup: deleted the leftover 'Agent Test Apartment Nyali'
+    (id 84) that the earlier runs had left published on the demo DB.
+  - Checks: pytest 232/232 (incl. new regression test), smoke 58/58,
+    functional 46/46 on run 1 AND immediate run 2 (the previous flake is
+    gone), /account/login/ 200, home 200, search results free of test rows.
+  - Next: none — same verdict as the earlier pass; site remains sufficient.
+```
+
+```
 2026-10-02 | Verification & troubleshooting pass ("is the site sufficient?") | Full
 audit: pytest 231/231, smoke 58/58, functional 46/46, live browser E2E. Found and
 fixed 7 real site bugs + rewrote stale test-script expectations.

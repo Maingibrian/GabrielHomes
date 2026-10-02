@@ -29,15 +29,24 @@ def rate_limit(key_func, max_requests: int = 5, window: int = 60):
     def decorator(view_func):
         @wraps(view_func)
         def wrapped(request, *args, **kwargs):
+            # Only meter state-changing requests. Brute force happens on
+            # form submission (POST), never on rendering the page (GET/HEAD),
+            # so a user who merely reloads the login/signup form must not be
+            # locked out of seeing it (shared NAT IPs would hit the cap).
+            if request.method not in ("POST", "PUT", "PATCH", "DELETE"):
+                return view_func(request, *args, **kwargs)
             key = key_func(request)
             now_ts = time()
             timestamps = cache.get(key, [])
             timestamps = [ts for ts in timestamps if now_ts - ts < window]
             if len(timestamps) >= max_requests:
-                return HttpResponse(
+                resp = HttpResponse(
                     "Too many requests. Please wait a minute and try again.",
                     status=429,
+                    content_type="text/plain",
                 )
+                resp["Retry-After"] = str(window)
+                return resp
             timestamps.append(now_ts)
             cache.set(key, timestamps, window)
             return view_func(request, *args, **kwargs)

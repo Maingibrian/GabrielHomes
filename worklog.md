@@ -20,3 +20,24 @@ Stage Summary:
 - Verdict: the site is SUFFICIENT / production-ready for v1 after this pass; it was not before (default search click 404'd, detail-page enquiry form was unusable in a real browser).
 - All fixes are in the repo; dev server auto-reloaded and serving the fixed build.
 - Test suites: pytest 231, scripts/smoke_test.sh, scripts/functional_test.sh — all green and now trustworthy as regression gates.
+
+---
+Task ID: 2
+Agent: Super Z (main agent)
+Task: Continue verification after session restart — re-confirm site sufficiency, re-run all suites, troubleshoot new findings.
+
+Work Log:
+- Re-verified current state of /home/z/my-project/gabriel_homes: dev server up (200), pytest 231/231, smoke 58/58 on first pass.
+- First functional re-run: 45/46; immediate second run: 37/46 — 9 failures clustered on agent login -> dashboard -> save toggle.
+- Diagnosed via server.log: GET /account/login/ returned 429 (auth rate limiter metered page views), so the login POST had no CSRF cookie -> 403, cascading to all session-dependent checks. Section-6 "listing created" check false-passed on a leftover published test listing (id 84) from a prior run.
+- Fixed apps/accounts/rate_limit.py: limiter now meters only POST/PUT/PATCH/DELETE; GET/HEAD pass through. Added Retry-After header + text/plain content type to the 429 response.
+- Added regression test test_login_get_is_never_rate_limited (10 GETs -> all 200; POST budget unaffected by GETs).
+- Made scripts/functional_test.sh idempotent: prep purges Property rows titled 'Agent Test *'.
+- Deleted leftover 'Agent Test Apartment Nyali' (id 84) from the demo DB; search results confirmed clean.
+- Re-ran everything: pytest 232/232, smoke 58/58, functional 46/46 on run 1 AND immediate back-to-back run 2. /account/login/ -> 200, home -> 200.
+- Appended dated entry to gabriel_homes/WORK.md section 14.
+
+Stage Summary:
+- Verdict unchanged and re-confirmed: the site IS sufficient / production-ready for v1.
+- New fix this pass: auth rate limiter no longer locks users out of rendering auth pages (real NAT/office UX bug found via test flakiness).
+- All suites green and now provably idempotent across consecutive runs.
