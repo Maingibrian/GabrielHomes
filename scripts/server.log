@@ -2024,3 +2024,247 @@ Not Found: /dashboard/listings/79/edit/
 [02/Oct/2026 16:30:53] "GET / HTTP/1.1" 200 37765
 [02/Oct/2026 16:30:53] "GET /property-for-sale/mombasa/ HTTP/1.1" 200 67422
 [02/Oct/2026 16:31:04] "GET /property-for-sale/mombasa/ HTTP/1.1" 200 65765
+[02/Oct/2026 16:50:41] "GET /media/property-images/2026/10/commercial-premises-in-limuru-001.jpg HTTP/1.1" 200 30333
+[02/Oct/2026 16:52:58] "GET / HTTP/1.1" 200 37765
+[02/Oct/2026 16:52:58] "GET /styleguide/ HTTP/1.1" 200 30939
+[02/Oct/2026 16:52:58] "GET /about/ HTTP/1.1" 200 14614
+[02/Oct/2026 16:52:58] "GET /contact/ HTTP/1.1" 200 11233
+[02/Oct/2026 16:52:58] "GET /privacy/ HTTP/1.1" 200 11935
+[02/Oct/2026 16:52:58] "GET /terms/ HTTP/1.1" 200 11664
+[02/Oct/2026 16:52:58] "GET /flats-apartments-for-sale/ HTTP/1.1" 200 47366
+[02/Oct/2026 16:52:58] "GET /flats-apartments-for-sale/mombasa/ HTTP/1.1" 200 32482
+[02/Oct/2026 16:52:58] "GET /houses-for-rent/nairobi/ HTTP/1.1" 200 24497
+[02/Oct/2026 16:52:58] "GET /property-for-sale/mombasa/ HTTP/1.1" 200 65765
+[02/Oct/2026 16:52:58] "GET /property-for-rent/nairobi/ HTTP/1.1" 200 38554
+[02/Oct/2026 16:52:58] "GET /houses-for-rent/ HTTP/1.1" 200 25290
+[02/Oct/2026 16:52:58] "GET /property-for-sale/ HTTP/1.1" 200 71360
+[02/Oct/2026 16:52:58] "GET /property-for-rent/ HTTP/1.1" 200 74322
+[02/Oct/2026 16:52:58] "GET /land-for-sale/kiambu/ HTTP/1.1" 200 26376
+[02/Oct/2026 16:52:58] "GET /villas-for-rent/diani/ HTTP/1.1" 200 24823
+[02/Oct/2026 16:52:58] "GET /flats-apartments-for-sale/mombasa/?min_price=5000000&max_price=20000000 HTTP/1.1" 200 28059
+[02/Oct/2026 16:52:58] "GET /flats-apartments-for-sale/mombasa/?beds=2&baths=2 HTTP/1.1" 200 32737
+[02/Oct/2026 16:52:58] "GET /houses-for-rent/nairobi/?furnishing=furnished HTTP/1.1" 200 24825
+[02/Oct/2026 16:52:58] "GET /property-for-sale/mombasa/?sort=price_desc HTTP/1.1" 200 65973
+[02/Oct/2026 16:52:58] "GET /property-for-sale/mombasa/?sort=featured HTTP/1.1" 200 65967
+[02/Oct/2026 16:52:58] "GET /property-for-sale/mombasa/?q=Nyali HTTP/1.1" 200 39572
+[02/Oct/2026 16:52:58] "GET /property-for-sale/mombasa/?page=2 HTTP/1.1" 200 65956
+[02/Oct/2026 16:52:58] "GET /property-for-rent/nairobi/?amenities=1&amenities=2 HTTP/1.1" 200 38766
+[02/Oct/2026 16:52:58] "GET /property-for-sale/mombasa/?sort=DROP%20TABLE HTTP/1.1" 200 65967
+[02/Oct/2026 16:52:58] "GET /property-for-sale/mombasa/?page=999 HTTP/1.1" 200 65958
+[02/Oct/2026 16:52:58] "GET /listing/retail-shop-in-likoni-80/ HTTP/1.1" 200 31778
+[02/Oct/2026 16:52:58] "GET /listing/retail-shop-in-likoni-80/ HTTP/1.1" 200 31778
+[02/Oct/2026 16:52:58] "GET /agents/ HTTP/1.1" 200 11952
+[02/Oct/2026 16:52:58] "GET /agents/coast-property-co/ HTTP/1.1" 200 36258
+[02/Oct/2026 16:52:58] "GET /agents/?q=mombasa HTTP/1.1" 200 9586
+[02/Oct/2026 16:52:58] "GET /account/login/ HTTP/1.1" 200 2296
+[02/Oct/2026 16:52:58] "GET /account/signup/ HTTP/1.1" 200 2518
+[02/Oct/2026 16:52:58] "GET /account/password/reset/ HTTP/1.1" 200 1830
+[02/Oct/2026 16:52:58] "GET /account/saved/ HTTP/1.1" 302 0
+[02/Oct/2026 16:52:58] "GET /account/saved/ HTTP/1.1" 302 0
+[02/Oct/2026 16:52:58] "GET /account/login/?next=/account/saved/ HTTP/1.1" 200 2380
+[02/Oct/2026 16:52:58] "GET /dashboard/ HTTP/1.1" 302 0
+[02/Oct/2026 16:52:58] "GET /dashboard/ HTTP/1.1" 302 0
+[02/Oct/2026 16:52:58] "GET /account/login/?next=/dashboard/ HTTP/1.1" 200 2370
+[02/Oct/2026 16:52:58] "GET /robots.txt HTTP/1.1" 200 178
+[02/Oct/2026 16:52:59] "GET /sitemap.xml HTTP/1.1" 200 38869
+[02/Oct/2026 16:52:59] "GET /favicon.ico HTTP/1.1" 301 0
+[02/Oct/2026 16:52:59] "GET /favicon.ico HTTP/1.1" 301 0
+[02/Oct/2026 16:52:59] "GET /static/img/favicon.svg HTTP/1.1" 200 406
+Not Found: /this-page-does-not-exist/
+[02/Oct/2026 16:52:59] "GET /this-page-does-not-exist/ HTTP/1.1" 404 11111
+Not Found: /listing/not-a-real-listing-99999/
+[02/Oct/2026 16:52:59] "GET /listing/not-a-real-listing-99999/ HTTP/1.1" 404 4258
+Not Found: /property-for-sale/not-a-place/
+[02/Oct/2026 16:52:59] "GET /property-for-sale/not-a-place/ HTTP/1.1" 404 5360
+Not Found: /not-a-type-for-sale/mombasa/
+[02/Oct/2026 16:52:59] "GET /not-a-type-for-sale/mombasa/ HTTP/1.1" 404 6582
+[02/Oct/2026 16:52:59] "GET /admin/login/ HTTP/1.1" 200 4156
+[02/Oct/2026 16:52:59] "GET /search/locations/?q=Nya HTTP/1.1" 200 221
+[02/Oct/2026 16:52:59] "GET /property-for-sale/mombasa/?page=2 HTTP/1.1" 200 65956
+[02/Oct/2026 16:52:59] "GET /static/css/tokens.css HTTP/1.1" 200 4689
+[02/Oct/2026 16:52:59] "GET /static/css/base.css HTTP/1.1" 200 2690
+[02/Oct/2026 16:52:59] "GET /static/css/components.css HTTP/1.1" 200 21745
+[02/Oct/2026 16:52:59] "GET /static/css/home.css HTTP/1.1" 200 10745
+[02/Oct/2026 16:52:59] "GET /static/css/search.css HTTP/1.1" 200 10308
+[02/Oct/2026 16:52:59] "GET /static/css/detail.css HTTP/1.1" 200 12912
+[02/Oct/2026 16:52:59] "GET /static/css/dashboard.css HTTP/1.1" 200 11055
+[02/Oct/2026 16:52:59] "GET /static/js/motion.js HTTP/1.1" 200 11273
+[02/Oct/2026 16:52:59] "GET /static/fonts/Geist-Variable.woff2 HTTP/1.1" 200 69760
+[02/Oct/2026 16:52:59] "GET /static/fonts/GeistMono-Variable.woff2 HTTP/1.1" 200 71596
+[02/Oct/2026 16:52:59] "GET /static/img/hero-bg.jpg HTTP/1.1" 200 47638
+[02/Oct/2026 16:52:59] "GET /media/property-images/2026/10/commercial-premises-in-limuru-001.jpg HTTP/1.1" 200 30333
+[02/Oct/2026 16:53:01] "GET / HTTP/1.1" 200 37765
+[02/Oct/2026 16:53:01] "GET /flats-apartments-for-sale/mombasa/ HTTP/1.1" 200 32482
+[02/Oct/2026 16:53:01] "GET /property-for-sale/mombasa/?sort=DROP%20TABLE HTTP/1.1" 200 65967
+[02/Oct/2026 16:53:01] "GET /listing/3br-apartment-in-bamburi-70/ HTTP/1.1" 200 27966
+Content-Type: multipart/alternative;
+ boundary="===============9211075726348135851=="
+MIME-Version: 1.0
+Subject: New enquiry for 3BR Apartment in Bamburi #070
+From: enquiries@gabrielhomes.co.ke
+To: info@coastproperty.co.ke
+Date: Fri, 02 Oct 2026 13:53:01 -0000
+Message-ID: 
+ <179094918178.8109.16403431112615110744@c-6abf9d92-14810412-468cd615826b>
+
+--===============9211075726348135851==
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+
+Subject: New enquiry for 3BR Apartment in Bamburi #070
+
+A new enquiry has been submitted for the following property:
+
+  Title:    3BR Apartment in Bamburi #070
+  Listing:  Gabriel Homes — /listing/3br-apartment-in-bamburi-70/
+  Price:    KES 23950000
+
+From:
+  Name:  Test Buyer
+  Email: buyer@test.com
+  Phone: 254700111222
+
+Message:
+  Is this still available?
+
+--
+This enquiry was submitted via Gabriel Homes.
+Reply directly to this email to contact the enquirer.
+
+--===============9211075726348135851==
+Content-Type: text/html; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+
+
+<!doctype html>
+<html>
+<body style="font-family: -apple-system, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; color: #211e1b;">
+  <h2 style="color: #af4715; margin-top: 0;">New enquiry for 3BR Apartment in Bamburi #070</h2>
+
+  <p>A new enquiry has been submitted for the following property:</p>
+
+  <table style="width: 100%; border-collapse: collapse; margin: 16px 0;">
+    <tr><td style="padding: 8px 0; color: #8a7d70; width: 80px;">Title:</td><td>3BR Apartment in Bamburi #070</td></tr>
+    <tr><td style="padding: 8px 0; color: #8a7d70;">Price:</td><td>KES 23950000</td></tr>
+    <tr><td style="padding: 8px 0; color: #8a7d70;">URL:</td><td><a href="/listing/3br-apartment-in-bamburi-70/" style="color: #af4715;">View listing</a></td></tr>
+  </table>
+
+  <h3 style="color: #211e1b; margin-top: 24px;">From</h3>
+  <table style="width: 100%; border-collapse: collapse;">
+    <tr><td style="padding: 4px 0; color: #8a7d70; width: 80px;">Name:</td><td>Test Buyer</td></tr>
+    <tr><td style="padding: 4px 0; color: #8a7d70;">Email:</td><td>buyer@test.com</td></tr>
+    <tr><td style="padding: 4px 0; color: #8a7d70;">Phone:</td><td>254700111222</td></tr>
+  </table>
+
+  <h3 style="color: #211e1b; margin-top: 24px;">Message</h3>
+  <p style="background: #faf8f4; padding: 16px; border-radius: 8px; white-space: pre-wrap;">Is this still available?</p>
+
+  <hr style="border: 0; border-top: 1px solid #d8c9b8; margin: 24px 0;">
+  <p style="font-size: 12px; color: #8a7d70;">This enquiry was submitted via Gabriel Homes. Reply directly to this email to contact the enquirer.</p>
+</body>
+</html>
+
+--===============9211075726348135851==--
+
+-------------------------------------------------------------------------------
+[02/Oct/2026 16:53:01] "POST /listing/3br-apartment-in-bamburi-70/enquire/ HTTP/1.1" 200 647
+[02/Oct/2026 16:53:02] "POST /listing/3br-apartment-in-bamburi-70/enquire/ HTTP/1.1" 200 528
+Content-Type: multipart/alternative;
+ boundary="===============6232884460061107330=="
+MIME-Version: 1.0
+Subject: New enquiry for 3BR Apartment in Bamburi #070
+From: enquiries@gabrielhomes.co.ke
+To: info@coastproperty.co.ke
+Date: Fri, 02 Oct 2026 13:53:02 -0000
+Message-ID: 
+ <179094918265.8109.11354016258629212790@c-6abf9d92-14810412-468cd615826b>
+
+--===============6232884460061107330==
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+
+Subject: New enquiry for 3BR Apartment in Bamburi #070
+
+A new enquiry has been submitted for the following property:
+
+  Title:    3BR Apartment in Bamburi #070
+  Listing:  Gabriel Homes — /listing/3br-apartment-in-bamburi-70/
+  Price:    KES 23950000
+
+From:
+  Name:  RL1
+  Email: rl1@test.com
+  Phone: 1
+
+Message:
+  Is this listing still available?
+
+--
+This enquiry was submitted via Gabriel Homes.
+Reply directly to this email to contact the enquirer.
+
+--===============6232884460061107330==
+Content-Type: text/html; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+
+
+<!doctype html>
+<html>
+<body style="font-family: -apple-system, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; color: #211e1b;">
+  <h2 style="color: #af4715; margin-top: 0;">New enquiry for 3BR Apartment in Bamburi #070</h2>
+
+  <p>A new enquiry has been submitted for the following property:</p>
+
+  <table style="width: 100%; border-collapse: collapse; margin: 16px 0;">
+    <tr><td style="padding: 8px 0; color: #8a7d70; width: 80px;">Title:</td><td>3BR Apartment in Bamburi #070</td></tr>
+    <tr><td style="padding: 8px 0; color: #8a7d70;">Price:</td><td>KES 23950000</td></tr>
+    <tr><td style="padding: 8px 0; color: #8a7d70;">URL:</td><td><a href="/listing/3br-apartment-in-bamburi-70/" style="color: #af4715;">View listing</a></td></tr>
+  </table>
+
+  <h3 style="color: #211e1b; margin-top: 24px;">From</h3>
+  <table style="width: 100%; border-collapse: collapse;">
+    <tr><td style="padding: 4px 0; color: #8a7d70; width: 80px;">Name:</td><td>RL1</td></tr>
+    <tr><td style="padding: 4px 0; color: #8a7d70;">Email:</td><td>rl1@test.com</td></tr>
+    <tr><td style="padding: 4px 0; color: #8a7d70;">Phone:</td><td>1</td></tr>
+  </table>
+
+  <h3 style="color: #211e1b; margin-top: 24px;">Message</h3>
+  <p style="background: #faf8f4; padding: 16px; border-radius: 8px; white-space: pre-wrap;">Is this listing still available?</p>
+
+  <hr style="border: 0; border-top: 1px solid #d8c9b8; margin: 24px 0;">
+  <p style="font-size: 12px; color: #8a7d70;">This enquiry was submitted via Gabriel Homes. Reply directly to this email to contact the enquirer.</p>
+</body>
+</html>
+
+--===============6232884460061107330==--
+
+-------------------------------------------------------------------------------
+[02/Oct/2026 16:53:02] "POST /listing/3br-apartment-in-bamburi-70/enquire/ HTTP/1.1" 200 638
+Too Many Requests: /listing/3br-apartment-in-bamburi-70/enquire/
+[02/Oct/2026 16:53:02] "POST /listing/3br-apartment-in-bamburi-70/enquire/ HTTP/1.1" 429 177
+Too Many Requests: /listing/3br-apartment-in-bamburi-70/enquire/
+[02/Oct/2026 16:53:02] "POST /listing/3br-apartment-in-bamburi-70/enquire/ HTTP/1.1" 429 177
+Too Many Requests: /listing/3br-apartment-in-bamburi-70/enquire/
+[02/Oct/2026 16:53:02] "POST /listing/3br-apartment-in-bamburi-70/enquire/ HTTP/1.1" 429 177
+[02/Oct/2026 16:53:02] "GET /account/login/ HTTP/1.1" 200 2296
+[02/Oct/2026 16:53:02] "POST /account/login/ HTTP/1.1" 302 0
+[02/Oct/2026 16:53:02] "GET / HTTP/1.1" 200 42696
+[02/Oct/2026 16:53:02] "GET /dashboard/ HTTP/1.1" 200 25187
+[02/Oct/2026 16:53:02] "GET /dashboard/listings/new/ HTTP/1.1" 200 23679
+[02/Oct/2026 16:53:04] "POST /dashboard/listings/new/ HTTP/1.1" 302 0
+[02/Oct/2026 16:53:04] "GET /dashboard/ HTTP/1.1" 200 26022
+[02/Oct/2026 16:53:04] "GET /listing/agent-test-apartment-nyali-87/ HTTP/1.1" 200 26656
+Not Found: /dashboard/listings/79/edit/
+[02/Oct/2026 16:53:04] "GET /dashboard/listings/79/edit/ HTTP/1.1" 404 10229
+[02/Oct/2026 16:53:04] "POST /account/save/87/ HTTP/1.1" 200 595
+[02/Oct/2026 16:53:05] "POST /account/save/87/ HTTP/1.1" 200 577
+[02/Oct/2026 16:53:05] "GET /account/saved/ HTTP/1.1" 200 9374
+[02/Oct/2026 16:53:05] "GET /search/locations/?q=nya HTTP/1.1" 200 221
+[02/Oct/2026 16:53:06] "GET /sitemap.xml HTTP/1.1" 200 39035
+[02/Oct/2026 16:53:06] "GET /robots.txt HTTP/1.1" 200 178
+[02/Oct/2026 16:53:06] "GET /property-for-sale/mombasa/?page=2 HTTP/1.1" 200 43787
+[02/Oct/2026 17:03:40] "GET / HTTP/1.1" 200 37765

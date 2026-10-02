@@ -1,0 +1,135 @@
+@echo off
+rem ---------------------------------------------------------------------------
+rem Gabriel Homes - one-click website launcher (Windows)
+rem
+rem What it does:
+rem   1. Finds (or installs via winget) Python 3.10+
+rem   2. Creates a .venv and installs dependencies (first run, needs internet)
+rem   3. Migrates + seeds ~80 demo listings (skipped automatically if data exists)
+rem   4. Ensures demo accounts (admin + agent) exist
+rem   5. Picks a free port (8000-8010), opens your browser, starts the site
+rem
+rem Stop: close this window, or run STOP-WEBSITE.bat
+rem Set GABRIEL_NO_BROWSER=1 to skip auto-opening the browser.
+rem ---------------------------------------------------------------------------
+setlocal EnableExtensions EnableDelayedExpansion
+title Gabriel Homes
+cd /d "%~dp0"
+
+echo.
+echo --------------------------------------------------------------
+echo   GABRIEL HOMES - local website launcher
+echo --------------------------------------------------------------
+
+set "NOBROWSER=!GABRIEL_NO_BROWSER!"
+set "PYCMD="
+
+py -3 -c "import sys; sys.exit(0 if sys.version_info>=(3,10) else 1)" >nul 2>nul
+if not errorlevel 1 set "PYCMD=py -3"
+
+if not defined PYCMD (
+    python -c "import sys; sys.exit(0 if sys.version_info>=(3,10) else 1)" >nul 2>nul
+    if not errorlevel 1 set "PYCMD=python"
+)
+
+if not defined PYCMD (
+    echo   Python 3.10+ not found. Trying to install via winget...
+    where winget >nul 2>nul
+    if not errorlevel 1 (
+        winget install -e --id Python.Python.3.12 --silent --accept-package-agreements --accept-source-agreements
+    ) else (
+        echo   winget not available on this system.
+    )
+    py -3 -c "import sys; sys.exit(0 if sys.version_info>=(3,10) else 1)" >nul 2>nul
+    if errorlevel 1 (
+        echo.
+        echo   Could not find or install Python automatically.
+        echo   Opening https://www.python.org/downloads/
+        echo   Install Python 3.12 and TICK "Add python.exe to PATH",
+        echo   then run this file again.
+        start "" "https://www.python.org/downloads/"
+        pause
+        exit /b 1
+    )
+    set "PYCMD=py -3"
+)
+
+for /f "delims=" %%v in ('!PYCMD! --version 2^>^&1') do echo   Python: %%v
+
+if not exist ".venv\Scripts\python.exe" (
+    echo   Creating virtual environment (.venv) - one time only...
+    !PYCMD! -m venv .venv
+    if errorlevel 1 (
+        echo   ERROR: could not create the virtual environment.
+        pause
+        exit /b 1
+    )
+)
+set "VPY=.venv\Scripts\python.exe"
+
+if not exist ".venv\.deps_ok" (
+    echo   Installing dependencies - first run needs internet, 1-3 min...
+    "!VPY!" -m pip install --quiet --disable-pip-version-check -r requirements.txt
+    if errorlevel 1 (
+        echo   ERROR: pip install failed - check your internet connection.
+        pause
+        exit /b 1
+    )
+    type nul > ".venv\.deps_ok"
+) else (
+    echo   Dependencies: OK
+)
+
+echo   Preparing database...
+"!VPY!" manage.py migrate --noinput >nul 2>nul
+if errorlevel 1 (
+    echo   ERROR: database migration failed.
+    pause
+    exit /b 1
+)
+"!VPY!" manage.py seed_demo
+if errorlevel 1 (
+    echo   ERROR: demo data seeding failed.
+    pause
+    exit /b 1
+)
+
+"!VPY!" manage.py shell < scripts\setup_accounts.py
+if errorlevel 1 (
+    echo   ERROR: account setup failed.
+    pause
+    exit /b 1
+)
+
+set "PORT="
+for /f "delims=" %%p in ('call "!VPY!" scripts\find_free_port.py') do set "PORT=%%p"
+if not defined PORT (
+    echo   ERROR: could not determine a free port.
+    pause
+    exit /b 1
+)
+if "!PORT!"=="0" (
+    echo   ERROR: ports 8000-8010 are all in use. Close some apps and retry.
+    pause
+    exit /b 1
+)
+
+echo.
+echo --------------------------------------------------------------
+echo   Gabriel Homes is starting at:  http://127.0.0.1:!PORT!/
+echo   Website:   http://127.0.0.1:!PORT!/
+echo   Admin:     http://127.0.0.1:!PORT!/admin/     (admin@gabrielhomes.co.ke / gabriel2026^)
+echo   Agent:     http://127.0.0.1:!PORT!/dashboard/  (hello@gabrielhomes.co.ke / gabriel2026^)
+echo   Stop:      close this window, or run STOP-WEBSITE.bat
+echo --------------------------------------------------------------
+echo.
+
+if not "!NOBROWSER!"=="1" (
+    start "" "http://127.0.0.1:!PORT!/"
+)
+
+"!VPY!" manage.py runserver 0.0.0.0:!PORT! --noreload
+
+echo.
+echo   The website has stopped.
+pause

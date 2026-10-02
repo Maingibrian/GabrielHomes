@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ page_title }}{% endblock %}
+{% block meta_description %}{{ meta_description }}{% endblock %}
+{% block canonical %}<link rel="canonical" href="{{ SITE_DOMAIN }}{{ canonical_url }}">{% endblock %}
+
+{% block styles %}
+  <link rel="stylesheet" href="{% static 'css/pages.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<section class="page-hero">
+  <div class="container">
+    <p class="section-tag" data-reveal>[ LEGAL ]</p>
+    <span class="eyebrow" data-reveal>The ground rules</span>
+    <h1 class="page-hero__title" data-reveal>Terms of service.</h1>
+    <p class="page-hero__subtitle" data-reveal>
+      The terms that govern your use of the Gabriel Homes portal — listings,
+      enquiries, accounts, and what we expect from each other.
+    </p>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container prose">
+    <p class="prose__updated">Last updated: 1 October 2026 · Gabriel Homes, Nyali Centre, Links Road, Mombasa</p>
+
+    <h2>1. Using the portal</h2>
+    <p>
+      Gabriel Homes is a property-listing portal for buyers, renters, and
+      short-stay guests in Kenya. By using the site you agree to these terms.
+      You may browse listings, create an account, save properties, and contact
+      agents for personal, non-commercial purposes. You may not scrape, republish,
+      or resell listing data or photographs without our written permission.
+    </p>
+
+    <h2>2. Listings and accuracy</h2>
+    <p>
+      Listings are provided by partner agencies. We verify listing details
+      before publication and mark verified listings with a badge, but we rely
+      on agents for the underlying information. Prices, availability, and
+      details can change without notice — always confirm specifics with the
+      listing agent before making decisions. Listings are advertisements, not
+      offers or guarantees.
+    </p>
+
+    <h2>3. Enquiries and dealings with agents</h2>
+    <p>
+      When you enquire about a property, your message and contact details go
+      to the listing agent. Any negotiation, viewing, agreement, or payment
+      happens between you and the agent — Gabriel Homes is not a party to that
+      relationship and does not hold deposits or process rent or purchase
+      payments. Never send money for a property you have not viewed and
+      confirmed with the agent.
+    </p>
+
+    <h2>4. Accounts</h2>
+    <p>
+      You are responsible for keeping your password confidential and for the
+      activity on your account. Give us accurate registration details and keep
+      them current. We may suspend accounts used for spam, fraud, scraping, or
+      abuse of our enquiry and contact systems.
+    </p>
+
+    <h2>5. Agent obligations</h2>
+    <p>
+      Agents listing on the portal must own or be authorised to market each
+      listing, must provide accurate details and lawful photographs, and must
+      keep listings current (marking them sold, let, or archived when they are
+      no longer available). We may unpublish listings that breach these rules.
+    </p>
+
+    <h2>6. Acceptable use</h2>
+    <ul>
+      <li>Do not submit false, misleading, or unlawful content.</li>
+      <li>Do not use automated tools to access the site without permission.</li>
+      <li>Do not interfere with the site's security features or rate limits.</li>
+      <li>Do not impersonate other people or agencies.</li>
+    </ul>
+
+    <h2>7. Liability</h2>
+    <p>
+      The portal is provided "as is". To the fullest extent permitted by Kenyan
+      law, Gabriel Homes is not liable for indirect or consequential loss
+      arising from use of the site, or for the accuracy of third-party listing
+      content. Nothing in these terms limits liability that cannot be limited
+      by law.
+    </p>
+
+    <h2>8. Governing law</h2>
+    <p>
+      These terms are governed by the laws of Kenya, and the courts of Kenya
+      have exclusive jurisdiction over any dispute arising from them.
+    </p>
+
+    <h2>9. Contact</h2>
+    <p>
+      Questions about these terms: <strong>hello@gabrielhomes.co.ke</strong> or
+      +254 712 345 678, or at our office — Nyali Centre, Links Road, Mombasa.
+    </p>
+  </div>
+</section>
+
+{% endblock %}

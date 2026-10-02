@@ -41,3 +41,23 @@ Stage Summary:
 - Verdict unchanged and re-confirmed: the site IS sufficient / production-ready for v1.
 - New fix this pass: auth rate limiter no longer locks users out of rendering auth pages (real NAT/office UX bug found via test flakiness).
 - All suites green and now provably idempotent across consecutive runs.
+
+---
+Task ID: 3
+Agent: Super Z (main agent)
+Task: Deliver the project as a one-click package — script the user can double-click to run the whole website. Plan first, triple-check before delivery.
+
+Work Log:
+- Read key configs: requirements.txt (pinned, Python 3.12), dev settings force SQLite + DEBUG, MEDIA_ROOT='' (CWD-relative -> launcher must cd to project root), seed_demo idempotent + Pillow covers (offline), UserManager.create_superuser(email, password), PyPI reachable.
+- TRIPLE-CHECK 1: re-ran full suites on the fixed project — pytest 232/232, smoke 58/58, functional 46/46.
+- Wrote launchers (scripts/launcher/): START-GABRIEL-HOMES.{sh,command,bat} + STOP-WEBSITE.{sh,command,bat} + RUN-ME-FIRST.txt. Shared logic: find/install Python 3.10+ (winget/brew fallback, download-page last resort), venv + pip install (marker-file .deps_ok), migrate, idempotent seed, demo accounts via project scripts/setup_accounts.py (admin@gabrielhomes.co.ke / hello@gabrielhomes.co.ke, both gabriel2026), free-port scan 8000-8010 via project scripts/find_free_port.py, auto-open browser (GABRIEL_NO_BROWSER=1 for headless runs), runserver --noreload in foreground. Windows .bat authored then CRLF-converted; unix scripts LF + chmod +x; for /f uses the call pattern for quoted paths.
+- Added project helpers: scripts/find_free_port.py, scripts/setup_accounts.py.
+- build_package.sh: DB hygiene (test inquiries/sessions/Agent Test listings deleted), rsync stage (excludes .venv/__pycache__/.pytest_cache/etc), adds launchers, fixes line endings, zips -> download/gabriel-homes-oneclick.zip (3.8M, 486 files, verified 0 junk entries).
+- TRIPLE-CHECK 2 (cold start, scripts/coldstart_test.sh): fresh copy with NO venv and NO db -> launcher created venv, installed deps (~12s), migrated, seeded 80 listings + images, created accounts, port fallback 8001 (8000 busy), 8/8 page checks (home/search x2/detail/login/admin/media/autocomplete), no data duplication on re-run. PASSED.
+- TRIPLE-CHECK 3 (delivery verification, scripts/zipboot_test.sh): unzipped the actual zip -> structure complete, 0 junk entries, .bat=CRLF ASCII, .sh=LF executable, exec bits preserved; booted with shipped db -> server in ~12s, 7/7 checks, seeding correctly skipped (80->80). PASSED.
+- Cleaned test copies (coldtest/ziptest). Main dev server on :8000 still serving.
+
+Stage Summary:
+- Deliverable: /home/z/my-project/download/gabriel-homes-oneclick.zip (3.8 MB) — unzip anywhere, double-click START-GABRIEL-HOMES(.bat/.command/.sh) for your OS.
+- Triple-checked: suites green pre-package; cold start green; delivered-zip boot green.
+- Demo credentials documented in RUN-ME-FIRST.txt: admin@gabrielhomes.co.ke / gabriel2026 (admin), hello@gabrielhomes.co.ke / gabriel2026 (agent dashboard).

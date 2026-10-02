@@ -1,0 +1,16 @@
+# Gabriel Homes — pinned dependencies
+# See WORK.md section 4 for the tech-stack rationale.
+# Python 3.12 required.
+
+Django==5.1.15
+django-environ==0.14.0
+django-allauth==65.19.7
+django-filter==25.1
+easy-thumbnails==2.10.1
+Pillow==11.3.0
+whitenoise==6.12.0
+gunicorn==26.2.0
+
+# Dev / test only
+pytest==9.0.2
+pytest-django==4.14.0

@@ -1,0 +1,19 @@
+Subject: New enquiry for {{ property.title }}
+
+A new enquiry has been submitted for the following property:
+
+  Title:    {{ property.title }}
+  Listing:  {{ site_name }} — {{ property.get_absolute_url }}
+  Price:    KES {{ property.price|floatformat:0 }}{% if property.price_period == "monthly" %} / month{% endif %}
+
+From:
+  Name:  {{ inquiry.name }}
+  Email: {{ inquiry.email }}
+  Phone: {{ inquiry.phone|default:"(not provided)" }}
+
+Message:
+  {{ inquiry.message }}
+
+--
+This enquiry was submitted via {{ site_name }}.
+Reply directly to this email to contact the enquirer.

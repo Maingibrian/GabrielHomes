@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ page_title }}{% endblock %}
+{% block meta_description %}{{ meta_description }}{% endblock %}
+{% block canonical %}<link rel="canonical" href="{{ SITE_DOMAIN }}{{ canonical_url }}">{% endblock %}
+
+{% block styles %}
+  <link rel="stylesheet" href="{% static 'css/pages.css' %}">
+  <link rel="stylesheet" href="{% static 'css/home.css' %}">
+  <link rel="stylesheet" href="{% static 'css/search.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<section class="page-hero">
+  <div class="container">
+    <p class="section-tag" data-reveal>[ AGENT ]</p>
+    <span class="eyebrow" data-reveal>{% if agency.is_verified %}Verified agency{% else %}Agency{% endif %}</span>
+    <div class="profile-header" data-reveal>
+      <div class="profile-header__portrait" aria-hidden="true"
+           {% if agency.logo %}style="background-image: url('{{ agency.logo.url }}');"{% else %}{% endif %}></div>
+      <div>
+        <h1 class="profile-header__name">{{ agency.name }}</h1>
+        <p class="profile-header__meta">
+          {% if agency.office_location %}Based in {{ agency.office_location.name }} · {% endif %}
+          {{ active_count }} active listing{{ active_count|pluralize }}
+        </p>
+        <div class="profile-actions">
+          {% if agency.display_phone %}
+            <a class="btn btn--primary btn--sm" href="tel:{{ agency.display_phone|cut:' ' }}">Call {{ agency.display_phone }}</a>
+          {% endif %}
+          {% if whatsapp_url %}
+            <a class="btn btn--dark btn--sm" href="{{ whatsapp_url }}" target="_blank" rel="noopener">WhatsApp</a>
+          {% endif %}
+          {% if agency.display_email %}
+            <a class="btn btn--outline btn--sm" href="mailto:{{ agency.display_email }}">Email</a>
+          {% endif %}
+          {% if agency.website %}
+            <a class="btn btn--outline btn--sm" href="{{ agency.website }}" target="_blank" rel="noopener">Website</a>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+{% if agency.bio %}
+  <section class="section">
+    <div class="container">
+      <p class="section-tag" data-reveal>[ PROFILE ]</p>
+      <p class="profile-bio" data-reveal>{{ agency.bio }}</p>
+    </div>
+  </section>
+{% endif %}
+
+<section class="section" id="listings">
+  <div class="container">
+    <div class="featured__header">
+      <p class="section-tag" data-reveal>[ PROPERTIES ]</p>
+      <h2 class="featured__title">Active listings from {{ agency.name }}.</h2>
+    </div>
+
+    <div class="featured__grid" style="margin-top: 2rem;">
+      {% for property in active_listings %}
+        {% include "includes/_listing_card.html" with property=property index=forloop.counter %}
+      {% empty %}
+        <p style="color: var(--taupe);">
+          No active listings right now — check back soon, or contact the
+          agency directly above.
+        </p>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<section class="section" style="background: var(--espresso);">
+  <div class="container" style="text-align: center;">
+    <h2 style="color: var(--cream); font-size: var(--text-display-2); font-weight: 500; letter-spacing: var(--track-display);">
+      Looking for your next home?
+    </h2>
+    <div style="margin-top: 2rem;">
+      <a class="btn btn--primary btn--lg" href="/property-for-sale/mombasa/">
+        Explore all properties <span class="btn__arrow">→</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+{% endblock %}

@@ -341,6 +341,31 @@ pytest -q
 Append newest entries at the top. Format: `YYYY-MM-DD | Phase | What changed | Checks run | Next`.
 
 ```
+2026-10-02 | One-click delivery package | Built gabriel-homes-oneclick.zip for
+handoff: unzip anywhere, double-click START-GABRIEL-HOMES for your OS, site runs.
+  - Launchers (all OSes): .bat (Windows, CRLF), .command (macOS), .sh (Linux) +
+    STOP-WEBSITE variants + RUN-ME-FIRST.txt. Logic: find/install Python 3.10+
+    (winget/brew, fallback python.org), venv + pinned pip install (marker file),
+    migrate, idempotent seed_demo, demo accounts (admin@gabrielhomes.co.ke and
+    first agent hello@gabrielhomes.co.ke, both password gabriel2026), free-port
+    scan 8000-8010 (scripts/find_free_port.py), auto-open browser
+    (GABRIEL_NO_BROWSER=1 disables), runserver --noreload in foreground.
+  - New project helpers: scripts/find_free_port.py, scripts/setup_accounts.py
+    (run via manage.py shell < scripts/setup_accounts.py).
+  - Package: 3.8 MB zip — code + templates/static + 287 property images +
+    media thumbnails + pre-seeded clean db.sqlite3 (80 listings, 0 test rows,
+    sessions cleared). Excludes .venv/__pycache__/pytest artefacts.
+  - TRIPLE CHECK: (1) suites re-run green pre-package — pytest 232/232, smoke
+    58/58, functional 46/46. (2) Cold-start simulation with NO venv and NO db:
+    launcher seeded everything, port fallback 8001, 8/8 page checks, accounts
+    verified. (3) Delivered zip unzipped + booted: 0 junk entries, .bat CRLF,
+    exec bits preserved, seeding correctly skipped (80 -> 80), 7/7 checks.
+  - Note: MEDIA_ROOT is '' (CWD-relative) — the launchers always cd to the
+    project root first, so media serving behaves exactly as in dev.
+  - Next: user hands the zip off; no further code changes pending.
+```
+
+```
 2026-10-02 | Continuation pass — re-verification + auth rate-limit fix | After the
 session restart, re-ran every suite against the live dev server: pytest 232/232,
 smoke 58/58, functional 46/46 — twice back-to-back to prove idempotency.
