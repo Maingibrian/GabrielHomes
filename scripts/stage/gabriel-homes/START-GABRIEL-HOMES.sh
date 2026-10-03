@@ -1,19 +1,28 @@
 #!/usr/bin/env bash
 # ---------------------------------------------------------------------------
-# Gabriel Homes — one-click website launcher (Linux: .sh / macOS: .command)
+# Gabriel Homes — one-click website launcher (Linux: .sh / macOS: .command) [v2]
 #
 # What it does:
 #   1. Finds (or helps install) Python 3.10+
 #   2. Creates a .venv and installs dependencies (first run only, needs internet)
 #   3. Migrates + seeds ~80 demo listings (skipped automatically if data exists)
 #   4. Ensures demo accounts (admin + agent) exist
-#   5. Picks a free port (8000-8010), opens your browser, starts the site
+#   5. Picks a free port (8000-8010), waits until the site answers,
+#      THEN opens your browser, and keeps the site running here
 #
 # Stop: close this window, or run STOP-WEBSITE(.sh/.bat)
 # Set GABRIEL_NO_BROWSER=1 to skip auto-opening the browser.
 # ---------------------------------------------------------------------------
 set -u
 cd "$(dirname "$0")" || exit 1
+
+# -- Guard: the script needs the whole project next to it.
+if [ ! -f "manage.py" ]; then
+  echo "  ERROR: manage.py not found next to this script."
+  echo "  Please extract the WHOLE zip into a folder first, then run"
+  echo "  this script from inside the extracted gabriel-homes folder."
+  exit 1
+fi
 
 BOLD=""; NC=""
 if [ -t 1 ]; then BOLD=$'\033[1m'; NC=$'\033[0m'; fi
@@ -106,15 +115,17 @@ printf "  Website:   %s\n" "$URL"
 printf "  Admin:     http://127.0.0.1:%s/admin/     (admin@gabrielhomes.co.ke / gabriel2026)\n" "$PORT"
 printf "  Agent:     http://127.0.0.1:%s/dashboard/  (hello@gabrielhomes.co.ke / gabriel2026)\n" "$PORT"
 printf "  Stop:      close this window, or run STOP-WEBSITE\n"
+printf "  Your browser will open as soon as the site is ready.\n"
 hr
 printf "\n"
 
+# -- v2 fix: the browser used to open on a fixed 2-second guess, which
+# -- raced the server (users got "This site can't be reached" or, on
+# -- WSL/headless systems, nothing at all and silence about it).
+# -- Now a waiter polls until the site answers, then opens the browser,
+# -- with WSL-aware fallbacks and a loud message if it cannot.
 if [ "$NO_BROWSER" != "1" ]; then
-  ( sleep 2
-    open "$URL" 2>/dev/null \
-      || xdg-open "$URL" 2>/dev/null \
-      || sensible-browser "$URL" 2>/dev/null \
-      || true ) &
+  "$VPY" scripts/open_browser_when_ready.py "$PORT" &
 fi
 
 exec "$VPY" manage.py runserver "0.0.0.0:${PORT}" --noreload

@@ -5,14 +5,31 @@
 #   - no .venv            (launcher must create it + pip install)
 #   - no db.sqlite3       (launcher must migrate + seed ~80 listings)
 #   - port 8000 occupied  (launcher must fall back to 8001+)
-# Then curls the key pages and shuts the server down.
+# Then curls the key pages, verifies the BROWSER AUTO-OPEN fired only after
+# the site was actually serving (v1 regression!), and shuts the server down.
 # =============================================================================
 set -u
 TESTROOT=/home/z/my-project/scripts/coldtest
 PKG="$TESTROOT/gabriel-homes"
 
+rm -rf "$TESTROOT"; mkdir -p "$TESTROOT"
+
+# -- Fake browser: records every open() + whether the site answered.
+# -- $BROWSER is what the stdlib webbrowser module uses on POSIX.
+FAKE_BROWSER="$TESTROOT/fake-browser.sh"
+FAKE_BROWSER_LOG="$TESTROOT/browser-opens.log"
+export FAKE_BROWSER_LOG
+cat > "$FAKE_BROWSER" <<'EOF'
+#!/bin/bash
+URL="$1"
+if curl -s -o /dev/null --max-time 2 "$URL"; then STATE=UP; else STATE=DOWN; fi
+echo "$(date +%s.%N) $URL $STATE" >> "${FAKE_BROWSER_LOG:?}"
+exit 0
+EOF
+chmod +x "$FAKE_BROWSER"
+: > "$FAKE_BROWSER_LOG"
+
 echo "== 1. Fresh copy of staged package (no venv, no DB) =="
-rm -rf "$TESTROOT"
 mkdir -p "$TESTROOT"
 cp -r /home/z/my-project/scripts/stage/gabriel-homes "$PKG/"
 rm -f "$PKG/db.sqlite3"
@@ -20,9 +37,9 @@ rm -rf "$PKG/.venv"
 [ -f "$PKG/db.sqlite3" ] && echo "FAIL: db still present" && exit 1
 echo "  OK: no .venv, no db.sqlite3"
 
-echo "== 2. Launch (headless: GABRIEL_NO_BROWSER=1) =="
+echo "== 2. Launch (fake browser wired via \$BROWSER - the real path is exercised) =="
 cd "$PKG"
-GABRIEL_NO_BROWSER=1 bash START-GABRIEL-HOMES.sh > "$TESTROOT/launcher.log" 2>&1 &
+BROWSER="$FAKE_BROWSER %s" bash START-GABRIEL-HOMES.sh > "$TESTROOT/launcher.log" 2>&1 &
 LAUNCH_PID=$!
 echo "  launcher PID: $LAUNCH_PID — polling for the server (up to 300s)..."
 
@@ -88,7 +105,27 @@ else
   FAIL=$((FAIL+1))
 fi
 
-echo "== 5. Shutdown =="
+echo "== 5. Browser auto-open check (the v1 bug) =="
+sleep 2   # give the browser waiter a moment to fire after the server came up
+OPENS=$(wc -l < "$FAKE_BROWSER_LOG" | tr -d ' ')
+if [ "$OPENS" = "1" ]; then
+  PASS=$((PASS+1)); echo "  OK   browser auto-open fired exactly once"
+else
+  FAIL=$((FAIL+1)); echo "  FAIL browser auto-open fired $OPENS times (want 1)"
+fi
+OPEN_URL=$(awk '{print $2}' "$FAKE_BROWSER_LOG" | head -1)
+if [ "$OPEN_URL" = "http://127.0.0.1:$PORT/" ]; then
+  PASS=$((PASS+1)); echo "  OK   browser opened the served URL ($OPEN_URL)"
+else
+  FAIL=$((FAIL+1)); echo "  FAIL browser opened '$OPEN_URL' (want http://127.0.0.1:$PORT/)"
+fi
+if grep -q " UP$" "$FAKE_BROWSER_LOG"; then
+  PASS=$((PASS+1)); echo "  OK   site was actually serving when the browser opened"
+else
+  FAIL=$((FAIL+1)); echo "  FAIL browser opened while site was DOWN: $(cat "$FAKE_BROWSER_LOG")"
+fi
+
+echo "== 6. Shutdown =="
 pkill -f "coldtest/gabriel-homes" 2>/dev/null && echo "  stopped (pkill coldtest)" || kill "$LAUNCH_PID" 2>/dev/null
 sleep 1
 echo ""

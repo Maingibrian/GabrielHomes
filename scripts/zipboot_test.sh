@@ -2,18 +2,33 @@
 # =============================================================================
 # zipboot_test.sh — TRIPLE-CHECK 3 (boot half)
 # Boots the UNZIPPED delivery copy exactly as a user would (shipped DB present,
-# no venv) and verifies the site + data integrity.
+# no venv) and verifies the site + data integrity + BROWSER AUTO-OPEN.
 # =============================================================================
 set -u
 PKG=/home/z/my-project/scripts/ziptest/gabriel-homes
 LOG=/home/z/my-project/scripts/ziptest/boot.log
+TESTROOT=/home/z/my-project/scripts/ziptest
+
+# -- Fake browser (same contract as the unit test + coldstart test).
+FAKE_BROWSER="$TESTROOT/fake-browser.sh"
+FAKE_BROWSER_LOG="$TESTROOT/browser-opens.log"
+export FAKE_BROWSER_LOG
+cat > "$FAKE_BROWSER" <<'EOF'
+#!/bin/bash
+URL="$1"
+if curl -s -o /dev/null --max-time 2 "$URL"; then STATE=UP; else STATE=DOWN; fi
+echo "$(date +%s.%N) $URL $STATE" >> "${FAKE_BROWSER_LOG:?}"
+exit 0
+EOF
+chmod +x "$FAKE_BROWSER"
+: > "$FAKE_BROWSER_LOG"
 
 cd "$PKG"
 LISTINGS_BEFORE=$(python3 -c "
 import sqlite3; print(sqlite3.connect('db.sqlite3').execute('SELECT COUNT(*) FROM listings_property').fetchone()[0])")
 echo "listings in shipped db: $LISTINGS_BEFORE"
 
-GABRIEL_NO_BROWSER=1 bash START-GABRIEL-HOMES.sh > "$LOG" 2>&1 &
+BROWSER="$FAKE_BROWSER %s" bash START-GABRIEL-HOMES.sh > "$LOG" 2>&1 &
 LAUNCH_PID=$!
 echo "launcher PID $LAUNCH_PID — polling..."
 
@@ -55,6 +70,14 @@ LISTINGS_AFTER=$(python3 -c "
 import sqlite3; print(sqlite3.connect('db.sqlite3').execute('SELECT COUNT(*) FROM listings_property').fetchone()[0])")
 echo "  listings before=$LISTINGS_BEFORE after=$LISTINGS_AFTER"
 if [ "$LISTINGS_BEFORE" = "$LISTINGS_AFTER" ]; then PASS=$((PASS+1)); echo "  OK   no duplication"; else FAIL=$((FAIL+1)); echo "  FAIL duplicated"; fi
+
+echo "browser auto-open check (the v1 bug):"
+sleep 2
+OPENS=$(wc -l < "$FAKE_BROWSER_LOG" | tr -d ' ')
+if [ "$OPENS" = "1" ]; then PASS=$((PASS+1)); echo "  OK   browser fired exactly once"; else FAIL=$((FAIL+1)); echo "  FAIL browser fired $OPENS times (want 1)"; fi
+OPEN_URL=$(awk '{print $2}' "$FAKE_BROWSER_LOG" | head -1)
+if [ "$OPEN_URL" = "http://127.0.0.1:$PORT/" ]; then PASS=$((PASS+1)); echo "  OK   browser opened the served URL"; else FAIL=$((FAIL+1)); echo "  FAIL browser opened '$OPEN_URL'"; fi
+if grep -q " UP$" "$FAKE_BROWSER_LOG"; then PASS=$((PASS+1)); echo "  OK   site was UP at browser-open time"; else FAIL=$((FAIL+1)); echo "  FAIL site was DOWN at browser-open: $(cat "$FAKE_BROWSER_LOG")"; fi
 
 pkill -f "ziptest/gabriel-homes" 2>/dev/null && echo "stopped."
 sleep 1

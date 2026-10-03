@@ -61,3 +61,34 @@ Stage Summary:
 - Deliverable: /home/z/my-project/download/gabriel-homes-oneclick.zip (3.8 MB) — unzip anywhere, double-click START-GABRIEL-HOMES(.bat/.command/.sh) for your OS.
 - Triple-checked: suites green pre-package; cold start green; delivered-zip boot green.
 - Demo credentials documented in RUN-ME-FIRST.txt: admin@gabrielhomes.co.ke / gabriel2026 (admin), hello@gabrielhomes.co.ke / gabriel2026 (agent dashboard).
+
+---
+Task ID: 4
+Agent: Super Z (main agent)
+Task: Bug report from user — "it didn't open my browser". Re-assess the one-click package, find the root cause, fix it, re-verify 100%.
+
+Work Log:
+- Root-cause analysis of the v1 launchers (user ran the delivered zip; browser never opened usable site). Found 7 concrete defects:
+  1. START-GABRIEL-HOMES.bat opened the browser BEFORE `runserver` bound the port -> browser fired into ERR_CONNECTION_REFUSED.
+  2. .sh launcher used a fixed `sleep 2` guess -> same race on slow first boots.
+  3. .sh swallowed every browser-open failure silently (`2>/dev/null || true`) — WSL/headless systems got nothing AND no message.
+  4. No WSL-aware fallbacks (wslview / cmd.exe / explorer.exe) — xdg-open typically fails under WSL.
+  5. Windows: a winget-installed Python is invisible in the running session (PATH not refreshed) -> script gave up before the browser stage.
+  6. Windows: running the .bat from inside Explorer's zip preview extracts only that file to %TEMP% -> pip failed -> early exit, no browser.
+  7. STOP-WEBSITE.bat used `!FOUND!` without EnableDelayedExpansion -> status messages never printed.
+- META root cause (why previous "triple check" missed it): all three verification runs used GABRIEL_NO_BROWSER=1 — the browser path was NEVER executed before delivery.
+- Fixes:
+  - New gabriel_homes/scripts/open_browser_when_ready.py: polls the URL until HTTP is answered (45s budget), THEN opens the browser (webbrowser + per-OS fallbacks incl. WSL), prints a loud ASCII manual-URL banner if it cannot; honours GABRIEL_NO_BROWSER; non-fatal exit 0.
+  - Rewrote START-GABRIEL-HOMES.bat (v2): extraction guard, winget PATH-refresh probe of standard install dirs, browser helper via `start /b`, runserver stays foreground.
+  - Rewrote START-GABRIEL-HOMES.sh (v2): extraction guard, helper in background replaces racy sleep-2 subshell.
+  - Fixed STOP-WEBSITE.bat delayed expansion; updated RUN-ME-FIRST.txt (extract-first warning, Gatekeeper, WSL note, "browser opens when site is ready", manual-URL troubleshooting).
+- NEW regression harness scripts/browser_helper_test.sh (4 cases, 14 checks): late-starting server -> browser fires once, correct URL, site verifiably UP at open time, waited >=2s (v1 would fire at ~0s); timeout -> loud warning no open; GABRIEL_NO_BROWSER=1 -> no-op; no browser available -> loud manual-URL message. 14/14 PASS.
+- Environment drift found + fixed: source .venv and db.sqlite3 had vanished -> restored db from the shipped zip, recreated .venv, made build_package.sh self-healing (recreates venv + reseeds db if missing) with zip-stage sanity gates (helper present, launchers call it, racy patterns absent).
+- Upgraded coldstart_test.sh + zipboot_test.sh: fake browser wired via $BROWSER records every open + whether the site answered — the browser path is now exercised end-to-end in BOTH e2e tests.
+- Re-verified: pytest 232/232; build sanity gates OK; TRIPLE-CHECK 2 cold start 11/11 (incl. browser fired once, correct URL, site UP); TRIPLE-CHECK 3 delivered-zip boot 10/10 (80->80 no duplication, browser checks green); zip integrity OK, .bat CRLF OK.
+- Cleaned test copies; rebuilt /home/z/my-project/download/gabriel-homes-oneclick.zip (3.8 MB).
+
+Stage Summary:
+- The browser bug is fixed at the design level: the browser can no longer open before the site answers, failures are loud (never silent), and WSL/zip-viewer/winget-PATH traps are guarded.
+- The exact failure the user hit is now a permanent regression gate: browser auto-open is asserted in the unit harness AND both e2e harnesses.
+- Deliverable rebuilt and triple-verified: /home/z/my-project/download/gabriel-homes-oneclick.zip

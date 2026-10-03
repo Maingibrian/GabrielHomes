@@ -3,7 +3,7 @@ rem ---------------------------------------------------------------------------
 rem Gabriel Homes - stop the local website (Windows)
 rem Kills whatever is listening on ports 8000-8010 (the launcher's range).
 rem ---------------------------------------------------------------------------
-setlocal EnableExtensions
+setlocal EnableExtensions EnableDelayedExpansion
 echo Stopping Gabriel Homes website...
 set "FOUND=0"
 

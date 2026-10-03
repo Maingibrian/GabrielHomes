@@ -14,7 +14,9 @@ WHAT IS THIS?
     - installs Python (if missing) and the project dependencies
     - creates the database and loads ~80 demo Kenyan property
       listings, agents and images (first run only)
-    - opens your browser at the site
+    - waits until the site is running, then opens your browser
+      (it will NOT open a dead/error page - if no browser can be
+      opened automatically it prints the URL loudly instead)
 
 
 WHAT YOU NEED
@@ -24,10 +26,15 @@ WHAT YOU NEED
 
 
 HOW TO START
+  IMPORTANT (Windows): EXTRACT the zip first! Right-click the zip,
+  choose "Extract All...", open the extracted gabriel-homes folder,
+  and start the launcher from THERE. Running the .bat from inside
+  the zip preview window will not work.
+
   WINDOWS
     1. Double-click  START-GABRIEL-HOMES.bat
     2. Wait for the console to finish its first-run setup
-    3. Your browser opens the site automatically
+    3. Your browser opens the site automatically once it is ready
 
   macOS
     1. Double-click  START-GABRIEL-HOMES.command
@@ -37,14 +44,19 @@ HOW TO START
        - If it says "Permission denied": open Terminal, drag the
          file in, and run once:
            chmod +x START-GABRIEL-HOMES.command
-    2. Your browser opens the site automatically
+    2. Your browser opens the site automatically once it is ready
 
   LINUX
     1. In a terminal, from this folder:
          chmod +x START-GABRIEL-HOMES.sh
          ./START-GABRIEL-HOMES.sh
        (many file managers also let you double-click it)
-    2. Your browser opens the site automatically
+    2. Your browser opens the site automatically once it is ready
+
+  WSL (Windows Subsystem for Linux)
+    Run START-GABRIEL-HOMES.sh as above; the browser opens on the
+    Windows side. If it does not, copy the URL from the console
+    into your Windows browser.
 
 
 URLS & DEMO LOGINS
@@ -76,6 +88,14 @@ WHERE IS MY DATA?
 
 
 TROUBLESHOOTING
+  - Browser did not open by itself:
+      The site IS still running. Look at the console window - it
+      prints the address (e.g. http://127.0.0.1:8000/). Type that
+      into your browser manually. If the console says the site did
+      not respond yet, wait a few seconds and try the URL again.
+  - Windows ran the .bat from inside the zip window:
+      Extract the WHOLE zip first (right-click -> Extract All...),
+      then double-click the .bat in the extracted folder.
   - "Python was not found" / installer did not run:
       Install Python 3.12 from https://www.python.org/downloads/
       (Windows: tick "Add python.exe to PATH"), then start again.

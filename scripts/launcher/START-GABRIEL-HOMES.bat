@@ -1,13 +1,14 @@
 @echo off
 rem ---------------------------------------------------------------------------
-rem Gabriel Homes - one-click website launcher (Windows)
+rem Gabriel Homes - one-click website launcher (Windows)  [v2]
 rem
 rem What it does:
 rem   1. Finds (or installs via winget) Python 3.10+
 rem   2. Creates a .venv and installs dependencies (first run, needs internet)
 rem   3. Migrates + seeds ~80 demo listings (skipped automatically if data exists)
 rem   4. Ensures demo accounts (admin + agent) exist
-rem   5. Picks a free port (8000-8010), opens your browser, starts the site
+rem   5. Picks a free port (8000-8010), waits until the site answers,
+rem      THEN opens your browser, and keeps the site running here
 rem
 rem Stop: close this window, or run STOP-WEBSITE.bat
 rem Set GABRIEL_NO_BROWSER=1 to skip auto-opening the browser.
@@ -21,9 +22,22 @@ echo --------------------------------------------------------------
 echo   GABRIEL HOMES - local website launcher
 echo --------------------------------------------------------------
 
+rem -- Guard: running from inside a zip preview window extracts only
+rem -- THIS file to a temp folder; the rest of the project is missing.
+if not exist "manage.py" (
+    echo   ERROR: manage.py not found next to this script.
+    echo   You probably ran it from INSIDE the zip window.
+    echo   Please EXTRACT the whole zip first: right-click the zip,
+    echo   choose "Extract All...", open the gabriel-homes folder,
+    echo   then double-click START-GABRIEL-HOMES.bat there.
+    pause
+    exit /b 1
+)
+
 set "NOBROWSER=!GABRIEL_NO_BROWSER!"
 set "PYCMD="
 
+rem -- Try the py launcher, then python on PATH.
 py -3 -c "import sys; sys.exit(0 if sys.version_info>=(3,10) else 1)" >nul 2>nul
 if not errorlevel 1 set "PYCMD=py -3"
 
@@ -40,18 +54,39 @@ if not defined PYCMD (
     ) else (
         echo   winget not available on this system.
     )
+
+    rem -- A freshly installed Python is NOT on PATH in this running
+    rem -- session, so probe the standard install locations directly.
     py -3 -c "import sys; sys.exit(0 if sys.version_info>=(3,10) else 1)" >nul 2>nul
-    if errorlevel 1 (
-        echo.
-        echo   Could not find or install Python automatically.
-        echo   Opening https://www.python.org/downloads/
-        echo   Install Python 3.12 and TICK "Add python.exe to PATH",
-        echo   then run this file again.
-        start "" "https://www.python.org/downloads/"
-        pause
-        exit /b 1
+    if not errorlevel 1 set "PYCMD=py -3"
+)
+
+if not defined PYCMD (
+    for %%P in (
+        "%LOCALAPPDATA%\Programs\Python\Python312\python.exe"
+        "%ProgramFiles%\Python312\python.exe"
+        "%LOCALAPPDATA%\Programs\Python\Python311\python.exe"
+        "%ProgramFiles%\Python311\python.exe"
+        "%LOCALAPPDATA%\Programs\Python\Python310\python.exe"
+        "%ProgramFiles%\Python310\python.exe"
+    ) do (
+        if not defined PYCMD if exist %%P (
+            set "CAND=%%~P"
+            call "%%~P" -c "import sys; sys.exit(0 if sys.version_info>=(3,10) else 1)" >nul 2>nul
+            if not errorlevel 1 set "PYCMD=%%~P"
+        )
     )
-    set "PYCMD=py -3"
+)
+
+if not defined PYCMD (
+    echo.
+    echo   Could not find or install Python automatically.
+    echo   Opening https://www.python.org/downloads/
+    echo   Install Python 3.12 and TICK "Add python.exe to PATH",
+    echo   then run this file again.
+    start "" "https://www.python.org/downloads/"
+    pause
+    exit /b 1
 )
 
 for /f "delims=" %%v in ('!PYCMD! --version 2^>^&1') do echo   Python: %%v
@@ -72,6 +107,8 @@ if not exist ".venv\.deps_ok" (
     "!VPY!" -m pip install --quiet --disable-pip-version-check -r requirements.txt
     if errorlevel 1 (
         echo   ERROR: pip install failed - check your internet connection.
+        echo   (If you ran this from inside the zip window, extract the
+        echo    WHOLE zip first, then run it from the extracted folder.)
         pause
         exit /b 1
     )
@@ -121,11 +158,15 @@ echo   Website:   http://127.0.0.1:!PORT!/
 echo   Admin:     http://127.0.0.1:!PORT!/admin/     (admin@gabrielhomes.co.ke / gabriel2026^)
 echo   Agent:     http://127.0.0.1:!PORT!/dashboard/  (hello@gabrielhomes.co.ke / gabriel2026^)
 echo   Stop:      close this window, or run STOP-WEBSITE.bat
+echo   Your browser will open as soon as the site is ready.
 echo --------------------------------------------------------------
 echo.
 
+rem -- v2 fix: do NOT open the browser before the server listens.
+rem -- Background this small waiter: it polls until the site answers,
+rem -- then opens the default browser. Closing this window stops both.
 if not "!NOBROWSER!"=="1" (
-    start "" "http://127.0.0.1:!PORT!/"
+    start "" /b "!VPY!" scripts\open_browser_when_ready.py !PORT!
 )
 
 "!VPY!" manage.py runserver 0.0.0.0:!PORT! --noreload
