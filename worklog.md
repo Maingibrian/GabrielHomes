@@ -149,3 +149,20 @@ Stage Summary:
 - The site went from wireframe-generic to "Coastal Editorial" brand: real photography everywhere, Fraunces display serif identity, tactile cards, textured dark sections.
 - All demo imagery is type-matched (apartments get apartment exteriors, warehouses get warehouses, land gets gardens), deterministic per slug, watermark-audited, and reproducible offline via the bundled pool + seed_demo integration.
 - All regression gates still green; the one-click zip is rebuilt and re-verified end-to-end.
+
+---
+Task ID: 8
+Agent: Super Z (main agent)
+Task: "give me the home page ..all code should be in one html, css, js block" — single-file HTML snapshot of the redesigned home page.
+
+Work Log:
+- Captured the LIVE Django-rendered home page (curl from runserver on :8765) so the snapshot carries real data: 80 listings stat, 6 featured property cards with real covers/prices, 6 agency portraits, founder, counties/types counts.
+- Wrote scripts/build_single_home.py: assembles tokens.css + components.css + base.css + home.css into ONE <style> (exact cascade order, @imports stripped), inlines motion.js as ONE <script> at end of body, embeds 4 woff2 fonts + favicon + hero/CTA/founder/6 covers/6 portraits as base64 data URIs (images resized: hero/CTA 1600w q78, covers 800w q75, portraits 520w q80, founder 640w q80).
+- BUG FOUND during build: my media-ref regex omitted the "=" after src (src branch never matched, only url( did) — the in-script external-ref audit caught the 6 leftover <img> tags; fixed pattern to (?:src="|url\(['"]?). Lesson: audit gate did its job.
+- Also learned re.sub replacement-template pitfall (base64 in repl string) — switched to lambda replacements.
+- Verification (headless Chromium): 0 page errors, 0 console errors; fonts.check true for Fraunces+Geist; EXACTLY 1 <style> + 1 <script>; 0 external stylesheets/scripts; all 6 imgs loaded; motion.js alive (counter animated to 80, 46 reveal elements); hamburger mobile menu opens (screenshots desktop hero + full scroll + mobile hero + mobile menu all pixel-correct).
+- Dropped <link canonical> + fonts preconnect (meaningless standalone); provenance banner added after doctype.
+- Deliverable: download/gabriel-homes-homepage.html (2.2 MB, self-contained, double-click to open).
+
+Stage Summary:
+- The redesigned "Coastal Editorial" home page now ships as ONE self-contained HTML file: 1 style block, 1 script block, every font/photo inlined as data URIs — verified rendering identically to the live Django site on desktop + mobile.
