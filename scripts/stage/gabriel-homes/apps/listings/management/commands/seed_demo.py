@@ -11,10 +11,13 @@ Usage:
 """
 from __future__ import annotations
 
+import hashlib
 import io
 import random
 from decimal import Decimal
+from pathlib import Path
 
+from django.conf import settings
 from django.core.files.base import ContentFile
 from django.core.management.base import BaseCommand, CommandParser
 from django.db import transaction
@@ -229,6 +232,32 @@ def _cover_image(caption: str, w: int = 1280, h: int = 800) -> ContentFile:
     buf = io.BytesIO()
     img.save(buf, format="JPEG", quality=82)
     return ContentFile(buf.getvalue(), name=f"{slugify(caption)[:60] or 'cover'}.jpg")
+
+
+# ---------------------------------------------------------------------------
+# Real-photo pool (bundled under MEDIA_ROOT/demo-photos/<pool>/) — generated
+# by scripts/assign_demo_images.py. When present, seeded listings use real
+# photography instead of the Pillow placeholder art.
+# ---------------------------------------------------------------------------
+DEMO_TYPE_POOL = {
+    "flats-apartments": "apartment", "houses": "house", "townhouses": "house",
+    "maisonettes": "house", "bungalows": "house", "villas": "house",
+    "land": "land", "commercial-property": "office", "offices": "office",
+    "shops": "shops", "warehouses": "warehouse",
+}
+
+
+def _demo_photo(caption: str, pool: str) -> ContentFile | None:
+    """Return a ContentFile with a real demo photo, or None if the bundled
+    demo-photos pool is not shipped (then callers fall back to Pillow art)."""
+    base = Path(settings.MEDIA_ROOT) / "demo-photos" / pool
+    files = sorted(base.glob("*.jpg")) if base.is_dir() else []
+    if not files:
+        return None
+    digest = int(hashlib.md5(caption.encode("utf-8")).hexdigest(), 16)
+    src = files[digest % len(files)]
+    name = f"{slugify(caption)[:60] or 'photo'}.jpg"
+    return ContentFile(src.read_bytes(), name=name)
 
 
 # ---------------------------------------------------------------------------
@@ -495,9 +524,10 @@ class Command(BaseCommand):
             picked = random.sample(amenities, k=random.randint(2, 4))
             property_obj.amenities.set(picked)
 
-            # Cover image
+            # Cover image (real demo photo when bundled, else Pillow art)
             if with_images:
-                cover = _cover_image(title)
+                pool = DEMO_TYPE_POOL.get(ptype.slug_plural, "house")
+                cover = _demo_photo(title, pool) or _cover_image(title)
                 PropertyImage.objects.create(
                     property=property_obj,
                     image=cover,
@@ -507,7 +537,8 @@ class Command(BaseCommand):
                 )
                 # Optionally add a second non-cover image
                 if random.random() < 0.4:
-                    extra_img = _cover_image(f"{title} — interior")
+                    extra_img = (_demo_photo(f"{title} — interior", "interior")
+                                 or _cover_image(f"{title} — interior"))
                     PropertyImage.objects.create(
                         property=property_obj,
                         image=extra_img,

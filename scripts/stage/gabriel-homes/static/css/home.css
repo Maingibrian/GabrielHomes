@@ -29,7 +29,7 @@
   content: "";
   position: absolute;
   inset: 0;
-  background: linear-gradient(180deg, rgba(42,33,28,0.45) 0%, rgba(42,33,28,0.65) 100%);
+  background: linear-gradient(180deg, rgba(28,21,17,0.52) 0%, rgba(42,33,28,0.38) 45%, rgba(42,33,28,0.72) 100%);
 }
 .hero .container { position: relative; z-index: 1; }
 .hero__tag {
@@ -42,11 +42,18 @@
 }
 .hero__title {
   font-size: var(--text-display-1);
-  font-weight: 500;
-  line-height: var(--leading-tight);
-  letter-spacing: var(--track-hero);
+  font-weight: 520;
+  font-variation-settings: "opsz" 144;
+  line-height: 1.06;
+  letter-spacing: -0.015em;
   margin: 0 0 1.5rem;
-  max-width: 18ch;
+  max-width: 16ch;
+  text-wrap: balance;
+}
+.hero__title .hero__accent {
+  font-style: italic;
+  font-weight: 480;
+  color: color-mix(in srgb, var(--clay) 55%, var(--cream));
 }
 .hero__subtitle {
   font-size: var(--text-md);
@@ -137,10 +144,13 @@
   margin-bottom: 2rem;
 }
 .story__quote {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 380;
+  font-variation-settings: "opsz" 40;
   font-size: var(--text-2xl);
-  font-weight: 300;
-  letter-spacing: var(--track-tight);
-  line-height: var(--leading-tight);
+  letter-spacing: 0;
+  line-height: 1.25;
   color: var(--ink);
   margin: 2.5rem 0;
 }
@@ -171,8 +181,8 @@
   border-radius: var(--radius-frame);
   background: var(--sand);
   background-size: cover;
-  background-position: center;
-  filter: grayscale(0.2);
+  background-position: center top;
+  box-shadow: var(--shadow-card-hover);
 }
 .story__founder-meta {
   font-family: var(--font-mono);
@@ -248,7 +258,10 @@
    6. Agents — espresso background, numbered portrait cards
    ============================================================ */
 .agents {
-  background: var(--espresso);
+  background:
+    radial-gradient(1200px 600px at 85% -10%, color-mix(in srgb, var(--clay) 16%, transparent), transparent 60%),
+    radial-gradient(900px 500px at 0% 110%, color-mix(in srgb, var(--brown) 45%, transparent), transparent 55%),
+    var(--espresso);
   color: var(--cream);
 }
 .agents__header {
@@ -354,14 +367,20 @@
    9. CTA band — dark, pill button with arrows
    ============================================================ */
 .cta {
-  background: var(--espresso);
+  position: relative;
+  background:
+    linear-gradient(180deg, rgba(28,21,17,0.82) 0%, rgba(42,33,28,0.68) 50%, rgba(28,21,17,0.88) 100%),
+    url("../img/cta-bg.jpg") center/cover no-repeat,
+    var(--espresso);
   color: var(--cream);
   text-align: center;
+  overflow: hidden;
 }
 .cta__title {
   font-size: var(--text-display-2);
-  font-weight: 500;
-  letter-spacing: var(--track-display);
+  font-weight: 520;
+  font-variation-settings: "opsz" 100;
+  letter-spacing: -0.015em;
   line-height: var(--leading-tight);
   max-width: 18ch;
   margin: 0 auto 2rem;

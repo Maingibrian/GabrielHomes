@@ -128,3 +128,24 @@ Work Log:
 
 Stage Summary:
 - The exact zip in download/gabriel-homes-oneclick.zip is verified as-shipped, not as-sourced: UNC auto-copy logic, browser-when-ready chain, paren-audit cleanliness, encodings and boot behaviour all green on the artifact itself.
+
+---
+Task ID: 7
+Agent: Super Z (main agent)
+Task: Design overhaul — user verdict "the front page looks generic... give it style". Plan + implement + verify.
+
+Work Log:
+- AUDIT (before-screenshots desktop/mobile + code read): root cause of "generic" was NOT layout — it was (1) zero real photography: hero was a cartoon skyline JPEG, all 80 listing covers were flat Pillow-gradient rectangles, agency portraits were CSS gradient divs, founder portrait was a gradient block; (2) one font family (Geist) doing every job; (3) text-only cards; (4) cavernous flat dark sections.
+- IMAGERY (the ~70% win): 6 image-search batches -> 95 downloaded, PIL-validated. Curated + cropped stock watermark strips (CROP_BOTTOM map). Built clean pools in media/demo-photos/{house,apartment,shops,warehouse,office,land,interior,portraits}. First assignment caught 6 images with DIAGONAL watermarks that survive bottom-crops (men-01/women-02/women-03 portraits, living-06/bedroom-02 interiors, garden-03 land, plus borderline apartment2-02/04, officebld-04) -> blacklisted after large-thumb pool audit (verify_pools.py), re-fetched 12 replacement portraits (men2/women2). Final: 80 covers overwritten IN PLACE (filename/DB stable, type-matched exteriors via md5(slug)), 33 interiors, 6 agency portraits via AgencyProfile.logo, hero (dusk cliff villa), CTA beach, founder portrait. Orphan media files deleted (6 old logos + portrait-07).
+- seed_demo.py: added _demo_photo() — future reseeds prefer the bundled media/demo-photos pool (deterministic md5 pick, type-aware via DEMO_TYPE_POOL), Pillow art stays as offline fallback.
+- TYPOGRAPHY: self-hosted Fraunces variable (normal+italic latin woff2, 144KB total) in static/fonts; tokens.css adds --font-display; base.css h1-h6 -> Fraunces 560 opsz60; hero/display/wordmark/story-quote tuned per-section (opsz 144 display sizes, italic clay accent on "human").
+- CSS: components.css — warm-tinted shadow tokens (--shadow-card-hover), listing-card cover shade + 0.7s image zoom + 5px lift, value/principle cards get icon slot + hover lift, agent cards + portraits refined. home.css — hero overlay deepened, agents section radial clay/brown texture, CTA background photo + overlay, founder portrait real image with hover shadow.
+- TEMPLATES: home.html hero title gets <em class="hero__accent">, founder portrait uses static/img/founder.jpg, 3 value cards get inline SVG line icons (people/eye/keys).
+- BUGS FOUND DURING VERIFY: pytest caught my new SVGs missing aria-hidden (a11y gate works) -> fixed, 232/232. Dev server (--noreload) served stale templates -> restart fixed. Browser cache showed stale hero -> fresh session re-captured.
+- VERIFICATION: pytest 232/232, smoke 58/58, functional 46/46 (run twice), before/after screenshots desktop + mobile viewport-scrolls (mobile hero/serif/search pill confirmed clean), zipboot e2e 10/10, browser-helper 14/14, delivery gate PASS=18 FAIL=0 CLEARED FOR DELIVERY.
+- Deliverable rebuilt: download/gabriel-homes-oneclick.zip now 29 MB (photography adds ~23 MB; ships DB-referenced photos + demo-photos reseed pool + Fraunces).
+
+Stage Summary:
+- The site went from wireframe-generic to "Coastal Editorial" brand: real photography everywhere, Fraunces display serif identity, tactile cards, textured dark sections.
+- All demo imagery is type-matched (apartments get apartment exteriors, warehouses get warehouses, land gets gardens), deterministic per slug, watermark-audited, and reproducible offline via the bundled pool + seed_demo integration.
+- All regression gates still green; the one-click zip is rebuilt and re-verified end-to-end.
