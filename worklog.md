@@ -112,3 +112,19 @@ Stage Summary:
 - Root cause of user's failure: corporate UNC Downloads folder + CMD's UNC limitation; fixed by automatic copy-to-local-disk in v3.
 - Also found and killed the deeper Windows-killer (paren-in-echo breaking every first run) that v1 and v2 shipped with; a static scanner gate now prevents this bug class permanently.
 - All suites green; browser path exercised end-to-end in unit + both e2e harnesses.
+
+---
+Task ID: 6
+Agent: Super Z (main agent)
+Task: Final independent verification of the SHIPPED v3 zip before telling the user "download and run".
+
+Work Log:
+- Confirmed zip mtime 2026-10-05 07:48 UTC (5.4 MB, 602 entries, integrity OK).
+- Byte-verified the shipped START-GABRIEL-HOMES.bat against the v3 source (identical modulo CRLF; file(1) confirms "DOS batch file, ASCII text, with CRLF line terminators"); shipped .sh and open_browser_when_ready.py identical to sources.
+- Wrote scripts/verify_v3_zip.sh: runs every build gate against the launchers EXTRACTED FROM THE ZIP (browser chain, UNC detection SRCDIR:~0,2 + robocopy + LOCALAPPDATA, block-paren audit, CRLF/LF, RUN-ME network-drive docs), fresh-unzips the artifact (0 junk entries, all 10 key files present, exec bits), then chains zipboot_test.sh and browser_helper_test.sh.
+- Harness bugs found and fixed during gating (artifact was never wrong): Python backslash-escaping in the UNC assertion, case-sensitive grep for "network drive", pass/fail accounting that read $? after echo instead of after python.
+- Results: static gates PASS; zipboot e2e PASS=10 FAIL=0 (server up ~9-12s, home/search/about/listing/media/sitemap green, 80->80 listings no duplication, browser fired exactly once at the served URL with site UP); browser-helper harness PASS=14 FAIL=0; STOP-WEBSITE.bat EnableDelayedExpansion fix confirmed in zip. FINAL: PASS=18 FAIL=0 -> CLEARED FOR DELIVERY.
+- Cleaned ziptest/ziptest-gate scratch dirs.
+
+Stage Summary:
+- The exact zip in download/gabriel-homes-oneclick.zip is verified as-shipped, not as-sourced: UNC auto-copy logic, browser-when-ready chain, paren-audit cleanliness, encodings and boot behaviour all green on the artifact itself.
