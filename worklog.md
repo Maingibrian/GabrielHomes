@@ -92,3 +92,23 @@ Stage Summary:
 - The browser bug is fixed at the design level: the browser can no longer open before the site answers, failures are loud (never silent), and WSL/zip-viewer/winget-PATH traps are guarded.
 - The exact failure the user hit is now a permanent regression gate: browser auto-open is asserted in the unit harness AND both e2e harnesses.
 - Deliverable rebuilt and triple-verified: /home/z/my-project/download/gabriel-homes-oneclick.zip
+
+---
+Task ID: 5
+Agent: Super Z (main agent)
+Task: User hit "CMD does not support UNC paths" — corporate redirected Downloads (\\KT-DC2\FolderRedir$\...). Re-assess, fix, re-verify.
+
+Work Log:
+- Diagnosis: user DID extract the zip correctly; their Downloads folder is a network share. CMD cannot use a UNC path as CWD (silently falls back to C:\Windows), so the v2 guard misfired with the "zip window" message.
+- DEEPER FIND via paren-audit grep: the v1 AND v2 .bat contained 3 unquoted ')' inside echo lines within if(...) blocks — in cmd this closes the block early. Consequences: v1/v2 died with a syntax error at "Creating virtual environment (.venv)" on EVERY first run (the true Windows-killer), and the pip-error branch paused+exited unconditionally. The UNC bug the user hit was just the first wall.
+- v3 START-GABRIEL-HOMES.bat: absolute-path manage.py guard, UNC detection (%SRCDIR:~0,2%=="\\") -> robocopy the site to %LOCALAPPDATA%\GabrielHomes (excluding db.sqlite3/.venv/__pycache__, db copied only if absent so local data is never clobbered), then run from the local copy; all 3 paren bugs reworded; space-safe PYCMD storage (quoted %%P); delayed !LOCALAPPDATA! for the fallback path; runserver bound to 127.0.0.1 (avoids the Windows Firewall prompt on corporate machines). .sh switched to 127.0.0.1 too.
+- NEW permanent gate in build_package.sh: static .bat block-paren auditor (tracks if/for block depth on quote-stripped lines; forbids unquoted ')' in echo/rem lines inside blocks; checks block balance). Self-tested: fixed .bat CLEAN; all 3 historical bugs CAUGHT by the scanner.
+- Environment drift (Oct 5): source .venv + db.sqlite3 wiped again between sessions — build_package.sh self-heal recreated both automatically (recreated venv, migrate+seed 80 listings, setup accounts) exactly as designed on Oct 3.
+- RUN-ME-FIRST.txt: documented the network-drive auto-copy behaviour (HOW TO START + TROUBLESHOOTING).
+- Re-verified: browser-helper unit 14/14; cold start 11/11 (browser fired once, correct URL, site UP); delivered-zip boot 10/10 (80->80, browser green); zip integrity OK; UNC handling + CRLF confirmed inside the shipped .bat.
+- Deliverable: /home/z/my-project/download/gabriel-homes-oneclick.zip (5.2 MB — larger because the reseeded DB regenerated fresh image files).
+
+Stage Summary:
+- Root cause of user's failure: corporate UNC Downloads folder + CMD's UNC limitation; fixed by automatic copy-to-local-disk in v3.
+- Also found and killed the deeper Windows-killer (paren-in-echo breaking every first run) that v1 and v2 shipped with; a static scanner gate now prevents this bug class permanently.
+- All suites green; browser path exercised end-to-end in unit + both e2e harnesses.

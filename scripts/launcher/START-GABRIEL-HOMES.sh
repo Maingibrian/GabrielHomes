@@ -128,4 +128,4 @@ if [ "$NO_BROWSER" != "1" ]; then
   "$VPY" scripts/open_browser_when_ready.py "$PORT" &
 fi
 
-exec "$VPY" manage.py runserver "0.0.0.0:${PORT}" --noreload
+exec "$VPY" manage.py runserver "127.0.0.1:${PORT}" --noreload

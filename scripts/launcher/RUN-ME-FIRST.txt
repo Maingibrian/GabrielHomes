@@ -36,6 +36,12 @@ HOW TO START
     2. Wait for the console to finish its first-run setup
     3. Your browser opens the site automatically once it is ready
 
+    On a COMPANY laptop where Downloads is a network folder
+    (address looks like \\server\...)? The launcher detects that,
+    copies the site to your local disk
+    (%LOCALAPPDATA%\GabrielHomes) and runs it from there - your
+    data is saved in that local copy. No action needed from you.
+
   macOS
     1. Double-click  START-GABRIEL-HOMES.command
        - If macOS says the file "cannot be opened because it is
@@ -93,6 +99,13 @@ TROUBLESHOOTING
       prints the address (e.g. http://127.0.0.1:8000/). Type that
       into your browser manually. If the console says the site did
       not respond yet, wait a few seconds and try the URL again.
+  - "CMD does not support UNC paths" / network drive (\\server\...):
+      Fixed automatically in v3 - the launcher copies the site to
+      %LOCALAPPDATA%\GabrielHomes and runs it from your local disk.
+      To move it by hand instead: copy the gabriel-homes folder to
+      a LOCAL folder such as C:\ (NOT Desktop/Documents/Downloads
+      if those are redirected to \\server\...), then run the .bat
+      from there.
   - Windows ran the .bat from inside the zip window:
       Extract the WHOLE zip first (right-click -> Extract All...),
       then double-click the .bat in the extracted folder.

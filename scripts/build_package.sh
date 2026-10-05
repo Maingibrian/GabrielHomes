@@ -102,6 +102,46 @@ assert "open_browser_when_ready.py" in bat, "bat launcher does not call the brow
 assert "sleep 2" not in sh, "sh launcher still uses the racy fixed sleep"
 assert 'start "" "http://' not in bat, "bat launcher still opens the browser before the server starts"
 print("  sanity: browser-open chain present in staged launchers")
+
+# -- .bat block-paren audit: in cmd, an UNQUOTED ')' inside an echo/rem line
+# -- that sits within an if/for (...) block terminates the block early and
+# -- aborts or corrupts the script. This exact bug class broke the v1+v2
+# -- Windows launchers (script died at 'Creating virtual environment (.venv)').
+# -- We have no Windows box in CI, so enforce it statically.
+import re
+
+def strip_quotes(line: str) -> str:
+    return re.sub(r'"[^"]*"', "Q", line)
+
+depth = 0
+violations = []
+for n, raw in enumerate(bat.splitlines(), 1):
+    code = strip_quotes(raw).strip()
+    if not code or code.lower().startswith("rem"):
+        # rem lines still break blocks on ')', so audit their text when inside blocks
+        if depth > 0:
+            no_esc = re.sub(r"\^\)", "", strip_quotes(raw).strip())
+            if ")" in no_esc:
+                violations.append(f"line {n}: unquoted ')' inside block: {raw.strip()[:70]}")
+        continue
+    body = strip_quotes(raw)
+    stripped = body.strip()
+    cmd = stripped.split()[0].lower() if stripped.split() else ""
+    if cmd == "echo" and depth > 0:
+        # any unquoted ')' that is not an escaped '^)' and not the line's
+        # trailing block-terminator is forbidden inside a block
+        no_esc = re.sub(r"\^\)", "", stripped)
+        if ")" in no_esc.rstrip(">").rstrip():
+            violations.append(f"line {n}: unquoted ')' in echo inside block: {raw.strip()[:70]}")
+    # block-depth tracking (quoted text already neutralised)
+    if stripped.endswith("("):
+        depth += 1
+    if stripped.startswith(")"):
+        depth -= 1
+if depth != 0:
+    violations.append(f"unbalanced blocks: final depth {depth}")
+assert not violations, "BAT BLOCK-PAREN BUGS:\n" + "\n".join(violations)
+print("  sanity: .bat block-paren audit clean")
 PYEOF
 chmod +x "$PKG/START-GABRIEL-HOMES.sh" "$PKG/START-GABRIEL-HOMES.command" \
          "$PKG/STOP-WEBSITE.sh" "$PKG/STOP-WEBSITE.command"

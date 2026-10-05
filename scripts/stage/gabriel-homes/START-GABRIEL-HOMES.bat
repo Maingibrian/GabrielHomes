@@ -1,6 +1,6 @@
 @echo off
 rem ---------------------------------------------------------------------------
-rem Gabriel Homes - one-click website launcher (Windows)  [v2]
+rem Gabriel Homes - one-click website launcher (Windows)  [v3]
 rem
 rem What it does:
 rem   1. Finds (or installs via winget) Python 3.10+
@@ -10,12 +10,17 @@ rem   4. Ensures demo accounts (admin + agent) exist
 rem   5. Picks a free port (8000-8010), waits until the site answers,
 rem      THEN opens your browser, and keeps the site running here
 rem
+rem New in v3: if this script is started from a NETWORK path (UNC, e.g. a
+rem   corporate redirected Downloads folder \\server\...), CMD cannot use it
+rem   as a working directory - so the site is copied to your LOCAL disk
+rem   (%LOCALAPPDATA%\GabrielHomes) and runs from there automatically.
+rem
 rem Stop: close this window, or run STOP-WEBSITE.bat
 rem Set GABRIEL_NO_BROWSER=1 to skip auto-opening the browser.
 rem ---------------------------------------------------------------------------
 setlocal EnableExtensions EnableDelayedExpansion
 title Gabriel Homes
-cd /d "%~dp0"
+set "SRCDIR=%~dp0"
 
 echo.
 echo --------------------------------------------------------------
@@ -24,12 +29,50 @@ echo --------------------------------------------------------------
 
 rem -- Guard: running from inside a zip preview window extracts only
 rem -- THIS file to a temp folder; the rest of the project is missing.
-if not exist "manage.py" (
+if not exist "%SRCDIR%manage.py" (
     echo   ERROR: manage.py not found next to this script.
     echo   You probably ran it from INSIDE the zip window.
     echo   Please EXTRACT the whole zip first: right-click the zip,
     echo   choose "Extract All...", open the gabriel-homes folder,
     echo   then double-click START-GABRIEL-HOMES.bat there.
+    pause
+    exit /b 1
+)
+
+set "RUNDIR=%SRCDIR%"
+
+rem -- Network path (UNC) handling. CMD does not support UNC paths as a
+rem -- current directory: "cd /d \\server\share\..." fails and CMD silently
+rem -- falls back to C:\Windows, where nothing of ours exists. Corporate
+rem -- machines often redirect Downloads to \\server\FolderRedir$\... .
+rem -- Fix: copy the site to the LOCAL disk and run it from there.
+if "%SRCDIR:~0,2%"=="\\" (
+    if not defined LOCALAPPDATA set "LOCALAPPDATA=%USERPROFILE%\AppData\Local"
+    set "LOCALDIR=!LOCALAPPDATA!\GabrielHomes"
+    echo   Your folder is on a NETWORK drive, which Windows does not
+    echo   allow Python to run from. Copying the website to your LOCAL
+    echo   disk at "!LOCALDIR!" - one time, a few seconds...
+    if not exist "!LOCALDIR!" mkdir "!LOCALDIR!"
+    robocopy "%SRCDIR:~0,-1%" "!LOCALDIR!" /E /XF db.sqlite3 /XD .venv __pycache__ /NFL /NDL /NJH /NJS >nul
+    if errorlevel 8 (
+        echo   ERROR: could not copy the site to your local disk.
+        echo   Workaround: copy the gabriel-homes folder manually to your
+        echo   Desktop or C:\ drive, then run START-GABRIEL-HOMES.bat there.
+        pause
+        exit /b 1
+    )
+    if not exist "!LOCALDIR!\db.sqlite3" (
+        copy /Y "%SRCDIR%db.sqlite3" "!LOCALDIR!\db.sqlite3" >nul
+    )
+    echo   Copied. The website will run from your local disk and your
+    echo   data - listings and enquiries - is saved in the copy at
+    echo   "!LOCALDIR!".
+    set "RUNDIR=!LOCALDIR!\"
+)
+
+cd /d "!RUNDIR!"
+if not exist "manage.py" (
+    echo   ERROR: could not enter the site folder "!RUNDIR!".
     pause
     exit /b 1
 )
@@ -71,9 +114,8 @@ if not defined PYCMD (
         "%ProgramFiles%\Python310\python.exe"
     ) do (
         if not defined PYCMD if exist %%P (
-            set "CAND=%%~P"
             call "%%~P" -c "import sys; sys.exit(0 if sys.version_info>=(3,10) else 1)" >nul 2>nul
-            if not errorlevel 1 set "PYCMD=%%~P"
+            if not errorlevel 1 set PYCMD=%%P
         )
     )
 )
@@ -92,7 +134,7 @@ if not defined PYCMD (
 for /f "delims=" %%v in ('!PYCMD! --version 2^>^&1') do echo   Python: %%v
 
 if not exist ".venv\Scripts\python.exe" (
-    echo   Creating virtual environment (.venv) - one time only...
+    echo   Creating the .venv virtual environment - one time only...
     !PYCMD! -m venv .venv
     if errorlevel 1 (
         echo   ERROR: could not create the virtual environment.
@@ -107,8 +149,8 @@ if not exist ".venv\.deps_ok" (
     "!VPY!" -m pip install --quiet --disable-pip-version-check -r requirements.txt
     if errorlevel 1 (
         echo   ERROR: pip install failed - check your internet connection.
-        echo   (If you ran this from inside the zip window, extract the
-        echo    WHOLE zip first, then run it from the extracted folder.)
+        echo   If you ran this from inside the zip window, extract the
+        echo   WHOLE zip first, then run it from the extracted folder.
         pause
         exit /b 1
     )
@@ -169,7 +211,7 @@ if not "!NOBROWSER!"=="1" (
     start "" /b "!VPY!" scripts\open_browser_when_ready.py !PORT!
 )
 
-"!VPY!" manage.py runserver 0.0.0.0:!PORT! --noreload
+"!VPY!" manage.py runserver 127.0.0.1:!PORT! --noreload
 
 echo.
 echo   The website has stopped.
