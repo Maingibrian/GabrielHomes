@@ -121,7 +121,6 @@
 <section class="section story" id="story">
   <div class="container">
     <p class="section-tag" data-reveal>[ STORY ]</p>
-    <span class="eyebrow" data-reveal>Vision</span>
 
     <div class="story__grid">
       <div>
@@ -132,12 +131,8 @@
           Our work doesn't end when the keys change hands.
         </p>
 
-        <p class="story__quote" data-quote-reveal>
+        <p class="story__quote" data-reveal>
           The best comes as standard. Premium quality, verified details, and full support included across every property.
-        </p>
-
-        <p class="story__tagline" data-reveal>
-          The best comes as standard.
         </p>
       </div>
 
@@ -199,7 +194,6 @@
 <section class="section numbers" id="numbers">
   <div class="container">
     <p class="section-tag" data-reveal>[ NUMBERS ]</p>
-    <span class="eyebrow" data-reveal>Milestones / Impact</span>
     <h2 class="numbers__title" data-reveal>A more personal approach to real estate.</h2>
 
     <div class="numbers__grid">
@@ -243,13 +237,12 @@
   <div class="container">
     <div class="agents__header" data-reveal>
       <p class="section-tag section-tag--light">[ AGENTS ]</p>
-      <span class="eyebrow eyebrow--light">Experts</span>
       <h2 class="agents__title">Meet the people behind your next move.</h2>
     </div>
 
     <div class="agents__grid">
       {% for agency in agencies %}
-        <article class="agent-card" data-reveal>
+        <a class="agent-card" href="/agents/" aria-label="{{ agency.name }} — meet the agents" data-reveal>
           <div class="agent-card__portrait" aria-hidden="true"
                {% if agency.logo %}style="background-image: url('{{ agency.logo.url }}');"{% else %}style="background: linear-gradient(135deg, var(--clay), var(--brown));"{% endif %}></div>
           <div>
@@ -257,7 +250,7 @@
             <h3 class="agent-card__name">{{ agency.name }}</h3>
             <p class="agent-card__role">{% if agency.is_verified %}Verified agency{% else %}Agency{% endif %} · {{ agency.properties.published.count }} active listings</p>
           </div>
-        </article>
+        </a>
       {% empty %}
         <p style="color: var(--sand);">No agencies seeded yet.</p>
       {% endfor %}
@@ -272,7 +265,6 @@
 <section class="section philosophy" id="philosophy">
   <div class="container">
     <p class="section-tag" data-reveal>[ PHILOSOPHY ]</p>
-    <span class="eyebrow" data-reveal>Principle / Difference</span>
     <h2 class="philosophy__title" data-reveal>Smart property search, genuine human perspective.</h2>
 
     <div class="philosophy__grid">
@@ -323,7 +315,6 @@
 <section class="section browse" id="browse">
   <div class="container">
     <p class="section-tag" data-reveal>[ BROWSE ]</p>
-    <span class="eyebrow" data-reveal>Find your area</span>
 
     <div class="browse__grid">
       <div data-reveal>

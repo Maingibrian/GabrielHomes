@@ -1,0 +1,74 @@
+{% load core_tags %}
+{% comment %}
+  Reusable listing card. Pass a Property instance as `property`
+  and (optionally) an `index` integer for the [001]-style cover tag.
+
+  Example:
+    {% include "includes/_listing_card.html" with property=p index=forloop.counter %}
+{% endcomment %}
+<a class="listing-card" href="{{ property.get_absolute_url|default:'/' }}"
+   aria-label="{{ property.title }} — {{ property.price|kes }}">
+
+  <div class="listing-card__cover">
+    {% if property.images.all.0.image %}
+      <img class="listing-card__img"
+           src="{{ property.images.all.0.image.url }}"
+           alt="{{ property.title }} — {{ property.location.full_path }}"
+           loading="lazy"
+           width="640" height="480"
+           decoding="async">
+    {% endif %}
+    {% if index %}
+      <span class="listing-card__cover-tag">[ {{ index|stringformat:"03d" }} ]</span>
+    {% endif %}
+    {% if property.is_featured %}
+      <span class="listing-card__featured">Featured</span>
+    {% endif %}
+    {% if request.user.is_authenticated %}
+      <span id="save-btn-{{ property.pk }}" style="position: absolute; bottom: 1rem; right: 1rem;">
+        {% include "accounts/_save_button.html" with property=property %}
+      </span>
+    {% endif %}
+  </div>
+
+  <div class="listing-card__body">
+    <div>
+      <span class="listing-card__price">{{ property.price|kes }}</span>
+      {% if property.price_period == "monthly" %}<span class="listing-card__price-period">/ month</span>{% endif %}
+    </div>
+    <h3 class="listing-card__title">{{ property.title }}</h3>
+    <p class="listing-card__location">{{ property.location.full_path }}</p>
+
+    <div class="listing-card__facts">
+      {% if property.bedrooms %}
+        <span class="listing-card__fact">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 4v16M2 8h18a2 2 0 0 1 2 2v10M2 17h20M6 8V4h8v4"></path></svg>
+          {{ property.bedrooms }} beds
+        </span>
+      {% endif %}
+      {% if property.bathrooms %}
+        <span class="listing-card__fact">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12V4a2 2 0 1 1 4 0M2 12h20v3a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4v-3zM5 19l-1 2M19 19l1 2"></path></svg>
+          {{ property.bathrooms }} baths
+        </span>
+      {% endif %}
+      {% if property.size_sqm %}
+        <span class="listing-card__fact">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3h18v18H3zM9 3v18M3 9h6"></path></svg>
+          {{ property.size_sqm }}m²
+        </span>
+      {% elif property.land_size_acres %}
+        <span class="listing-card__fact">
+          {{ property.land_size_acres }} acres
+        </span>
+      {% endif %}
+    </div>
+
+    {% if property.is_verified %}
+      <div class="listing-card__verified">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+        Verified
+      </div>
+    {% endif %}
+  </div>
+</a>

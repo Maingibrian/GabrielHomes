@@ -69,7 +69,7 @@
   --font-display: "Fraunces", "Iowan Old Style", Georgia, "Times New Roman", serif;
 
   /* Size scale seen in the reference */
-  --text-xs:   0.75rem;   /* 12px */
+  --text-xs:   0.8125rem; /* 13px — floor for UI text; was 12px (too small) */
   --text-sm:   0.875rem;  /* 14px */
   --text-base: 1rem;      /* 16px */
   --text-md:   1.125rem;  /* 18px */
@@ -88,6 +88,7 @@
   --track-display:  -0.04em;
   --track-hero:     -0.05em;
   --track-wordmark: -0.08em;
+  --track-mono:     0.02em;  /* monospace gets POSITIVE tracking — negative crushes it */
 
   /* Line-height */
   --leading-tight: 1.2;

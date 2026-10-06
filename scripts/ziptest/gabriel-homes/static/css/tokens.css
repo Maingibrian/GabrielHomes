@@ -1,0 +1,150 @@
+/* =============================================================
+   Gabriel Homes — design tokens
+   Extracted from design-reference/index.html per WORK.md §10
+   and DESIGN.md. The token layer is the single source of truth
+   for every visual decision; component CSS in components.css
+   and page CSS in home.css only reference these tokens.
+   ============================================================= */
+
+/* ---------- Self-hosted Geist + Geist Mono + Fraunces (DESIGN.md §2b) ---------- */
+@font-face {
+  font-family: "Geist";
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url("../fonts/Geist-Variable.woff2") format("woff2-variations"),
+       url("../fonts/Geist-Variable.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Geist Mono";
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url("../fonts/GeistMono-Variable.woff2") format("woff2-variations"),
+       url("../fonts/GeistMono-Variable.woff2") format("woff2");
+}
+/* Fraunces — editorial display serif for headlines (variable: opsz 9-144, wght 300-700) */
+@font-face {
+  font-family: "Fraunces";
+  font-style: normal;
+  font-weight: 300 700;
+  font-display: swap;
+  src: url("../fonts/Fraunces-Variable-normal.woff2") format("woff2-variations"),
+       url("../fonts/Fraunces-Variable-normal.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Fraunces";
+  font-style: italic;
+  font-weight: 300 700;
+  font-display: swap;
+  src: url("../fonts/Fraunces-Variable-italic.woff2") format("woff2-variations"),
+       url("../fonts/Fraunces-Variable-italic.woff2") format("woff2");
+}
+
+:root {
+  /* --- Colour (WORK.md §10.1) --- */
+  --cream:    #faf8f4;  /* page background, light sections */
+  --white:    #ffffff;
+  --sand:     #d8c9b8;  /* soft borders, chips, subtle fills */
+  --taupe:    #8a7d70;  /* muted text, divider lines */
+  --clay:     #a66a4d;  /* secondary accent */
+  --brown:    #5a4032;  /* hover / secondary dark */
+  --espresso: #2a211c;  /* main dark background (agents, CTA, footer) */
+  --ink:      #211e1b;  /* body text on light */
+  --burnt:    #af4715;  /* primary accent: key CTAs, highlights */
+
+  /* Colour-mix helpers — used to fade solid colours without new tokens */
+  --cream-90:  color-mix(in srgb, var(--cream) 90%, var(--espresso));
+  --cream-75:  color-mix(in srgb, var(--cream) 75%, transparent);
+  --espresso-88: color-mix(in srgb, var(--espresso) 88%, transparent);
+  --espresso-70: color-mix(in srgb, var(--espresso) 70%, transparent);
+  --burnt-12:  color-mix(in srgb, var(--burnt) 12%, var(--cream));
+  --burnt-30:  color-mix(in srgb, var(--burnt) 30%, transparent);
+  --sand-60:   color-mix(in srgb, var(--sand) 60%, transparent);
+  --taupe-35:  color-mix(in srgb, var(--taupe) 35%, transparent);
+
+  /* --- Typography (WORK.md §10.2) --- */
+  --font-sans: "Geist", "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-mono: "Geist Mono", "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+  --font-display: "Fraunces", "Iowan Old Style", Georgia, "Times New Roman", serif;
+
+  /* Size scale seen in the reference */
+  --text-xs:   0.8125rem; /* 13px — floor for UI text; was 12px (too small) */
+  --text-sm:   0.875rem;  /* 14px */
+  --text-base: 1rem;      /* 16px */
+  --text-md:   1.125rem;  /* 18px */
+  --text-lg:   1.25rem;   /* 20px */
+  --text-xl:   1.5rem;    /* 24px */
+  --text-2xl:  1.75rem;   /* 28px */
+  --text-3xl:  2.25rem;   /* 36px */
+  --text-4xl:  clamp(2.5rem, 2.2rem + 1.2vw, 3rem);     /* ~40-48 */
+  --text-display-2: clamp(3rem, 2.4rem + 2.6vw, 4rem);  /* ~48-64 */
+  --text-display-1: clamp(3.5rem, 2.6rem + 4vw, 5rem);  /* ~56-80 */
+  --text-wordmark: clamp(4rem, 2rem + 12vw, 7.5rem);    /* ~64-120 */
+
+  /* Tracking */
+  --track-tight:    -0.02em;
+  --track-tighter:  -0.03em;
+  --track-display:  -0.04em;
+  --track-hero:     -0.05em;
+  --track-wordmark: -0.08em;
+  --track-mono:     0.02em;  /* monospace gets POSITIVE tracking — negative crushes it */
+
+  /* Line-height */
+  --leading-tight: 1.2;
+  --leading-body:  1.3;
+
+  /* OpenType features from the Framer file */
+  --font-features: "blwf" 1, "cv03" 1, "cv04" 1, "cv09" 1, "cv11" 1;
+
+  /* --- Shape & depth (WORK.md §10.3) --- */
+  --radius-sm:    8px;   /* inputs, small chips */
+  --radius-md:    15px;
+  --radius-card:  20px;
+  --radius-frame: 40px;  /* cards, image frames */
+  --radius-pill:  100px; /* pill buttons and tags */
+
+  /* Soft layered shadows */
+  --shadow-card: 0 0.6px 1.57px -1.5px rgba(42,33,28,.14),
+                 0 2.29px 5.95px -3px rgba(42,33,28,.12),
+                 0 10px 26px -4.5px rgba(42,33,28,.03);
+  --shadow-card-hover: 0 24px 48px -14px rgba(42,33,28,.24),
+                 0 8px 16px -6px rgba(42,33,28,.10),
+                 0 2px 4px rgba(42,33,28,.06);
+  --shadow-btn:  0 2px 4px rgba(0,0,0,.1),
+                 0 1px 0 rgba(0,0,0,.05),
+                 0 0 0 1px rgba(255,255,255,.15);
+  --shadow-outline: inset 0 0 0 1px var(--ink);
+
+  /* --- Layout (WORK.md §10.4) --- */
+  --container-max: 1280px;
+  --gutter: clamp(1rem, 0.6rem + 2vw, 2.5rem);
+  --section-pad-y: clamp(3rem, 2rem + 4vw, 6rem);
+  --section-pad-y-lg: clamp(4.5rem, 3rem + 6vw, 8rem);
+
+  /* Breakpoints (mirror in media queries below) */
+  --bp-tablet: 810px;
+  --bp-desktop: 1200px;
+
+  /* Motion */
+  --ease: cubic-bezier(0.2, 0.6, 0.2, 1);
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --t-fast: 0.15s;
+  --t-med: 0.3s;
+  --t-slow: 0.6s;
+
+  /* z-index scale */
+  --z-header: 50;
+  --z-overlay: 100;
+  --z-modal: 200;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --t-fast: 0s;
+    --t-med: 0s;
+    --t-slow: 0s;
+    --ease: steps(1);
+    --ease-out: steps(1);
+  }
+}

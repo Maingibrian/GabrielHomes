@@ -33,6 +33,13 @@ entries. Standing rule for EVERY deliverable (documents, pages, snapshots, repor
   verify via `scripts/verify_v3_zip.sh` (18 gates).
 - Design language: "Coastal Editorial" — cream/clay/espresso palette, Fraunces display
   serif + Geist text, [ BRACKETED ] mono tags, numbered cards, real photography.
+  DESIGN RULES SET 2026-10-06 (user hates tiny type — keep for all future work):
+  (a) hard 13px floor (--text-xs) for ANY UI text; informational text 14px Geist;
+  (b) mono tags get --track-mono (+0.02em), NEVER negative tracking on mono;
+  (c) sections carry ONE bracket label — no eyebrow underneath;
+  (d) mobile hero stats are compact 3-across so the search bar stays in the first viewport;
+  (e) after ANY static-file edit run `manage.py collectstatic` (whitenoise serves
+  staticfiles/) and hard-reload a fresh browser context when screenshotting.
 - Single-file home page snapshot: `download/gabriel-homes-homepage.html` (2.2 MB,
   1 style block + 1 script block, all assets base64). Rebuild via
   `scripts/build_single_home.py` (requires dev server curl to /tmp/home_rendered.html).

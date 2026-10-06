@@ -1,0 +1,48 @@
+--------------------------------------------------------------
+   Gabriel Homes — local website launcher 
+--------------------------------------------------------------
+  Python:   Python 3.12.14 (python3.12)
+  Creating virtual environment (.venv) — one time only...
+  Installing dependencies (first run needs internet, 1-3 min)...
+  Preparing database...
+Listings already seeded; skipping generation.
+
+Done.
+  Locations:      61
+  Property types: 11
+  Amenities:      24
+  Agencies:       6
+  Listings:       80
+  Images:         generated
+  Demo agent login:       hello@gabrielhomes.co.ke / gabriel2026
+  Account setup OK.
+
+--------------------------------------------------------------
+  Gabriel Homes is starting at:  http://127.0.0.1:8001/
+  Website:   http://127.0.0.1:8001/
+  Admin:     http://127.0.0.1:8001/admin/     (admin@gabrielhomes.co.ke / gabriel2026)
+  Agent:     http://127.0.0.1:8001/dashboard/  (hello@gabrielhomes.co.ke / gabriel2026)
+  Stop:      close this window, or run STOP-WEBSITE
+  Your browser will open as soon as the site is ready.
+--------------------------------------------------------------
+
+Performing system checks...
+
+System check identified no issues (0 silenced).
+October 06, 2026 - 10:41:25
+Django version 5.1.15, using settings 'config.settings.dev'
+Starting development server at http://127.0.0.1:8001/
+Quit the server with CONTROL-C.
+
+[06/Oct/2026 10:41:25] "GET / HTTP/1.1" 200 38906
+[06/Oct/2026 10:41:25] "GET / HTTP/1.1" 200 38906
+[06/Oct/2026 10:41:25] "GET / HTTP/1.1" 200 38906
+[06/Oct/2026 10:41:25] "GET / HTTP/1.1" 200 38906
+[gabriel] Browser opened: http://127.0.0.1:8001/
+[06/Oct/2026 10:41:25] "GET /property-for-sale/mombasa/ HTTP/1.1" 200 65765
+[06/Oct/2026 10:41:25] "GET /about/ HTTP/1.1" 200 14737
+[06/Oct/2026 10:41:25] "GET /property-for-sale/mombasa/ HTTP/1.1" 200 65765
+[06/Oct/2026 10:41:25] "GET /listing/retail-shop-in-likoni-80/ HTTP/1.1" 200 31800
+[06/Oct/2026 10:41:25] "GET /property-for-sale/mombasa/ HTTP/1.1" 200 65765
+[06/Oct/2026 10:41:25] "GET /media/property-images/2026/10/retail-shop-in-likoni-080.jpg HTTP/1.1" 200 105579
+[06/Oct/2026 10:41:25] "GET /sitemap.xml HTTP/1.1" 200 38869

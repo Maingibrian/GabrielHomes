@@ -182,3 +182,28 @@ Work Log:
 Stage Summary:
 - Standing rule captured permanently: every future deliverable must be presented IN this UI (Preview Panel on port 3000 + preview link), files also kept in download/.
 - Gabriel Homes home page is now LIVE for the user in the Preview Panel.
+
+---
+Task ID: 10
+Agent: Super Z (main agent)
+Task: User hates the small fonts (bracket tags, nav) — deep visual study of the home page, find flaws, improve further.
+
+Work Log:
+- ENV DRIFT: venv + db.sqlite3 + entire media/ wiped again mid-session. Self-healed: restored db.sqlite3 + media (agency-logos, demo-photos, property-images) from the shipped 29MB zip; rebuilt .venv + requirements. Server :8765 healthy (81 listing-card refs = full data).
+- VISUAL STUDY (measured computed styles + 13 screenshots desktop 1440x900 & mobile 390x844, every section):
+  FLAW 1 (user's complaint, confirmed): whole mono layer stuck at 12px — .nav-link, .hero__tag, .section-tag, .eyebrow, .stat__label, .agent-card__index, .site-header__contact — plus .btn--sm 12px, .search-bar__label 10px, .listing-card__featured 10px. Below comfortable UI floor.
+  FLAW 2: negative tracking (-0.02em) applied to MONOSPACED text — typographically wrong, crushes mono rhythm.
+  FLAW 3 (interaction): mobile hero stats stacked full-width 1-col (3 hairlines + 48-64px numbers) pushed the search bar ~2 screens below the fold.
+  FLAW 4: story quote word-reveal read as broken static text (half-lit gray/clay) + duplicated "The best comes as standard." tagline below it.
+  FLAW 5: double-label device everywhere: [ STORY ]+Vision, [ NUMBERS ]+Milestones/Impact, [ AGENTS ]+Experts, [ PHILOSOPHY ]+Principle/Difference, [ BROWSE ]+Find your area — noise.
+  FLAW 6: contrast — burnt #af4715 12px tags on espresso ~2:1 (agents section); taupe card locations fainter than the VERIFIED badge despite being key info.
+  FLAW 7: agent cards were <article>, not clickable — dead end; washed-out gray card bg.
+  FLAW 8: header contact block 12px mono = fine print.
+- FIXES: tokens.css --text-xs 12->13px (global floor), new --track-mono 0.02em; nav-link -> 14px mono + padding; header contact -> 14px Geist w500 brighter; btn--sm padding up; section-tag 13px w500 deepened burnt color, --light variant lightened; search-bar__label 11.5px darker; listing-card__location 14px darkened; agent role 13px; hero tag 13px brighter + mono tracking; mobile hero stats -> compact 3-across, hairlines hidden, numbers clamped, search bar now IN the first viewport; story quote fully-lit burnt italic (removed data-quote-reveal + duplicate tagline + .story__tagline CSS); removed ALL 5 eyebrow spans from home.html (kept in styleguide for tests); agent cards -> <a href="/agents/"> warmer bg (espresso 62% brown); browse counts darkened.
+- GOTCHA: whitenoise runserver_nostatic serves staticfiles/ not static/ — MUST run collectstatic after CSS edits (browser showed stale 12px until fresh context + recollect).
+- TEST CONSTRAINT HANDLED: test_home_page_has_design_language_markers needs exact "[ STORY ]" etc — kept verbatim; eyebrow assertion only on /styleguide/ — kept there.
+- VERIFICATION: fresh-context measured nav 14px, tag 13px +0.26px, search label 11.5px; screenshots hero/story/featured/agents desktop + mobile (search bar above fold); agent role uppercase experiment REVERTED (wrapped badly); pytest 232/232, smoke 58/58 (needs :8000), functional 46/46; single-file rebuilt (2.23MB) + verified 0 errors; preview :3000 serves new design (nav 14px, quote burnt, 6 agent links); zip rebuilt 30MB -> verify_v3_zip PASS=18 FAIL=0 CLEARED.
+- Deliverables refreshed: download/gabriel-homes-homepage.html, download/gabriel-homes-oneclick.zip, preview on :3000.
+
+Stage Summary:
+- The type system now has a hard 13px floor, mono tracking is positive, the mono layer is reserved for labels while informational text moved to 14px Geist; sections carry a single bracket tag; the story quote reads complete; agents are clickable with warmer cards; mobile hero shows the search bar in the first viewport. All gates green, all three deliverables rebuilt.
