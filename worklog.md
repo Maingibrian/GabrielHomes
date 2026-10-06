@@ -166,3 +166,19 @@ Work Log:
 
 Stage Summary:
 - The redesigned "Coastal Editorial" home page now ships as ONE self-contained HTML file: 1 style block, 1 script block, every font/photo inlined as data URIs — verified rendering identically to the live Django site on desktop + mobile.
+
+---
+Task ID: 9
+Agent: Super Z (main agent)
+Task: "need it in this ui...put this in your memory and always remember to have all documents presented in this ui"
+
+Work Log:
+- User wants deliverables VIEWABLE inside the chat UI, not just in the Files panel.
+- Mechanism found: the Preview Panel proxies sandbox port 3000 (per fullstack-dev skill instructions); FC_CUSTOM_LISTEN_PORT=81 is the outer proxy.
+- Served the single-file home page on port 3000: scripts/preview_site/index.html via python http.server (nohup, --bind 0.0.0.0) -> HTTP 200, 2.23 MB payload verified by curl.
+- Created /home/z/my-project/MEMORY.md — persistent standing-preferences file for all future sessions: ALWAYS (1) save to download/, (2) serve HTML deliverables on port 3000 for the Preview Panel + give preview link, (3) never reply with only a path. Includes project context snapshot.
+- Appended this worklog entry.
+
+Stage Summary:
+- Standing rule captured permanently: every future deliverable must be presented IN this UI (Preview Panel on port 3000 + preview link), files also kept in download/.
+- Gabriel Homes home page is now LIVE for the user in the Preview Panel.
