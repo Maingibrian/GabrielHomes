@@ -207,3 +207,21 @@ Work Log:
 
 Stage Summary:
 - The type system now has a hard 13px floor, mono tracking is positive, the mono layer is reserved for labels while informational text moved to 14px Geist; sections carry a single bracket tag; the story quote reads complete; agents are clickable with warmer cards; mobile hero shows the search bar in the first viewport. All gates green, all three deliverables rebuilt.
+
+---
+Task ID: 11
+Agent: Super Z (main agent)
+Task: "what should we do next make an indepth plan" — after fork-vs-continue decision (Task: continue won, C*>0.89 unattainable), produce a grounded in-depth delivery plan toward client demo.
+
+Work Log:
+- Launched Explore agent for full codebase inventory of /home/z/my-project/gabriel_homes: 6 apps, 15 models, complete route table (home/search+filters/detail/HTMX enquiry/agents/dashboard/saved/allauth), 22 templates (no stubs), admin fully customized, 232 pytest green, split settings + DEPLOY.md + whitenoise/gunicorn pinned, split-typography tokens quoted exactly.
+- KEY FINDING: project is feature-complete v1 (not 60-70%); remaining = deploy, content, allauth theming (only unbranded surface), contact-page form, MEDIA_ROOT quirk (287 images at project root, no db.sqlite3 in workspace this session), backups, QA/handoff.
+- Read worklog Tasks 1-10: confirmed Task 10 typography fix (13px floor, nav 14px) was already completed and verified.
+- Wrote in-depth delivery plan: Phase 0 pre-flight (1.5h: venv+migrate+seed, MEDIA_ROOT normalize, health) → Phase 1 polish (6h: allauth theme, contact form, inner-page type sweep, SEO hand-check, WhatsApp) → Phase 2 content (5h) → Phase 3 deploy (7h: VPS per DEPLOY.md, DNS+certbot, Brevo SMTP+SPF/DKIM, prod env, backups, content live) → Phase 4 QA+handoff (5h: suites vs prod, Lighthouse >=90, device sweep, client pack, rehearsal). 24.5h core + 15% buffer ~= 28h across 4 days; critical path + day-by-day + risk register + 6 needs-from-you inputs (domain, host, email, WhatsApp, content, demo date) + decision log + freeze list.
+- Deliverable: download/gabriel-homes-delivery-plan.html (20KB, self-contained, Coastal-toned system fonts, print-friendly); copied to scripts/preview_site/plan.html; restarted port-3000 http.server (both / and /plan.html verified 200 after session restart killed servers).
+- Appended this worklog entry.
+
+Stage Summary:
+- Plan delivered and viewable in UI at preview link /plan.html; homepage preview untouched at root.
+- Ground truth for next execution: start Phase 0 on user go; the 6 external inputs are the only schedule risk (domain + host + email are the critical ones — user should procure Day 0).
+- Decision log persists: continue custom, packages-not-repos, scope frozen until demo.

@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gabriel Homes — Client Delivery Plan</title>
+<style>
+  :root{
+    --cream:#FAF6EF; --paper:#FFFDF8; --espresso:#2B2118; --taupe:#7A6A58;
+    --clay:#B4552D; --burnt:#AF4715; --line:#E5DCCC; --ok:#3E6B4F;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:var(--cream);color:var(--espresso);font:16px/1.55 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:920px;margin:0 auto;padding:48px 24px 80px}
+  .serif{font-family:"Iowan Old Style",Georgia,"Times New Roman",serif}
+  .eyebrow{font:500 12px/1 ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.14em;text-transform:uppercase;color:var(--burnt)}
+  header h1{font-size:clamp(2rem,4.5vw,3rem);letter-spacing:-.03em;line-height:1.08;margin:14px 0 10px}
+  header .sub{color:var(--taupe);font-size:17px;max-width:640px}
+  .meta{margin-top:14px;font-size:13px;color:var(--taupe)}
+  .meta b{color:var(--espresso);font-weight:600}
+  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:14px;overflow:hidden;margin:32px 0 8px}
+  .stat{background:var(--paper);padding:18px 20px}
+  .stat .n{font-size:26px;font-weight:650;letter-spacing:-.02em}
+  .stat .l{font-size:12px;color:var(--taupe);text-transform:uppercase;letter-spacing:.08em;margin-top:4px}
+  .note{font-size:13px;color:var(--taupe);margin-top:8px}
+  section{margin-top:52px}
+  h2{font-size:24px;letter-spacing:-.02em;margin:6px 0 6px;padding-top:6px}
+  h2 .idx{color:var(--clay);font-family:ui-monospace,Menlo,monospace;font-size:14px;vertical-align:super;margin-right:6px}
+  .lead{color:var(--taupe);font-size:15px;max-width:700px;margin-bottom:18px}
+  .cols{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  @media(max-width:700px){.cols{grid-template-columns:1fr}}
+  .card{background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:20px 22px}
+  .card h3{font-size:13px;text-transform:uppercase;letter-spacing:.1em;margin-bottom:12px}
+  .card.done h3{color:var(--ok)} .card.gaps h3{color:var(--burnt)}
+  .card ul{list-style:none}
+  .card li{padding:5px 0 5px 22px;position:relative;font-size:14.5px;border-bottom:1px dashed var(--line)}
+  .card li:last-child{border-bottom:0}
+  .card.done li::before{content:"✓";position:absolute;left:0;color:var(--ok);font-weight:700}
+  .card.gaps li::before{content:"→";position:absolute;left:0;color:var(--burnt);font-weight:700}
+  table{width:100%;border-collapse:collapse;background:var(--paper);border:1px solid var(--line);border-radius:12px;overflow:hidden;font-size:14px}
+  th{background:#F2EBDD;text-align:left;font-size:12px;text-transform:uppercase;letter-spacing:.07em;color:var(--taupe);padding:10px 14px;border-bottom:1px solid var(--line)}
+  td{padding:11px 14px;border-bottom:1px solid var(--line);vertical-align:top}
+  tr:last-child td{border-bottom:0}
+  td.id{font-family:ui-monospace,Menlo,monospace;font-size:12.5px;color:var(--clay);white-space:nowrap}
+  td.hrs{font-family:ui-monospace,Menlo,monospace;white-space:nowrap;color:var(--taupe)}
+  .acc{color:var(--taupe);font-size:13px}
+  .block{display:inline-block;font:600 10px/1.8 ui-monospace,Menlo,monospace;letter-spacing:.08em;color:#fff;background:var(--burnt);border-radius:5px;padding:1px 7px;margin-left:6px;vertical-align:middle}
+  .soft{display:inline-block;font:600 10px/1.8 ui-monospace,Menlo,monospace;letter-spacing:.08em;color:var(--taupe);background:#EFE7D7;border-radius:5px;padding:1px 7px;margin-left:6px;vertical-align:middle}
+  .path{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:14px 0 4px}
+  .chip{background:var(--paper);border:1.5px solid var(--clay);color:var(--espresso);border-radius:999px;padding:7px 14px;font:600 13px/1 ui-monospace,Menlo,monospace}
+  .chip.ext{border-style:dashed;border-color:var(--burnt);color:var(--burnt)}
+  .arrow{color:var(--clay);font-weight:700}
+  .dayrow td:first-child{font-weight:650;white-space:nowrap}
+  .check li{padding:8px 0 8px 30px;position:relative;font-size:15px;border-bottom:1px dashed var(--line);list-style:none}
+  .check li:last-child{border:0}
+  .check li::before{content:"";position:absolute;left:0;top:9px;width:16px;height:16px;border:2px solid var(--clay);border-radius:5px}
+  .why{font-size:13px;color:var(--taupe)}
+  .pills{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+  .pill{background:#EFE7D7;border-radius:999px;padding:6px 13px;font-size:13px;color:var(--espresso)}
+  footer{margin-top:64px;padding-top:18px;border-top:1px solid var(--line);font-size:12.5px;color:var(--taupe)}
+  @media print{body{background:#fff}.wrap{padding:0}section{page-break-inside:avoid}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="eyebrow">Gabriel Homes · Delivery Plan · v1.0</div>
+  <h1 class="serif">From verified v1 to a client demo<br>in four working days.</h1>
+  <p class="sub">Grounded in a full codebase audit of 2026-10-07 (all routes, models, templates, tests and settings inventoried) plus worklog Tasks 1–10. Every task below is scoped against what actually exists — nothing speculative.</p>
+  <p class="meta">Baseline: <b>232/232 pytest</b> · 58/58 smoke · 46/46 functional · design system at 13px type floor · one-click demo zip verified (18/18 gates)</p>
+  <div class="stats">
+    <div class="stat"><div class="n">24.5h</div><div class="l">Core work (+15% buffer ≈ 28h)</div></div>
+    <div class="stat"><div class="n">5</div><div class="l">Phases · 21 tasks</div></div>
+    <div class="stat"><div class="n">4 days</div><div class="l">To client demo (Day 0 = today)</div></div>
+    <div class="stat"><div class="n">6</div><div class="l">Inputs only you can provide</div></div>
+    <div class="stat"><div class="n">0</div><div class="l">New heavy dependencies</div></div>
+  </div>
+  <p class="note">Strategy per decision log: continue the custom build (fork loses by ~40–55% on the math), adopt packages not repos (stack already covers everything), freeze scope until after the demo.</p>
+</header>
+
+<section id="standing">
+  <h2 class="serif"><span class="idx">01</span>Where we stand</h2>
+  <p class="lead">The audit's headline: this is not a 60%-done project. The application layer is finished and regression-gated. What remains is deployment, content, four polish items, and handoff.</p>
+  <div class="cols">
+    <div class="card done">
+      <h3>Already built &amp; verified</h3>
+      <ul>
+        <li>Full page set: home, search + filters (price/beds/type/location/amenities/sort), listing detail (gallery, agent card, WhatsApp, JSON-LD, similar listings), agents directory + profiles, about, contact, privacy, terms</li>
+        <li>Inquiry pipeline: HTMX form, honeypot, 3/min rate limit, agent email templating, status tracking (new/read/replied)</li>
+        <li>Agent dashboard: create/edit listings, image manager, inquiry inbox — role-gated (is_agent + AgencyProfile)</li>
+        <li>Auth: allauth email login/signup, saved properties, admin fully tuned (inlines, slugs, actions)</li>
+        <li>SEO: sitemap.xml, robots.txt, OG/Twitter blocks, JSON-LD on detail</li>
+        <li>Deploy readiness: split settings (base/dev/prod), DEPLOY.md runbook, WhiteNoise + gunicorn pinned, security headers configured</li>
+      </ul>
+    </div>
+    <div class="card gaps">
+      <h3>Standing between us and the demo</h3>
+      <ul>
+        <li>Not deployed: no domain, host, SSL or transactional email yet</li>
+        <li>Workspace DB not initialized this session (migrate + seed needed; 287 property images sitting at project root from a past MEDIA_ROOT override — must be normalized)</li>
+        <li>Allauth login/signup pages are unthemed — the only off-brand surface a client would see</li>
+        <li>Contact page is info-only — no form (model already supports general inquiries)</li>
+        <li>Real client content pending: listings, agency profiles, WhatsApp number</li>
+        <li>No backups; no Lighthouse/device QA pass on prod</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section id="path">
+  <h2 class="serif"><span class="idx">02</span>Critical path</h2>
+  <p class="lead">Two chains converge on the demo. Phase 3's external inputs (domain, host, email) are the true schedule risk — procure them on Day 0 and the plan holds.</p>
+  <div class="path">
+    <span class="chip">P0 pre-flight</span><span class="arrow">→</span>
+    <span class="chip">3.1 host</span><span class="arrow">→</span>
+    <span class="chip ext">3.2 domain+SSL ⚑</span><span class="arrow">→</span>
+    <span class="chip">3.6 content live</span><span class="arrow">→</span>
+    <span class="chip">P4 QA → DEMO</span>
+  </div>
+  <div class="path">
+    <span class="chip">1.1 auth theme</span><span class="arrow">→</span>
+    <span class="chip">1.2 contact form</span><span class="arrow">→</span>
+    <span class="chip">3.6 content</span><span class="arrow">→</span>
+    <span class="chip">4.4 client pack</span>
+  </div>
+  <p class="note">⚑ = blocked on your input. Phases 1 and 2 run in parallel with Phase 3 and can absorb any DNS waiting time.</p>
+</section>
+
+<section id="phases">
+  <h2 class="serif"><span class="idx">03</span>The work, task by task</h2>
+
+  <h3 class="serif" style="font-size:19px;margin:26px 0 8px">Phase 0 — Pre-flight <span class="hrs" style="font-size:13px;color:var(--taupe)">· Day 0 · 1.5h</span></h3>
+  <table>
+    <tr><th style="width:52px">ID</th><th>Task</th><th style="width:56px">Hrs</th><th>Acceptance</th></tr>
+    <tr><td class="id">0.1</td><td>Restore runtime: venv, migrate, seed_demo (80 listings), demo accounts; run all three suites green</td><td class="hrs">0.75</td><td class="acc">232/232 · 58/58 · 46/46</td></tr>
+    <tr><td class="id">0.2</td><td>Normalize MEDIA_ROOT: move <i>property-images/</i> → <i>media/property-images/</i>, verify thumbnails and pages resolve</td><td class="hrs">0.5</td><td class="acc">0 broken images in smoke checks</td></tr>
+    <tr><td class="id">0.3</td><td>Health-check dev server + preview panel serving</td><td class="hrs">0.25</td><td class="acc">HTTP 200 both</td></tr>
+  </table>
+
+  <h3 class="serif" style="font-size:19px;margin:26px 0 8px">Phase 1 — Client-facing polish <span class="hrs" style="font-size:13px;color:var(--taupe)">· Day 1 · 6h</span></h3>
+  <table>
+    <tr><th style="width:52px">ID</th><th>Task</th><th style="width:56px">Hrs</th><th>Acceptance</th></tr>
+    <tr><td class="id">1.1</td><td>Theme allauth login / signup / password-reset pages in Coastal Editorial (templates/account/ overrides)</td><td class="hrs">2.0</td><td class="acc">Branded end-to-end; 390px clean; suite green</td></tr>
+    <tr><td class="id">1.2</td><td>General inquiry form on /contact/ (HTMX partial reuse, honeypot + rate limit, property_ref null)</td><td class="hrs">1.5</td><td class="acc">Submits → email + admin + dashboard inbox</td></tr>
+    <tr><td class="id">1.3</td><td>Typography sweep on inner pages (search/detail/dashboard): enforce the 13px floor, nav 14px everywhere</td><td class="hrs">1.0</td><td class="acc">No computed font &lt;13px on any page</td></tr>
+    <tr><td class="id">1.4</td><td>SEO hand-check: OG/Twitter cards, home + detail JSON-LD, sitemap completeness</td><td class="hrs">1.0</td><td class="acc">Rich-results clean on 5 key URLs</td></tr>
+    <tr><td class="id">1.5</td><td>WhatsApp CTA wiring across detail / contact / agent cards <span class="block">NEEDS NUMBER</span></td><td class="hrs">0.5</td><td class="acc">wa.me links open correct pre-filled message</td></tr>
+  </table>
+
+  <h3 class="serif" style="font-size:19px;margin:26px 0 8px">Phase 2 — Content <span class="hrs" style="font-size:13px;color:var(--taupe)">· Day 2 · 5h</span></h3>
+  <table>
+    <tr><th style="width:52px">ID</th><th>Task</th><th style="width:56px">Hrs</th><th>Acceptance</th></tr>
+    <tr><td class="id">2.1</td><td>Load real listings (or approve curated demo pack as launch content) <span class="block">NEEDS CONTENT</span></td><td class="hrs">2.5</td><td class="acc">Client inventory live; seed retired or demoted to draft</td></tr>
+    <tr><td class="id">2.2</td><td>Real agency profiles: names, portraits, phones, WhatsApp, bios</td><td class="hrs">1.0</td><td class="acc">Directory matches client team</td></tr>
+    <tr><td class="id">2.3</td><td>Founder letter / about copy finalized with client voice; contact details</td><td class="hrs">0.75</td><td class="acc">Copy approved by you</td></tr>
+    <tr><td class="id">2.4</td><td>Image QA: covers curated, captions, interiors attached, one-cover constraint</td><td class="hrs">0.75</td><td class="acc">No gradient placeholders left</td></tr>
+  </table>
+
+  <h3 class="serif" style="font-size:19px;margin:26px 0 8px">Phase 3 — Deploy <span class="hrs" style="font-size:13px;color:var(--taupe)">· Day 3 · 7h</span></h3>
+  <table>
+    <tr><th style="width:52px">ID</th><th>Task</th><th style="width:56px">Hrs</th><th>Acceptance</th></tr>
+    <tr><td class="id">3.1</td><td>Provision VPS (Ubuntu 24.04): Postgres, gunicorn systemd unit, nginx, ufw — per existing DEPLOY.md runbook <span class="block">NEEDS HOST</span></td><td class="hrs">2.5</td><td class="acc">App serves via gunicorn on stage URL</td></tr>
+    <tr><td class="id">3.2</td><td>Domain DNS + certbot SSL + www/apex redirects <span class="block">NEEDS DOMAIN</span></td><td class="hrs">1.0</td><td class="acc">https:// locked, A+  edge certificates</td></tr>
+    <tr><td class="id">3.3</td><td>Transactional SMTP (Brevo free tier) + SPF/DKIM + test send <span class="block">NEEDS EMAIL</span></td><td class="hrs">1.0</td><td class="acc">Inquiry email lands in client inbox, not spam</td></tr>
+    <tr><td class="id">3.4</td><td>Prod env: real SECRET_KEY, ALLOWED_HOSTS, DEBUG=False, email verification set optional for launch week</td><td class="hrs">1.0</td><td class="acc">manage.py check --deploy clean</td></tr>
+    <tr><td class="id">3.5</td><td>Backups: cron pg_dump + media sync (nightly, 14-day retention)</td><td class="hrs">0.75</td><td class="acc">Restore rehearsed once</td></tr>
+    <tr><td class="id">3.6</td><td>Content entry on live admin + production smoke run</td><td class="hrs">0.75</td><td class="acc">58/58 smoke vs production URL</td></tr>
+  </table>
+
+  <h3 class="serif" style="font-size:19px;margin:26px 0 8px">Phase 4 — QA &amp; handoff <span class="hrs" style="font-size:13px;color:var(--taupe)">· Day 4 · 5h</span></h3>
+  <table>
+    <tr><th style="width:52px">ID</th><th>Task</th><th style="width:56px">Hrs</th><th>Acceptance</th></tr>
+    <tr><td class="id">4.1</td><td>Full suites vs production + 104 scripted URL/flow checks</td><td class="hrs">1.0</td><td class="acc">All green on https</td></tr>
+    <tr><td class="id">4.2</td><td>Lighthouse ≥90 perf / SEO / a11y on 5 key pages</td><td class="hrs">1.0</td><td class="acc">Scores met or exceptions documented</td></tr>
+    <tr><td class="id">4.3</td><td>Device sweep 1440 / 768 / 390 incl. iOS Safari quirks</td><td class="hrs">1.0</td><td class="acc">Zero layout breaks, menu + forms verified</td></tr>
+    <tr><td class="id">4.4</td><td>Client pack: credentials sheet, one-page admin guide (PDF), 10-minute demo script</td><td class="hrs">1.5</td><td class="acc">Non-technical agent can add a listing unaided</td></tr>
+    <tr><td class="id">4.5</td><td>Demo rehearsal + fix list burn-down</td><td class="hrs">0.5</td><td class="acc">Run-through with zero blockers</td></tr>
+  </table>
+</section>
+
+<section id="schedule">
+  <h2 class="serif"><span class="idx">04</span>Day-by-day</h2>
+  <table>
+    <tr><th style="width:110px">Day</th><th>Blocks (approx. 7–8h/day incl. buffer)</th></tr>
+    <tr class="dayrow"><td>Day 0 — today</td><td>P0 pre-flight (1.5h) · <b>You procure: domain, VPS, email</b> · I draft demo script while waiting</td></tr>
+    <tr class="dayrow"><td>Day 1</td><td>1.1 auth theme → 1.2 contact form → 1.3 type sweep → 1.4 SEO → 1.5 WhatsApp stub</td></tr>
+    <tr class="dayrow"><td>Day 2</td><td>2.1–2.4 content build-out · VPS bootstrap can start tonight if host ready</td></tr>
+    <tr class="dayrow"><td>Day 3</td><td>3.1 → 3.2 → 3.3 → 3.4 → 3.5 → 3.6 (DNS waiting absorbed by Phase 2 overflow)</td></tr>
+    <tr class="dayrow"><td>Day 4</td><td>4.1 → 4.4 → rehearsal → <b>CLIENT DEMO</b></td></tr>
+  </table>
+</section>
+
+<section id="risks">
+  <h2 class="serif"><span class="idx">05</span>Risk register</h2>
+  <table>
+    <tr><th>Risk</th><th style="width:70px">Likelihood</th><th style="width:64px">Impact</th><th>Mitigation</th></tr>
+    <tr><td>Domain/DNS procurement or propagation delays</td><td>Medium</td><td>High</td><td>Buy Day 0, TTL 3600, demo can run on stage URL or local one-click zip</td></tr>
+    <tr><td>Real listing content arrives late</td><td>High</td><td>Medium</td><td>Demo on curated seed (80 realistic listings, real photography); swap is admin-only later</td></tr>
+    <tr><td>Email deliverability</td><td>Medium</td><td>Medium</td><td>SPF/DKIM on Day 3; site collects inquiries to dashboard even with email down; WhatsApp fallback</td></tr>
+    <tr><td>Prod email-verification locks client out</td><td>Medium</td><td>High</td><td>ACCOUNT_EMAIL_VERIFICATION=optional for launch week, tighten after</td></tr>
+    <tr><td>MEDIA_ROOT quirk regresses on prod</td><td>Low</td><td>High</td><td>Fixed in 0.2, asserted by smoke checks + backup restore rehearsal</td></tr>
+    <tr><td>Scope creep during demo prep</td><td>High</td><td>Medium</td><td>Freeze list (§07); new asks go to post-demo backlog</td></tr>
+  </table>
+</section>
+
+<section id="needs">
+  <h2 class="serif"><span class="idx">06</span>What I need from you</h2>
+  <p class="lead">These are the only items that can stall the plan. Everything else is on me.</p>
+  <ul class="check">
+    <li><b>Domain name</b> — registered? which registrar? <span class="block">BLOCKS 3.2</span><div class="why">If not bought: ~$10/yr; gabrielhomes.co.ke is the natural pick.</div></li>
+    <li><b>Hosting approval</b> — recommend a $6–12/mo VPS (Hetzner/DigitalOcean) <span class="block">BLOCKS 3.1</span><div class="why">Alternative: client's existing cPanel — adds migration friction, still workable.</div></li>
+    <li><b>Email sender</b> — approve Brevo free tier (300 emails/day) or a client mailbox <span class="block">BLOCKS 3.3</span></li>
+    <li><b>WhatsApp business number</b> for CTAs <span class="soft">Day 1 stub with placeholder ok</span></li>
+    <li><b>Real listing content</b> — photos, prices, locations — or approve curated demo pack <span class="block">BLOCKS 2.1</span></li>
+    <li><b>Demo date &amp; time</b> — anchors Day 4 <span class="soft">default: Day 4, 11:00 EAT</span></li>
+  </ul>
+</section>
+
+<section id="decisions">
+  <h2 class="serif"><span class="idx">07</span>Decision log &amp; freeze list</h2>
+  <table>
+    <tr><th style="width:200px">Decision</th><th>Rationale (the math)</th></tr>
+    <tr><td><b>Continue custom build</b></td><td>Fork wins only if repo coverage C &gt; (L+S)/(W(1−α)) ≈ 0.89 of remaining work — unattainable. Fork path ≈ 44–50h vs 28h continue; variance 2× higher; maintenance on foreign code 1.5–2× forever.</td></tr>
+    <tr><td><b>Packages, not repos</b></td><td>Stack already pinned covers every commodity need (django-filter, easy-thumbnails, allauth, whitenoise, gunicorn). Package L≈1h, α≈0.05 — beats both options ~10×.</td></tr>
+    <tr><td><b>Frozen until after demo</b></td><td>M-Pesa payments · blog/guides · map embeds · multi-currency · Swahili i18n · saved-search email digests. Anything new → backlog, priced post-demo.</td></tr>
+  </table>
+  <div class="pills">
+    <span class="pill">Post-demo backlog kept in repo WORK.md §14</span>
+    <span class="pill">All gates re-run before demo: pytest · smoke · functional · zip 18/18</span>
+  </div>
+</section>
+
+<footer>
+  Generated 2026-10-07 · Gabriel Homes delivery plan v1.0 · Source: full codebase inventory (routes, 15 models, 22 templates, admin config, settings, 232 tests) + worklog Tasks 1–10 · Baseline suites green as of 2026-10-05.
+</footer>
+
+</div>
+</body>
+</html>
