@@ -225,3 +225,22 @@ Stage Summary:
 - Plan delivered and viewable in UI at preview link /plan.html; homepage preview untouched at root.
 - Ground truth for next execution: start Phase 0 on user go; the 6 external inputs are the only schedule risk (domain + host + email are the critical ones — user should procure Day 0).
 - Decision log persists: continue custom, packages-not-repos, scope frozen until demo.
+
+---
+Task ID: 12
+Agent: Super Z (main agent)
+Task: "i need a deployment ready site...give me a list of what is left..output in word...give me in this ui as always...simple layout and explanation"
+
+Work Log:
+- Loaded docx skill + full reference chain (SKILL.md, routes/create.md, references/docx-js-core.md, design-system.md, common-rules.md, scenes/report.md) BEFORE any code.
+- Routed: report docType -> R1 cover recipe, MIN-1 Warm Gold palette (matches Coastal brand), Profile A formal (English: Times New Roman, pure-black body, line 312), Horizontal-Only tables with MIN-1 tokens, no TOC (user asked simple; short doc -> cover + Arabic-numbered body only).
+- Installed docx@9.9.0 via bun; wrote scripts/generate_deployment_checklist.js implementing calcTitleLayout + splitTitleLines + calcCoverSpacing + buildCoverR1 verbatim from design-system (allNoBorders, exact 16838 wrapper, margin-0 cover section, percentage widths, tableHeader/cantSplit/keepNext everywhere).
+- Content: exec summary; audit status table (8 components); 5 checklist blocks A-E (21 tasks, owner/time/why columns); client-inputs table (6 items with costs + what each blocks); go-live gate (6 objective criteria); 4-day timeline. Total 24.5h + 15% buffer.
+- Generated docx (20.4KB) -> postcheck.py MANDATORY gate: 9/9 passed, 0 errors, 0 warnings (blank pages, cover overflow, line spacing, heading levels, shading all clean).
+- Built HTML companion (scripts/preview_site/deployment-checklist.html + copy in download/) mirroring the Word content; restarted port-3000 http.server (died with session restart again); verified 200 on /deployment-checklist.html, /plan.html and /.
+- Appended this worklog entry.
+
+Stage Summary:
+- Deliverable: download/Gabriel-Homes-Deployment-Readiness-Checklist.docx (postcheck 9/9) + in-UI preview at /deployment-checklist.html; homepage and delivery-plan previews untouched.
+- Standing note: port-3000 http.server must be restarted after every session restart (nohup python3 -m http.server 3000 --bind 0.0.0.0 --directory scripts/preview_site).
+- Next execution step remains Phase 0 / Block A on user go.

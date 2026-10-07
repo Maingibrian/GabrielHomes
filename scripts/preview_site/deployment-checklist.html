@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gabriel Homes — Deployment Readiness Checklist</title>
+<style>
+  :root{--cream:#FAF6EF;--paper:#FFFDF8;--espresso:#2B2118;--taupe:#7A6A58;--clay:#B4552D;--line:#E5DCCC;--gold:#D6C096}
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:var(--cream);color:var(--espresso);font:15.5px/1.6 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+  .wrap{max-width:880px;margin:0 auto;padding:44px 22px 72px}
+  .eyebrow{font:500 12px/1 ui-monospace,Menlo,monospace;letter-spacing:.14em;text-transform:uppercase;color:var(--clay)}
+  h1{font-family:"Iowan Old Style",Georgia,serif;font-size:clamp(1.9rem,4vw,2.6rem);letter-spacing:-.02em;line-height:1.12;margin:12px 0 8px}
+  .sub{color:var(--taupe);max-width:640px}
+  .badge{display:inline-block;margin-top:14px;background:#EFE7D7;border-radius:999px;padding:6px 14px;font-size:13px;color:var(--espresso)}
+  h2{font-family:"Iowan Old Style",Georgia,serif;font-size:21px;letter-spacing:-.01em;margin:44px 0 10px}
+  h2 span{color:var(--clay);font-family:ui-monospace,Menlo,monospace;font-size:13px;margin-right:8px}
+  h3{font-size:16px;margin:24px 0 8px;color:var(--espresso)}
+  p{margin:0 0 12px;color:#3A3430}
+  .note{color:var(--taupe);font-size:14px}
+  table{width:100%;border-collapse:collapse;background:var(--paper);border:1px solid var(--line);border-radius:12px;overflow:hidden;font-size:13.5px;margin:12px 0 18px}
+  th{background:var(--gold);color:#1A1A1A;text-align:left;font-size:11.5px;text-transform:uppercase;letter-spacing:.06em;padding:9px 12px}
+  td{padding:9px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+  tr:last-child td{border-bottom:0}
+  td.id{font-family:ui-monospace,Menlo,monospace;color:var(--clay);font-size:12px;white-space:nowrap}
+  td.mono{white-space:nowrap;color:var(--taupe);font-family:ui-monospace,Menlo,monospace;font-size:12.5px}
+  .total{background:var(--paper);border:1px solid var(--line);border-left:4px solid var(--clay);border-radius:10px;padding:14px 18px;margin:18px 0;font-size:14.5px}
+  footer{margin-top:56px;padding-top:16px;border-top:1px solid var(--line);font-size:12.5px;color:var(--taupe)}
+  @media print{body{background:#fff}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">Gabriel Homes · Word document companion</div>
+  <h1>Deployment Readiness Checklist</h1>
+  <p class="sub">What remains to go live. This page mirrors the delivered Word document — same content, simple layout.</p>
+  <span class="badge">Feature-complete v1 · 232/232 tests · 21 tasks · approx. 28h incl. buffer · 4 days to demo</span>
+
+  <h2><span>1</span>Executive Summary</h2>
+  <p>The site is functionally complete: every public page, the agent dashboard, the inquiry pipeline and the admin are built and regression-gated. The remaining distance to a live, client-ready deployment is operational, not constructive — environment fixes, four brand-critical polish items, real content, and the production stack itself (hosting, domain, SSL, transactional email). Three of those can only be procured by you; buying them on day one protects the launch date. Everything else needs no further input.</p>
+
+  <h2><span>2</span>Where the Project Stands</h2>
+  <p>Audit of 7 October 2026: the application layer is finished and verified — nothing left involves building new product features.</p>
+  <table>
+    <tr><th style="width:32%">Component</th><th>State at audit</th></tr>
+    <tr><td>Public pages (home, search, detail, agents, about, contact, legal)</td><td>Complete — all routes live, covered by automated tests</td></tr>
+    <tr><td>Search and filtering</td><td>Complete — price, beds, type, location, amenities, sort; URL-driven</td></tr>
+    <tr><td>Listing detail and inquiry pipeline</td><td>Complete — gallery, agent card, HTMX form, honeypot, rate limit, agent email</td></tr>
+    <tr><td>Agent dashboard and admin</td><td>Complete — listing creation, image manager, inquiry inbox, tuned admin</td></tr>
+    <tr><td>Accounts and saved properties</td><td>Complete — email login; pages unthemed (item B1)</td></tr>
+    <tr><td>SEO surface</td><td>Complete — sitemap, robots, Open Graph, structured data</td></tr>
+    <tr><td>Deployment artifacts</td><td>Documented, not yet executed — split settings, runbook, gunicorn pinned</td></tr>
+    <tr><td>Content</td><td>Demo data only — 80 seeded listings, real photography; client inventory pending</td></tr>
+  </table>
+  <p class="note">Two workspace defects ride in Block A: the session database/media reset, and 287 images sitting at the project root instead of the media directory. Neither touches the codebase; both would break a naive deploy.</p>
+
+  <h2><span>3</span>What Is Left — The Checklist</h2>
+
+  <h3>Block A · Pre-flight environment fixes — 1.5h (Dev)</h3>
+  <table>
+    <tr><th style="width:7%">ID</th><th style="width:36%">Task</th><th style="width:9%">Time</th><th>Why it matters</th></tr>
+    <tr><td class="id">A1</td><td>Restore runtime: venv, migrate, seed, accounts</td><td class="mono">0.75h</td><td>Every later step depends on a green 232/232 baseline</td></tr>
+    <tr><td class="id">A2</td><td>Normalise media storage (move 287 images)</td><td class="mono">0.5h</td><td>Images outside the media root = broken images in production</td></tr>
+    <tr><td class="id">A3</td><td>Health-check dev and preview servers</td><td class="mono">0.25h</td><td>Confirms the baseline before changes begin</td></tr>
+  </table>
+
+  <h3>Block B · Final client-facing polish — 6h (Dev)</h3>
+  <table>
+    <tr><th style="width:7%">ID</th><th style="width:36%">Task</th><th style="width:9%">Time</th><th>Why it matters</th></tr>
+    <tr><td class="id">B1</td><td>Brand the login / signup / password pages</td><td class="mono">2.0h</td><td>The only off-brand pages — and the client logs in on day one</td></tr>
+    <tr><td class="id">B2</td><td>Working inquiry form on the contact page</td><td class="mono">1.5h</td><td>Completes the conversion path via the existing spam-protected pipeline</td></tr>
+    <tr><td class="id">B3</td><td>Typography sweep on inner pages</td><td class="mono">1.0h</td><td>No text below 13px anywhere, matching the fixed home page</td></tr>
+    <tr><td class="id">B4</td><td>SEO verification pass</td><td class="mono">1.0h</td><td>Share cards, structured data and sitemap correct before indexing</td></tr>
+    <tr><td class="id">B5</td><td>Wire WhatsApp buttons to the real number</td><td class="mono">0.5h</td><td>Buttons point to a placeholder; needs your number (Section 4)</td></tr>
+  </table>
+
+  <h3>Block C · Content — 5h (You + Dev)</h3>
+  <table>
+    <tr><th style="width:7%">ID</th><th style="width:36%">Task</th><th style="width:9%">Time</th><th>Why it matters</th></tr>
+    <tr><td class="id">C1</td><td>Load real listings, or approve the demo pack</td><td class="mono">2.5h</td><td>Demos convince with real inventory; demo pack swappable via admin</td></tr>
+    <tr><td class="id">C2</td><td>Publish real agency profiles</td><td class="mono">1.0h</td><td>Names, portraits, numbers and bios must match the client team</td></tr>
+    <tr><td class="id">C3</td><td>Finalise about and founder copy</td><td class="mono">0.75h</td><td>The story section should read as the client, not a template</td></tr>
+    <tr><td class="id">C4</td><td>Image quality pass</td><td class="mono">0.75h</td><td>No placeholder art on any cover or interior</td></tr>
+  </table>
+
+  <h3>Block D · Deployment — 7h (Dev; three inputs blocked on you)</h3>
+  <table>
+    <tr><th style="width:7%">ID</th><th style="width:36%">Task</th><th style="width:9%">Time</th><th>Why it matters</th></tr>
+    <tr><td class="id">D1</td><td>Provision VPS: Ubuntu, PostgreSQL, gunicorn, nginx</td><td class="mono">2.5h</td><td>The production server, per the runbook already in the repo — blocked by hosting</td></tr>
+    <tr><td class="id">D2</td><td>Domain, DNS and SSL certificate</td><td class="mono">1.0h</td><td>HTTPS is mandatory for a trusted business site — blocked by domain</td></tr>
+    <tr><td class="id">D3</td><td>Transactional email with SPF/DKIM</td><td class="mono">1.0h</td><td>Inquiry emails must reach the inbox, not spam — blocked by email account</td></tr>
+    <tr><td class="id">D4</td><td>Production hardening</td><td class="mono">1.0h</td><td>Real secret key, DEBUG off, Django security check clean</td></tr>
+    <tr><td class="id">D5</td><td>Automated nightly backups</td><td class="mono">0.75h</td><td>A business site without backups is an unacceptable liability</td></tr>
+    <tr><td class="id">D6</td><td>Content entry on live site and smoke test</td><td class="mono">0.75h</td><td>Verifies the public URL end-to-end</td></tr>
+  </table>
+
+  <h3>Block E · QA and handoff — 5h (Dev)</h3>
+  <table>
+    <tr><th style="width:7%">ID</th><th style="width:36%">Task</th><th style="width:9%">Time</th><th>Why it matters</th></tr>
+    <tr><td class="id">E1</td><td>Full test suites against production</td><td class="mono">1.0h</td><td>232/232 tests plus 104 scripted checks on the live HTTPS URL</td></tr>
+    <tr><td class="id">E2</td><td>Performance and accessibility audit</td><td class="mono">1.0h</td><td>Lighthouse 90+ on five key pages</td></tr>
+    <tr><td class="id">E3</td><td>Device sweep: desktop, tablet, phone</td><td class="mono">1.0h</td><td>Most Kenyan property browsing is mobile</td></tr>
+    <tr><td class="id">E4</td><td>Client handoff pack</td><td class="mono">1.5h</td><td>Credentials, one-page admin guide, ten-minute demo script</td></tr>
+    <tr><td class="id">E5</td><td>Demo rehearsal</td><td class="mono">0.5h</td><td>A clean run-through the day before</td></tr>
+  </table>
+
+  <div class="total"><b>Total: 24.5h across 21 tasks, approx. 28h with buffer.</b> Nineteen of 21 tasks need no client input and start immediately; the two content tasks depend on Section 4.</div>
+
+  <h2><span>4</span>Client Inputs Required for Launch</h2>
+  <p>Only the first three are schedule-critical — each is minutes of online procurement, and buying them today is the single action that protects the four-day launch.</p>
+  <table>
+    <tr><th style="width:30%">Item</th><th style="width:38%">Why it is needed</th><th style="width:16%">Cost</th><th>Blocks</th></tr>
+    <tr><td>Domain name (gabrielhomes.co.ke recommended)</td><td>The site's address; the SSL certificate is issued against it</td><td class="mono">~USD 10/yr</td><td class="mono">D2</td></tr>
+    <tr><td>Hosting account (small VPS: Hetzner, DigitalOcean)</td><td>The production server for D1</td><td class="mono">USD 6–12/mo</td><td class="mono">D1</td></tr>
+    <tr><td>Email sending account (Brevo free tier)</td><td>Sends inquiry notifications from the site's address</td><td class="mono">Free</td><td class="mono">D3</td></tr>
+    <tr><td>WhatsApp business number</td><td>Contact buttons (B5) and agent profiles</td><td class="mono">—</td><td class="mono">B5</td></tr>
+    <tr><td>Real listing content, or demo-pack approval</td><td>Determines what C1 loads</td><td class="mono">—</td><td class="mono">C1</td></tr>
+    <tr><td>Demo date and time</td><td>Anchors day four and the rehearsal</td><td class="mono">—</td><td class="mono">Schedule</td></tr>
+  </table>
+
+  <h2><span>5</span>The Go-Live Quality Gate</h2>
+  <p>Deployment-ready is declared against objective criteria, verified on the production URL during Block E — never on judgement.</p>
+  <table>
+    <tr><th style="width:52%">Criterion</th><th>Verified by</th></tr>
+    <tr><td>Live at https with valid certificate and www redirects</td><td>Certificate and redirect check</td></tr>
+    <tr><td>Django deployment security check passes clean</td><td>manage.py check --deploy output</td></tr>
+    <tr><td>All automated tests pass on production</td><td>232/232 tests + 104 scripted checks</td></tr>
+    <tr><td>Performance and accessibility at or above 90</td><td>Lighthouse on five key pages</td></tr>
+    <tr><td>Nightly backups running, restore rehearsed once</td><td>Backup logs and a test restore</td></tr>
+    <tr><td>A non-technical agent can add a listing unaided</td><td>Handoff session using the admin guide</td></tr>
+  </table>
+
+  <h2><span>6</span>Timeline to Launch</h2>
+  <table>
+    <tr><th style="width:16%">Day</th><th style="width:52%">Focus</th><th>Output</th></tr>
+    <tr><td class="mono">Day 0 (today)</td><td>Block A pre-flight; you procure domain, hosting, email</td><td>Verified baseline; accounts in hand</td></tr>
+    <tr><td class="mono">Day 1</td><td>Block B polish</td><td>Every page client-ready</td></tr>
+    <tr><td class="mono">Day 2</td><td>Block C content build-out</td><td>Real or approved content loaded</td></tr>
+    <tr><td class="mono">Day 3</td><td>Block D deployment</td><td>Site live at https</td></tr>
+    <tr><td class="mono">Day 4</td><td>Block E QA and handoff, rehearsal, client demo</td><td>Deployment-ready declared; demo delivered</td></tr>
+  </table>
+  <p class="note">Next action: Block A — needs nothing from you. The parallel action that matters is your three purchases in Section 4.</p>
+
+  <footer>Mirrors: Gabriel-Homes-Deployment-Readiness-Checklist.docx (in download/) · Generated 7 October 2026 · Baseline suites green</footer>
+</div>
+</body>
+</html>
