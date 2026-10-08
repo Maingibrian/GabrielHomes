@@ -82,3 +82,42 @@ def test_setup_accounts_creates_missing_accounts_on_clean_copy(settings):
     assert agent.check_password("gabriel2026")
     assert admin.is_superuser and admin.is_staff
     assert agent.is_agent and agent.is_staff
+
+
+def test_setup_accounts_initializes_empty_password_agent(settings):
+    """Regression (Phase 0, Task 14): seed_demo used to create agent users via
+    User.objects.get_or_create WITHOUT touching the password, leaving it as an
+    EMPTY string. has_usable_password() cannot detect that state, so
+    setup_accounts skipped initialization and the documented agent login
+    (hello@gabrielhomes.co.ke / gabriel2026) was impossible after a reseed.
+    An empty password must count as "not initialized"."""
+    settings.DEBUG = True
+    raw = User.objects.create(
+        email="empty-pw@gabrielhomes.co.ke",
+        full_name="X",
+        is_agent=True,
+        is_staff=True,
+        password="",  # exactly what the old seed path produced
+    )
+    raw.refresh_from_db()
+    assert raw.password == ""
+    _make_user("admin@gabrielhomes.co.ke", None, is_staff=True, is_superuser=True)
+    _run_setup_script()
+    agent = User.objects.get(email="empty-pw@gabrielhomes.co.ke")
+    assert agent.check_password("gabriel2026")
+
+
+def test_seed_demo_creates_agents_with_unusable_password(settings):
+    """S4 invariant restored: seed_demo must never mint working credentials.
+    Freshly created agency users get an unusable password; setup_accounts is
+    the only place the initial demo password is set."""
+    from django.core.management import call_command
+
+    settings.DEBUG = True
+    call_command("seed_demo", "--no-images", verbosity=0)
+    for email in ("hello@gabrielhomes.co.ke", "hello@highlandsestates.co.ke"):
+        u = User.objects.get(email=email)
+        assert u.is_agent
+        assert not u.has_usable_password()
+        assert not u.check_password("gabriel2026")
+

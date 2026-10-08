@@ -55,3 +55,28 @@ Stage Summary:
 - All engineering tasks from the plan are DONE except: D2 suite-on-PG + D5 drill execution (BLOCKED-OWNER O11, one-liner ready in STATUS.md), C1 archive move (needs O2 confirmation), C4 privacy text (O3, lawyer), V1–V4 + R1–R3 verification pass (next loop / after owner inputs).
 - Launch-critical asks unchanged: domain + VPS (O7), SMTP (O6).
 - Repo state: 26 commits total, gate green with G-DEPLOY/G-SAFE/G-CDN/G-STATIC, 296 passing tests.
+
+---
+Task ID: 14
+Agent: Super Z (main agent)
+Task: "continue" + three hygiene asks — (1) reword bare-UUID commit messages to task IDs, (2) remove .env (DATABASE_URL) before any export, (3) set git safe.directory. Then proceed with the pending Phase 0 precheck and the plan's verification pass.
+
+Work Log:
+- Set git safe.directory for / and /gabriel_homes (global).
+- Audited both repos: gabriel_homes repo already had task-ID messages (F1→C3, 27 commits) and no .env; the WORKSPACE-ROOT repo had 1 initial + 15 bare-UUID snapshot commits AND tracked .env since the initial commit.
+- Built hash→message map for all 15 UUID commits by correlating per-commit diffs with worklog Tasks 1–13; one-pass git filter-branch (index-filter removes .env everywhere + msg-filter rewords). Post-verify: git log all Task-ID style; .env absent from every commit in every branch; tree diff vs backup = exactly 1 file (.env) removed; backup ref + reflog expired, gc pruned.
+- Deleted .env from disk (only key: DATABASE_URL; nothing sources it), added .env/.env.*/upload//tool-results/ to root .gitignore, hygiene commit. Re-verified both deliverable zips contain only .env.example.
+- Phase 0: .venv healthy (py3.12.14, Django 5.2.18, Pillow 12.3.0, psycopg 3.2.13); applied 3 pending migrations; scripts/normalize_media.py merged the stray root property-images/ (287 files) into media/property-images with md5 content-dedupe (250 moved, 36 dup-dropped, 1 renamed-on-conflict; every copy verified before source unlink), stray dir removed; restored media/demo-photos pool (65 files) from the shipped oneclick zip; seed_demo --clear → 80 published listings, 129 image rows, 0 missing media files.
+- BUG (found via UI login failing): seed created agency users with EMPTY password strings; has_usable_password() treats "" as usable → setup_accounts skipped initialization; admin@ missing. Fixed both layers (seed sets unusable password on create; setup treats empty password as uninitialized) + 2 regression tests → 298 tests. Ran setup_accounts: both demo accounts now verify gabriel2026.
+- Three suites green after restore: pytest 296 (then 298), smoke 58/58, functional 46/46. Environment lesson: background servers are reaped between tool calls — every Bash call needing :8000/:3000 carries an inline pgrep||start guard, and multi-step browser flows must complete within a single call.
+- V1: pytest-cov (venv-only); per-app coverage agents 89.9 / inquiries 98.1 / listings 95.2 — no new tests needed; ENABLE_G_COV=1 in gate.sh; full make gate GREEN with all five stages.
+- R2: new gabriel_homes/scripts/smoke.sh (BASE_URL parameterized: 9× 200 public+healthz, 2× 302 auth-gated, 1× 404 unknown slug) — 12/12 local PASS, exit 0.
+- V3: hey/ab unavailable, no sudo → wrote scripts/load_smoke.py (stdlib threads, p50/p95/p99 + non-200 accounting; fixed urlparse shadowing bug). Local baseline 20 workers × 60 s: / 23.9 req/s p95 1008 ms; detail page 32.3 req/s p95 1619 ms; 0 non-200 both. Staging measurement deferred to R1 (O7). Data hygiene: purged leftover 'Agent Test' listing.
+- V2: agent-browser QA — 5 pages (home, search, detail, enquiry success, dashboard) × 360/810/1280 = 15/15 PASS, 0 console errors, 0 page errors; HTMX enquiry submitted end-to-end at each viewport; agent dashboard via genuine UI login (validates credential fix). Screenshots in download/gabriel-homes-qa/ (out of repo per plan).
+- docs/STATUS.md: tasks table V1/V2/V3/R2/P0 rows + Loop 3 log entry; repo commits eb97c80 (media) + 434f2a0 (verification + bugfix), GATE GREEN.
+- Delivered download/gabriel-homes-qa/ (15 PNGs) + preview_site/qa.html QA report (embeds shots, hygiene table, bug table, remaining-work table); :3000 health-checked 200 for /qa.html + shots + index/plan/checklist.
+
+Stage Summary:
+- User's three asks DONE and verifiable; Phase 0 DONE (environment restored, media normalized, 80 listings, suites green); plan tasks V1/V2/R2 DONE, V3 local baseline DONE.
+- One real product bug found and fixed with regression coverage (demo credentials after reseed).
+- Everything now waits on owner inputs: O7 (VPS + domain) unblocks R1 rehearsal, staging load numbers with hey, R2 staging tick; O11 unblocks D2/D5; V4 + R3 are owner-run. Remaining code-side work: none until R1 defects surface.

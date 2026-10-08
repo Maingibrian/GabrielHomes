@@ -59,9 +59,13 @@ if agent is None:
     agent.set_password(DEMO_PASSWORD)
     agent.save()
     print(f"  Demo agent login created: {agent.email} / {DEMO_PASSWORD}")
-elif not agent.has_usable_password():
+elif not agent.has_usable_password() or not agent.password:
     # Seeded agents start with an unusable password — set the initial demo
     # password. This is an initial set, not a reset of an existing password.
+    # NB: an EMPTY password string (older seed versions created users via
+    # User.objects.create without touching the password) also counts as
+    # "not initialized" — check_password never matches it, and
+    # has_usable_password() alone cannot detect it.
     agent.set_password(DEMO_PASSWORD)
     agent.is_staff = True
     agent.is_agent = True

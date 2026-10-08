@@ -27,7 +27,12 @@ Current loop: 2 · Current task: done (S7–S12, D3–D6, C1–C3 complete) · N
 | C2 | DONE | 2 | GATE GREEN | seed_demo refuses when DEBUG=False unless --i-know-this-is-demo; all test call sites updated; 2 tests |
 | C3 | DONE | 2 | 5 tests | purge_inquiries --days 365 (default) with --dry-run; cron line added to DEPLOY.md; retention period itself = O4 owner decision |
 | C4 | **BLOCKED-OWNER (O3)** | — | — | Privacy/Terms text: Kenyan lawyer review (Data Protection Act, 2019). Not code. |
-| V1–V4, R1–R3 | TODO | 3 | — | Verification + readiness pass, after owner inputs |
+| V1 | DONE | 3 | GATE GREEN, G-COV ON | pytest-cov installed (venv-only): agents 89.9% · inquiries 98.1% · listings 95.2% — all ≥80%, no new tests needed; ENABLE_G_COV=1 in gate.sh |
+| V2 | DONE (local) | 3 | — | agent-browser headless QA: home / search / detail / enquiry-success / dashboard at 360+810+1280 px — 15/15 PASS, 0 console errors, 0 page errors; HTMX enquiry pipeline verified end-to-end at all 3 viewports; dashboard reached via real UI login (validates credential fix). Screenshots kept OUT of repo (workspace download/gabriel-homes-qa/) |
+| V3 | DONE (local baseline) · staging run **BLOCKED-OWNER (O7)** | 3 | — | hey/ab unavailable, no sudo → scripts/load_smoke.py (stdlib threads, same metrics). Dev runserver, 20 workers × 60 s: `/` 23.9 req/s, p95 1008 ms; `/listing/warehouse-in-karen-90/` 32.3 req/s, p95 1619 ms; **0 non-200 on both**. The plan's p95<500 ms target is judged on the 2 GB VPS at R1 |
+| R2 | Script DONE · staging tick **BLOCKED-OWNER (O7)** | 3 | 12/12 local | scripts/smoke.sh — takes BASE_URL, checks the §1 pages + /healthz/ (200), /dashboard/ + /admin/ (302 logged out), unknown slug (404); non-zero exit on mismatch. Verified against 127.0.0.1:8000 |
+| R1 / V4 / R3 | **BLOCKED-OWNER (O7/O1)** | — | — | R1 fresh-VM rehearsal, V4 Lighthouse (owner), R3 go-live sign-off — all wait for the VPS/domain |
+| P0 | DONE | 3 | 298 tests | Phase 0 environment restore: .venv verified (py3.12.14, Django 5.2.18, Pillow 12.3.0, psycopg 3.2.13); 3 pending migrations applied; stray root property-images/ (287 files) merged into media/ with md5 dedupe (250 moved · 36 dup-dropped · 1 renamed) and removed — media/ is the single MEDIA_ROOT; demo-photos pool (65 files) restored from the shipped zip; seed_demo --clear → 80 published listings, 129 image rows, 0 missing media files; pytest 296 / smoke 58 / functional 46 all green |
 
 ## S11 audit record (per PLAN: each hit + user/agent-supplied assessment)
 | Sink | Location | Input source | Verdict |
@@ -58,6 +63,14 @@ Current loop: 2 · Current task: done (S7–S12, D3–D6, C1–C3 complete) · N
 - Loop 2 (batched multi-task run): all of S7–S12 + D2–D6 + C1–C3 in one loop. 14 tasks, 15 commits, ~38 tool calls total. Tasks averaged ~2.5 calls each; the two environment-imposed failures (Leaflet assets missing under G-STATIC, pytest collecting test_pg.py) were fixed in one iteration each.
 
 ## Loop log (newest first, max 300 lines; archive older entries)
+### Loop 3 — 2026-10-08 (Phase 0 restore · V1 · V2 · V3 local · R2 · demo-credential bugfix)
+- **Phase 0 restore**: venv + pins verified; 3 migrations applied; 287 stray root images merged into media/ (content-dedupe, md5-verified, zero loss) and the root folder removed; demo-photos pool recovered from the shipped zip; reseed 80 listings + 129 images, 0 dangling references; pytest 296 / smoke 58 / functional 46 green.
+- **Bug found & fixed (demo credentials after reseed)**: seed_demo created agency users with EMPTY password strings; `has_usable_password()` cannot detect that, so setup_accounts skipped initialization and the documented agent login was impossible (admin@ was missing entirely). Fix on both layers: seed sets an unusable password on create; setup_accounts treats empty-string passwords as uninitialized. +2 regression tests → **298 tests**.
+- **V1**: coverage per app above the 80 % bar with no new tests required; G-COV enabled → full gate GREEN with G-DEPLOY/G-SAFE/G-CDN/G-STATIC/G-COV all on.
+- **R2**: portable `scripts/smoke.sh` (BASE_URL env) — 12/12 locally, exit 0.
+- **V3**: stdlib load driver `scripts/load_smoke.py` (no hey/ab/sudo in env); local baseline recorded, staging measurement deferred to R1 (O7).
+- **V2**: full browser QA matrix 5 pages × 3 viewports — PASS everywhere, zero console/page errors; real-HTMX enquiry success captured 3×; dashboard via genuine UI login.
+- **Workspace git hygiene** (owner request): all 16 UUID snapshot commits reworded to Task-ID messages; `.env` (DATABASE_URL) purged from every commit + disk + ignored; `safe.directory` set; deliverable zips re-verified .env-free.
 ### Loop 2 — 2026-10-08 (S7–S12, D3, D4, D6, C1–C3; D2/D5 prepared)
 - S7: 5.2.18 verified via `pip index versions`; first-run gate green.
 - S8: pip-audit (venv-only tool, not in requirements.txt) → Pillow/pytest bumps → clean re-audit.

@@ -401,7 +401,7 @@ class Command(BaseCommand):
     # ------------------------------------------------------------------
     def _seed_agencies(self) -> int:
         for name, email, phone, whatsapp, area_name in AGENCIES:
-            user, _ = User.objects.get_or_create(
+            user, created = User.objects.get_or_create(
                 email=email,
                 defaults={
                     "full_name": name,
@@ -410,6 +410,12 @@ class Command(BaseCommand):
                     "is_staff": True,
                 },
             )
+            if created:
+                # Seeded agents get an UNUSABLE password so that
+                # scripts/setup_accounts.py performs the one-and-only initial
+                # password set (S4: seed never mints working credentials).
+                user.set_unusable_password()
+                user.save(update_fields=["password"])
             # Office location = the area itself, not a neighbourhood.
             office = Location.objects.filter(
                 name__iexact=area_name, level=Location.Level.AREA

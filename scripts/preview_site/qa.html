@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gabriel Homes — Verification Pass QA Report (Loop 3)</title>
+<style>
+  :root{
+    --bg:#faf7f2; --ink:#221a14; --clay:#c25e3a; --line:#e6ddd1; --muted:#7a6f63;
+    --ok:#2e7d4f; --card:#ffffff;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:Georgia,'Times New Roman',serif;background:var(--bg);color:var(--ink);line-height:1.6}
+  .wrap{max-width:1180px;margin:0 auto;padding:48px 28px 80px}
+  .kicker{font-family:Menlo,Consolas,monospace;font-size:12px;letter-spacing:.22em;text-transform:uppercase;color:var(--clay);margin-bottom:14px}
+  h1{font-size:clamp(30px,4.5vw,46px);font-weight:600;line-height:1.15;margin-bottom:16px}
+  h1 em{font-style:italic;color:var(--clay)}
+  .lede{font-size:17px;color:var(--muted);max-width:760px;margin-bottom:36px}
+  .badges{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:44px}
+  .badge{font-family:Menlo,Consolas,monospace;font-size:12px;padding:7px 14px;border:1px solid var(--line);border-radius:999px;background:var(--card)}
+  .badge b{color:var(--ok)}
+  h2{font-size:24px;margin:52px 0 18px;padding-bottom:10px;border-bottom:2px solid var(--ink)}
+  h2 .tag{font-family:Menlo,Consolas,monospace;font-size:12px;color:var(--clay);letter-spacing:.14em;margin-left:10px}
+  table{width:100%;border-collapse:collapse;font-size:14.5px;background:var(--card);border:1px solid var(--line)}
+  th,td{text-align:left;padding:11px 14px;border-bottom:1px solid var(--line);vertical-align:top}
+  th{font-family:Menlo,Consolas,monospace;font-size:11.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);background:#f4efe7}
+  td.num{font-family:Menlo,Consolas,monospace;white-space:nowrap}
+  .pass{color:var(--ok);font-weight:700}
+  .warn{color:#b07d2b;font-weight:700}
+  .shots{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:22px;margin-top:20px}
+  figure{background:var(--card);border:1px solid var(--line);padding:10px 10px 14px;box-shadow:0 10px 24px rgba(34,26,20,.07)}
+  figure img{width:100%;height:auto;display:block;border:1px solid var(--line)}
+  figcaption{font-family:Menlo,Consolas,monospace;font-size:11.5px;color:var(--muted);padding:10px 4px 0;letter-spacing:.06em}
+  .note{background:#f4efe7;border-left:3px solid var(--clay);padding:16px 20px;font-size:14.5px;margin:18px 0}
+  .note b{color:var(--ink)}
+  code{font-family:Menlo,Consolas,monospace;font-size:.9em;background:#f0e9df;padding:2px 6px;border-radius:4px}
+  .footer{margin-top:64px;padding-top:18px;border-top:1px solid var(--line);font-family:Menlo,Consolas,monospace;font-size:11.5px;color:var(--muted);letter-spacing:.08em}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="kicker">Gabriel Homes · Loop 3 · 2026-10-08</div>
+  <h1>Verification pass — the site checked in a <em>real browser</em>, under load, with coverage.</h1>
+  <p class="lede">Phase 0 restored the environment (80 seeded listings, real photography pool, media normalized), then the plan's verification tasks ran: V1 coverage gate, V2 browser QA matrix, V3 load baseline, R2 portable smoke. Plus the git-hygiene fixes you asked for.</p>
+
+  <div class="badges">
+    <span class="badge">pytest <b>298/298</b></span>
+    <span class="badge">smoke <b>58/58</b></span>
+    <span class="badge">functional <b>46/46</b></span>
+    <span class="badge">GATE <b>GREEN</b> (G-DEPLOY·G-SAFE·G-CDN·G-STATIC·<b>G-COV</b>)</span>
+    <span class="badge">browser QA <b>15/15</b> · 0 errors</span>
+    <span class="badge">load smoke <b>0 non-200</b></span>
+    <span class="badge">portable smoke <b>12/12</b></span>
+  </div>
+
+  <h2>What you asked for — git &amp; env hygiene <span class="tag">DONE</span></h2>
+  <table>
+    <tr><th>Issue</th><th>Fix</th><th>Verified</th></tr>
+    <tr><td>Commit messages were bare UUIDs — unauditable</td><td>All <b>16</b> workspace commits reworded to Task-ID messages (<code>Task 1: verification pass…</code> … <code>Task 13: Brian plan loop 2…</code>) via a hash→message map; backup refs + reflog pruned</td><td><code>git log --oneline</code> — every commit carries its task ID; repo commits were already clean (F1→C3)</td></tr>
+    <tr><td><code>.env</code> contains a DATABASE_URL — must never ship in an export</td><td>File deleted; <b>purged from every commit in history</b> (index-filter rewrite); <code>.env / .env.*</code> gitignored; both deliverable zips re-checked — only <code>.env.example</code> inside</td><td><code>git log --all -- .env</code> → 0 commits; <code>git grep DATABASE_URL $(git rev-list --all)</code> → 0 hits</td></tr>
+    <tr><td><code>git</code> refuses to run — dubious ownership</td><td><code>safe.directory</code> set for the workspace root and the repo (global config)</td><td>All subsequent git operations ran without stalls</td></tr>
+  </table>
+
+  <h2>V1 — Coverage &amp; gate <span class="tag">GATE GREEN · G-COV ON</span></h2>
+  <table>
+    <tr><th>App</th><th>Coverage</th><th>Bar</th></tr>
+    <tr><td>agents</td><td class="num">89.9%</td><td class="num pass">≥80% ✓</td></tr>
+    <tr><td>inquiries</td><td class="num">98.1%</td><td class="num pass">≥80% ✓</td></tr>
+    <tr><td>listings</td><td class="num">95.2%</td><td class="num pass">≥80% ✓</td></tr>
+  </table>
+  <p class="note">No new tests were needed to clear the bar. <code>ENABLE_G_COV=1</code> is now permanent in <code>scripts/gate.sh</code> — coverage regressions fail the gate from today.</p>
+
+  <h2>V2 — Browser QA matrix <span class="tag">15/15 PASS · 0 console errors · 0 page errors</span></h2>
+  <p style="color:var(--muted);max-width:820px">Headless Chromium via agent-browser. Every page captured at 360, 810 and 1280 px. The HTMX enquiry pipeline was exercised end-to-end at each viewport (form → success partial), and the agent dashboard was reached with a genuine UI login — which also validated the credential bugfix below. Screenshots live outside the repo in <code>download/gabriel-homes-qa/</code>.</p>
+
+  <h2 style="font-size:20px">1280 px — desktop</h2>
+  <div class="shots">
+    <figure><img src="qa-shots/home-1280.png" alt="Home 1280"><figcaption>HOME — Coastal Editorial hero, real photography</figcaption></figure>
+    <figure><img src="qa-shots/search-1280.png" alt="Search 1280"><figcaption>SEARCH — /flats-apartments-for-sale/mombasa/</figcaption></figure>
+    <figure><img src="qa-shots/detail-1280.png" alt="Detail 1280"><figcaption>DETAIL — /listing/warehouse-in-karen-90/</figcaption></figure>
+    <figure><img src="qa-shots/enquiry-1280.png" alt="Enquiry 1280"><figcaption>ENQUIRY — HTMX success partial</figcaption></figure>
+    <figure><img src="qa-shots/dashboard-1280.png" alt="Dashboard 1280"><figcaption>DASHBOARD — agent UI, real login</figcaption></figure>
+  </div>
+
+  <h2 style="font-size:20px">810 px — tablet</h2>
+  <div class="shots">
+    <figure><img src="qa-shots/home-810.png" alt="Home 810"><figcaption>HOME</figcaption></figure>
+    <figure><img src="qa-shots/search-810.png" alt="Search 810"><figcaption>SEARCH</figcaption></figure>
+    <figure><img src="qa-shots/detail-810.png" alt="Detail 810"><figcaption>DETAIL</figcaption></figure>
+    <figure><img src="qa-shots/enquiry-810.png" alt="Enquiry 810"><figcaption>ENQUIRY — success</figcaption></figure>
+    <figure><img src="qa-shots/dashboard-810.png" alt="Dashboard 810"><figcaption>DASHBOARD</figcaption></figure>
+  </div>
+
+  <h2 style="font-size:20px">360 px — mobile</h2>
+  <div class="shots">
+    <figure><img src="qa-shots/home-360.png" alt="Home 360"><figcaption>HOME</figcaption></figure>
+    <figure><img src="qa-shots/search-360.png" alt="Search 360"><figcaption>SEARCH</figcaption></figure>
+    <figure><img src="qa-shots/detail-360.png" alt="Detail 360"><figcaption>DETAIL</figcaption></figure>
+    <figure><img src="qa-shots/enquiry-360.png" alt="Enquiry 360"><figcaption>ENQUIRY — success</figcaption></figure>
+    <figure><img src="qa-shots/dashboard-360.png" alt="Dashboard 360"><figcaption>DASHBOARD</figcaption></figure>
+  </div>
+
+  <h2>V3 — Load baseline (local) <span class="tag">0 non-200 on both pages</span></h2>
+  <table>
+    <tr><th>Target</th><th>Throughput</th><th>p50</th><th>p95</th><th>p99</th><th>Non-200</th></tr>
+    <tr><td><code>/</code> (home)</td><td class="num">23.9 req/s</td><td class="num">827 ms</td><td class="num">1008 ms</td><td class="num">1104 ms</td><td class="num pass">0</td></tr>
+    <tr><td><code>/listing/warehouse-in-karen-90/</code></td><td class="num">32.3 req/s</td><td class="num">437 ms</td><td class="num">1619 ms</td><td class="num">2672 ms</td><td class="num pass">0</td></tr>
+  </table>
+  <p class="note"><b>Read this correctly:</b> these are Django <i>dev-server</i> numbers on a shared container — a baseline, not the bar. The plan's p95 &lt; 500 ms target is judged on the 2 GB VPS with nginx + gunicorn at R1 (needs the VPS, O7). <code>hey</code>/<code>ab</code> aren't installed here (no sudo), so <code>scripts/load_smoke.py</code> (stdlib, same metrics) does the job until then.</p>
+
+  <h2>R2 — Portable smoke script <span class="tag">12/12 locally · exit 0</span></h2>
+  <table>
+    <tr><th>Check</th><th>Expect</th><th>Got</th></tr>
+    <tr><td>/, search pages (Mombasa sale, Nairobi rent), /agents/, /about/, sitemap, robots, login, <b>/healthz/</b></td><td class="num">200</td><td class="num pass">9× 200 ✓</td></tr>
+    <tr><td>/dashboard/ and /admin/ — logged out</td><td class="num">302</td><td class="num pass">2× 302 ✓</td></tr>
+    <tr><td>unknown listing slug</td><td class="num">404</td><td class="num pass">1× 404 ✓</td></tr>
+  </table>
+  <p class="note">Usage on any environment: <code>BASE_URL=https://your-domain bash scripts/smoke.sh</code> — the staging tick happens right after the VPS lands (O7).</p>
+
+  <h2>Bug found during Phase 0 — demo credentials after a reseed <span class="tag">FIXED + 2 regression tests</span></h2>
+  <table>
+    <tr><th></th><th>Before</th><th>After</th></tr>
+    <tr><td><b>What happened</b></td><td><code>seed_demo --clear</code> created agency users with <i>empty-string</i> passwords; <code>has_usable_password()</code> can't see that state, so <code>setup_accounts</code> skipped initialization — the documented agent login was impossible and <code>admin@</code> didn't exist</td><td>Seed sets an <b>unusable</b> password on create (S4 invariant: seed never mints credentials); <code>setup_accounts</code> treats empty-string passwords as uninitialized and performs the one-time demo set</td></tr>
+    <tr><td><b>Proof</b></td><td>UI login bounced, DB check: <code>gabriel2026 → False</code></td><td>Real UI login reaches the dashboard; <code>check_password</code> True for both demo accounts; pytest <b>296 → 298</b></td></tr>
+  </table>
+
+  <h2>Where this leaves the plan</h2>
+  <table>
+    <tr><th>Remaining</th><th>Owner</th><th>Why</th></tr>
+    <tr><td>R1 — fresh-VM deploy rehearsal (DEPLOY.md, end-to-end)</td><td>O7 — VPS access</td><td>Needs an Ubuntu VM; every deviation gets logged back into DEPLOY.md</td></tr>
+    <tr><td>V3 — staging load numbers with <code>hey</code></td><td>O7 — VPS access</td><td>Same VM as R1</td></tr>
+    <tr><td>V4 — Lighthouse scores</td><td>Brian</td><td>Owner-run, bar set by owner</td></tr>
+    <tr><td>R3 — go-live sign-off</td><td>Brian</td><td>After R1 + owner inputs (domain, SMTP, WhatsApp, content)</td></tr>
+    <tr><td>D2/D5 — Postgres suite + restore drill</td><td>O11 — any machine with PG</td><td>One-liners ready in STATUS.md</td></tr>
+  </table>
+
+  <div class="footer">GABRIEL HOMES · LOOP 3 VERIFICATION PASS · REPO GATE GREEN (298 TESTS) · SHOTS: download/gabriel-homes-qa/</div>
+</div>
+</body>
+</html>

@@ -9,7 +9,7 @@ cd "$(dirname "$0")/.."
 
 ENABLE_G_CDN=1     # enabled after S10 (2026-10-08)
 ENABLE_G_STATIC=1  # enabled after S6
-ENABLE_G_COV=0     # enabled after V1
+ENABLE_G_COV=1     # enabled after V1 (2026-10-08: agents 89.9% / inquiries 98.1% / listings 95.2%)
 
 PY="${PYTHON:-.venv/bin/python}"
 FAIL=0
