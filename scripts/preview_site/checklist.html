@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Gabriel Homes — Launch Checklist (Word twin)</title>
+<style>
+  :root { --bg:#0B1C2C; --accent:#529286; --ink:#132535; --muted:#5A6B7A; --line:#BECFCC; --surface:#E8ECEB; }
+  * { box-sizing:border-box; }
+  body { margin:0; font:16px/1.65 Georgia,'Times New Roman',serif; color:#111; background:#F6F8F7; }
+  .wrap { max-width:860px; margin:0 auto; padding:32px 28px 72px; }
+  .cover { background:var(--bg); color:#fff; border-radius:14px; padding:44px 40px 36px; margin-bottom:34px; }
+  .cover .label { color:var(--accent); font:600 11px/1 Arial,sans-serif; letter-spacing:.35em; border-bottom:2px solid var(--accent); display:inline-block; padding-bottom:10px; }
+  .cover h1 { font:700 clamp(28px,5vw,42px)/1.15 Arial,sans-serif; margin:22px 0 12px; }
+  .cover p.sub { color:#B0B8C0; margin:0 0 22px; max-width:56ch; }
+  .meta { border-left:3px solid var(--accent); padding:2px 0 2px 14px; color:#90989F; font-size:14.5px; }
+  .meta div { margin:3px 0; }
+  h2 { font:700 22px/1.3 Arial,sans-serif; color:var(--ink); border-bottom:2px solid var(--accent); padding-bottom:6px; margin:38px 0 14px; }
+  h3 { font:700 17px/1.35 Arial,sans-serif; color:var(--ink); margin:24px 0 8px; }
+  p { margin:0 0 14px; }
+  .task { margin:0 0 14px; padding:12px 16px; background:#fff; border:1px solid var(--line); border-left:4px solid var(--accent); border-radius:8px; }
+  .task b { color:var(--ink); }
+  .task .est { color:var(--muted); font-style:italic; font-size:14px; }
+  .task p { margin:4px 0 0; font-size:15.5px; }
+  table { width:100%; border-collapse:collapse; background:#fff; font-size:15px; margin:8px 0 18px; }
+  th { background:var(--accent); color:#fff; text-align:left; padding:10px 12px; font:600 14px/1.4 Arial,sans-serif; }
+  td { padding:10px 12px; border-bottom:1px solid var(--line); vertical-align:top; }
+  tr:nth-child(even) td { background:var(--surface); }
+  .files { background:var(--surface); border:1px dashed var(--accent); border-radius:8px; padding:12px 16px; font-size:14.5px; margin:26px 0 0; }
+  code { background:#fff; border:1px solid var(--line); border-radius:5px; padding:1px 6px; font-size:13.5px; }
+  .pill { display:inline-block; background:var(--accent); color:#fff; border-radius:99px; font:600 11px/1 Arial,sans-serif; padding:5px 10px; letter-spacing:.05em; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="cover">
+    <span class="label">DEPLOYMENT&nbsp;READINESS</span>
+    <h1>Gabriel Homes Launch Checklist</h1>
+    <p class="sub">Deployment-readiness gap list: what is already closed, what remains on my side, and the seven inputs only you can provide. This page mirrors the Word deliverable 1:1.</p>
+    <div class="meta">
+      <div>Project: gabriel_homes · Django property portal</div>
+      <div>Date: 8 October 2026</div>
+      <div>Live status: 258/258 tests green · 6 security blockers closed today</div>
+      <div>Source plan: docs/PLAN.md (Production Plan v1.0)</div>
+    </div>
+  </div>
+
+  <h2>1. Where We Stand</h2>
+  <p>The site is feature-complete: search &amp; filters, listing pages with map + JSON-LD, the enquiry pipeline (rate limit + honeypot + email), agent dashboards, saved listings, admin, sitemap and social cards — all tested. What stood between it and launch were production-grade gaps: security hardening, deploy plumbing, content provenance, operations. Those are now tracked in <b>docs/PLAN.md</b> with an automated gate.</p>
+  <p>Today's run closed the foundation plus six security blockers: git baseline with green gate · listing-title <b>XSS closed</b> · rate limiting <b>ignores forged X-Forwarded-For</b> and is <b>shared across workers</b> · demo passwords <b>can never reach prod</b> · prod <b>refuses unsafe config</b> (secret key, hosts, Postgres URL) · <b>hashed static files</b> now actually active. Suite grew 232 → 258 tests, all passing.</p>
+  <p><span class="pill">WORD FILE</span>&nbsp; <code>/download/gabriel-homes-launch-checklist.docx</code> — this page is its twin.</p>
+
+  <h2>2. What Remains on My Side (≈ 24 h engineering)</h2>
+
+  <h3>2.1 Finish security hardening</h3>
+  <div class="task"><b>S7 — Upgrade to Django 5.2 LTS</b> <span class="est">~2 h</span><p>5.1 is past its security window; bump the pin, run the gate, fix fallout.</p></div>
+  <div class="task"><b>S8 — Dependency vulnerability audit</b> <span class="est">~0.5 h</span><p>pip-audit over pinned requirements; upgrade anything with a known CVE.</p></div>
+  <div class="task"><b>S9 — Never lose an enquiry silently</b> <span class="est">~2 h</span><p>Failed enquiry emails vanish today; add sent-at/error fields + a red "email not delivered" badge in the agent dashboard.</p></div>
+  <div class="task"><b>S10 — Security headers + self-hosted map</b> <span class="est">~2.5 h</span><p>Download Leaflet off unpkg into the repo, add a strict Content-Security-Policy, move inline scripts out of templates.</p></div>
+  <div class="task"><b>S11 — Template &amp; XSS audit</b> <span class="est">~1 h</span><p>Every |safe / mark_safe / innerHTML usage gets a written verdict; user-influenced ones get fixed.</p></div>
+  <div class="task"><b>S12 — Input length caps</b> <span class="est">~1 h</span><p>Tested size limits on enquiry and listing fields; oversized junk rejected at the form.</p></div>
+
+  <h3>2.2 Platform, deploy and data</h3>
+  <div class="task"><b>D2 — Full test run on PostgreSQL</b> <span class="est">~1.5 h</span><p>258 tests currently run on SQLite; run them on real Postgres and fix dialect quirks.</p></div>
+  <div class="task"><b>D3 — /healthz/ + logging</b> <span class="est">~1 h</span><p>200 when the DB is reachable, 503 when not — the hook your uptime monitor needs; logs to stdout.</p></div>
+  <div class="task"><b>D4 — Correct the deploy runbook</b> <span class="est">~2 h</span><p>No demo seeding in prod, createcachetable, nginx real-IP header, gunicorn timeout, every .env key documented.</p></div>
+  <div class="task"><b>D5 — Backups + real restore drill</b> <span class="est">~2 h</span><p>Nightly pg_dump (30-day retention) plus a drill that proves a backup restores. An unrestored backup is a hope, not a backup.</p></div>
+  <div class="task"><b>D6 — make gate</b> <span class="est">~0.25 h</span><p>One command for every quality check.</p></div>
+  <div class="task"><b>C1 — Media cleanup</b> <span class="est">~1 h</span><p>List unused/junk images; archive after your OK; test guarantees every listing photo is referenced.</p></div>
+  <div class="task"><b>C2 — Production starts empty</b> <span class="est">~0.5 h</span><p>seed_demo refuses to run on the live server; fictional listings can never appear.</p></div>
+  <div class="task"><b>C3 — Enquiry retention</b> <span class="est">~1 h</span><p>Purge command (365 days suggested, your call) + cron — supports deletion requests.</p></div>
+
+  <h3>2.3 Verification &amp; launch rehearsal</h3>
+  <div class="task"><b>V1 — Coverage ≥ 80%</b> <span class="est">~1.5 h</span><p>On listings/agents/inquiries, wired into the gate so it can't rot.</p></div>
+  <div class="task"><b>V2 — Browser QA at 360/810/1280 px</b> <span class="est">~1 h</span><p>Screenshots of home, search, detail, enquiry, dashboard against the owner QA list.</p></div>
+  <div class="task"><b>V3 — Load smoke</b> <span class="est">~0.5 h</span><p>20 concurrent users for 60 s on staging; zero errors, p95 &lt; 500 ms on the 2 GB VPS.</p></div>
+  <div class="task"><b>R1–R2 — Fresh-server rehearsal + smoke script</b> <span class="est">~3 h</span><p>Follow DEPLOY.md word-for-word on a clean VM, fix every deviation in the doc, confirm HTTPS + /healthz/. Launch becomes a replay.</p></div>
+
+  <h2>3. What Only You Can Provide (Owner Inputs)</h2>
+  <p>Decisions and credentials no code can conjure — nothing technical required. O6 and O7 gate the launch rehearsal itself.</p>
+  <table>
+    <tr><th style="width:26%">What I need from you</th><th style="width:48%">Why it matters</th><th style="width:26%">Unblocks</th></tr>
+    <tr><td><b>O6 · Email credentials</b> — Brevo (or similar) for hello@gabrielhomes.co.ke, SPF/DKIM on the domain</td><td>Enquiries, signups, password resets send from this address; unauthenticated mail lands in spam or nowhere.</td><td>S9 staging test, go-live</td></tr>
+    <tr><td><b>O7 · VPS + DNS</b> — Ubuntu 22.04/24.04 server, DNS for gabrielhomes.co.ke</td><td>The rehearsal deploys the real runbook to the real server; SSL needs DNS pointed first.</td><td>R1 rehearsal, launch</td></tr>
+    <tr><td><b>O1 · Photo licences / provenance</b></td><td>Every public photo needs a source we may use; unknown-origin images get replaced.</td><td>C1 cleanup, go-live</td></tr>
+    <tr><td><b>O3 · Lawyer review</b> of Privacy &amp; Terms</td><td>Privacy page must satisfy the Kenya Data Protection Act, 2019; I prepare text, lawyer approves.</td><td>Legal pages live</td></tr>
+    <tr><td><b>O4 · Retention period</b> (365 days suggested)</td><td>How long enquiry personal data is kept and who may delete it.</td><td>C3 retention cron</td></tr>
+    <tr><td><b>O8 · Backup destination</b> (B2/S3) + credentials</td><td>Nightly dumps need an off-site home.</td><td>D5 off-site step</td></tr>
+    <tr><td><b>O5 · Uptime checker</b> + alert destination</td><td>An external monitor watches /healthz/ and tells you before clients do.</td><td>Ops sign-off</td></tr>
+    <tr><td><b>O2 · OK to archive unused media</b></td><td>Confirms junk files leave the repo.</td><td>C1 completion</td></tr>
+    <tr><td><b>O9–O12 · Small confirmations</b> — admin-only agents; logs-only errors at launch; Postgres test run if stalled; clean-machine launcher check</td><td>Sign-offs that close their linked tasks.</td><td>various</td></tr>
+  </table>
+
+  <h2>4. Definition of Done</h2>
+  <table>
+    <tr><th style="width:22%">Group</th><th>Launch requires</th></tr>
+    <tr><td><b>Security</b></td><td>No unallowlisted |safe; XSS + rate-limit regressions green; real-IP limiting with shared store; prod refuses unsafe config; CSP live, no third-party scripts; pip-audit clean; Django LTS.</td></tr>
+    <tr><td><b>Config &amp; deploy</b></td><td>check --deploy clean under prod settings; hashed static files; full suite green on PostgreSQL; DEPLOY.md reproducible on a fresh VM; honest /healthz/.</td></tr>
+    <tr><td><b>Data &amp; content</b></td><td>No demo seeding in prod; every referenced image resolves; photo provenance confirmed; privacy text lawyer-reviewed.</td></tr>
+    <tr><td><b>Operations</b></td><td>Nightly backups with proven restore; failed emails visible in dashboard; logs on stdout; external uptime check.</td></tr>
+    <tr><td><b>Quality</b></td><td>Coverage ≥ 80% on core apps; smoke script green on staging; browser QA desktop + phone; Lighthouse mobile recorded.</td></tr>
+  </table>
+
+  <h2>5. Order of Play</h2>
+  <p><b>Day 1</b> — finish security (S7–S12) + health endpoint; needs nothing from you. <b>Day 2</b> — platform &amp; data: Postgres run, runbook, backups, media cleanup, retention — ideal alongside your O1/O4/O8. <b>Day 3</b> — verification + launch rehearsal, which needs O7 (VPS + DNS) and O6 (mail) on the table.</p>
+  <p>Critical path: S7–S12 → D2 → D4–D5 → R1 rehearsal → go-live sign-off, owner inputs landing no later than the rehearsal. Progress is tracked task-by-task in <code>docs/STATUS.md</code> with gate output as proof — at any moment, "what is left?" gets an audited answer instead of a feeling.</p>
+
+  <div class="files">
+    <b>Deliverables:</b> Word file at <code>/home/z/my-project/download/gabriel-homes-launch-checklist.docx</code> (this page = HTML twin) · plan adopted as <code>gabriel_homes/docs/PLAN.md</code> · live progress in <code>gabriel_homes/docs/STATUS.md</code> · 11 commits, gate green, 258/258 tests.
+  </div>
+
+</div>
+</body>
+</html>

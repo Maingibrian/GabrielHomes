@@ -43,7 +43,7 @@
 
 {% block head_extra %}
   {# JSON-LD: Residence/Place (Phase 4) #}
-  <script type="application/ld+json">{{ json_ld|safe }}</script>
+  <script type="application/ld+json">{{ json_ld|json_ld_script }}</script>
   {# JSON-LD: BreadcrumbList (Phase 6) #}
   <script type="application/ld+json">
   {

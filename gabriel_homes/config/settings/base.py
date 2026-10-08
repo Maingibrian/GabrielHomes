@@ -159,7 +159,17 @@ USE_TZ = True
 STATIC_URL = env.str("STATIC_URL", default="/static/")
 STATIC_ROOT = env.str("STATIC_ROOT", default=str(BASE_DIR / "staticfiles"))
 STATICFILES_DIRS = [BASE_DIR / "static"]
-STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+
+# D-STATIC (PLAN S6): Django 5.1 removed STATICFILES_STORAGE — setting it
+# here was a silent no-op. STORAGES is the replacement. Base/dev use plain
+# storage; prod.py swaps in whitenoise's CompressedManifestStaticFilesStorage
+# so files are served under hashed names.
+STORAGES = {
+    "default": {"BACKEND": "django.core.files.storage.FileSystemStorage"},
+    "staticfiles": {
+        "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage"
+    },
+}
 
 MEDIA_URL = env.str("MEDIA_URL", default="/media/")
 MEDIA_ROOT = env.str("MEDIA_ROOT", default=str(BASE_DIR / "media"))
@@ -201,3 +211,8 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 # Security defaults — overridden in prod.py
 SECURE_BROWSER_XSS_FILTER = True
 X_FRAME_OPTIONS = "DENY"
+
+# D-RL (PLAN S2): X-Real-IP is only trusted when our own nginx sets it from
+# the socket address. Off by default; prod.py turns it on. X-Forwarded-For
+# is never used for rate limiting either way.
+TRUST_X_REAL_IP = env.bool("TRUST_X_REAL_IP", default=False)

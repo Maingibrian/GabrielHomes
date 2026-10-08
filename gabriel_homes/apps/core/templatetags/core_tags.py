@@ -1,9 +1,45 @@
-"""Template tags for the core app — currently just the `kes` filter."""
+"""Template tags for the core app — `kes` price filter and `json_ld_script`."""
+import json
 from decimal import Decimal
 
 from django import template
+from django.core.serializers.json import DjangoJSONEncoder
+from django.utils.safestring import mark_safe
 
 register = template.Library()
+
+# Same escape scheme as Django's json_script filter (django.utils.html):
+# <, > and & become JSON-native unicode escapes so a user-supplied string
+# like "</script>" cannot break out of an embedding <script> tag.
+_JSON_SCRIPT_ESCAPES = {
+    ord(">"): "\\u003E",
+    ord("<"): "\\u003C",
+    ord("&"): "\\u0026",
+}
+
+
+@register.filter
+def json_ld_script(value) -> str:
+    """Serialize a dict as JSON that is safe to embed in a <script> tag.
+
+    Usage:
+        <script type="application/ld+json">{{ json_ld|json_ld_script }}</script>
+
+    Unlike `|safe`, hostile strings in user-controlled fields (e.g. a
+    listing title containing `</script>`) are neutralized: `<`, `>` and `&`
+    are escaped as \\u003C / \\u003E / \\u0026 inside JSON string literals,
+    which parse back to the original characters. The output stays valid
+    JSON for schema.org parsers.
+
+    Safety: mark_safe is sound here because after translate() the output
+    contains no raw `<`, `>` or `&` anywhere — the only sequence that can
+    end a script data block is `</script`, and its `<` and `>` are gone.
+    Non-ASCII (incl. U+2028/2029) is escaped by ensure_ascii=True.
+    """
+    json_str = json.dumps(value, cls=DjangoJSONEncoder, indent=2).translate(
+        _JSON_SCRIPT_ESCAPES
+    )
+    return mark_safe(json_str)
 
 
 @register.filter

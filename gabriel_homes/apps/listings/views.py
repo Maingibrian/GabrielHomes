@@ -373,7 +373,6 @@ def listing_detail(request, slug: str, pk: int):
     from django.conf import settings
     from django.urls import reverse
 
-    import json
     json_ld = {
         "@context": "https://schema.org",
         "@type": "Residence" if property.property_type.is_residential else "Place",
@@ -440,7 +439,7 @@ def listing_detail(request, slug: str, pk: int):
         "property": property,
         "similar_listings": similar_listings,
         "breadcrumbs": crumbs,
-        "json_ld": json.dumps(json_ld, indent=2),
+        "json_ld": json_ld,
         "enquiry_form": enquiry_form,
         "whatsapp_url": wa_url,
         "canonical_url": property.get_absolute_url(),

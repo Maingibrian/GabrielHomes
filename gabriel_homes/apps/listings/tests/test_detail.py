@@ -144,7 +144,9 @@ def test_detail_page_has_description():
     c = Client()
     url, p = _get_first_listing_url()
     r = c.get(url)
-    body = r.content.decode()
+    # unescape: seeded descriptions can contain "&", rendered as "&amp;" by design
+    from html import unescape
+    body = unescape(r.content.decode())
     assert "detail-description" in body
     assert p.description[:50] in body
 

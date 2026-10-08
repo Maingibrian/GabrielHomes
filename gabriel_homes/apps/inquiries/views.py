@@ -17,6 +17,7 @@ from django.template.loader import render_to_string
 from django.utils import timezone
 from django.views.decorators.http import require_POST
 
+from apps.core.clientip import get_client_ip
 from apps.listings.models import Property
 
 from .forms import InquiryForm
@@ -27,17 +28,9 @@ RATE_LIMIT_MAX = 3
 RATE_LIMIT_WINDOW = timedelta(minutes=1)
 
 
-def _get_client_ip(request) -> str:
-    """Get the client IP, respecting X-Forwarded-For behind a proxy."""
-    xff = request.headers.get("X-Forwarded-For")
-    if xff:
-        return xff.split(",")[0].strip()
-    return request.META.get("REMOTE_ADDR", "")
-
-
 def _is_rate_limited(request) -> bool:
     """Return True if the client IP has exceeded the enquiry rate limit."""
-    ip = _get_client_ip(request)
+    ip = get_client_ip(request)
     if not ip:
         return False
     cutoff = timezone.now() - RATE_LIMIT_WINDOW
@@ -71,7 +64,7 @@ def submit_enquiry(request, slug: str, pk: int):
             inquiry = form.save(commit=False)
             inquiry.property_ref = property
             inquiry.honeypot = honeypot_value
-            inquiry.submitter_ip = _get_client_ip(request)
+            inquiry.submitter_ip = get_client_ip(request)
             if request.user.is_authenticated:
                 inquiry.user = request.user
             inquiry.save()
@@ -91,7 +84,7 @@ def submit_enquiry(request, slug: str, pk: int):
         # Save the genuine inquiry.
         inquiry = form.save(commit=False)
         inquiry.property_ref = property
-        inquiry.submitter_ip = _get_client_ip(request)
+        inquiry.submitter_ip = get_client_ip(request)
         if request.user.is_authenticated:
             inquiry.user = request.user
         inquiry.save()
