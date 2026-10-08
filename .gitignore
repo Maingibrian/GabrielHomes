@@ -1,2 +1,9 @@
 skills/
 node_modules/
+
+# never track env files (DATABASE_URL etc.)
+.env
+.env.*
+!.env.example
+upload/
+tool-results/
