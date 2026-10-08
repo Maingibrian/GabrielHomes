@@ -64,9 +64,8 @@
 
       <div class="results-header__sort">
         <label for="sort-select">Sort</label>
-        <select id="sort-select" name="sort"
-                {% if is_htmx %}hx-get="{{ canonical_url }}" hx-target="#results-grid" hx-push-url="true" hx-trigger="change"{% endif %}
-                onchange="this.form ? this.form.submit() : window.location.href='{{ canonical_url }}?sort=' + this.value">
+        <select id="sort-select" name="sort" data-sort-select
+                {% if is_htmx %}hx-get="{{ canonical_url }}" hx-target="#results-grid" hx-push-url="true" hx-trigger="change"{% endif %}>
           {% for value, label in sort_options %}
             <option value="{{ value }}" {% if current_sort == value %}selected{% endif %}>{{ label }}</option>
           {% endfor %}
@@ -135,29 +134,5 @@
 
 {% block scripts %}
   {{ block.super }}
-  <script>
-    // Mobile filter drawer toggle
-    (function () {
-      var toggle = document.querySelector('[data-filter-toggle]');
-      var drawer = document.querySelector('[data-filter-drawer]');
-      if (!toggle || !drawer) return;
-      var open = function () {
-        drawer.classList.add('is-open');
-        drawer.setAttribute('aria-hidden', 'false');
-        document.body.style.overflow = 'hidden';
-      };
-      var close = function () {
-        drawer.classList.remove('is-open');
-        drawer.setAttribute('aria-hidden', 'true');
-        document.body.style.overflow = '';
-      };
-      toggle.addEventListener('click', open);
-      drawer.querySelectorAll('[data-filter-close]').forEach(function (el) {
-        el.addEventListener('click', close);
-      });
-      document.addEventListener('keydown', function (e) {
-        if (e.key === 'Escape' && drawer.classList.contains('is-open')) close();
-      });
-    })();
-  </script>
+  <script src="{% static 'js/search-filters.js' %}" defer></script>
 {% endblock %}

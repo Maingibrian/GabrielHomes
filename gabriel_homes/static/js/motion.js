@@ -79,10 +79,17 @@
     if (!quote) return;
     var text = quote.textContent.trim();
     var words = text.split(/\s+/);
-    quote.innerHTML = words.map(function (w) {
-      return '<span class="word">' + w + "</span>";
-    }).join(" ");
-    var wordEls = quote.querySelectorAll(".word");
+    // S11 audit: build spans via DOM APIs instead of innerHTML so no
+    // template-supplied text is ever re-parsed as markup.
+    quote.textContent = "";
+    var wordEls = words.map(function (w, i) {
+      var span = document.createElement("span");
+      span.className = "word";
+      span.textContent = w;
+      if (i > 0) quote.appendChild(document.createTextNode(" "));
+      quote.appendChild(span);
+      return span;
+    });
     if (prefersReduced || !("IntersectionObserver" in window)) {
       wordEls.forEach(function (w) { w.classList.add("is-lit"); });
       return;
@@ -247,10 +254,16 @@
             "color:var(--ink)",
             "border-bottom:1px solid var(--sand)",
           ].join(";");
-          item.innerHTML =
-            '<strong>' + escapeHtml(res.name) + '</strong>' +
-            '<span style="display:block;font-size:var(--text-xs);color:var(--taupe);font-family:var(--font-mono)">' +
-            escapeHtml(res.full_path) + '</span>';
+          // S11 audit: DOM APIs instead of innerHTML (input is DB-derived
+          // location data; textContent can never re-parse it as markup).
+          var strong = document.createElement("strong");
+          strong.textContent = res.name;
+          var pathSpan = document.createElement("span");
+          pathSpan.style.cssText =
+            "display:block;font-size:var(--text-xs);color:var(--taupe);font-family:var(--font-mono)";
+          pathSpan.textContent = res.full_path;
+          item.appendChild(strong);
+          item.appendChild(pathSpan);
           item.addEventListener("mouseenter", function () {
             item.style.background = "var(--cream)";
           });
@@ -284,12 +297,6 @@
         setTimeout(clearDropdown, 200);
       });
     }
-  }
-
-  function escapeHtml(s) {
-    return String(s).replace(/[&<>"']/g, function (c) {
-      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
-    });
   }
 
   function init() {

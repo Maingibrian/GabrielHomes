@@ -78,3 +78,37 @@ CACHES = {
         "LOCATION": "gabriel_cache",
     }
 }
+
+# Structured-enough logging (D3): everything goes to stdout — journald /
+# the container runtime picks it up. App loggers (apps.*) at INFO, root at
+# WARNING. `logger.exception` calls (e.g. enquiry email failures, S9) land
+# here; view them with:
+#   journalctl -u gabriel-homes --since "1 hour ago" -p err
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "plain": {
+            "format": "{levelname} {asctime} {name} {message}",
+            "style": "{",
+        },
+    },
+    "handlers": {
+        "console": {
+            "class": "logging.StreamHandler",
+            "stream": "ext://sys.stdout",
+            "formatter": "plain",
+        },
+    },
+    "root": {
+        "handlers": ["console"],
+        "level": "WARNING",
+    },
+    "loggers": {
+        "apps": {
+            "handlers": ["console"],
+            "level": "INFO",
+            "propagate": False,
+        },
+    },
+}

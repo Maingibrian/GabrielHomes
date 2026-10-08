@@ -17,7 +17,7 @@ ROTATING_XFF = [f"203.0.113.{i}" for i in range(1, 12)]
 
 @pytest.fixture(autouse=True)
 def seeded_db(db):
-    call_command("seed_demo", no_images=True, target=80, verbosity=0)
+    call_command("seed_demo", no_images=True, target=80, verbosity=0, i_know_this_is_demo=True)
     yield
 
 

@@ -273,9 +273,25 @@ class Command(BaseCommand):
                             help="Delete all seeded data first (DESTRUCTIVE).")
         parser.add_argument("--target", type=int, default=80,
                             help="Target number of listings to seed (default 80).")
+        parser.add_argument(
+            "--i-know-this-is-demo",
+            action="store_true",
+            help="Explicit override required when DEBUG=False (C2: "
+                 "production must never be seeded with fictional data).",
+        )
 
     @transaction.atomic
     def handle(self, *args, **opts):
+        # C2 — production starts empty. Fictional listings on a live site
+        # would be a launch-killer; refuse unless explicitly overridden.
+        if not settings.DEBUG and not opts["i_know_this_is_demo"]:
+            raise SystemExit(
+                "seed_demo: refusing to run — DEBUG is False. This command "
+                "fills the site with FICTIONAL listings. Production starts "
+                "empty; enter listings via the agent dashboard or admin. "
+                "If you really mean it, pass --i-know-this-is-demo."
+            )
+
         do_clear = opts["clear"]
         no_images = opts["no_images"]
         target = opts["target"]

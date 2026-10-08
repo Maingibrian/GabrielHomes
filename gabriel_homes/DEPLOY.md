@@ -67,6 +67,7 @@ SECRET_KEY=<generated-50+-char-key>
 DEBUG=False
 ALLOWED_HOSTS=gabrielhomes.co.ke,www.gabrielhomes.co.ke
 DATABASE_URL=postgres://gabriel:change-me@localhost:5432/gabriel_homes
+TRUST_X_REAL_IP=True
 EMAIL_HOST=smtp.your-provider.com
 EMAIL_PORT=587
 EMAIL_HOST_USER=...
@@ -77,18 +78,23 @@ SITE_DOMAIN=https://gabrielhomes.co.ke
 SECURE_SSL_REDIRECT=True
 ```
 
-## 6. Migrate + collect static + seed
+## 6. Migrate + collect static
 
 ```bash
 sudo -u gabriel -H bash <<'BASH'
 cd /opt/gabriel-homes
 source .venv/bin/activate
 python manage.py migrate
+python manage.py createcachetable   # DatabaseCache table for rate limits (PLAN S3)
 python manage.py collectstatic --noinput
-python manage.py seed_demo --no-images --target=80  # optional: seed demo data
 python manage.py createsuperuser
 BASH
 ```
+
+Production starts EMPTY: no `seed_demo`, no fictional listings, no demo
+accounts. Real listings are entered through the agent dashboard or the
+admin. (`seed_demo` itself refuses to run when `DEBUG=False` unless
+`--i-know-this-is-demo` is passed — PLAN C2.)
 
 ## 7. Gunicorn systemd service
 
@@ -105,8 +111,10 @@ User=gabriel
 Group=www-data
 WorkingDirectory=/opt/gabriel-homes
 EnvironmentFile=/opt/gabriel-homes/.env
+ExecStartPre=/opt/gabriel-homes/.venv/bin/python /opt/gabriel-homes/manage.py collectstatic --noinput
 ExecStart=/opt/gabriel-homes/.venv/bin/gunicorn \
   --workers 3 \
+  --timeout 60 \
   --bind unix:/opt/gabriel-homes/gabriel-homes.sock \
   --access-logfile - \
   --error-logfile - \
@@ -193,24 +201,22 @@ sudo certbot --nginx -d gabrielhomes.co.ke -d www.gabrielhomes.co.ke
 
 ### Database backup (daily cron)
 
-Create `/opt/gabriel-homes/scripts/backup-db.sh`:
-
-```bash
-#!/bin/bash
-set -euo pipefail
-BACKUP_DIR=/opt/gabriel-homes/backups
-mkdir -p "$BACKUP_DIR"
-DATE=$(date +%Y%m%d-%H%M%S)
-pg_dump -U gabriel -h localhost gabriel_homes | gzip > "$BACKUP_DIR/gabriel-homes-$DATE.sql.gz"
-# Keep last 30 days
-find "$BACKUP_DIR" -name "*.sql.gz" -mtime +30 -delete
-```
+Use the script from the repo (PLAN D5) — it parses `DATABASE_URL`, keeps
+30 days, and exits non-zero so cron mail catches failures:
 
 ```bash
 sudo chmod +x /opt/gabriel-homes/scripts/backup-db.sh
 sudo crontab -e -u gabriel
 # Add:
-0 3 * * * /opt/gabriel-homes/scripts/backup-db.sh
+15 3 * * * cd /opt/gabriel-homes && DATABASE_URL=$(grep '^DATABASE_URL' .env | cut -d= -f2-) ./scripts/backup-db.sh
+```
+
+After the first backup exists, run the restore drill ONCE and again after
+any backup-configuration change — a backup that has never been restored is
+a hope, not a plan:
+
+```bash
+sudo -u gabriel -H bash -c "cd /opt/gabriel-homes && set -a && . ./.env && set +a && ./scripts/restore-drill.sh"
 ```
 
 ### Media backup (weekly)
@@ -225,6 +231,13 @@ Sync backups to S3 / Backblaze B2 / rsync.net:
 
 ```bash
 0 5 * * * aws s3 sync /opt/gabriel-homes/backups s3://gabriel-homes-backups/ --delete
+```
+
+### Inquiry data retention (privacy housekeeping, PLAN C3)
+
+```bash
+# Delete enquiries older than the retention period (owner sets it, PLAN O4):
+30 3 * * * cd /opt/gabriel-homes && .venv/bin/python manage.py purge_inquiries --days 365
 ```
 
 ## 10. Deploy checklist
@@ -243,7 +256,9 @@ Deploy steps:
 ```bash
 sudo -u gabriel -H bash <<'BASH'
 cd /opt/gabriel-homes
-git pull
+# Deploy the tagged release you intend to ship (git tag or uploaded archive).
+# Placeholder repo URL: <REPO_URL>
+git fetch --tags && git checkout <release-tag>
 source .venv/bin/activate
 pip install -r requirements.txt
 python manage.py migrate
@@ -255,9 +270,15 @@ sudo systemctl restart gabriel-homes
 ## 11. Monitoring
 
 ```bash
+# Health check (add to any uptime monitor — returns 200 ok / 503):
+curl -fsS https://gabrielhomes.co.ke/healthz/
+
 # Check Gunicorn
 sudo systemctl status gabriel-homes
 sudo journalctl -u gabriel-homes -f
+
+# The one command that shows the last hour of errors (PLAN O-a):
+sudo journalctl -u gabriel-homes --since "1 hour ago" -p err
 
 # Check Nginx
 sudo systemctl status nginx

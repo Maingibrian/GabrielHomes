@@ -28,3 +28,30 @@ Stage Summary:
 - Deliverables: download/gabriel-homes-launch-checklist.docx + preview twin /checklist.html on :3000 + docs/{PLAN,AGENT-BRIEF,STATUS,DECISIONS}.md in repo.
 - 26 new regression tests (232→258); 6 security defects closed (D-XSS, D-RL, D-CACHE, D-CRED, D-KEY, D-DB, D-STATIC); 1 dependency added (psycopg 3.2.13, DECISIONS logged).
 - Owner inputs O6 (SMTP) and O7 (VPS+DNS) are the launch-critical asks; everything else can parallelize.
+
+---
+Task ID: 13
+Agent: Super Z (main agent)
+Task: User said "go" — execute Loop 2 of Brian's Production Plan (docs/PLAN.md): S7–S12 security hardening, D2–D6 platform tasks, C1–C3 data/content tasks, then final gate + docs.
+
+Work Log:
+- S7: Django 5.1.15 → 5.2.18 LTS (verified latest 5.2 patch via pip index); gate green first run; no deprecation warnings.
+- S8: pip-audit found 37 PYSEC findings on Pillow 11.3.0 + 1 on pytest → bumped to Pillow 12.3.0 / pytest 9.0.3; re-audit "No known vulnerabilities found". pip-audit kept out of requirements.txt (venv-only tooling).
+- S9: wrote 5 RED tests → Inquiry.email_sent_at/email_error fields (migration 0002), fail_silently=False in try, logger.exception, email_error truncated to 300, dashboard "Email not delivered"/"Email sent" badges → GREEN.
+- S10: self-hosted Leaflet 1.9.4 (js/css/source-map/images with SHA-256 in DECISIONS.md; SRI attrs verified matching and kept); CSP middleware (policy per PLAN verbatim) in base MIDDLEWARE; moved 4 executable inline scripts to static/js/{search-filters,detail-map,detail-gallery,dashboard-images}.js and rewired 2 inline handlers via data attrs; enabled G-CDN; 7 tests. G-STATIC caught missing Leaflet assets (MissingFileError) — lesson: manifest storage requires every referenced asset.
+- S11: audit recorded in STATUS.md table (|safe 0, format_html 0, autoescape-off 0, mark_safe only in escaped json_ld_script filter); motion.js innerHTML ×2 rewritten to createElement/textContent, escapeHtml removed as dead code.
+- S12: model-level caps (message 5 000, description 20 000, price ≥ 0, bedrooms/bathrooms ≤ 20, size_sqm ≤ 100 000; migrations 0003 in both apps); 12 tests; fixed latent str-vs-Decimal compare in Property.clean() exposed by new tests.
+- D3: /healthz/ (SELECT 1 → 200/503, no detail leak) + prod LOGGING (stdout, apps INFO / root WARNING); 4 tests.
+- D2: no PostgreSQL/Docker/sudo in environment → BLOCKED-OWNER (O11). Delivered config/settings/test_pg.py + GABRIEL_TEST_DB_URL (verified by import test for both reject and accept paths). pytest tried collecting test_pg.py as a test module → scoped testpaths=["apps"] in pyproject.toml.
+- D4: all 8 corrections to DEPLOY.md (no seed_demo + starts-empty note, createcachetable, TRUST_X_REAL_IP env, gunicorn --timeout 60 + ExecStartPre collectstatic, tagged-release deploy + <REPO_URL> placeholder, healthz curl, D5 backup script reference, .env keys) + O-a journalctl command + C3 cron line. .env.example now carries every key prod reads.
+- D5: scripts/backup-db.sh (parses DATABASE_URL, gzip, 30-day retention, gzip -t + size sanity, non-zero exit) + scripts/restore-drill.sh (newest backup → gabriel_restore_test → check + showmigrations → drop, trap cleanup); bash -n clean; Makefile targets; drill execution BLOCKED-OWNER (needs D2's PG).
+- D6: make gate → scripts/gate.sh; fixed pre-existing Makefile recipe indentation (spaces → tabs) that the new target exposed.
+- C1: scripts/list_unused_media.py — current dev DB has 10 properties / 0 image rows → 847 files on disk unreferenced; NOTHING deleted pending owner O2. Added media-integrity tests (every PropertyImage/AgencyProfile logo resolves to a real file).
+- C2: seed_demo refuses when DEBUG=False unless --i-know-this-is-demo (SystemExit with plain-language message); pytest-django runs DEBUG=False so all 18 test call sites got the explicit flag; 2 guard tests.
+- C3: purge_inquiries --days (default 365) with --dry-run + 5 tests; cron line in DEPLOY.md.
+- Final: make gate → GATE GREEN, 296 tests (232 baseline → 258 loop 1 → 296 loop 2). STATUS.md loop-2 record (task table, S11 audit table, blocked list with Brian's exact commands); DECISIONS.md +3 entries; 15 commits d84094b..7799f67.
+
+Stage Summary:
+- All engineering tasks from the plan are DONE except: D2 suite-on-PG + D5 drill execution (BLOCKED-OWNER O11, one-liner ready in STATUS.md), C1 archive move (needs O2 confirmation), C4 privacy text (O3, lawyer), V1–V4 + R1–R3 verification pass (next loop / after owner inputs).
+- Launch-critical asks unchanged: domain + VPS (O7), SMTP (O6).
+- Repo state: 26 commits total, gate green with G-DEPLOY/G-SAFE/G-CDN/G-STATIC, 296 passing tests.

@@ -8,6 +8,7 @@ Per WORK.md §11 Phase 4:
 """
 from __future__ import annotations
 
+import logging
 from datetime import timedelta
 
 from django.core.mail import send_mail
@@ -22,6 +23,8 @@ from apps.listings.models import Property
 
 from .forms import InquiryForm
 from .models import Inquiry
+
+logger = logging.getLogger(__name__)
 
 # Per-IP rate limit: max 3 enquiries per minute from the same IP.
 RATE_LIMIT_MAX = 3
@@ -109,10 +112,16 @@ def _send_enquiry_email(property: Property, inquiry: Inquiry) -> None:
 
     Uses Django's email backend — console in dev (per WORK.md §11
     Phase 4: "console backend in dev"), SMTP in prod.
+
+    Delivery tracking (S9): on success the inquiry's email_sent_at is
+    stamped; on failure email_error records the exception (truncated to
+    300 chars) and the failure is logged — never silently swallowed.
+    In both cases the caller proceeds: the enquiry itself was saved, so
+    the visitor still gets the success partial.
     """
     agent_email = property.agent.display_email
     if not agent_email:
-        return  # nothing we can do without an address
+        return  # nothing we can do without an address — leave tracking untouched
 
     context = {
         "property": property,
@@ -123,11 +132,23 @@ def _send_enquiry_email(property: Property, inquiry: Inquiry) -> None:
     body_text = render_to_string("inquiries/email/enquiry.txt", context)
     body_html = render_to_string("inquiries/email/enquiry.html", context)
 
-    send_mail(
-        subject=subject,
-        message=body_text,
-        from_email="enquiries@gabrielhomes.co.ke",
-        recipient_list=[agent_email],
-        html_message=body_html,
-        fail_silently=True,  # don't 500 the form submit if email fails
-    )
+    try:
+        send_mail(
+            subject=subject,
+            message=body_text,
+            from_email="enquiries@gabrielhomes.co.ke",
+            recipient_list=[agent_email],
+            html_message=body_html,
+            fail_silently=False,  # failures are caught below and recorded (S9)
+        )
+    except Exception as exc:
+        # Truncate to the column limit — SMTP traces can be enormous.
+        inquiry.email_error = f"{type(exc).__name__}: {exc}"[:300]
+        inquiry.save(update_fields=["email_error", "updated_at"])
+        logger.exception(
+            "Enquiry notification email failed for inquiry %s (agent %s)",
+            inquiry.pk, agent_email,
+        )
+        return
+    inquiry.email_sent_at = timezone.now()
+    inquiry.save(update_fields=["email_sent_at", "updated_at"])

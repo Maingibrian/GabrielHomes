@@ -7,7 +7,7 @@ set -u
 
 cd "$(dirname "$0")/.."
 
-ENABLE_G_CDN=0     # enabled after S10
+ENABLE_G_CDN=1     # enabled after S10 (2026-10-08)
 ENABLE_G_STATIC=1  # enabled after S6
 ENABLE_G_COV=0     # enabled after V1
 

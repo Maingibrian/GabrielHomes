@@ -11,7 +11,7 @@ def seeded_db(db):
     """Seed before each test — keeps tests isolated via transaction rollback."""
     from django.core.cache import cache
     cache.clear()  # Clear the home page cache so stale listings don't leak
-    call_command("seed_demo", no_images=True, target=20, verbosity=0)
+    call_command("seed_demo", no_images=True, target=20, verbosity=0, i_know_this_is_demo=True)
     yield
     cache.clear()
 
