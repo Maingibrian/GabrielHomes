@@ -80,3 +80,25 @@ Stage Summary:
 - User's three asks DONE and verifiable; Phase 0 DONE (environment restored, media normalized, 80 listings, suites green); plan tasks V1/V2/R2 DONE, V3 local baseline DONE.
 - One real product bug found and fixed with regression coverage (demo credentials after reseed).
 - Everything now waits on owner inputs: O7 (VPS + domain) unblocks R1 rehearsal, staging load numbers with hey, R2 staging tick; O11 unblocks D2/D5; V4 + R3 are owner-run. Remaining code-side work: none until R1 defects surface.
+
+---
+Task ID: 15
+Agent: Super Z (main agent)
+Task: User approved Phase 0 re-bootstrap ("re-run the Phase 0 bootstrap to bring venv/db/media/.env back in line") after discovering the sandbox snapshot restore (Oct 8 ~11:07) wiped the runtime layer while leaving source/history/deliverables intact.
+
+Work Log:
+- Deleted reappeared root .env (only key DATABASE_URL, restored by snapshot); verified .gitignore guard (.env, .env.*, !.env.example) and check-ignore match.
+- Re-added git safe.directory for /home/z/my-project/gabriel_homes (global config had lost it in restore; root path entry survived).
+- FINDING: nested gabriel_homes/.git did not survive the snapshot restore — it is a plain directory tracked by the root repo (194 files) again. Root repo (16 commits, all Task-ID style, .env purged everywhere) is now the SOLE audit trail; its per-task snapshot commits contain the full project tree, so no source history was lost. Decision: keep single-repo layout; task-ID commit convention applies to root repo commits.
+- Rebuilt gabriel_homes/.venv with python3.12: exact pinned deps restored (py 3.12.14, Django 5.2.18, django-allauth 65.19.7, easy-thumbnails 2.10.1, Pillow 12.3.0, psycopg 3.2.13, whitenoise 6.12.0, pytest 9.0.3, pytest-django 4.14.0).
+- Restored media/ from download/gabriel-homes-oneclick.zip: media/property-images 176 jpgs (19 MB), media/demo-photos 65 jpgs (7.3 MB), media/agency-logos 7 files (492 KB).
+- manage.py migrate: all migrations applied (incl. listings 0002/0003, inquiries 0002/0003).
+- seed_demo --clear: 61 locations, 11 property types, 24 amenities, 6 agencies, 80 published listings, 129 image rows — identical to Task 14 baseline.
+- setup_accounts via manage.py shell < scripts/setup_accounts.py (direct python invocation fails: no DJANGO_SETTINGS_MODULE — script docstring documents shell-only usage); verified admin@gabrielhomes.co.ke and hello@gabrielhomes.co.ke both check_password(gabriel2026) = True.
+- Three suites green: pytest 298/298 (51 s), smoke_test.sh 58/58, functional_test.sh 46/46 (single-call server+suite pattern per environment lesson; healthz answered via runserver --noreload).
+- Preview :3000 was down after restore (curl 000) — restarted http.server on scripts/preview_site; qa.html now 200.
+
+Stage Summary:
+- Runtime layer fully back in line with Task 14 baseline: venv pinned, db seeded (80/129), media restored (176+65+7), demo credentials working, all 3 suites green, preview up.
+- Repo layout simplification documented: root repo = single audit trail (Task-ID history); nested gabriel_homes/.git intentionally not recreated.
+- Still waiting on owner inputs (unchanged): O7 domain+VPS, O6 SMTP, O11 PG suite/drill, O2 media archive decision, O3 privacy text.
