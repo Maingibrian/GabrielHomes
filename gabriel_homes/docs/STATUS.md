@@ -1,6 +1,11 @@
 # STATUS — Gabriel Homes
 
-Current loop: 2 · Current task: done (S7–S12, D3–D6, C1–C3 complete) · Next: owner inputs O1–O12, then V1–V4 + R1–R3 verification pass
+Current loop: 4 · Current task: H1 preview-server allow-list (+ H2 export dotfiles if budget allows) · Tool calls used: 1/30 · Next: owner inputs O1–O12, then V1–V4 + R1–R3 verification pass
+
+## Loop 4 plan
+- Tasks: H1 (S) lock the public preview server to an explicit allow-list, deny everything else; H2 (S) fix zip exports dropping dotfiles (.env.example/.gitignore) — H2 only if budget allows after H1.
+- Files: H1 → scripts/workspace_server.py (workspace-level) + new scripts/tests_preview_server.py; H2 → scripts/build_package.sh + new scripts/check_export.sh; plus gabriel_homes/docs/STATUS.md + docs/DECISIONS.md.
+- Proof: H1 — `python3 scripts/tests_preview_server.py` exit 0 (5 paths → 403, 3 paths → 200), then `bash scripts/gate.sh` green; H2 — `scripts/check_export.sh <zip>` exit 0 on a fresh build and non-zero naming the missing file on a stripped copy; gate green.
 
 ## Baseline (recorded F4, loop 1)
 - Python: 3.12.14 · Django: 5.1.15 → **5.2.18 LTS** (S7) · psycopg: 3.2.13
