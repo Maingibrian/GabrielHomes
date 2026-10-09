@@ -15,3 +15,4 @@ psycopg[binary]==3.2.13
 # Dev / test only
 pytest==9.0.3
 pytest-django==4.14.0
+pytest-cov==7.1.0
