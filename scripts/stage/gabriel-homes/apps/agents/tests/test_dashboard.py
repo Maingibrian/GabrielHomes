@@ -8,7 +8,7 @@ pytestmark = pytest.mark.django_db
 
 @pytest.fixture(autouse=True)
 def seeded_db(db):
-    call_command("seed_demo", no_images=True, target=20, verbosity=0)
+    call_command("seed_demo", no_images=True, target=20, verbosity=0, i_know_this_is_demo=True)
     yield
 
 

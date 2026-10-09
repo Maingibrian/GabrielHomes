@@ -1,10 +1,10 @@
 # Gabriel Homes — Makefile of common commands
 # Usage: make <target>
 
-.PHONY: help install dev test test-cov lint check deploy-check \
-        migrate makemigrations seed seed-clear seed-no-images \
-        collectstatic runserver shell superuser \
-        backup-db restore-db clean
+.PHONY: help install dev test test-cov lint check deploy-check gate \
+	migrate makemigrations seed seed-clear seed-no-images \
+	collectstatic runserver shell superuser \
+	backup-db restore-db clean
 
 PYTHON ?= python3
 VENV ?= .venv
@@ -21,7 +21,7 @@ endif
 
 help: ## Show this help
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | \
-		awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-20s\033[0m %s\n", $$1, $$2}'
+	        awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-20s\033[0m %s\n", $$1, $$2}'
 
 install: ## Create venv and install dependencies
 	$(PYTHON) -m venv $(VENV)
@@ -43,11 +43,14 @@ test: ## Run the test suite
 test-cov: ## Run tests with coverage report
 	$(PY) -m pytest --cov=apps --cov-report=term-missing -q
 
-lint: ## Run linters (placeholder — add flake8/ruff as needed)
-	@echo "No linter configured. Add flake8 or ruff to requirements.txt."
+lint: ## Run linters (placeholder — no linter in dev tooling; see DECISIONS.md)
+	@echo "No linter configured. Add flake8 or ruff to dev tooling with a DECISIONS.md entry first."
 
 check: ## Run Django system check
 	$(MANAGE) check
+
+gate: ## Run the full release gate (scripts/gate.sh — check, migrations, tests, G-DEPLOY, G-SAFE, G-CDN, G-STATIC)
+	bash scripts/gate.sh
 
 deploy-check: ## Run check --deploy (uses prod settings + dummy env)
 	DJANGO_SETTINGS_MODULE=config.settings.prod \
@@ -85,10 +88,11 @@ shell: ## Django shell
 superuser: ## Create a superuser
 	$(MANAGE) createsuperuser
 
-backup-db: ## Backup the database (pg_dump)
-	@mkdir -p backups
-	pg_dump -U gabriel -h localhost gabriel_homes | gzip > backups/gabriel-homes-$$(date +%Y%m%d-%H%M%S).sql.gz
-	@echo "✓ Backup saved to backups/"
+backup-db: ## Backup the database via scripts/backup-db.sh (reads DATABASE_URL, keeps 30 days)
+	bash scripts/backup-db.sh
+
+restore-drill: ## Restore-drill: newest backup into a scratch DB, run checks, drop (PLAN D5)
+	bash scripts/restore-drill.sh
 
 restore-db: ## Restore the database from a backup file (usage: make restore-db FILE=backups/xxx.sql.gz)
 	@if [ -z "$(FILE)" ]; then echo "Usage: make restore-db FILE=backups/xxx.sql.gz"; exit 1; fi

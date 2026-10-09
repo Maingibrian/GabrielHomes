@@ -12,7 +12,7 @@ pytestmark = pytest.mark.django_db
 @pytest.fixture(autouse=True)
 def seeded_db(db):
     """Seed before each test."""
-    call_command("seed_demo", no_images=True, target=80, verbosity=0)
+    call_command("seed_demo", no_images=True, target=80, verbosity=0, i_know_this_is_demo=True)
     yield
 
 
@@ -144,7 +144,9 @@ def test_detail_page_has_description():
     c = Client()
     url, p = _get_first_listing_url()
     r = c.get(url)
-    body = r.content.decode()
+    # unescape: seeded descriptions can contain "&", rendered as "&amp;" by design
+    from html import unescape
+    body = unescape(r.content.decode())
     assert "detail-description" in body
     assert p.description[:50] in body
 

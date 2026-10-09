@@ -1,6 +1,9 @@
 [tool.pytest.ini_options]
 DJANGO_SETTINGS_MODULE = "config.settings.dev"
 python_files = ["tests.py", "test_*.py", "*_tests.py"]
+# Only collect tests from the apps — never treat settings modules like
+# config/settings/test_pg.py (a settings file, not a test) as test modules.
+testpaths = ["apps"]
 addopts = "-ra --strict-markers"
 filterwarnings = [
     "ignore::DeprecationWarning:allauth.*",

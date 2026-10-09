@@ -12,7 +12,7 @@ pytestmark = pytest.mark.django_db
 
 def _seed(**opts):
     """Run seed_demo with --no-images by default for speed."""
-    defaults = {"no_images": True, "target": 80, "verbosity": 0}
+    defaults = {"no_images": True, "target": 80, "verbosity": 0, "i_know_this_is_demo": True}
     defaults.update(opts)
     call_command("seed_demo", **defaults)
 
@@ -60,13 +60,13 @@ def test_seed_is_idempotent():
 def test_seed_clear_wipes_everything():
     _seed()
     assert Property.objects.exists()
-    call_command("seed_demo", clear=True, no_images=True, target=10, verbosity=0)
+    call_command("seed_demo", clear=True, no_images=True, target=10, verbosity=0, i_know_this_is_demo=True)
     # After --clear, the seed runs again from scratch with target=10
     assert Property.objects.count() == 10
 
 
 def test_seed_with_images_creates_at_least_one_cover_per_listing():
-    call_command("seed_demo", clear=True, target=10, verbosity=0)
+    call_command("seed_demo", clear=True, target=10, verbosity=0, i_know_this_is_demo=True)
     # Every listing should have at least one image, marked as cover.
     for p in Property.objects.all():
         assert p.images.filter(is_cover=True).count() == 1, (
@@ -89,3 +89,23 @@ def test_seed_listings_have_agent_and_type():
     for p in Property.objects.all():
         assert p.agent_id is not None
         assert p.property_type_id is not None
+
+
+# ---------------------------------------------------------------------------
+# C2 — production starts empty
+# ---------------------------------------------------------------------------
+from django.test import override_settings
+
+
+@override_settings(DEBUG=False)
+def test_seed_refuses_when_debug_false():
+    with pytest.raises(SystemExit, match="refusing to run"):
+        call_command("seed_demo", no_images=True, target=5, verbosity=0)
+
+
+@override_settings(DEBUG=False)
+def test_seed_runs_with_explicit_demo_override_when_debug_false():
+    before = Property.objects.count()
+    call_command("seed_demo", no_images=True, target=5, verbosity=0,
+                 i_know_this_is_demo=True)
+    assert Property.objects.count() > before

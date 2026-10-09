@@ -5,6 +5,9 @@ from .base import BASE_DIR, TEMPLATES
 DEBUG = True
 ALLOWED_HOSTS = ["localhost", "127.0.0.1", "0.0.0.0", "testserver"]
 
+# D-RL (PLAN S2): dev never trusts X-Real-IP (no trusted proxy locally).
+TRUST_X_REAL_IP = False
+
 # WORK.md: SQLite allowed in local dev only. Always force SQLite here so a
 # stray DATABASE_URL in the surrounding environment does not surprise us.
 DATABASES = {
@@ -14,8 +17,24 @@ DATABASES = {
     }
 }
 
-# Use plain StaticFilesStorage in dev so runserver reloads CSS without manifest.
-STATICFILES_STORAGE = "django.contrib.staticfiles.storage.StaticFilesStorage"
+# D-STATIC (PLAN S6): plain StaticFilesStorage in dev so runserver reloads
+# CSS without collectstatic. (STORAGES is the Django 5.1 replacement for the
+# removed STATICFILES_STORAGE setting.)
+STORAGES = {
+    "default": {"BACKEND": "django.core.files.storage.FileSystemStorage"},
+    "staticfiles": {
+        "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage"
+    },
+}
+
+# D-CACHE (PLAN S3): LocMem stays fine for the single-process dev server;
+# prod uses DatabaseCache so rate limits are shared across workers.
+CACHES = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+        "LOCATION": "gabriel-dev",
+    }
+}
 
 # Verbose emails to console
 EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"

@@ -39,7 +39,9 @@ class Inquiry(models.Model):
     name = models.CharField(max_length=160)
     email = models.EmailField()
     phone = models.CharField(max_length=32, blank=True)
-    message = models.TextField()
+    # S12 input limit: 5 000 chars ≈ 800 words — any real enquiry fits,
+    # mail-bomb payloads don't. Enforced via the ModelForm automatically.
+    message = models.TextField(max_length=5000)
 
     status = models.CharField(
         max_length=8, choices=Status.choices, default=Status.NEW, db_index=True
@@ -52,6 +54,17 @@ class Inquiry(models.Model):
         help_text="Honeypot: must stay empty. Any value flags the row as spam.",
     )
     submitter_ip = models.GenericIPAddressField(null=True, blank=True)
+
+    # Delivery tracking for the agent notification email (S9). Both stay
+    # null/blank when the agent has no email address on file.
+    email_sent_at = models.DateTimeField(
+        null=True, blank=True,
+        help_text="When the agent notification email was handed to the mail backend.",
+    )
+    email_error = models.CharField(
+        max_length=300, blank=True, default="",
+        help_text="Last notification-email failure, truncated to 300 chars. Empty = no failure.",
+    )
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

@@ -36,14 +36,14 @@
   <link rel="stylesheet" href="{% static 'css/search.css' %}">
   <link rel="stylesheet" href="{% static 'css/detail.css' %}">
   {# Leaflet CSS for the map (per §8: Leaflet + OpenStreetMap, no API key) #}
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+  <link rel="stylesheet" href="{% static 'vendor/leaflet/leaflet.css' %}"
         integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
         crossorigin="" referrerpolicy="no-referrer">
 {% endblock %}
 
 {% block head_extra %}
   {# JSON-LD: Residence/Place (Phase 4) #}
-  <script type="application/ld+json">{{ json_ld|safe }}</script>
+  <script type="application/ld+json">{{ json_ld|json_ld_script }}</script>
   {# JSON-LD: BreadcrumbList (Phase 6) #}
   <script type="application/ld+json">
   {
@@ -140,7 +140,7 @@
                 Verified
               </span>
             {% endif %}
-            <button class="detail-header__action" type="button" onclick="navigator.share ? navigator.share({title: '{{ property.title|escapejs }}', url: window.location.href}) : navigator.clipboard.writeText(window.location.href)">
+            <button class="detail-header__action" type="button" data-share-url="{{ request.build_absolute_uri }}">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
               Share
             </button>
@@ -294,61 +294,12 @@
   {{ block.super }}
   {% if property.lat and property.lng %}
   {# Leaflet map (per §8: Leaflet + OpenStreetMap tiles, free, no API key) #}
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+  <script src="{% static 'vendor/leaflet/leaflet.js' %}"
           integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
           crossorigin="" referrerpolicy="no-referrer"></script>
-  <script>
-    (function () {
-      var mapEl = document.getElementById('detail-map');
-      if (!mapEl || typeof L === 'undefined') return;
-      var lat = parseFloat(mapEl.dataset.lat);
-      var lng = parseFloat(mapEl.dataset.lng);
-      var label = mapEl.dataset.label || '';
-      var map = L.map('detail-map').setView([lat, lng], 13);
-      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '© OpenStreetMap contributors',
-        maxZoom: 19,
-      }).addTo(map);
-      L.marker([lat, lng]).addTo(map).bindPopup(label);
-    })();
-  </script>
+  <script src="{% static 'js/detail-map.js' %}" defer></script>
   {% endif %}
 
-  {# Gallery slider (vanilla JS — no library) #}
-  <script>
-    (function () {
-      var gallery = document.querySelector('[data-gallery]');
-      if (!gallery) return;
-      var main = gallery.querySelector('[data-gallery-main]');
-      var thumbs = gallery.querySelectorAll('[data-gallery-thumb]');
-      var prevBtn = gallery.querySelector('[data-gallery-prev]');
-      var nextBtn = gallery.querySelector('[data-gallery-next]');
-      var currentEl = gallery.querySelector('[data-gallery-current]');
-      // Image URLs come from the thumbnails' background-image.
-      var images = Array.from(thumbs).map(function (t) {
-        return t.style.backgroundImage.slice(5, -2);
-      });
-      if (images.length === 0) return;
-      var current = 0;
-
-      function show(i) {
-        current = (i + images.length) % images.length;
-        main.style.backgroundImage = 'url("' + images[current] + '")';
-        if (currentEl) currentEl.textContent = current + 1;
-        thumbs.forEach(function (t, j) {
-          t.classList.toggle('is-active', j === current);
-        });
-      }
-
-      if (prevBtn) prevBtn.addEventListener('click', function () { show(current - 1); });
-      if (nextBtn) nextBtn.addEventListener('click', function () { show(current + 1); });
-      thumbs.forEach(function (t, i) { t.addEventListener('click', function () { show(i); }); });
-
-      // Keyboard nav
-      document.addEventListener('keydown', function (e) {
-        if (e.key === 'ArrowLeft') show(current - 1);
-        if (e.key === 'ArrowRight') show(current + 1);
-      });
-    })();
-  </script>
+  {# Gallery slider + share button (vanilla JS — no library) #}
+  <script src="{% static 'js/detail-gallery.js' %}" defer></script>
 {% endblock %}

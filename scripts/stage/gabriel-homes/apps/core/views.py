@@ -200,3 +200,26 @@ def terms(request):
         ),
         canonical_url="/terms/",
     ))
+
+
+# ---------------------------------------------------------------------------
+# Health check (D3)
+# ---------------------------------------------------------------------------
+from django.db import connection  # noqa: E402
+from django.http import JsonResponse  # noqa: E402
+
+
+def healthz(request):
+    """Liveness + DB-reachability probe for uptime checkers and load balancers.
+
+    Runs `SELECT 1`: 200 "ok" when the database answers, 503 "unavailable"
+    when it does not. Returns no details (no stack traces, no timings) —
+    this endpoint is public by design.
+    """
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute("SELECT 1")
+            cursor.fetchone()
+    except Exception:
+        return JsonResponse({"status": "unavailable"}, status=503)
+    return JsonResponse({"status": "ok"})

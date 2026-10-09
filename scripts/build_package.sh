@@ -166,9 +166,14 @@ rm -f "$OUT"
 # zip by directory NAME (not by glob): 'zip -rq out *' would silently drop
 # every dotfile at the staging root — the H2 bug class.
 (cd "$STAGE" && zip -rq "$OUT" gabriel-homes)
-# post-zip proof the dotfiles made it into the archive
+# post-zip proof the dotfiles made it into the archive.
+# Capture the listing ONCE, then grep the captured text. An
+# 'unzip -l | grep -q' pipeline is racy under 'set -o pipefail':
+# grep -q exits at the first match, unzip gets SIGPIPE (exit 141),
+# and the check reports a false FATAL on a perfectly good zip.
+ZIP_LISTING="$(unzip -l "$OUT")"
 for f in gabriel-homes/.env.example gabriel-homes/.gitignore gabriel-homes/docs/STATUS.md; do
-  unzip -l "$OUT" | grep -q " $f$" || { echo "FATAL: $f missing from $OUT" >&2; exit 1; }
+  grep -q " $f\$" <<<"$ZIP_LISTING" || { echo "FATAL: $f missing from $OUT" >&2; exit 1; }
 done
 echo "  zip verified: .env.example/.gitignore/docs present in archive"
 ls -lh "$OUT"

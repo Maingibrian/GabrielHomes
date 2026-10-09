@@ -58,6 +58,11 @@
             {% if inq.is_spam %}
               <span class="status-badge status-badge--archived" style="margin-left: 0.25rem;">Spam</span>
             {% endif %}
+            {% if inq.email_error %}
+              <span class="status-badge status-badge--archived" style="margin-left: 0.25rem;" title="{{ inq.email_error }}">Email not delivered</span>
+            {% elif inq.email_sent_at %}
+              <span class="status-badge" style="margin-left: 0.25rem; background: var(--sage, #6b8f71); color: #fff;" title="Sent {{ inq.email_sent_at|date:'M j, Y H:i' }}">Email sent</span>
+            {% endif %}
           </td>
           <td style="font-size: var(--text-xs); color: var(--taupe); white-space: nowrap;">
             {{ inq.created_at|date:"M j, Y" }}<br>{{ inq.created_at|time:"H:i" }}

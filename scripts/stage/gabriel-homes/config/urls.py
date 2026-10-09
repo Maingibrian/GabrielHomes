@@ -50,6 +50,8 @@ urlpatterns = [
     path("contact/", core_views.contact, name="contact"),
     path("privacy/", core_views.privacy, name="privacy"),
     path("terms/", core_views.terms, name="terms"),
+    # Health check for uptime monitors / load balancers (D3)
+    path("healthz/", core_views.healthz, name="healthz"),
     # SEO
     path("robots.txt", robots_txt, name="robots_txt"),
     path("sitemap.xml", sitemap_view, {"sitemaps": SITEMAPS}, name="sitemap"),

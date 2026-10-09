@@ -4,8 +4,10 @@ Per WORK.md §11 Phase 7: rate limiting on auth endpoints.
 The enquiry endpoint already has its own rate limiter (apps/inquiries/views.py);
 this module provides a reusable decorator for login/signup/password-reset.
 
-Uses the DB-backed LocMemCache — fine for v1 single-instance deployments.
-For multi-instance, switch to Redis via django-redis-memcached.
+Uses the default cache alias. In prod that is DatabaseCache, so the limit
+is shared across all gunicorn workers (PLAN S3 / defect D-CACHE); in dev it
+is LocMemCache for the single-process dev server. No Redis — one fewer
+service to operate.
 """
 from __future__ import annotations
 
@@ -14,6 +16,8 @@ from time import time
 
 from django.core.cache import cache
 from django.http import HttpResponse
+
+from apps.core.clientip import get_client_ip
 
 
 def rate_limit(key_func, max_requests: int = 5, window: int = 60):
@@ -55,9 +59,12 @@ def rate_limit(key_func, max_requests: int = 5, window: int = 60):
 
 
 def auth_rate_limit_key(request) -> str:
-    """Cache key for auth rate limiting: IP + path."""
-    xff = request.headers.get("X-Forwarded-For", "")
-    ip = xff.split(",")[0].strip() if xff else request.META.get("REMOTE_ADDR", "unknown")
+    """Cache key for auth rate limiting: real client IP + path.
+
+    D-RL (PLAN S2): keys on get_client_ip(), which never trusts the
+    client-controlled X-Forwarded-For header.
+    """
+    ip = get_client_ip(request) or "unknown"
     return f"auth_rl:{ip}:{request.path}"
 
 

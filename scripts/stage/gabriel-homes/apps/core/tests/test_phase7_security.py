@@ -12,7 +12,7 @@ pytestmark = pytest.mark.django_db
 
 @pytest.fixture(autouse=True)
 def seeded_db(db):
-    call_command("seed_demo", no_images=True, target=20, verbosity=0)
+    call_command("seed_demo", no_images=True, target=20, verbosity=0, i_know_this_is_demo=True)
     yield
 
 
@@ -150,6 +150,8 @@ def test_check_deploy_is_clean_with_prod_settings():
     env["DJANGO_SETTINGS_MODULE"] = "config.settings.prod"
     env["SECRET_KEY"] = "a-proper-secret-key-with-at-least-50-characters-for-production-use-12345"
     env["ALLOWED_HOSTS"] = "localhost"
+    # S5: prod refuses to start without a postgres DATABASE_URL
+    env["DATABASE_URL"] = "postgres://u:p@localhost:5432/x"
     result = subprocess.run(
         [sys.executable, "manage.py", "check", "--deploy"],
         capture_output=True, text=True, env=env, cwd=os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__)))))
@@ -207,24 +209,35 @@ def test_save_requires_csrf_token():
 # ---------------------------------------------------------------------------
 # DEBUG = False in prod settings
 # ---------------------------------------------------------------------------
-def test_prod_settings_have_debug_false():
-    from django.conf import settings
+def _import_prod_module(monkeypatch):
+    """Import config.settings.prod with a minimal-good environment.
+
+    Since PLAN S5, the prod module raises ImproperlyConfigured when imported
+    without SECRET_KEY / ALLOWED_HOSTS / DATABASE_URL — so these attribute
+    tests must supply a valid environment first.
+    """
     import importlib
-    # Load prod settings module directly
-    prod = importlib.import_module("config.settings.prod")
+    import sys
+    monkeypatch.setenv("SECRET_KEY", "x" * 60)
+    monkeypatch.setenv("ALLOWED_HOSTS", "example.com")
+    monkeypatch.setenv("DATABASE_URL", "postgres://u:p@localhost:5432/x")
+    sys.modules.pop("config.settings.prod", None)
+    return importlib.import_module("config.settings.prod")
+
+
+def test_prod_settings_have_debug_false(monkeypatch):
+    prod = _import_prod_module(monkeypatch)
     assert prod.DEBUG is False
 
 
-def test_prod_settings_have_secure_cookies():
-    import importlib
-    prod = importlib.import_module("config.settings.prod")
+def test_prod_settings_have_secure_cookies(monkeypatch):
+    prod = _import_prod_module(monkeypatch)
     assert prod.SESSION_COOKIE_SECURE is True
     assert prod.CSRF_COOKIE_SECURE is True
 
 
-def test_prod_settings_have_hsts():
-    import importlib
-    prod = importlib.import_module("config.settings.prod")
+def test_prod_settings_have_hsts(monkeypatch):
+    prod = _import_prod_module(monkeypatch)
     assert prod.SECURE_HSTS_SECONDS > 0
     assert prod.SECURE_HSTS_INCLUDE_SUBDOMAINS is True
     assert prod.SECURE_HSTS_PRELOAD is True

@@ -11,6 +11,7 @@ from decimal import Decimal
 
 from django.conf import settings
 from django.core.exceptions import ValidationError
+from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from django.db.models import Q, UniqueConstraint
 from django.utils.text import slugify
@@ -177,7 +178,9 @@ class Property(models.Model):
     # Identity
     title = models.CharField(max_length=180)
     slug = models.SlugField(max_length=200, unique=True)
-    description = models.TextField()
+    # S12 input limit: 20 000 chars ≈ 3 000 words — far above any real listing
+    # copy, but stops multi-megabyte junk from admins or API misuse.
+    description = models.TextField(max_length=20000)
 
     listing_type = models.CharField(max_length=8, choices=ListingType.choices, db_index=True)
     property_type = models.ForeignKey(
@@ -199,16 +202,29 @@ class Property(models.Model):
     lng = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True)
 
     # Pricing
-    price = models.DecimalField(max_digits=14, decimal_places=2)
+    # S12 input limit: min 0 rejects negative prices; the max_digits=14 DB
+    # cap already bounds the upper end (KSh 9 999 999 999 999.99).
+    price = models.DecimalField(
+        max_digits=14, decimal_places=2,
+        validators=[MinValueValidator(Decimal("0"))],
+    )
     price_period = models.CharField(
         max_length=8, choices=PricePeriod.choices, default=PricePeriod.TOTAL
     )
     price_negotiable = models.BooleanField(default=False)
 
     # Specs
-    bedrooms = models.PositiveSmallIntegerField(default=0)
-    bathrooms = models.PositiveSmallIntegerField(default=0)
-    size_sqm = models.PositiveIntegerField(null=True, blank=True)
+    # S12 input limits: Positive* fields reject negatives at DB and validation
+    # level; the Max validators reject absurd values (no 500-bedroom flat).
+    bedrooms = models.PositiveSmallIntegerField(
+        default=0, validators=[MaxValueValidator(20)]
+    )
+    bathrooms = models.PositiveSmallIntegerField(
+        default=0, validators=[MaxValueValidator(20)]
+    )
+    size_sqm = models.PositiveIntegerField(
+        null=True, blank=True, validators=[MaxValueValidator(100000)]
+    )
     land_size_acres = models.DecimalField(
         max_digits=10, decimal_places=2, null=True, blank=True
     )
@@ -269,7 +285,9 @@ class Property(models.Model):
             raise ValidationError({"price_period": "Sale listings must use 'total' pricing."})
         if self.listing_type == Property.ListingType.RENT and self.price_period != Property.PricePeriod.MONTHLY:
             raise ValidationError({"price_period": "Rent listings must use 'monthly' pricing."})
-        if self.price is not None and self.price < 0:
+        if self.price is not None and Decimal(self.price) < 0:
+            # Decimal() coercion: price is a str when the instance was not
+            # built through a ModelForm (e.g. constructed in tests/shells).
             raise ValidationError({"price": "Price cannot be negative."})
 
     def save(self, *args, **kwargs):
