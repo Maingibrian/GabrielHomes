@@ -116,3 +116,20 @@ Work Log:
 
 Stage Summary:
 - :3000 is now allow-list only; exports keep dotfiles and are auto-validated; gate GREEN; remaining work is owner input (O1-O12, V4, R3)
+
+---
+Task ID: Loop 5
+Agent: Super Z (main)
+Task: H3 reproducible coverage gate; H4 snapshot builder fix; H5 live re-check; H6 DEPLOY doc-lint; H7 owner packet
+
+Work Log:
+- Oriented per AGENT-BRIEF; Loop 5 plan written into STATUS.md
+- H3: /tmp/h3venv RED (GATE FAIL: coverage) -> pinned pytest-cov==7.1.0 -> fresh-venv GATE GREEN; commit 83ed2e8
+- H4: tests_build_snapshot.sh RED (WS_ROOT ignored, marker missing) -> builder WS_ROOT/arg-1/zip-derived-count -> GREEN + check_export 0; commit cb92e41 (recovered from a partially-applied MultiEdit via read+single edit)
+- H5: server already listening; 12-row curl matrix all as expected (nonexistent -> 404); no allow-list change
+- H6: tests_deploy_doc.py first run GREEN (no drift); test hardened ($SRC/scripts refs, 2 script refs validated); commit 544e029
+- H7: docs/OWNER-INPUTS.md (O1-O12 + Brian's D2/D5 commands verbatim)
+- STATUS loop-5 record + DECISIONS D-H3/D-H4/D-H6 + handover note re UUID commit fee5f6e
+
+Stage Summary:
+- Gate now reproducible from a bare checkout; snapshot builder portable and honest; preview matrix re-verified; owner packet live; next: owner answers per docs/OWNER-INPUTS.md
