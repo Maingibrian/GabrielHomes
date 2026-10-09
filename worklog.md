@@ -102,3 +102,17 @@ Stage Summary:
 - Runtime layer fully back in line with Task 14 baseline: venv pinned, db seeded (80/129), media restored (176+65+7), demo credentials working, all 3 suites green, preview up.
 - Repo layout simplification documented: root repo = single audit trail (Task-ID history); nested gabriel_homes/.git intentionally not recreated.
 - Still waiting on owner inputs (unchanged): O7 domain+VPS, O6 SMTP, O11 PG suite/drill, O2 media archive decision, O3 privacy text.
+
+---
+Task ID: Loop 4
+Agent: Super Z (main)
+Task: H1 allow-list preview server; H2 export dotfiles; close out STATUS/DECISIONS
+
+Work Log:
+- Oriented per AGENT-BRIEF; wrote Loop 4 plan into gabriel_homes/docs/STATUS.md
+- H1: workspace_server.py found MISSING on disk (env reset); tests_preview_server.py (stdlib, temp-replica workspace, dummy db) RED -> implemented allow-list server (hard deny-list, scripts/ closed except 4 pages + qa-shots, symlink guard) -> GREEN 4/4 exit 0; :3000 restarted, curl matrix 6x403 / 4x200; .venv rebuilt (missing again) then GATE GREEN; commit 5df8d1c
+- H2: build_package.sh .git leak closed + staging/post-zip dotfile guarantees; build_workspace_snapshot.sh persisted (218 files, dotfiles kept); check_export.sh: clean=0, stripped copy=1 naming "MISSING gabriel_homes/.env.example"; commit 780d967
+- STATUS.md loop-4 record + gate tail + 30/30 calls + Next loop; DECISIONS.md D-H1a/D-H1b/D-H2
+
+Stage Summary:
+- :3000 is now allow-list only; exports keep dotfiles and are auto-validated; gate GREEN; remaining work is owner input (O1-O12, V4, R3)
