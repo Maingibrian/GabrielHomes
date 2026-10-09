@@ -50,6 +50,8 @@ echo "== 1. Stage project =="
 rm -rf "$STAGE"
 mkdir -p "$STAGE"
 rsync -a \
+  --exclude '.git/' \
+  --exclude '.env' \
   --exclude '.venv/' \
   --exclude '__pycache__/' \
   --exclude '*.pyc' \
@@ -62,6 +64,18 @@ rsync -a \
   --exclude '*.sqlite3-wal' \
   --exclude '*.sqlite3-shm' \
   "$SRC/" "$PKG/"
+
+# -- H2 dotfile guarantee: these files are part of the deliverable (setup and
+# -- repo hygiene for the buyer); if staging ever drops dotfiles again, fail
+# -- here instead of shipping a broken zip.
+echo "== 1b. Dotfile guarantee =="
+for f in .env.example .gitignore docs/STATUS.md docs/AGENT-BRIEF.md manage.py; do
+  if [ ! -f "$PKG/$f" ]; then
+    echo "FATAL: $f missing from staged package (dotfiles dropped in staging?)" >&2
+    exit 1
+  fi
+done
+echo "  dotfiles present in package: .env.example .gitignore docs/STATUS.md docs/AGENT-BRIEF.md"
 
 echo "== 2. Add launchers + guide =="
 cp "$LAUNCH/START-GABRIEL-HOMES.sh"      "$PKG/START-GABRIEL-HOMES.sh"
@@ -149,6 +163,13 @@ chmod +x "$PKG/START-GABRIEL-HOMES.sh" "$PKG/START-GABRIEL-HOMES.command" \
 echo "== 4. Zip =="
 mkdir -p /home/z/my-project/download
 rm -f "$OUT"
+# zip by directory NAME (not by glob): 'zip -rq out *' would silently drop
+# every dotfile at the staging root — the H2 bug class.
 (cd "$STAGE" && zip -rq "$OUT" gabriel-homes)
+# post-zip proof the dotfiles made it into the archive
+for f in gabriel-homes/.env.example gabriel-homes/.gitignore gabriel-homes/docs/STATUS.md; do
+  unzip -l "$OUT" | grep -q " $f$" || { echo "FATAL: $f missing from $OUT" >&2; exit 1; }
+done
+echo "  zip verified: .env.example/.gitignore/docs present in archive"
 ls -lh "$OUT"
 echo "== Package built: $OUT =="
