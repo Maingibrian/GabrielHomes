@@ -6,7 +6,10 @@
 # earlier snapshot).
 #
 # Usage:   bash scripts/build_workspace_snapshot.sh [out.zip]
-# Default: /home/z/my-project/download/gabriel-workspace-snapshot.zip
+# Env:     WS_ROOT=<dir>  — workspace root to snapshot; default is the
+#          directory two levels above this script's own location (never a
+#          hard-coded /home path), so the builder runs from any checkout.
+# Default out: $WS_ROOT/download/gabriel-workspace-snapshot.zip
 #
 # Layout: zip root = workspace root, so entries look like
 #   gabriel_homes/manage.py, gabriel_homes/.env.example, scripts/preview_site/...
@@ -21,22 +24,26 @@
 # =============================================================================
 set -euo pipefail
 
-OUT="${1:-/home/z/my-project/download/gabriel-workspace-snapshot.zip}"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+WS_ROOT="${WS_ROOT:-$(dirname "$SCRIPT_DIR")}"
+OUT="${1:-$WS_ROOT/download/gabriel-workspace-snapshot.zip}"
 
-python3 - "$OUT" <<'PYEOF'
+python3 - "$WS_ROOT" "$OUT" <<'PYEOF'
 import os
 import sys
 import zipfile
 from pathlib import Path
 
-out = Path(sys.argv[1])
+ws_root = Path(sys.argv[1]).resolve()
+out = Path(sys.argv[2])
 out.parent.mkdir(parents=True, exist_ok=True)
-WS = Path("/home/z/my-project")
+if not ws_root.is_dir():
+    sys.exit(f"WS_ROOT is not a directory: {ws_root}")
 
 include_dirs = [
-    WS / "gabriel_homes",
-    WS / "scripts" / "preview_site",
-    WS / "scripts" / "launcher",
+    ws_root / "gabriel_homes",
+    ws_root / "scripts" / "preview_site",
+    ws_root / "scripts" / "launcher",
 ]
 prune_dirs = {
     ".git", ".venv", "__pycache__", ".pytest_cache", ".idea", ".vscode",
@@ -50,7 +57,6 @@ drop_files = {
 }
 drop_suffixes = (".pyc", ".pyo", ".log", ".sqlite3-journal", ".sqlite3-wal", ".sqlite3-shm")
 
-count = 0
 with zipfile.ZipFile(out, "w", zipfile.ZIP_DEFLATED) as z:
     for base in include_dirs:
         if not base.exists():
@@ -61,9 +67,11 @@ with zipfile.ZipFile(out, "w", zipfile.ZIP_DEFLATED) as z:
                 if name in drop_files or name.endswith(drop_suffixes):
                     continue
                 p = Path(root) / name
-                arcname = p.relative_to(WS).as_posix()
-                z.write(p, arcname)
-                count += 1
+                z.write(p, p.relative_to(ws_root).as_posix())
 
-print(f"snapshot: {count} files -> {out}")
+# Report the count FROM the finished zip, not from a pre-count — the walk
+# counter could read 0 while the archive was fine (the H4 bug report).
+with zipfile.ZipFile(out) as zdone:
+    n = len(zdone.namelist())
+print(f"snapshot: {n} files -> {out}")
 PYEOF
