@@ -8,7 +8,12 @@
 
 
 /* ============================================================
-   1. Hero — full-bleed photo with dark gradient overlay
+   1. Hero — full-bleed SLIDESHOW of the real home photos.
+   Pure-CSS crossfade + Ken Burns drift; no JS required (slides
+   are plain divs, images referenced from this stylesheet only).
+   4 slides x 6s = 24s loop; 0.96s crossfade overlaps so the
+   sum of visible opacity never dips. Reduced-motion: static
+   first frame. Images built by scripts/make_hero_slides.py.
    ============================================================ */
 .hero {
   position: relative;
@@ -23,18 +28,53 @@
 .hero__bg {
   position: absolute;
   inset: 0;
-  background: linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.55) 100%),
-              url("../img/hero-bg.jpg") center/cover no-repeat,
-              var(--espresso);
+  background: var(--espresso);
   z-index: 0;
+}
+.hero__slide {
+  position: absolute;
+  inset: 0;
+  background-image: var(--slide-img, none);
+  background-size: cover;
+  background-position: center;
+  opacity: 0;
+  animation: hero-fade 24s linear infinite,
+             hero-drift 24s linear infinite;
+  will-change: opacity, transform;
+}
+/* Slide order + animation offsets. The IMAGE itself comes from the
+   inline --slide-img custom property (staticv-versioned per file). */
+.hero__slide:nth-child(1) { animation-delay: 0s; }
+.hero__slide:nth-child(2) { animation-delay: 6s; }
+.hero__slide:nth-child(3) { animation-delay: 12s; }
+.hero__slide:nth-child(4) { animation-delay: 18s; }
+/* Fade in 0-4%, hold to 25%, fade out by 29% — the 1s overlap with
+   the next slide's fade-in makes a seamless crossfade. */
+@keyframes hero-fade {
+  0%   { opacity: 0; }
+  4%   { opacity: 1; }
+  25%  { opacity: 1; }
+  29%  { opacity: 0; }
+  100% { opacity: 0; }
+}
+/* Slow zoom runs only across the visible quarter; the snap-back to
+   1.02 happens while the slide is fully transparent. */
+@keyframes hero-drift {
+  0%   { transform: scale(1.02); }
+  25%  { transform: scale(1.085); }
+  100% { transform: scale(1.085); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hero__slide { animation: none; opacity: 0; }
+  .hero__slide:nth-child(1) { opacity: 1; }
 }
 .hero__bg::after {
   content: "";
   position: absolute;
   inset: 0;
   background:
-    linear-gradient(90deg, rgba(28,21,17,0.52) 0%, rgba(28,21,17,0.24) 48%, rgba(28,21,17,0.04) 100%),
-    linear-gradient(180deg, rgba(28,21,17,0.46) 0%, rgba(42,33,28,0.26) 45%, rgba(42,33,28,0.64) 100%);
+    linear-gradient(90deg, rgba(28,21,17,0.62) 0%, rgba(28,21,17,0.30) 48%, rgba(28,21,17,0.06) 100%),
+    linear-gradient(180deg, rgba(28,21,17,0.52) 0%, rgba(42,33,28,0.28) 45%, rgba(42,33,28,0.74) 100%);
 }
 .hero .container { position: relative; z-index: 1; width: 100%; }
 .hero__tag {

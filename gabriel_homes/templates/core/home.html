@@ -14,16 +14,27 @@
 {% block twitter_description %}Real estate with a human point of view. Buy and rent property on the Kenyan coast.{% endblock %}
 
 {% block styles %}
+  {# First slideshow frame is the LCP element — preload it (same versioned URL the slide div uses) #}
+  <link rel="preload" as="image" href="{% staticv 'img/real/hero-slide-1.jpg' %}" fetchpriority="high">
   <link rel="stylesheet" href="{% staticv 'css/home.css' %}">
 {% endblock %}
 
 {% block content %}
 
 {# =========================================================== #}
-{# 1. Hero — full-bleed photo + dark gradient + search bar       #}
+{# 1. Hero — real-homes slideshow + dark gradient + search bar   #}
+{#    Pure-CSS crossfade (motion.js not required); the four      #}
+{#    slides are prepped by scripts/make_hero_slides.py from     #}
+{#    the owner's real photos. aria-hidden: decorative.          #}
 {# =========================================================== #}
 <section class="hero" id="top">
-  <div class="hero__bg" aria-hidden="true"></div>
+  <div class="hero__bg" aria-hidden="true">
+    {# --slide-img via staticv: every slide re-busts its own cache on edit #}
+    <div class="hero__slide" style="--slide-img: url('{% staticv 'img/real/hero-slide-1.jpg' %}')"></div>
+    <div class="hero__slide" style="--slide-img: url('{% staticv 'img/real/hero-slide-2.jpg' %}')"></div>
+    <div class="hero__slide" style="--slide-img: url('{% staticv 'img/real/hero-slide-3.jpg' %}')"></div>
+    <div class="hero__slide" style="--slide-img: url('{% staticv 'img/real/hero-slide-4.jpg' %}')"></div>
+  </div>
   <div class="container">
     <p class="hero__tag">[ Gabriel Homes — Real estate on the Kenyan coast ]</p>
     <h1 class="hero__title">Real estate with a <em class="hero__accent">human</em> point of view.</h1>
