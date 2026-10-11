@@ -20,6 +20,8 @@ rsync -a --delete \
     --exclude 'media/' --exclude '.env' \
     --exclude '.pytest_cache/' --exclude 'staticfiles/' \
     --exclude 'WORK.md' --exclude 'preview_bridge.log' \
+    --exclude '/property-images/' --exclude 'docs/shots/' \
+    --exclude 'runserver.log' \
     "$SRC/" "$STAGE/"
 chmod +x "$STAGE/UPDATE-WEBSITE.sh" "$STAGE/scripts/ensure-runtime.sh"
 

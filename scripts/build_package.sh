@@ -63,6 +63,9 @@ rsync -a \
   --exclude '.DS_Store' \
   --exclude 'preview_bridge.log' \
   --exclude 'media/real-listing-src/' \
+  --exclude '/property-images/' \
+  --exclude 'docs/shots/' \
+  --exclude 'runserver.log' \
   --exclude '*.sqlite3-journal' \
   --exclude '*.sqlite3-wal' \
   --exclude '*.sqlite3-shm' \
