@@ -23,45 +23,52 @@ def test_home_page_returns_200():
 
 
 def test_home_page_has_all_ten_sections():
-    """WORK.md §8 mandates 10 sections — verify they all render."""
+    """docs/HOME-REDESIGN.md section map — verify they all render."""
     c = Client()
     r = c.get("/")
     body = r.content.decode()
     required_markers = [
-        "hero",            # 1. hero
-        "featured",        # 2. featured (note: section 2 in §8 is the same hero / search)
+        "hero",            # 1. hero (real-homes slideshow)
+        "showcase",        # 2. homes bento showcase (replaces featured grid)
         "story",           # 3. story / vision
         "numbers",         # 4. numbers
-        "agents",          # 5. agents
-        "philosophy",      # 6. philosophy
-        "browse",          # 7. browse
-        "cta",             # 8. cta band
-        "site-footer",     # 9. footer
-        "site-header",     # 10. nav (separate but required)
+        "philosophy",      # 5. philosophy
+        "browse",          # 6. browse
+        "cta",             # 7. cta band
+        "site-footer",     # 8. footer
+        "site-header",     # 9. nav (separate but required)
     ]
     for marker in required_markers:
         assert marker in body, f"Home page missing section marker: {marker!r}"
 
 
-def test_home_page_renders_real_featured_listings():
-    """The featured grid must contain listing-card partials driven by the DB."""
+def test_home_page_renders_real_showcase_listings():
+    """The bento showcase must be driven by the DB (homes, not agents)."""
     from apps.listings.models import Property
     c = Client()
     r = c.get("/")
     body = r.content.decode()
-    # The home page renders up to 6 listing cards.
-    assert body.count('class="listing-card"') >= 1
-    # And at least one of them must be a published featured or recent listing.
-    assert Property.objects.published().count() >= 1
+    # Spotlight card plus the mosaic must render.
+    assert "bento-card--spotlight" in body
+    assert body.count("bento-card") >= 2
+    # The lead card is the newest featured listing (or newest published).
+    lead = (
+        Property.objects.published().filter(is_featured=True)
+        .order_by("-published_at").first()
+        or Property.objects.published().order_by("-published_at").first()
+    )
+    assert lead is not None
+    assert lead.title in body
 
 
-def test_home_page_renders_real_agencies():
-    from apps.agents.models import AgencyProfile
+def test_home_page_has_no_agents_section():
+    """Homes, not agents — the agents band left the home page (it lives
+    at /agents/). The bento CTA links to the search page instead."""
     c = Client()
     r = c.get("/")
     body = r.content.decode()
-    for agency in AgencyProfile.objects.all()[:6]:
-        assert agency.name in body, f"Agency name {agency.name!r} not in home page"
+    assert 'id="agents"' not in body
+    assert "bento-card--cta" in body
 
 
 def test_home_page_has_three_hero_stats():
@@ -115,7 +122,7 @@ def test_home_page_has_design_language_markers():
     c = Client()
     r = c.get("/")
     body = r.content.decode()
-    bracket_tags = ["[ STORY ]", "[ NUMBERS ]", "[ AGENTS ]", "[ PHILOSOPHY ]", "[ FOOTER ]"]
+    bracket_tags = ["[ HOMES ]", "[ STORY ]", "[ NUMBERS ]", "[ PHILOSOPHY ]", "[ FOOTER ]"]
     for tag in bracket_tags:
         assert tag in body, f"Missing bracket tag {tag!r}"
 

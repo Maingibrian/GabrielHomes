@@ -4,32 +4,58 @@
 
 /* Page hero — full-bleed photo header matching the home hero treatment,
    so every inner page (about/contact/terms/privacy/agents) opens with the
-   same visual language as the home page. */
+   same visual language as the home page.
+
+   Legibility contract (the "washed-out hero" fix):
+   1. Photo focus shifted right (72%) so the bright villa never sits
+      behind the headline column.
+   2. Two graded scrims — a left-anchored column gradient that keeps the
+      text zone near-black, plus a vertical grade that grounds the bottom.
+   3. The [ TAG ] becomes a frosted pill chip and the eyebrow warms to
+      cream, so both survive even a sky-bright patch of photo. */
 .page-hero {
   position: relative;
   background: var(--espresso);
   color: var(--cream);
-  padding: calc(var(--section-pad-y-lg) * 1.35) 0 calc(var(--section-pad-y-lg) * 1.1);
+  min-height: clamp(430px, 58vh, 640px);
+  display: flex;
+  align-items: flex-end;
+  padding: calc(var(--section-pad-y-lg) * 0.9) 0 calc(var(--section-pad-y-lg) * 0.85);
   overflow: hidden;
 }
 .page-hero::before {
   content: "";
   position: absolute;
   inset: 0;
-  background: url("../img/hero-bg.jpg") center/cover no-repeat,
-              var(--espresso);
+  background:
+    linear-gradient(90deg, rgba(28,21,17,0.85) 0%, rgba(28,21,17,0.62) 42%, rgba(28,21,17,0.15) 100%),
+    url("../img/hero-bg.jpg") 72% 50% / cover no-repeat,
+    var(--espresso);
   z-index: 0;
 }
 .page-hero::after {
   content: "";
   position: absolute;
   inset: 0;
-  background: linear-gradient(180deg, rgba(28,21,17,0.60) 0%, rgba(42,33,28,0.45) 45%, rgba(28,21,17,0.78) 100%);
+  background: linear-gradient(180deg, rgba(28,21,17,0.42) 0%, rgba(42,33,28,0.08) 42%, rgba(28,21,17,0.68) 100%);
   z-index: 0;
+  pointer-events: none;
 }
-.page-hero .container { position: relative; z-index: 1; }
-.page-hero .section-tag { color: var(--clay); }
-.page-hero .eyebrow { color: var(--sand); }
+.page-hero .container { position: relative; z-index: 1; width: 100%; }
+.page-hero .section-tag {
+  color: var(--cream);
+  background: var(--espresso-70);
+  border: 1px solid color-mix(in srgb, var(--sand) 38%, transparent);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  padding: 0.45rem 0.95rem;
+  border-radius: var(--radius-pill);
+  margin-bottom: 1.1rem;
+}
+.page-hero .eyebrow {
+  color: color-mix(in srgb, var(--cream) 76%, var(--sand));
+  margin-top: 0.75rem;
+}
 .page-hero__title {
   font-size: var(--text-display-2);
   font-weight: 520;
@@ -39,18 +65,63 @@
   max-width: 18ch;
   margin-top: 0.75rem;
   text-wrap: balance;
+  text-shadow: 0 2px 28px rgba(28,21,17,0.45);
 }
 .page-hero__subtitle {
-  color: color-mix(in srgb, var(--cream) 85%, transparent);
+  color: color-mix(in srgb, var(--cream) 88%, transparent);
   font-size: var(--text-md);
   line-height: var(--leading-body);
   max-width: 52ch;
   margin-top: 1rem;
   letter-spacing: var(--track-tight);
+  text-shadow: 0 1px 16px rgba(28,21,17,0.4);
+}
+/* Search pill living INSIDE the page hero (agent directory). Mirrors the
+   home search-bar language: white pill, icon slot, dark submit. */
+.page-hero .directory-search {
+  margin-top: 2rem;
+  max-width: 620px;
+  background: var(--white);
+  border-radius: var(--radius-pill);
+  padding: 0.4rem 0.5rem 0.4rem 1.35rem;
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  box-shadow: var(--shadow-card-hover);
+}
+.page-hero .directory-search input[type="search"] {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  background: transparent;
+  padding: 0.65rem 0;
+  font-size: var(--text-sm);
+  font-family: var(--font-sans);
+  color: var(--ink);
+}
+.page-hero .directory-search input[type="search"]::placeholder { color: var(--taupe); }
+.page-hero .directory-search input[type="search"]:focus { outline: none; }
+.directory-search__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--taupe);
+  flex-shrink: 0;
+}
+.directory-search__icon svg { width: 18px; height: 18px; }
+@media (max-width: 560px) {
+  .page-hero .directory-search { flex-wrap: nowrap; padding-left: 1rem; }
+  .page-hero .directory-search .btn--sm { padding: 0.6rem 1rem; }
 }
 
-/* Prose blocks — privacy / terms / about body copy. */
+/* Prose blocks — privacy / terms / about body copy.
+   The container keeps the page grid; each child is capped at 72ch and
+   left-aligned so text edges line up with the hero above (no floating
+   centered block). */
 .prose {
+  max-width: none;
+}
+.prose > * {
   max-width: 72ch;
 }
 .prose h2 {
@@ -86,7 +157,8 @@
   letter-spacing: var(--track-tight);
 }
 
-/* Contact channel cards. */
+/* Contact channel cards — same icon-chip language as the home value
+   cards, a clay hairline on hover, and a gentle lift. */
 .contact-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
@@ -98,10 +170,29 @@
   border-radius: var(--radius-card);
   padding: 2rem;
   box-shadow: var(--shadow-card);
+  border: 1px solid var(--sand-60);
   display: flex;
   flex-direction: column;
   gap: 0.6rem;
+  transition: transform var(--t-med) var(--ease), box-shadow var(--t-med) var(--ease), border-color var(--t-med) var(--ease);
 }
+.contact-card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-card-hover);
+  border-color: color-mix(in srgb, var(--clay) 45%, var(--sand-60));
+}
+.contact-card__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  background: var(--burnt-12);
+  color: var(--burnt);
+  margin-bottom: 0.9rem;
+}
+.contact-card__icon svg { width: 22px; height: 22px; }
 .contact-card__tag {
   font-family: var(--font-mono);
   font-size: var(--text-xs);
@@ -117,105 +208,9 @@
 .contact-card__body { color: var(--taupe); font-size: var(--text-sm); line-height: var(--leading-body); }
 .contact-card .btn { align-self: flex-start; margin-top: 0.4rem; }
 
-/* Agent directory — bento grid: one full-width spotlight card, then a
-   3-column mosaic. Photo backgrounds, bottom-aligned copy, 12px gutters
-   (per the Framer "Spotlight Bento Grid" reference). */
-.bento-grid {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  grid-auto-rows: 280px;
-  grid-auto-flow: dense;
-  gap: 12px;
-  margin-top: 2rem;
-}
-.bento-card {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
-  border-radius: 16px;
-  overflow: hidden;
-  cursor: pointer;
-  color: var(--cream);
-  text-decoration: none;
-  background: linear-gradient(135deg, var(--clay), var(--brown));
-  isolation: isolate;
-}
-.bento-card--spotlight { grid-column: span 3; grid-row: span 2; }
-/* Directory heading above the mosaic. */
-.bento-grid__heading { margin-top: 3rem; }
-.bento-grid__title {
-  font-size: var(--text-2xl);
-  font-weight: 500;
-  letter-spacing: var(--track-display);
-  line-height: var(--leading-tight);
-  max-width: 24ch;
-  margin-top: 0.5rem;
-}
-/* Partner CTA card — no photo, warm gradient + grain so the mosaic reads
-   as even whatever the agency count. */
-.bento-card--cta {
-  background: linear-gradient(135deg, var(--clay), var(--brown));
-}
-.bento-card--cta .bento-card__scrim {
-  background: linear-gradient(180deg, rgba(28,21,17,0.12) 0%, rgba(28,21,17,0.55) 100%);
-}
-.bento-card--cta .bento-card__name { font-style: italic; }
-.bento-card--cta .bento-card__meta { max-width: 34ch; }
-/* Tasteful stagger: cards cascade in as the mosaic enters the viewport
-   (motion.js reveals each element once; delays only apply on reveal). */
-html.motion-ready .bento-grid .bento-card[data-reveal]:nth-child(3n+2) { transition-delay: 70ms; }
-html.motion-ready .bento-grid .bento-card[data-reveal]:nth-child(3n) { transition-delay: 140ms; }
-.bento-card__bg {
-  position: absolute;
-  inset: 0;
-  background-size: cover;
-  background-position: center;
-  filter: grayscale(0.18);
-  transition: transform 0.55s var(--ease), filter 0.55s var(--ease);
-  z-index: -1;
-}
-.bento-card:hover .bento-card__bg,
-.bento-card:focus-visible .bento-card__bg { transform: scale(1.05); filter: grayscale(0); }
-.bento-card__scrim {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(180deg, rgba(28,21,17,0) 38%, rgba(28,21,17,0.88) 100%);
-  z-index: -1;
-}
-.bento-card__body { padding: 1.25rem 1.4rem 1.35rem; }
-.bento-card__index {
-  font-family: var(--font-mono);
-  font-size: var(--text-xs);
-  letter-spacing: var(--track-mono);
-  text-transform: uppercase;
-  color: var(--sand);
-  margin-bottom: 0.45rem;
-}
-.bento-card__name {
-  font-size: var(--text-xl);
-  font-weight: 520;
-  letter-spacing: var(--track-tighter);
-  line-height: var(--leading-tight);
-}
-.bento-card__meta {
-  margin-top: 0.3rem;
-  font-size: var(--text-sm);
-  letter-spacing: var(--track-tight);
-  color: color-mix(in srgb, var(--cream) 78%, transparent);
-}
-.bento-card--spotlight .bento-card__name { font-size: var(--text-3xl); max-width: 22ch; }
-.bento-card--spotlight .bento-card__body { padding: 2rem 2.25rem 2.1rem; }
-@media (max-width: 1020px) {
-  .bento-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .bento-card--spotlight { grid-column: span 2; }
-}
-@media (max-width: 560px) {
-  .bento-grid { grid-template-columns: 1fr; grid-auto-rows: 240px; }
-  .bento-card--spotlight { grid-column: span 1; grid-row: span 1; }
-  .bento-card--spotlight .bento-card__name { font-size: var(--text-2xl); }
-  .bento-card--spotlight .bento-card__body { padding: 1.25rem 1.4rem 1.35rem; }
-}
+/* Bento mosaic (.bento-*) lives in components.css now so the home
+   showcase and this directory share the exact same component. */
+
 
 .directory-search {
   margin-top: 2rem;

@@ -21,20 +21,24 @@
       Verified agencies who know their neighbourhoods street by street. Browse
       the directory, or search by name, speciality, or location.
     </p>
+
+    {# Search lives IN the hero (same pill language as the home search bar) #}
+    <form class="directory-search" method="get" action="{% url 'agents:agent_directory' %}" role="search" data-reveal>
+      <span class="directory-search__icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.8-3.8"/></svg>
+      </span>
+      <input type="search" name="q" value="{{ q }}" placeholder="Search agencies, specialities, or locations…" aria-label="Search agencies">
+      <button type="submit" class="btn btn--dark btn--sm">Search</button>
+      {% if q %}<a class="btn btn--outline btn--sm" href="{% url 'agents:agent_directory' %}">Clear</a>{% endif %}
+    </form>
   </div>
 </section>
 
 <section class="section">
   <div class="container">
 
-    <form class="directory-search" method="get" action="{% url 'agents:agent_directory' %}" role="search">
-      <input type="search" name="q" value="{{ q }}" placeholder="Search agencies, specialities, or locations…" aria-label="Search agencies">
-      <button type="submit" class="btn btn--dark">Search</button>
-      {% if q %}<a class="btn btn--outline" href="{% url 'agents:agent_directory' %}">Clear</a>{% endif %}
-    </form>
-
     {% if q %}
-      <p style="margin-top: 1rem; color: var(--taupe); font-size: var(--text-sm); letter-spacing: var(--track-tight);">
+      <p style="color: var(--taupe); font-size: var(--text-sm); letter-spacing: var(--track-tight);">
         {{ paginator.count }} result{{ paginator.count|pluralize }} for “{{ q }}”
       </p>
     {% endif %}
@@ -47,7 +51,7 @@
       </h2>
     </div>
 
-    <div class="bento-grid" style="margin-top: 2rem;">
+    <div class="bento-grid" >
       {% for agency in agencies %}
         <a class="bento-card{% if forloop.first %} bento-card--spotlight{% endif %}"
            href="{% url 'agents:agent_detail' agency.slug %}" data-reveal>

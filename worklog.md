@@ -295,3 +295,22 @@ Work Log:
 Stage Summary:
 - Plan delivered in-chat and saved at docs/HOME-REDESIGN.md. Key decisions: bento homes showcase REPLACES both the Featured grid and the Agents section (kills duplication + white space); hero = pure-CSS crossfade of 4 real photos (no JS dependency, reduced-motion safe, slide 1 preloaded); story rebuilt as editorial column + real-photo collage with word-reveal restored; CTA bg swapped to real cta-balcony.jpg; agents stay on /agents/ only.
 - Awaiting user go-ahead to start Cycle 0 (env rebuild) + Cycle 1 (hero slideshow).
+
+---
+Task ID: home-redesign-exec-1
+Agent: Super Z (main agent)
+Task: Execute docs/HOME-REDESIGN.md cycles 0-5 — perfect the home page design (slideshow hero of real photos, homes bento showcase instead of agents, story depth + words, white-space rhythm).
+
+Work Log:
+- Cycle 0: rebuilt sandbox (venv, migrate, seed --clear, import_real_listing), restored media from oneclick zip (demo-photos pools + real Nyali set + tour video), setsid-runserver on :3011 survives across calls; bridge :3000 + gateway :81 verified 200; baseline screenshots (docs/shots/home-before-*).
+- Fixed a longstanding root cause of "site looks broken after update": staticv now auto-versions from each file's mtime (apps/core/templatetags/core_tags.py) instead of the forgotten manual ASSET_VERSION bump.
+- Cycle 1: scripts/make_hero_slides.py crops 4 best real photos to 1920x1080 16:9 with exposure normalization (target mean lum 0.47); hero markup -> .hero__slide divs with staticv-versioned --slide-img custom properties; pure-CSS crossfade (hero-fade 24s, 0.96s overlap) + Ken Burns (hero-drift), reduced-motion static fallback, first slide preloaded (LCP). Verified t=0/7/12s frames + mobile.
+- Cycle 2: home view now serves showcase_listings (newest-featured-first, 5-min cache, key home:showcase_listings); home.html replaced the Featured grid AND the Agents band with a homes bento showcase (spotlight = lead listing, 5 tiles, gradient view-all CTA) reusing the user's Framer bento component; .bento-* CSS moved from pages.css to components.css (agents page unchanged); hover zoom verified via computed transform matrix(1.05...); tests updated (sections map, showcase DB-driven, no-agents assertion, [HOMES] tag, cache key).
+- Cycle 3: story rebuilt — editorial column (statement, burnt kicker, two ~65-word paragraphs restating existing people/transparency/support themes only), layered real-photo collage (terrace main + bedroom inset print, cream border, -3deg) + frosted founder chip; word-by-word quote reveal restored (data-quote-reveal + real .word opacity rules, no-JS/reduced-motion safe). Crop bias fixes: main 58%, inset 68%.
+- Cycle 4: rhythm pass — showcase on white, story cream, numbers now the mid-page espresso anchor (light stats, sand-32 dividers), philosophy cream, browse white, CTA band background swapped to real hero-poster.jpg (shared by about/contact); dead .agents CSS removed from home.css.
+- Cycle 5: full suite 304 passed; full-page after-shots at 390/849/1200 (docs/shots/home-after-*); browser console clean.
+- Packaging: found repo-root property-images/ (57.7MB raw) is a runtime-unused duplicate of media/property-images — excluded from packages with anchored rsync pattern (first attempt wrongly nuked media/property-images; caught by db<->media integrity check and fixed with '/property-images/'). Wiped 101MB of stale seed-art accumulation in media/property-images/2026, reseeded fresh (13MB), re-encoded 18.6MB tour video to 720p/900k (6.4MB). Rebuilt zips: oneclick 69MB -> 35MB (db<->media 12/12 sampled images + video verified inside), update 30MB -> 4.7MB; stale workspace zips moved to download/archive/ (download/ shows exactly 2 zips again); README.md sizes updated.
+
+Stage Summary:
+- Home page fully redesigned per docs/HOME-REDESIGN.md: real-photo slideshow hero, homes bento showcase (no agents), rich story with word reveal, alternating section rhythm. 304 tests green. Zips in download/: oneclick 35MB (fresh installs, new design + slimmer), update 4.7MB (existing installs via UPDATE-WEBSITE.sh).
+- Commits: 7b98114 (C1), 6fc5e46 (C2), b93ea2e (C3), 93f2709 (C4) + packaging changes uncommitted.

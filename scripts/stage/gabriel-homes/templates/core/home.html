@@ -14,16 +14,27 @@
 {% block twitter_description %}Real estate with a human point of view. Buy and rent property on the Kenyan coast.{% endblock %}
 
 {% block styles %}
+  {# First slideshow frame is the LCP element — preload it (same versioned URL the slide div uses) #}
+  <link rel="preload" as="image" href="{% staticv 'img/real/hero-slide-1.jpg' %}" fetchpriority="high">
   <link rel="stylesheet" href="{% staticv 'css/home.css' %}">
 {% endblock %}
 
 {% block content %}
 
 {# =========================================================== #}
-{# 1. Hero — full-bleed photo + dark gradient + search bar       #}
+{# 1. Hero — real-homes slideshow + dark gradient + search bar   #}
+{#    Pure-CSS crossfade (motion.js not required); the four      #}
+{#    slides are prepped by scripts/make_hero_slides.py from     #}
+{#    the owner's real photos. aria-hidden: decorative.          #}
 {# =========================================================== #}
 <section class="hero" id="top">
-  <div class="hero__bg" aria-hidden="true"></div>
+  <div class="hero__bg" aria-hidden="true">
+    {# --slide-img via staticv: every slide re-busts its own cache on edit #}
+    <div class="hero__slide" style="--slide-img: url('{% staticv 'img/real/hero-slide-1.jpg' %}')"></div>
+    <div class="hero__slide" style="--slide-img: url('{% staticv 'img/real/hero-slide-2.jpg' %}')"></div>
+    <div class="hero__slide" style="--slide-img: url('{% staticv 'img/real/hero-slide-3.jpg' %}')"></div>
+    <div class="hero__slide" style="--slide-img: url('{% staticv 'img/real/hero-slide-4.jpg' %}')"></div>
+  </div>
   <div class="container">
     <p class="hero__tag">[ Gabriel Homes — Real estate on the Kenyan coast ]</p>
     <h1 class="hero__title">Real estate with a <em class="hero__accent">human</em> point of view.</h1>
@@ -87,13 +98,15 @@
 
 
 {# =========================================================== #}
-{# 3. Featured properties — 40px cards, [001] index tags         #}
+{# 3. Homes showcase — bento mosaic: spotlight + tiles + CTA.    #}
+{#    Same component + animation as the /agents/ directory grid  #}
+{#    (the user's pasted Framer reference), pointed at HOMES.    #}
 {# =========================================================== #}
-<section class="section featured" id="featured">
+<section class="section showcase" id="showcase">
   <div class="container">
     <div class="featured__header" data-reveal>
       <div>
-        <p class="section-tag">[ Properties ]</p>
+        <p class="section-tag">[ HOMES ]</p>
         <h2 class="featured__title">Featured homes, ready to view.</h2>
       </div>
       <a class="btn btn--outline" href="/property-for-sale/">
@@ -102,28 +115,59 @@
       </a>
     </div>
 
-    <div class="featured__grid">
-      {% for property in featured_listings %}
-        <div data-reveal>{% include "includes/_listing_card.html" with index=forloop.counter %}</div>
+    <div class="bento-grid">
+      {% for property in showcase_listings %}
+        <a class="bento-card bento-card--home{% if forloop.first %} bento-card--spotlight{% endif %}"
+           href="{{ property.get_absolute_url }}" data-reveal>
+          <div class="bento-card__bg" aria-hidden="true"
+               {% if property.images.all.0.image %}style="background-image: url('{{ property.images.all.0.image.url }}');"{% endif %}></div>
+          <div class="bento-card__scrim" aria-hidden="true"></div>
+          <div class="bento-card__body">
+            <p class="bento-card__index">[ {{ forloop.counter|stringformat:"03d" }} ]{% if property.is_featured %} &middot; FEATURED{% endif %}</p>
+            <h3 class="bento-card__name">{{ property.title }}</h3>
+            <p class="bento-card__meta">
+              <span class="bento-card__price">{{ property.price|kes }}</span>
+              {% if property.price_period == "monthly" %}<span class="bento-card__period"> / month</span>{% endif %}
+              <span class="bento-card__loc">{{ property.location.full_path }}</span>
+              {% if property.bedrooms %}<span class="bento-card__fact">{{ property.bedrooms }} bed</span>{% endif %}
+              {% if property.bathrooms %}<span class="bento-card__fact">{{ property.bathrooms }} bath</span>{% endif %}
+            </p>
+          </div>
+        </a>
       {% empty %}
         <p style="grid-column: 1 / -1; color: var(--taupe); text-align: center; padding: 4rem 0;">
-          No featured listings yet. Run <code>python manage.py seed_demo</code> to populate.
+          No listings yet. Run <code>python manage.py seed_demo</code> to populate.
         </p>
       {% endfor %}
+
+      {# View-all CTA — fills the final mosaic slot so the grid reads even #}
+      <a class="bento-card bento-card--cta" href="/property-for-sale/" data-reveal>
+        <div class="bento-card__scrim" aria-hidden="true"></div>
+        <div class="bento-card__body">
+          <p class="bento-card__index">[ BROWSE ALL ]</p>
+          <h3 class="bento-card__name">Every listing, one standard.</h3>
+          <p class="bento-card__meta">
+            Verified homes across the coast — Mombasa to Nairobi.
+            Browse all&nbsp;&rarr;
+          </p>
+        </div>
+      </a>
     </div>
   </div>
 </section>
 
 
 {# =========================================================== #}
-{# 4. Story / Vision — quote, founder, three value cards        #}
+{# 4. Story / Vision — editorial narrative + real-photo collage  #}
+{#    Copy restates the themes already on this page (people,     #}
+{#    transparency, support) — no new facts or numbers.          #}
 {# =========================================================== #}
 <section class="section story" id="story">
   <div class="container">
     <p class="section-tag" data-reveal>[ STORY ]</p>
 
     <div class="story__grid">
-      <div>
+      <div class="story__copy">
         <h2 class="story__statement" data-reveal>
           We don't just sell property. We help people move forward.
         </h2>
@@ -131,17 +175,44 @@
           Our work doesn't end when the keys change hands.
         </p>
 
-        <p class="story__quote" data-reveal>
-          The best comes as standard. Premium quality, verified details, and full support included across every property.
+        <div class="story__body" data-reveal>
+          <p>
+            Every search starts the same way — with a conversation, not a
+            listing sheet. We want to know what's prompting the move: schools,
+            commute, budget, the neighbours, what you don't like about where
+            you live now. Only when we understand the brief do we open the
+            portfolio — and everything we show you has already been walked,
+            photographed, and verified on the ground.
+          </p>
+          <p>
+            We'd rather lose a deal than paper over a problem. Disclosures
+            come before you ask, the paperwork is tracked at every step, and
+            when the keys change hands we stay in the room — handover,
+            fit-out, and the trusted local trades who finish the job properly.
+            A home you still love five years later is the only metric that
+            matters to us.
+          </p>
+        </div>
+
+        <p class="story__quote" data-quote-reveal data-reveal>
+          The best comes as standard. Premium quality, verified details, and
+          full support included across every property.
         </p>
       </div>
 
-      <div class="story__founder" data-reveal>
-        <div class="story__founder-portrait" aria-hidden="true"
-             style="background-image: url('{% static "img/founder.jpg" %}');"></div>
-        <div>
-          <p class="story__founder-name">Gabriel Omullu</p>
-          <p class="story__founder-meta">Founder &amp; Managing Director</p>
+      <div class="story__media" data-reveal>
+        <div class="story__photo story__photo--main" aria-hidden="true"
+             style="background-image: url('{% staticv 'img/real/real-06-living-terrace.jpg' %}');"></div>
+        <div class="story__photo story__photo--inset" aria-hidden="true"
+             style="background-image: url('{% staticv 'img/real/real-03-bedroom-garden.jpg' %}');"></div>
+
+        <div class="story__founder">
+          <div class="story__founder-portrait" aria-hidden="true"
+               style="background-image: url('{% static 'img/founder.jpg' %}');"></div>
+          <div>
+            <p class="story__founder-name">Gabriel Omullu</p>
+            <p class="story__founder-meta">Founder &amp; Managing Director</p>
+          </div>
         </div>
       </div>
     </div>
@@ -193,7 +264,7 @@
 {# =========================================================== #}
 <section class="section numbers" id="numbers">
   <div class="container">
-    <p class="section-tag" data-reveal>[ NUMBERS ]</p>
+    <p class="section-tag section-tag--light" data-reveal>[ NUMBERS ]</p>
     <h2 class="numbers__title" data-reveal>A more personal approach to real estate.</h2>
 
     <div class="numbers__grid">
@@ -231,32 +302,9 @@
 
 
 {# =========================================================== #}
-{# 6. Agents — espresso background, numbered portrait cards     #}
+{# 6. (removed) Agents band — the home page now showcases HOMES. #}
+{#    Agents live at /agents/ (bento directory + page hero).     #}
 {# =========================================================== #}
-<section class="section agents" id="agents">
-  <div class="container">
-    <div class="agents__header" data-reveal>
-      <p class="section-tag section-tag--light">[ AGENTS ]</p>
-      <h2 class="agents__title">Meet the people behind your next move.</h2>
-    </div>
-
-    <div class="agents__grid">
-      {% for agency in agencies %}
-        <a class="agent-card" href="/agents/" aria-label="{{ agency.name }} — meet the agents" data-reveal>
-          <div class="agent-card__portrait" aria-hidden="true"
-               {% if agency.logo %}style="background-image: url('{{ agency.logo.url }}');"{% else %}style="background: linear-gradient(135deg, var(--clay), var(--brown));"{% endif %}></div>
-          <div>
-            <p class="agent-card__index">{{ forloop.counter|stringformat:"02d" }}</p>
-            <h3 class="agent-card__name">{{ agency.name }}</h3>
-            <p class="agent-card__role">{% if agency.is_verified %}Verified agency{% else %}Agency{% endif %} · {{ agency.properties.published.count }} active listings</p>
-          </div>
-        </a>
-      {% empty %}
-        <p style="color: var(--sand);">No agencies seeded yet.</p>
-      {% endfor %}
-    </div>
-  </div>
-</section>
 
 
 {# =========================================================== #}
@@ -355,7 +403,7 @@
 <section class="section cta" id="cta">
   <div class="container">
     <h2 class="cta__title" data-reveal>Find a home that feels like Mombasa.</h2>
-    <a class="btn btn--primary btn--lg" href="/#featured" data-reveal>
+    <a class="btn btn--primary btn--lg" href="/#showcase" data-reveal>
       Explore properties
       <span class="btn__arrow" aria-hidden="true">&rarr;</span>
     </a>
