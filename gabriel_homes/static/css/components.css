@@ -919,7 +919,7 @@ html.motion-ready [data-reveal].is-visible {
   position: relative;
   background:
     linear-gradient(180deg, rgba(28,21,17,0.82) 0%, rgba(42,33,28,0.68) 50%, rgba(28,21,17,0.88) 100%),
-    url("../img/cta-bg.jpg") center/cover no-repeat,
+    url("../img/real/hero-poster.jpg") center/cover no-repeat,
     var(--espresso);
   color: var(--cream);
   text-align: center;

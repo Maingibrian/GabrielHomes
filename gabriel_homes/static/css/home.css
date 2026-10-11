@@ -311,10 +311,19 @@
    5. Numbers — animated counters separated by thin taupe lines
    ============================================================ */
 .numbers {
-  background: var(--cream);
-  border-top: 1px solid var(--sand-60);
-  border-bottom: 1px solid var(--sand-60);
+  background:
+    radial-gradient(1100px 560px at 88% -10%, color-mix(in srgb, var(--clay) 14%, transparent), transparent 60%),
+    radial-gradient(900px 500px at 0% 110%, color-mix(in srgb, var(--brown) 42%, transparent), transparent 55%),
+    var(--espresso);
+  color: var(--cream);
+  border-top: 0;
+  border-bottom: 0;
 }
+.numbers__title { color: var(--cream); }
+.numbers__cell { border-color: color-mix(in srgb, var(--sand) 32%, transparent); }
+.numbers .stat__label { color: var(--sand); }
+.numbers .stat__line { background: var(--sand); opacity: 0.4; }
+.numbers .section-tag { color: color-mix(in srgb, var(--clay) 48%, var(--sand)); }
 .numbers__title {
   font-size: var(--text-4xl);
   font-weight: 500;
@@ -333,53 +342,23 @@
 }
 .numbers__cell {
   padding: 2rem 1.5rem;
-  border-bottom: 1px solid var(--sand-60);
+  border-bottom: 1px solid color-mix(in srgb, var(--sand) 32%, transparent);
 }
 .numbers__cell:nth-child(even) {
-  border-left: 1px solid var(--sand-60);
+  border-left: 1px solid color-mix(in srgb, var(--sand) 32%, transparent);
 }
 @media (min-width: 810px) {
   .numbers__cell {
     padding: 2.5rem;
     border-bottom: 0;
-    border-left: 1px solid var(--sand-60);
+    border-left: 1px solid color-mix(in srgb, var(--sand) 32%, transparent);
   }
   .numbers__cell:first-child { border-left: 0; }
 }
 
 
-/* ============================================================
-   6. Agents — espresso background, numbered portrait cards
-   ============================================================ */
-.agents {
-  background:
-    radial-gradient(1200px 600px at 85% -10%, color-mix(in srgb, var(--clay) 16%, transparent), transparent 60%),
-    radial-gradient(900px 500px at 0% 110%, color-mix(in srgb, var(--brown) 45%, transparent), transparent 55%),
-    var(--espresso);
-  color: var(--cream);
-}
-.agents__header {
-  margin-bottom: 3rem;
-}
-.agents__title {
-  font-size: var(--text-display-2);
-  font-weight: 500;
-  letter-spacing: var(--track-display);
-  line-height: var(--leading-tight);
-  max-width: 22ch;
-  margin-top: 1rem;
-}
-.agents__grid {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 1.25rem;
-}
-@media (min-width: 810px) {
-  .agents__grid { grid-template-columns: repeat(2, 1fr); }
-}
-@media (min-width: 1200px) {
-  .agents__grid { grid-template-columns: repeat(4, 1fr); }
-}
+/* 6. (removed) Agents band — homes showcase took this slot; the
+   shared agent-card component lives in components.css. */
 
 
 /* ============================================================
@@ -474,7 +453,7 @@
    3b. Homes showcase (bento) — home-card meta. The grid itself
    is the shared .bento-* component in components.css.
    ============================================================ */
-.showcase { background: var(--cream); }
+.showcase { background: var(--white); }
 .bento-card--home .bento-card__name {
   text-wrap: balance;
 }
