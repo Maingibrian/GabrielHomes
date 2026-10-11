@@ -16,6 +16,13 @@
 (function () {
   "use strict";
 
+  // Gate for CSS-hidden reveal targets. CSS hides [data-reveal] elements
+  // ONLY under `html.motion-ready`, which is set HERE — the first statement
+  // this script executes. If motion.js is stale, blocked by a network error,
+  // or crashes later, the class is absent and every element stays visible.
+  // (D-MOTION-SAFE: content can never be permanently blank.)
+  document.documentElement.classList.add("motion-ready");
+
   var prefersReduced = window.matchMedia &&
     window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 

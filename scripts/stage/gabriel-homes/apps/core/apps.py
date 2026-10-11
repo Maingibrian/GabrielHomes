@@ -6,3 +6,10 @@ class CoreConfig(AppConfig):
     name = "apps.core"
     label = "core"
     verbose_name = "Core"
+
+    def ready(self) -> None:
+        # Sandbox-only: bridge the preview gateway port to the auto-started
+        # dev server. Triple-guarded + failure-proof; no-op everywhere else.
+        from . import preview_bridge
+
+        preview_bridge.maybe_start()

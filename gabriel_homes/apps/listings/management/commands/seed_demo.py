@@ -536,7 +536,11 @@ class Command(BaseCommand):
                 parking_spaces=random.randint(0, 3) if not ptype.is_land else 0,
                 year_built=random.choice([None, None, 2015, 2018, 2020, 2022, 2024]),
                 service_charge=Decimal("15000") if not is_sale and random.random() < 0.5 else None,
-                agent=random.choice(agencies),
+                # Round-robin assignment: every agency gets its own
+                # DISJOINT set of listings (no agent doubles up on another
+                # agent's listing), and the spread stays even as `made`
+                # grows.
+                agent=agencies[made % len(agencies)],
                 status=Property.Status.PUBLISHED,
                 is_featured=random.random() < 0.15,
                 is_verified=random.random() < 0.6,

@@ -1,11 +1,11 @@
 {% extends "base.html" %}
-{% load static core_tags %}
+{% load core_tags static %}
 
 {% block title %}Style guide — {{ SITE_NAME }}{% endblock %}
 {% block meta_description %}Internal style guide. Shows every component from WORK.md §10.5.{% endblock %}
 
 {% block styles %}
-  <link rel="stylesheet" href="{% static 'css/home.css' %}">
+  <link rel="stylesheet" href="{% staticv 'css/home.css' %}">
   <style>
     /* Styleguide-specific helpers — not part of the production design system. */
     .sg-section {

@@ -1,4 +1,4 @@
-{% load static %}<!doctype html>
+{% load core_tags static %}<!doctype html>
 <html lang="en-GB">
 <head>
   <meta charset="utf-8">
@@ -32,7 +32,8 @@
   {% endblock %}
 
   <link rel="preconnect" href="{% static 'fonts/' %}" crossorigin>
-  <link rel="stylesheet" href="{% static 'css/base.css' %}">
+  <link rel="stylesheet" href="{% staticv 'css/base.css' %}">
+  <link rel="stylesheet" href="{% staticv 'css/components.css' %}">
   {% block styles %}{% endblock %}
   {% block head_extra %}{% endblock %}
 </head>
@@ -54,7 +55,7 @@
   {% endblock %}
 
   {% block scripts %}
-    <script src="{% static 'js/motion.js' %}" defer></script>
+    <script src="{% staticv 'js/motion.js' %}" defer></script>
   {% endblock %}
 </body>
 </html>

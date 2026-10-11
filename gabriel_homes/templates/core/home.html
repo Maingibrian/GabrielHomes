@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% load static core_tags %}
+{% load core_tags static %}
 
 {% block title %}Gabriel Homes — Real Estate in Mombasa · Buy &amp; Rent{% endblock %}
 {% block meta_description %}Real estate with a human point of view. Buy and rent property on the Kenyan coast — Mombasa, Nairobi, Kilifi, Diani, Kiambu and Kajiado.{% endblock %}
@@ -14,7 +14,7 @@
 {% block twitter_description %}Real estate with a human point of view. Buy and rent property on the Kenyan coast.{% endblock %}
 
 {% block styles %}
-  <link rel="stylesheet" href="{% static 'css/home.css' %}">
+  <link rel="stylesheet" href="{% staticv 'css/home.css' %}">
 {% endblock %}
 
 {% block content %}

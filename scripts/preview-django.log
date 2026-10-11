@@ -1,0 +1,37 @@
+Watching for file changes with StatReloader
+Performing system checks...
+
+System check identified no issues (0 silenced).
+October 11, 2026 - 12:30:32
+Django version 5.2.18, using settings 'config.settings.dev'
+Starting development server at http://0.0.0.0:3000/
+Quit the server with CONTROL-C.
+
+WARNING: This is a development server. Do not use it in a production setting. Use a production WSGI or ASGI server instead.
+For more information on production servers see: https://docs.djangoproject.com/en/5.2/howto/deployment/
+[11/Oct/2026 12:30:36] "GET / HTTP/1.1" 200 39140
+[11/Oct/2026 12:30:36] "GET /agents/ HTTP/1.1" 200 12200
+Not Found: /search/
+[11/Oct/2026 12:30:36] "GET /search/ HTTP/1.1" 404 11224
+[11/Oct/2026 12:30:36] "GET /about/ HTTP/1.1" 200 14674
+[11/Oct/2026 12:30:36] "GET /contact/ HTTP/1.1" 200 11293
+[11/Oct/2026 12:30:36] "GET / HTTP/1.1" 200 39152
+Not Found: /media/property-images/real/
+[11/Oct/2026 12:30:36] "GET /media/property-images/real/ HTTP/1.1" 404 11294
+[11/Oct/2026 12:30:36] "GET /media/property-videos/real/nyali-real-tour.mp4 HTTP/1.1" 200 30
+Watching for file changes with StatReloader
+Performing system checks...
+
+System check identified no issues (0 silenced).
+October 11, 2026 - 12:32:37
+Django version 5.2.18, using settings 'config.settings.dev'
+Starting development server at http://0.0.0.0:3000/
+Quit the server with CONTROL-C.
+
+WARNING: This is a development server. Do not use it in a production setting. Use a production WSGI or ASGI server instead.
+For more information on production servers see: https://docs.djangoproject.com/en/5.2/howto/deployment/
+[11/Oct/2026 12:32:40] "GET / HTTP/1.1" 200 39140
+[11/Oct/2026 12:32:40] "GET /listing/modern-beachfront-apartment-nyali-81/ HTTP/1.1" 200 37043
+[11/Oct/2026 12:32:40] "GET /media/property-images/real/nyali-real-01.jpg HTTP/1.1" 200 22
+[11/Oct/2026 12:32:40] "GET /media/property-videos/real/nyali-real-tour.mp4 HTTP/1.1" 200 18648809
+[11/Oct/2026 12:32:40] "GET / HTTP/1.1" 200 39140

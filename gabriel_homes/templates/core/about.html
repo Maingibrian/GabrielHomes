@@ -1,13 +1,13 @@
 {% extends "base.html" %}
-{% load static %}
+{% load core_tags static %}
 
 {% block title %}{{ page_title }}{% endblock %}
 {% block meta_description %}{{ meta_description }}{% endblock %}
 {% block canonical %}<link rel="canonical" href="{{ SITE_DOMAIN }}{{ canonical_url }}">{% endblock %}
 
 {% block styles %}
-  <link rel="stylesheet" href="{% static 'css/pages.css' %}">
-  <link rel="stylesheet" href="{% static 'css/home.css' %}">
+  <link rel="stylesheet" href="{% staticv 'css/pages.css' %}">
+  <link rel="stylesheet" href="{% staticv 'css/home.css' %}">
 {% endblock %}
 
 {% block content %}
@@ -107,16 +107,14 @@
   </div>
 </section>
 
-<section class="section cta" style="background: var(--espresso);">
-  <div class="container" style="text-align: center;">
-    <h2 style="color: var(--cream); font-size: var(--text-display-2); font-weight: 500; letter-spacing: var(--track-display);">
+<section class="section cta">
+  <div class="container">
+    <h2 class="cta__title" data-reveal>
       Find a home that feels like Mombasa.
     </h2>
-    <div style="margin-top: 2rem;">
-      <a class="btn btn--primary btn--lg" href="/property-for-sale/mombasa/">
-        Explore properties <span class="btn__arrow">→</span>
-      </a>
-    </div>
+    <a class="btn btn--primary btn--lg" href="/property-for-sale/mombasa/" data-reveal>
+      Explore properties <span class="btn__arrow" aria-hidden="true">&rarr;</span>
+    </a>
   </div>
 </section>
 

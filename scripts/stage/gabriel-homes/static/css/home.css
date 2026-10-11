@@ -382,62 +382,7 @@
 
 
 /* ============================================================
-   Footer — extends the global _footer.html
+   Footer — frame styles moved to components.css so EVERY page
+   renders the same footer (they were trapped here, leaving the
+   footer unstyled on about/contact/terms/privacy/agents).
    ============================================================ */
-.site-footer {
-  background: var(--espresso);
-  color: color-mix(in srgb, var(--cream) 80%, transparent);
-  padding-block: 4rem 2rem;
-  font-size: var(--text-sm);
-}
-.site-footer__inner {
-  display: flex;
-  flex-direction: column;
-  gap: 3rem;
-}
-.site-footer__top {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 2.5rem;
-}
-@media (min-width: 1200px) {
-  .site-footer__top { grid-template-columns: 1.4fr 2fr; gap: 4rem; }
-}
-.site-footer__lead {
-  font-size: var(--text-2xl);
-  font-weight: 500;
-  color: var(--cream);
-  letter-spacing: var(--track-tighter);
-  line-height: var(--leading-tight);
-  max-width: 20ch;
-  margin-bottom: 1.5rem;
-}
-.site-footer__newsletter-label {
-  font-family: var(--font-mono);
-  font-size: var(--text-xs);
-  letter-spacing: var(--track-tight);
-  text-transform: uppercase;
-  color: var(--sand);
-  margin-bottom: 0.85rem;
-  display: block;
-}
-.site-footer__wordmark-row {
-  border-top: 1px solid color-mix(in srgb, var(--sand) 18%, transparent);
-  padding-top: 1.5rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-.site-footer__meta {
-  font-family: var(--font-mono);
-  font-size: var(--text-xs);
-  letter-spacing: var(--track-tight);
-  text-transform: uppercase;
-  color: var(--sand);
-}
-.site-footer__copyright {
-  font-family: var(--font-mono);
-  font-size: var(--text-xs);
-  letter-spacing: var(--track-tight);
-  color: var(--sand);
-}

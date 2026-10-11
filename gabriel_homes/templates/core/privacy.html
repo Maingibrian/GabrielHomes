@@ -1,12 +1,12 @@
 {% extends "base.html" %}
-{% load static %}
+{% load core_tags static %}
 
 {% block title %}{{ page_title }}{% endblock %}
 {% block meta_description %}{{ meta_description }}{% endblock %}
 {% block canonical %}<link rel="canonical" href="{{ SITE_DOMAIN }}{{ canonical_url }}">{% endblock %}
 
 {% block styles %}
-  <link rel="stylesheet" href="{% static 'css/pages.css' %}">
+  <link rel="stylesheet" href="{% staticv 'css/pages.css' %}">
 {% endblock %}
 
 {% block content %}

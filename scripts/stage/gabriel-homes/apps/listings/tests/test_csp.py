@@ -47,13 +47,28 @@ def test_csp_header_on_detail_page():
     assert "Content-Security-Policy" in r.headers
 
 
-def test_csp_allows_openstreetmap_tiles_only():
+def test_csp_allows_map_tile_hosts_only():
     r = Client().get("/")
     csp = r.headers.get("Content-Security-Policy", "")
+    # OSM streets + Esri World Imagery satellite (D-MAP-SAT)
+    # + CARTO Voyager streets (D-MAP-CARTO: OSM 403-blocks proxied browsers).
     assert "https://*.tile.openstreetmap.org" in csp
+    assert "https://server.arcgisonline.com" in csp
+    assert "https://*.basemaps.cartocdn.com" in csp
     # No other external hosts are whitelisted.
     assert "unpkg.com" not in csp
     assert "jsdelivr" not in csp
+
+
+def test_detail_map_js_defaults_to_satellite_and_needs_no_osm_tile():
+    """The default map layer must be Esri satellite, and the street toggle
+    must not depend on tile.openstreetmap.org (403-blocks proxied browsers,
+    which rendered as 'Access blocked' tiles for users)."""
+    js = (REPO / "static" / "js" / "detail-map.js").read_text()
+    assert "server.arcgisonline.com" in js            # satellite default
+    assert "basemaps.cartocdn.com" in js              # permissive street tiles
+    assert "layers: [satellite]" in js                # satellite is the default layer
+    assert "https://{s}.tile.openstreetmap.org" not in js   # no OSM tile layer
 
 
 # ---------------------------------------------------------------------------
@@ -91,6 +106,23 @@ def test_repo_has_no_cdn_references():
                 if banned.search(path.read_text(encoding="utf-8", errors="ignore")):
                     hits.append(str(path))
     assert hits == [], f"CDN references found in: {hits}"
+
+
+# ---------------------------------------------------------------------------
+# D-MOTION-SAFE — reveal animations can never permanently blank content
+# ---------------------------------------------------------------------------
+def test_reveal_hidden_state_is_js_gated():
+    """CSS must hide [data-reveal] elements ONLY under html.motion-ready
+    (a class motion.js sets as its first statement). Otherwise a stale or
+    blocked motion.js leaves every card invisible forever — exactly the
+    'agent cards / services page look broken' bug class."""
+    css = (REPO / "static" / "css" / "components.css").read_text()
+    assert "html.motion-ready [data-reveal]" in css
+    # No ungated hidden state may exist.
+    ungated = re.search(r"(?m)^\[data-reveal\]\s*\{", css)
+    assert ungated is None, "[data-reveal] hidden state is not gated by motion-ready"
+    js = (REPO / "static" / "js" / "motion.js").read_text()
+    assert 'document.documentElement.classList.add("motion-ready")' in js
 
 
 def test_templates_have_no_executable_inline_script_or_handlers():

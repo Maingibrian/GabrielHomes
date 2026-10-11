@@ -1,12 +1,12 @@
 {% extends "base.html" %}
-{% load static core_tags %}
+{% load core_tags static %}
 
 {% block title %}Saved properties — {{ SITE_NAME }}{% endblock %}
 {% block meta_description %}Your saved properties on Gabriel Homes.{% endblock %}
 
 {% block styles %}
-  <link rel="stylesheet" href="{% static 'css/search.css' %}">
-  <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+  <link rel="stylesheet" href="{% staticv 'css/search.css' %}">
+  <link rel="stylesheet" href="{% staticv 'css/dashboard.css' %}">
 {% endblock %}
 
 {% block content %}

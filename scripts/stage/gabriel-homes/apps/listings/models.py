@@ -241,6 +241,15 @@ class Property(models.Model):
 
     amenities = models.ManyToManyField(Amenity, blank=True, related_name="properties")
 
+    # Optional walkthrough video (mp4/webm) rendered on the detail page
+    # beneath the photo gallery. Blank for image-only listings.
+    video = models.FileField(
+        upload_to="property-videos/%Y/%m/",
+        blank=True,
+        verbose_name="Walkthrough video",
+        help_text="Optional listing walkthrough video (mp4 or webm).",
+    )
+
     # Ownership & state
     agent = models.ForeignKey(
         "agents.AgencyProfile",

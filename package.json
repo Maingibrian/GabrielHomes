@@ -1,5 +1,8 @@
 {
   "dependencies": {
     "docx": "^9.9.0"
+  },
+  "scripts": {
+    "dev": "cd gabriel_homes && sh scripts/ensure-runtime.sh && exec .venv/bin/python manage.py runserver 0.0.0.0:3000"
   }
 }

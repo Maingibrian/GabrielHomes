@@ -823,21 +823,88 @@
 
 /* ============================================================
    Utility: appear-on-scroll (set .is-visible via IntersectionObserver)
+
+   SAFETY: the hidden initial state ONLY applies once motion.js has run
+   (it sets `motion-ready` on <html> as its first statement). If the JS is
+   stale, blocked, or errors, no element is ever hidden — content always
+   renders. (D-MOTION-SAFE)
    ============================================================= */
-[data-reveal] {
+html.motion-ready [data-reveal] {
   opacity: 0;
   transform: translateY(16px);
   transition: opacity var(--t-slow) var(--ease-out),
               transform var(--t-slow) var(--ease-out);
 }
-[data-reveal].is-visible {
+html.motion-ready [data-reveal].is-visible {
   opacity: 1;
   transform: translateY(0);
 }
 @media (prefers-reduced-motion: reduce) {
-  [data-reveal] {
+  html.motion-ready [data-reveal] {
     opacity: 1;
     transform: none;
     transition: none;
   }
+}
+
+
+/* ============================================================
+   13. Site footer frame (moved from home.css — renders on ALL pages)
+   ============================================================ */
+.site-footer {
+  background: var(--espresso);
+  color: color-mix(in srgb, var(--cream) 80%, transparent);
+  padding-block: 4rem 2rem;
+  font-size: var(--text-sm);
+}
+.site-footer__inner {
+  display: flex;
+  flex-direction: column;
+  gap: 3rem;
+}
+.site-footer__top {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2.5rem;
+}
+@media (min-width: 1200px) {
+  .site-footer__top { grid-template-columns: 1.4fr 2fr; gap: 4rem; }
+}
+.site-footer__lead {
+  font-size: var(--text-2xl);
+  font-weight: 500;
+  color: var(--cream);
+  letter-spacing: var(--track-tighter);
+  line-height: var(--leading-tight);
+  max-width: 20ch;
+  margin-bottom: 1.5rem;
+}
+.site-footer__newsletter-label {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  letter-spacing: var(--track-tight);
+  text-transform: uppercase;
+  color: var(--sand);
+  margin-bottom: 0.85rem;
+  display: block;
+}
+.site-footer__wordmark-row {
+  border-top: 1px solid color-mix(in srgb, var(--sand) 18%, transparent);
+  padding-top: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.site-footer__meta {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  letter-spacing: var(--track-tight);
+  text-transform: uppercase;
+  color: var(--sand);
+}
+.site-footer__copyright {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  letter-spacing: var(--track-tight);
+  color: var(--sand);
 }

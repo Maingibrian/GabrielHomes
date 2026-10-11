@@ -6,8 +6,12 @@ from __future__ import annotations
 #
 #   default-src 'self'        — everything not listed falls back to same-origin
 #   img-src 'self' data: https://*.tile.openstreetmap.org
-#                             — Leaflet map tiles come from OSM; data: for
-#                               inline-encoded images
+#                             https://server.arcgisonline.com
+#                             https://*.basemaps.cartocdn.com
+#                             — Leaflet map tiles: OSM streets + Esri World
+#                               Imagery (satellite view, D-MAP-SAT) + CARTO
+#                               Voyager streets (D-MAP-CARTO: OSM 403-blocks
+#                               proxied browsers); data: for inline images
 #   style-src 'self' 'unsafe-inline'
 #                             — the template layer emits style="" attributes
 #                               (e.g. gallery thumbnails' background-image);
@@ -26,7 +30,9 @@ from __future__ import annotations
 #                               enquiry)
 CSP_POLICY = (
     "default-src 'self'; "
-    "img-src 'self' data: https://*.tile.openstreetmap.org; "
+    "img-src 'self' data: https://*.tile.openstreetmap.org"
+    " https://server.arcgisonline.com"
+    " https://*.basemaps.cartocdn.com; "
     "style-src 'self' 'unsafe-inline'; "
     "script-src 'self'; "
     "font-src 'self'; "

@@ -1,12 +1,34 @@
-"""Template tags for the core app — `kes` price filter and `json_ld_script`."""
+"""Template tags for the core app — `kes` price filter, `json_ld_script`,
+`absolute_url` and `staticv` (cache-busted static URLs)."""
 import json
 from decimal import Decimal
 
 from django import template
+from django.contrib.staticfiles.storage import staticfiles_storage
 from django.core.serializers.json import DjangoJSONEncoder
 from django.utils.safestring import mark_safe
 
 register = template.Library()
+
+# Asset version appended to every CSS/JS URL rendered via {% staticv %}.
+# Bump this once per release: every browser (and every stale proxy cache)
+# then treats the assets as new URLs instead of serving days-old cached
+# CSS/JS — the root cause of "the site looks broken / old version" reports
+# after each update. Django staticfiles ignores the query string.
+ASSET_VERSION = "20261011a"
+
+
+@register.simple_tag
+def staticv(path: str) -> str:
+    """{% static %} with a version query: /static/css/base.css?v=20261011a.
+
+    Use for CSS/JS/vendor assets. Images and the fonts/ preconnect can keep
+    plain {% static %}.
+    """
+    url = staticfiles_storage.url(path)
+    if url.endswith("/"):
+        return url  # directory preconnects etc. — nothing to version
+    return f"{url}?v={ASSET_VERSION}"
 
 # Same escape scheme as Django's json_script filter (django.utils.html):
 # <, > and & become JSON-native unicode escapes so a user-supplied string

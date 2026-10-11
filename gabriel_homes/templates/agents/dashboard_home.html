@@ -1,11 +1,11 @@
 {% extends "base.html" %}
-{% load static %}
+{% load core_tags static %}
 
 {% block title %}Dashboard — {{ SITE_NAME }}{% endblock %}
 {% block meta_description %}Agent dashboard.{% endblock %}
 
 {% block styles %}
-  <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+  <link rel="stylesheet" href="{% staticv 'css/dashboard.css' %}">
 {% endblock %}
 
 {% block content %}

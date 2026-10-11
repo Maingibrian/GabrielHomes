@@ -1,9 +1,15 @@
 """Dev settings — local development only."""
 from .base import *  # noqa: F401, F403
-from .base import BASE_DIR, TEMPLATES
+from .base import BASE_DIR, TEMPLATES, env
 
 DEBUG = True
-ALLOWED_HOSTS = ["localhost", "127.0.0.1", "0.0.0.0", "testserver"]
+ALLOWED_HOSTS = ["localhost", "127.0.0.1", "0.0.0.0", "testserver"] + env.list(
+    "EXTRA_ALLOWED_HOSTS", default=[]
+)
+# The workspace live-preview proxy presents its own public origin; without
+# this the enquiry form would 403 on CSRF. Empty by default, so plain local
+# runs are unaffected.
+CSRF_TRUSTED_ORIGINS = env.list("CSRF_TRUSTED_ORIGINS", default=[])
 
 # D-RL (PLAN S2): dev never trusts X-Real-IP (no trusted proxy locally).
 TRUST_X_REAL_IP = False

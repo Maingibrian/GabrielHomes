@@ -1,10 +1,10 @@
 {% extends "base.html" %}
-{% load static %}
+{% load core_tags static %}
 
 {% block title %}{% if is_create %}New listing{% else %}Edit listing{% endif %} — Dashboard{% endblock %}
 
 {% block styles %}
-  <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+  <link rel="stylesheet" href="{% staticv 'css/dashboard.css' %}">
 {% endblock %}
 
 {% block content %}

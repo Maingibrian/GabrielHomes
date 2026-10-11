@@ -27,10 +27,11 @@ if [ ! -x "$VPY" ]; then
 fi
 
 # -- Self-heal: the demo DB must ship pre-seeded; rebuild if absent.
-if [ ! -f "$SRC/db.sqlite3" ]; then
-  echo "   db.sqlite3 missing -> migrating + seeding a fresh demo DB..."
+if [ ! -f "$SRC/db.sqlite3" ] || [ ! -s "$SRC/db.sqlite3" ]; then
+  echo "   db.sqlite3 missing/empty -> migrating + seeding a fresh demo DB..."
   (cd "$SRC" && "$VPY" manage.py migrate --noinput >/dev/null \
      && "$VPY" manage.py seed_demo >/dev/null \
+     && "$VPY" manage.py import_real_listing >/dev/null \
      && "$VPY" manage.py shell < scripts/setup_accounts.py >/dev/null)
 fi
 
@@ -60,6 +61,8 @@ rsync -a \
   --exclude '.coverage' \
   --exclude 'staticfiles/' \
   --exclude '.DS_Store' \
+  --exclude 'preview_bridge.log' \
+  --exclude 'media/real-listing-src/' \
   --exclude '*.sqlite3-journal' \
   --exclude '*.sqlite3-wal' \
   --exclude '*.sqlite3-shm' \

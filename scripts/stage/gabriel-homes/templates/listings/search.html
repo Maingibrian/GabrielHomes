@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% load static core_tags %}
+{% load core_tags static %}
 
 {% block title %}{{ page_title }} — {{ SITE_NAME }}{% endblock %}
 {% block meta_description %}{{ meta_description }}{% endblock %}
@@ -14,7 +14,7 @@
 {% block twitter_description %}{{ meta_description }}{% endblock %}
 
 {% block styles %}
-  <link rel="stylesheet" href="{% static 'css/search.css' %}">
+  <link rel="stylesheet" href="{% staticv 'css/search.css' %}">
 {% endblock %}
 
 {% block head_extra %}
@@ -134,5 +134,5 @@
 
 {% block scripts %}
   {{ block.super }}
-  <script src="{% static 'js/search-filters.js' %}" defer></script>
+  <script src="{% staticv 'js/search-filters.js' %}" defer></script>
 {% endblock %}

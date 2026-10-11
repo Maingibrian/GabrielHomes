@@ -14,6 +14,9 @@
   position: relative;
   background: var(--espresso);
   color: var(--cream);
+  min-height: min(92vh, 880px);
+  display: flex;
+  align-items: center;
   padding-block: clamp(4.5rem, 3rem + 7vw, 8rem);
   overflow: hidden;
 }
@@ -29,9 +32,11 @@
   content: "";
   position: absolute;
   inset: 0;
-  background: linear-gradient(180deg, rgba(28,21,17,0.52) 0%, rgba(42,33,28,0.38) 45%, rgba(42,33,28,0.72) 100%);
+  background:
+    linear-gradient(90deg, rgba(28,21,17,0.52) 0%, rgba(28,21,17,0.24) 48%, rgba(28,21,17,0.04) 100%),
+    linear-gradient(180deg, rgba(28,21,17,0.46) 0%, rgba(42,33,28,0.26) 45%, rgba(42,33,28,0.64) 100%);
 }
-.hero .container { position: relative; z-index: 1; }
+.hero .container { position: relative; z-index: 1; width: 100%; }
 .hero__tag {
   font-family: var(--font-mono);
   font-size: var(--text-xs);
@@ -358,86 +363,13 @@
 
 
 /* ============================================================
-   9. CTA band — dark, pill button with arrows
+   CTA band — moved to components.css so inner pages (about,
+   contact) share the exact same dark photo band as the home page.
    ============================================================ */
-.cta {
-  position: relative;
-  background:
-    linear-gradient(180deg, rgba(28,21,17,0.82) 0%, rgba(42,33,28,0.68) 50%, rgba(28,21,17,0.88) 100%),
-    url("../img/cta-bg.jpg") center/cover no-repeat,
-    var(--espresso);
-  color: var(--cream);
-  text-align: center;
-  overflow: hidden;
-}
-.cta__title {
-  font-size: var(--text-display-2);
-  font-weight: 520;
-  font-variation-settings: "opsz" 100;
-  letter-spacing: -0.015em;
-  line-height: var(--leading-tight);
-  max-width: 18ch;
-  margin: 0 auto 2rem;
-}
 
 
 /* ============================================================
-   Footer — extends the global _footer.html
+   Footer — frame styles moved to components.css so EVERY page
+   renders the same footer (they were trapped here, leaving the
+   footer unstyled on about/contact/terms/privacy/agents).
    ============================================================ */
-.site-footer {
-  background: var(--espresso);
-  color: color-mix(in srgb, var(--cream) 80%, transparent);
-  padding-block: 4rem 2rem;
-  font-size: var(--text-sm);
-}
-.site-footer__inner {
-  display: flex;
-  flex-direction: column;
-  gap: 3rem;
-}
-.site-footer__top {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 2.5rem;
-}
-@media (min-width: 1200px) {
-  .site-footer__top { grid-template-columns: 1.4fr 2fr; gap: 4rem; }
-}
-.site-footer__lead {
-  font-size: var(--text-2xl);
-  font-weight: 500;
-  color: var(--cream);
-  letter-spacing: var(--track-tighter);
-  line-height: var(--leading-tight);
-  max-width: 20ch;
-  margin-bottom: 1.5rem;
-}
-.site-footer__newsletter-label {
-  font-family: var(--font-mono);
-  font-size: var(--text-xs);
-  letter-spacing: var(--track-tight);
-  text-transform: uppercase;
-  color: var(--sand);
-  margin-bottom: 0.85rem;
-  display: block;
-}
-.site-footer__wordmark-row {
-  border-top: 1px solid color-mix(in srgb, var(--sand) 18%, transparent);
-  padding-top: 1.5rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-.site-footer__meta {
-  font-family: var(--font-mono);
-  font-size: var(--text-xs);
-  letter-spacing: var(--track-tight);
-  text-transform: uppercase;
-  color: var(--sand);
-}
-.site-footer__copyright {
-  font-family: var(--font-mono);
-  font-size: var(--text-xs);
-  letter-spacing: var(--track-tight);
-  color: var(--sand);
-}
