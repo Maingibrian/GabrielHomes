@@ -158,14 +158,16 @@
 
 
 {# =========================================================== #}
-{# 4. Story / Vision — quote, founder, three value cards        #}
+{# 4. Story / Vision — editorial narrative + real-photo collage  #}
+{#    Copy restates the themes already on this page (people,     #}
+{#    transparency, support) — no new facts or numbers.          #}
 {# =========================================================== #}
 <section class="section story" id="story">
   <div class="container">
     <p class="section-tag" data-reveal>[ STORY ]</p>
 
     <div class="story__grid">
-      <div>
+      <div class="story__copy">
         <h2 class="story__statement" data-reveal>
           We don't just sell property. We help people move forward.
         </h2>
@@ -173,17 +175,44 @@
           Our work doesn't end when the keys change hands.
         </p>
 
-        <p class="story__quote" data-reveal>
-          The best comes as standard. Premium quality, verified details, and full support included across every property.
+        <div class="story__body" data-reveal>
+          <p>
+            Every search starts the same way — with a conversation, not a
+            listing sheet. We want to know what's prompting the move: schools,
+            commute, budget, the neighbours, what you don't like about where
+            you live now. Only when we understand the brief do we open the
+            portfolio — and everything we show you has already been walked,
+            photographed, and verified on the ground.
+          </p>
+          <p>
+            We'd rather lose a deal than paper over a problem. Disclosures
+            come before you ask, the paperwork is tracked at every step, and
+            when the keys change hands we stay in the room — handover,
+            fit-out, and the trusted local trades who finish the job properly.
+            A home you still love five years later is the only metric that
+            matters to us.
+          </p>
+        </div>
+
+        <p class="story__quote" data-quote-reveal data-reveal>
+          The best comes as standard. Premium quality, verified details, and
+          full support included across every property.
         </p>
       </div>
 
-      <div class="story__founder" data-reveal>
-        <div class="story__founder-portrait" aria-hidden="true"
-             style="background-image: url('{% static "img/founder.jpg" %}');"></div>
-        <div>
-          <p class="story__founder-name">Gabriel Omullu</p>
-          <p class="story__founder-meta">Founder &amp; Managing Director</p>
+      <div class="story__media" data-reveal>
+        <div class="story__photo story__photo--main" aria-hidden="true"
+             style="background-image: url('{% staticv 'img/real/real-06-living-terrace.jpg' %}');"></div>
+        <div class="story__photo story__photo--inset" aria-hidden="true"
+             style="background-image: url('{% staticv 'img/real/real-03-bedroom-garden.jpg' %}');"></div>
+
+        <div class="story__founder">
+          <div class="story__founder-portrait" aria-hidden="true"
+               style="background-image: url('{% static 'img/founder.jpg' %}');"></div>
+          <div>
+            <p class="story__founder-name">Gabriel Omullu</p>
+            <p class="story__founder-meta">Founder &amp; Managing Director</p>
+          </div>
         </div>
       </div>
     </div>
