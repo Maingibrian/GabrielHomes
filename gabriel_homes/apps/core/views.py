@@ -12,40 +12,43 @@ from apps.locations.models import Location
 
 
 def home(request):
-    """Home page — all 10 sections from WORK.md §8, real-DB-driven.
+    """Home page — hero slideshow, homes bento showcase, story, numbers,
+    philosophy, browse, CTA (docs/HOME-REDESIGN.md).
 
-    The featured-listings section is cached for 5 minutes (per §11
-    Phase 6: template fragment caching on home). The cache key includes
-    the list of featured listing PKs so it invalidates when listings
-    change status.
+    The showcase (bento) section is cached for 5 minutes; the cache key
+    invalidates naturally when listings change because we cache the
+    queryset result, and the fragment renders fresh each request.
     """
     from django.core.cache import cache
 
-    # Featured published listings — up to 6 for the home grid.
-    # Try the cache first; the fragment cache in the template handles
-    # the rendered HTML, but we also cache the queryset result to avoid
-    # re-running the query on every request.
-    cache_key = "home:featured_listings"
-    featured_listings = cache.get(cache_key)
-    if featured_listings is None:
-        featured_listings = list(
-            Property.objects.published().filter(is_featured=True).select_related(
+    # Homes showcase — up to 6 published listings for the bento mosaic.
+    # Spotlight (first card) = strongest featured listing; the rest are
+    # the most recently published. Topped up from the newest published
+    # when not enough are flagged featured.
+    cache_key = "home:showcase_listings"
+    showcase_listings = cache.get(cache_key)
+    if showcase_listings is None:
+        showcase_listings = list(
+            Property.objects.published().filter(is_featured=True)
+            .select_related(
                 "property_type", "location__parent__parent", "agent__user",
-            ).prefetch_related("images")[:6]
+            )
+            .prefetch_related("images")
+            .order_by("-published_at")[:6]
         )
-        # If we don't have enough featured, top up with the newest published.
-        if len(featured_listings) < 6:
-            seen = {p.pk for p in featured_listings}
-            extra = Property.objects.published().exclude(pk__in=seen).order_by("-published_at")[
-                : 6 - len(featured_listings)
-            ]
-            featured_listings.extend(list(extra))
-        cache.set(cache_key, featured_listings, 60 * 5)  # 5 minutes
-
-    # Agencies for the Agents section.
-    agencies = list(
-        AgencyProfile.objects.select_related("user").order_by("name")[:8]
-    )
+        if len(showcase_listings) < 6:
+            seen = {p.pk for p in showcase_listings}
+            extra = (
+                Property.objects.published()
+                .exclude(pk__in=seen)
+                .select_related(
+                    "property_type", "location__parent__parent", "agent__user",
+                )
+                .prefetch_related("images")
+                .order_by("-published_at")[: 6 - len(showcase_listings)]
+            )
+            showcase_listings.extend(list(extra))
+        cache.set(cache_key, showcase_listings, 60 * 5)  # 5 minutes
 
     # Browse-by-location: top counties by listing count.
     counties = list(Location.objects.filter(level=Location.Level.COUNTY).order_by("name"))
@@ -76,8 +79,7 @@ def home(request):
 
     context = {
         "body_class": "page-home",
-        "featured_listings": featured_listings,
-        "agencies": agencies,
+        "showcase_listings": showcase_listings,
         "counties": counties,
         "types_with_counts": types_with_counts,
         # Hero stats

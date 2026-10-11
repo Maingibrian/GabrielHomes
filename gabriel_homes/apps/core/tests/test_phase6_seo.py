@@ -361,13 +361,13 @@ def test_form_inputs_have_labels():
 # Caching
 # ---------------------------------------------------------------------------
 def test_home_cache_works():
-    """The home page cache should store featured listings."""
+    """The home page cache should store the showcase (bento) listings."""
     from django.core.cache import cache
     cache.clear()
     c = Client()
     # First request populates the cache
     c.get("/")
-    assert cache.get("home:featured_listings") is not None
+    assert cache.get("home:showcase_listings") is not None
     # Second request uses the cache
     c.get("/")
-    assert cache.get("home:featured_listings") is not None
+    assert cache.get("home:showcase_listings") is not None

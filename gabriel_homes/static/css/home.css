@@ -413,3 +413,30 @@
    renders the same footer (they were trapped here, leaving the
    footer unstyled on about/contact/terms/privacy/agents).
    ============================================================ */
+
+
+/* ============================================================
+   3b. Homes showcase (bento) — home-card meta. The grid itself
+   is the shared .bento-* component in components.css.
+   ============================================================ */
+.showcase { background: var(--cream); }
+.bento-card--home .bento-card__name {
+  text-wrap: balance;
+}
+.bento-card__price {
+  font-weight: 600;
+  color: var(--cream);
+  font-variant-numeric: tabular-nums;
+}
+.bento-card--spotlight .bento-card__price { font-size: var(--text-lg); }
+.bento-card__period {
+  color: color-mix(in srgb, var(--cream) 62%, transparent);
+}
+.bento-card__loc {
+  color: color-mix(in srgb, var(--cream) 70%, transparent);
+}
+.bento-card__loc::before,
+.bento-card__fact::before {
+  content: "\00b7\00a0\00a0"; /* middot separator inside the meta line */
+  color: color-mix(in srgb, var(--sand) 70%, transparent);
+}
