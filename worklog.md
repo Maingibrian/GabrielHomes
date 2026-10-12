@@ -388,3 +388,20 @@ Work Log:
 Stage Summary:
 - DisallowedHost FIXED permanently (reset-proof). Map task closed (verified satellite). Services page shipped + tested. Zips restored in download/. Remaining carried-over items: sticky agent card on listing detail, effects/animation audit, (background) Loop 5 plan + coverage gate.
 - Commits: 7851dc0 (bootstrap resilience), b2205ef (services page), follow-up chore commit.
+
+---
+Task ID: sticky-agent-card-5
+Agent: Super Z (main agent)
+Task: User picked "the sticky agent card on listing detail" as the next task.
+
+Work Log:
+- Found the sticky feature already built (prior session): .agent-card-sticky position:sticky top:5rem >=1200px, aside align-self:stretch for travel room, card + enquiry form as ONE sticky unit (form is a child of the card div — no sibling collision possible).
+- Runtime-verified with browser probes at 1440px: pins at exactly 80px across y=600-1200, docks gracefully at aside end; mobile 390px = static card + fixed thumb-reachable contact bar; zero console errors; real data (Ngong Ridge Properties, call/WhatsApp/email, verified).
+- Root-caused the residual "cards look broken" impression: after each sandbox reset the db reseeds WITHOUT agency logos (portrait pool lived only in wiped zips/media), so avatar circles showed a bare gradient. Original portrait photos unrecoverable (scripts/design-audit, scripts/media-golden, download/ all wiped).
+- Fix: designed monogram avatars instead of fake stock faces — new `initials` filter in core_tags (first letters of first two words, "Ngong Ridge Properties" -> "NR", GH fallback), rendered inside the gradient circle on listing detail, about page, styleguide; .logo-monogram styles in components.css (serif, cream, centered, per-context sizes). Reset-proof: needs no data.
+- 7 new tests in test_initials_filter.py (filter unit + template rendering with a factory-built agency/listing). Full suite 323 passed.
+- Rebuilt download/gabriel-homes-update-2026-10-12.zip (272 files) with the change.
+- Commits: bae5ae1.
+
+Stage Summary:
+- Sticky agent card CLOSED: verified working exactly as the user asked (pinned beside the listing, covering the white space) + the avatar polish makes it look finished after any reset. Remaining carried-over items: effects/animation audit; background: Loop 5 plan, coverage gate.
