@@ -1061,3 +1061,25 @@ html.motion-ready .bento-grid .bento-card[data-reveal]:nth-child(3n) { transitio
   .bento-card--spotlight .bento-card__body { padding: 1.25rem 1.4rem 1.35rem; }
 }
 
+
+/* ============================================================
+   Monogram avatar — agency initials over the brand gradient,
+   shown when no logo is uploaded (survives every db reset,
+   looks designed rather than missing).
+   ============================================================ */
+.agent-card-sticky__logo,
+.agent-card__portrait {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.logo-monogram {
+  font-family: var(--font-display);
+  font-weight: 500;
+  color: var(--cream);
+  letter-spacing: var(--track-tight);
+  line-height: 1;
+  user-select: none;
+}
+.agent-card-sticky__logo .logo-monogram { font-size: 1.3rem; }
+.agent-card__portrait .logo-monogram { font-size: 2.1rem; }

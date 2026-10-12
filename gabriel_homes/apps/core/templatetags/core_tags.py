@@ -130,6 +130,23 @@ def kes_short(value) -> str:
     return f"KES {int(amount)}"
 
 
+@register.filter
+def initials(name) -> str:
+    """Agency initials for monogram avatars — first letter of the first two
+    words, uppercase. "Ngong Ridge Properties" -> "NR", "Gabriel Homes" -> "GH".
+
+    Used when an agency has no logo uploaded: the avatar circle renders these
+    initials over the brand gradient instead of looking empty/broken.
+    """
+    words = [w for w in str(name or "").split() if w]
+    if not words:
+        return "GH"
+    chars = [words[0][0]]
+    if len(words) > 1:
+        chars.append(words[1][0])
+    return "".join(chars).upper()
+
+
 @register.simple_tag(takes_context=True)
 def absolute_url(context, path: str = "") -> str:
     """Build an absolute URL from a path, using the current request.

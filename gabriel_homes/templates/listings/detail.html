@@ -230,7 +230,7 @@
         <div class="agent-card-sticky__header">
           <div class="agent-card-sticky__logo"
                {% if property.agent.logo %}style="background-image: url('{{ property.agent.logo.url }}');"{% else %}style="background: linear-gradient(135deg, var(--clay), var(--brown));"{% endif %}
-               aria-hidden="true"></div>
+               aria-hidden="true">{% if not property.agent.logo %}<span class="logo-monogram">{{ property.agent.name|initials }}</span>{% endif %}</div>
           <div>
             <div class="agent-card-sticky__name">{{ property.agent.name }}</div>
             <div class="agent-card-sticky__role">

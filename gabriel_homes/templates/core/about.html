@@ -93,7 +93,7 @@
       {% for agency in agencies %}
         <a class="agent-card" href="{% url 'agents:agent_detail' agency.slug %}" data-reveal>
           <div class="agent-card__portrait" aria-hidden="true"
-               {% if agency.logo %}style="background-image: url('{{ agency.logo.url }}');"{% else %}style="background: linear-gradient(135deg, var(--clay), var(--brown));"{% endif %}></div>
+               {% if agency.logo %}style="background-image: url('{{ agency.logo.url }}');"{% else %}style="background: linear-gradient(135deg, var(--clay), var(--brown));"{% endif %}>{% if not agency.logo %}<span class="logo-monogram">{{ agency.name|initials }}</span>{% endif %}</div>
           <div>
             <p class="agent-card__index">{{ forloop.counter|stringformat:"02d" }}</p>
             <h3 class="agent-card__name">{{ agency.name }}</h3>
