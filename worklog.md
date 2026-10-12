@@ -333,3 +333,22 @@ Work Log:
 
 Stage Summary:
 - All six HOME-REDESIGN cycles verified green at runtime; four real defects fixed (mobile-menu a11y/ghosting, 849 overflow from numbers grid, KES counter overlap, non-hermetic prod tests). Full suite 304 passed. Update zip 2026-10-12 (4.9MB) in download/ for the user's existing install; oneclick zip unchanged (35MB, already carries the redesign).
+
+---
+Task ID: dead-file-purge-1
+Agent: Super Z (main agent)
+Task: User cancelled the zip-shrinking prompt; asked to "ensure there are no dead files but don't make the website useless."
+
+Work Log:
+- Audited every asset class before deleting anything: DB FileField introspection (all models), reference corpus over templates/CSS/JS/Python/shell/docs, template orphan scan (scripts/audit_dead_files.py in workspace scripts).
+- Verified NOT dead (kept): media/demo-photos pools (seed_demo source for fresh installs), scripts/ (START-GABRIEL-HOMES calls setup_accounts.py/find_free_port.py/open_browser_when_ready.py; Makefile calls gate.sh/backup-db.sh/restore-drill.sh), WORK.md (user's own master brief), design-reference/ (WORK.md points to it), docs/*.md governance docs.
+- Purged: 77 media orphans (superseded image/logo generations, a/b/c/d/test.jpg stubs) -> archive/media-orphans/; root property-images/ (287 files, 7.4MB — never served, MEDIA_ROOT=media/, originals in upload/) -> archived + git rm; docs/shots/ (21 PNGs, 23MB) -> archived + git rm; static/img/real/{04,07,08} (unused source photos) -> archived + git rm; gabriel_extract/ (stale site extraction, 2.4MB) deleted; preview_bridge.log + caches removed.
+- Fixed a real regression found during audit: tour video was unbound in the sandbox db (VIDEO TOUR dark) -> bound property-videos/real/nyali-real-tour.mp4 to flagship #77 (oneclick db already had it on its real listing). Detail page + 6.3MB stream verified 200.
+- Root-caused recurring dead-weight: git toplevel is the WORKSPACE, .gitignore didn't cover download/, archive/, scripts/stage/ etc., so auto-commits kept versioning zips, staging duplicates and scratch (UUID-named commits). Expanded .gitignore, untracked binaries/scratch: tracked files ~1900 -> 316 (216 gabriel_homes + 78 script sources + meta). Single amended commit cba9e6f.
+- Repackaged: update zip 2026-10-12 rebuilt (266 files, 4.3MB, dead static photos gone), oneclick rebuilt (38MB, current db+media pair, hygiene pass ran). Sanity checks green on both.
+- download/ organized: stale Oct 6-8 deliverables + superseded 10-11 zip + pre-redesign qa shots moved to download/archive/; README.md rewritten (current sizes, changelog 2026-10-12); preview gallery recaptured from the live site after fixing a stale real-listing URL in scripts/capture_preview_shots.sh (05/10 shots were 404 pages).
+- Verified: full suite 304 passed; smoke 200 on /, /agents/, /about/, /contact/, /styleguide/, /sitemap.xml, /healthz/, search pages, listing detail; DB<->media integrity 0 missing; gateway :81 + bridge :3000 + direct :3011 all 200.
+
+Stage Summary:
+- No dead files remain in the repo, packages, or git index; nothing functional was removed — seed pools, ops scripts, WORK.md, design-reference and all referenced assets kept. Website fully green (304 tests, all pages 200, video tour restored).
+- Zips: download/gabriel-homes-update-2026-10-12.zip (4.3MB) + gabriel-homes-oneclick.zip (38MB), both built from the cleaned tree; preview gallery current.
