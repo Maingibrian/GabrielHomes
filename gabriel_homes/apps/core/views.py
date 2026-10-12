@@ -165,6 +165,20 @@ def about(request):
     ))
 
 
+def services(request):
+    """Services page — what Gabriel Homes does: buy, rent & stays, list, support."""
+    return render(request, "core/services.html", _static_ctx(
+        body_class="page-services",
+        page_title="Services — Gabriel Homes",
+        meta_description=(
+            "What Gabriel Homes does: buying with verified details, rent and "
+            "short stays across the Kenyan coast, listing your property with "
+            "honest photography, and support from offer to handover."
+        ),
+        canonical_url="/services/",
+    ))
+
+
 def contact(request):
     """Contact page — all the ways to reach Gabriel Homes."""
     return render(request, "core/contact.html", _static_ctx(

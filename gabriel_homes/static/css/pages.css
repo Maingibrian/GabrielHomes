@@ -266,3 +266,71 @@
   .page-hero__title { font-size: var(--text-3xl); }
   .profile-header { flex-direction: column; align-items: flex-start; }
 }
+
+/* ============================================================
+   SERVICES page (/services/) — numbered alternating rows.
+   Editorial: photo panel + body column, mirroring the home
+   story collage (cream borders, mono kickers).
+   ============================================================ */
+.svc { row-gap: 0; }
+.svc .section-tag { margin-bottom: 1.25rem; }
+.svc-row {
+  display: grid;
+  grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+  gap: clamp(2rem, 5vw, 4.5rem);
+  align-items: center;
+  padding-bottom: var(--section-pad-y);
+}
+.svc-row--flip .svc-row__media { order: 2; }
+.svc-row--flip .svc-row__body { order: 1; }
+.svc-row__media {
+  aspect-ratio: 16 / 11;
+  border-radius: var(--radius-card);
+  background-size: cover;
+  background-position: center;
+  box-shadow: var(--shadow-outline);
+  /* cream print border, echoing the story collage */
+  border: 10px solid var(--cream);
+  outline: 1px solid var(--sand-60);
+}
+.svc-row__body { max-width: 56ch; }
+.svc-row__body .eyebrow { display: block; margin-bottom: 0.9rem; }
+.svc-row__title {
+  font-family: var(--font-display);
+  font-size: var(--text-3xl);
+  font-weight: 500;
+  letter-spacing: var(--track-tighter);
+  line-height: var(--leading-tight, 1.1);
+  margin-bottom: 1.1rem;
+  text-wrap: balance;
+}
+.svc-row__body p {
+  color: color-mix(in srgb, var(--ink) 82%, var(--cream));
+  line-height: var(--leading-body);
+  letter-spacing: var(--track-tight);
+}
+.svc-row__body p + p { margin-top: 0.85rem; }
+.svc-row__link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 1.4rem;
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  letter-spacing: var(--track-mono);
+  text-transform: uppercase;
+  color: var(--burnt);
+  border-bottom: 1px solid var(--burnt-30);
+  padding-bottom: 0.2rem;
+  transition: border-color 0.18s ease, color 0.18s ease;
+}
+.svc-row__link:hover { color: var(--espresso); border-color: var(--espresso); }
+
+@media (max-width: 900px) {
+  .svc-row,
+  .svc-row--flip .svc-row__media,
+  .svc-row--flip .svc-row__body { order: initial; }
+  .svc-row { grid-template-columns: 1fr; gap: 1.75rem; padding-bottom: 4.5rem; }
+  .svc-row__media { aspect-ratio: 16 / 10; border-width: 7px; }
+  .svc-row__title { font-size: var(--text-2xl); }
+}

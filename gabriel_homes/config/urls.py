@@ -47,6 +47,7 @@ urlpatterns = [
     path("styleguide/", core_views.styleguide, name="styleguide"),
     # Static pages (per WORK.md §7: /about/ /contact/ /privacy/ /terms/)
     path("about/", core_views.about, name="about"),
+    path("services/", core_views.services, name="services"),
     path("contact/", core_views.contact, name="contact"),
     path("privacy/", core_views.privacy, name="privacy"),
     path("terms/", core_views.terms, name="terms"),

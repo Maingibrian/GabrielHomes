@@ -32,7 +32,7 @@ class FlatSitemap(sitemaps.Sitemap):
     priority = 0.3
 
     def items(self):
-        return ["/about/", "/contact/", "/privacy/", "/terms/"]
+        return ["/about/", "/services/", "/contact/", "/privacy/", "/terms/"]
 
     def location(self, item):
         return item

@@ -1,0 +1,203 @@
+{% extends "base.html" %}
+{% load core_tags static %}
+
+{% block title %}{{ page_title }}{% endblock %}
+{% block meta_description %}{{ meta_description }}{% endblock %}
+{% block canonical %}<link rel="canonical" href="{{ SITE_DOMAIN }}{{ canonical_url }}">{% endblock %}
+
+{% block styles %}
+  <link rel="stylesheet" href="{% staticv 'css/pages.css' %}">
+  <link rel="stylesheet" href="{% staticv 'css/home.css' %}">
+{% endblock %}
+
+{% block content %}
+
+{# ============================================================ #}
+{# 1. Page hero — same editorial hero as About / Contact.        #}
+{# ============================================================ #}
+<section class="page-hero">
+  <div class="container">
+    <p class="section-tag" data-reveal>[ SERVICES ]</p>
+    <span class="eyebrow" data-reveal>What we do</span>
+    <h1 class="page-hero__title" data-reveal>Property services with a human point of view.</h1>
+    <p class="page-hero__subtitle" data-reveal>
+      Buying, renting, short stays, and listing your property — with verified
+      details, honest photography, and support that doesn't end when the keys
+      change hands.
+    </p>
+  </div>
+</section>
+
+{# ============================================================ #}
+{# 2. Service rows — numbered, alternating photo / text.         #}
+{#    Copy restates themes already on the site; no new facts.    #}
+{# ============================================================ #}
+<section class="section svc">
+  <div class="container">
+    <p class="section-tag" data-reveal>[ 001 — BUY ]</p>
+
+    <article class="svc-row" data-reveal>
+      <div class="svc-row__media" aria-hidden="true"
+           style="background-image: url('{% staticv 'img/real/hero-slide-1.jpg' %}');"></div>
+      <div class="svc-row__body">
+        <span class="eyebrow">Buy</span>
+        <h2 class="svc-row__title">Buy with your eyes open.</h2>
+        <p>
+          Every listing on Gabriel Homes carries verified details and honest
+          photography. If something is wrong with a property, we tell you
+          before you ask — no vague descriptions, no surprises at the viewing.
+        </p>
+        <p>
+          Start from {{ listing_count }} live properties across Mombasa,
+          Nairobi, Kilifi, Kwale (Diani), Kiambu and Kajiado, filtered to the
+          neighbourhoods and budget that fit how you actually live.
+        </p>
+        <a class="svc-row__link" href="/property-for-sale/">
+          Browse homes for sale <span class="btn__arrow" aria-hidden="true">&rarr;</span>
+        </a>
+      </div>
+    </article>
+  </div>
+
+  <div class="container">
+    <p class="section-tag" data-reveal>[ 002 — RENT &amp; STAYS ]</p>
+
+    <article class="svc-row svc-row--flip" data-reveal>
+      <div class="svc-row__media" aria-hidden="true"
+           style="background-image: url('{% staticv 'img/real/hero-slide-4.jpg' %}');"></div>
+      <div class="svc-row__body">
+        <span class="eyebrow">Rent &amp; stays</span>
+        <h2 class="svc-row__title">Rent a home, or stay a while.</h2>
+        <p>
+          From family homes to short stays along the coast, the same standard
+          applies: verified details, real photographs, and a clear word on
+          what a place is really like before you commit.
+        </p>
+        <p>
+          Our network includes {{ agency_count }} partner agencies, so the
+          listing you see is backed by people who know the property — not a
+          copy-paste advert.
+        </p>
+        <a class="svc-row__link" href="/property-for-rent/">
+          Explore rent &amp; stays <span class="btn__arrow" aria-hidden="true">&rarr;</span>
+        </a>
+      </div>
+    </article>
+  </div>
+
+  <div class="container">
+    <p class="section-tag" data-reveal>[ 003 — LIST ]</p>
+
+    <article class="svc-row" data-reveal>
+      <div class="svc-row__media" aria-hidden="true"
+           style="background-image: url('{% staticv 'img/real/hero-slide-2.jpg' %}');"></div>
+      <div class="svc-row__body">
+        <span class="eyebrow">Sell &amp; list</span>
+        <h2 class="svc-row__title">List it once. List it properly.</h2>
+        <p>
+          Your property goes live with the full treatment — verified details,
+          honest photography, and a paper trail at every step. Radical
+          transparency isn't a slogan; it's how a listing earns enquiries.
+        </p>
+        <p>
+          Partner agencies manage everything from a single dashboard, and
+          enquiries reach a named person — not an inbox nobody watches.
+        </p>
+        <a class="svc-row__link" href="/contact/">
+          Talk to us about your property <span class="btn__arrow" aria-hidden="true">&rarr;</span>
+        </a>
+      </div>
+    </article>
+  </div>
+
+  <div class="container">
+    <p class="section-tag" data-reveal>[ 004 — SUPPORT ]</p>
+
+    <article class="svc-row svc-row--flip" data-reveal>
+      <div class="svc-row__media" aria-hidden="true"
+           style="background-image: url('{% staticv 'img/real/hero-slide-3.jpg' %}');"></div>
+      <div class="svc-row__body">
+        <span class="eyebrow">Support</span>
+        <h2 class="svc-row__title">From offer to handover, we're in the room.</h2>
+        <p>
+          We attend the inspections, flag the small print, and chase the
+          lawyers so you don't have to. And we stay involved after the deal
+          closes — handover, fit-out, and connecting you with trusted local
+          trades.
+        </p>
+        <p>
+          The relationship doesn't end at completion. That is what "support
+          beyond the keys" means, and it shapes every part of how we work.
+        </p>
+        <a class="svc-row__link" href="/about/">
+          Meet the people behind it <span class="btn__arrow" aria-hidden="true">&rarr;</span>
+        </a>
+      </div>
+    </article>
+  </div>
+</section>
+
+{# ============================================================ #}
+{# 3. How we work — the four principle cards (same as home).     #}
+{# ============================================================ #}
+<section class="section philosophy">
+  <div class="container">
+    <p class="section-tag" data-reveal>[ HOW WE WORK ]</p>
+    <h2 class="philosophy__title" data-reveal>Smart property search, genuine human perspective.</h2>
+
+    <div class="philosophy__grid">
+      <article class="principle-card" data-reveal>
+        <p class="principle-card__index">[ 001 — UNDERSTAND ]</p>
+        <h3 class="principle-card__title">Listen first.</h3>
+        <p class="principle-card__body">
+          Before we show you a single property, we sit down and listen.
+          Schools, commute, budget, neighbours, what you don't like about
+          where you live now.
+        </p>
+      </article>
+      <article class="principle-card" data-reveal>
+        <p class="principle-card__index">[ 002 — INSIGHT ]</p>
+        <h3 class="principle-card__title">Know the market.</h3>
+        <p class="principle-card__body">
+          Years of trading on the coast mean we know which neighbourhoods
+          are quiet at low tide, which have water issues in the dry season,
+          and which are about to benefit from new infrastructure.
+        </p>
+      </article>
+      <article class="principle-card" data-reveal>
+        <p class="principle-card__index">[ 003 — SUPPORT ]</p>
+        <h3 class="principle-card__title">Stay involved.</h3>
+        <p class="principle-card__body">
+          From offer to handover we're in the room. We attend the
+          inspections, flag the small print, and chase the lawyers so you
+          don't have to.
+        </p>
+      </article>
+      <article class="principle-card" data-reveal>
+        <p class="principle-card__index">[ 004 — RESULTS ]</p>
+        <h3 class="principle-card__title">Make the right move.</h3>
+        <p class="principle-card__body">
+          We measure ourselves on long-term fit, not transaction count. A
+          property you still love five years later is the only metric that
+          matters.
+        </p>
+      </article>
+    </div>
+  </div>
+</section>
+
+{# ============================================================ #}
+{# 4. CTA — same band as About.                                  #}
+{# ============================================================ #}
+<section class="section cta">
+  <div class="container">
+    <h2 class="cta__title" data-reveal>
+      Tell us what you're looking for.
+    </h2>
+    <a class="btn btn--primary btn--lg" href="/contact/" data-reveal>
+      Start a conversation <span class="btn__arrow" aria-hidden="true">&rarr;</span>
+    </a>
+  </div>
+</section>
+
+{% endblock %}
