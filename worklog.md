@@ -352,3 +352,20 @@ Work Log:
 Stage Summary:
 - No dead files remain in the repo, packages, or git index; nothing functional was removed — seed pools, ops scripts, WORK.md, design-reference and all referenced assets kept. Website fully green (304 tests, all pages 200, video tour restored).
 - Zips: download/gabriel-homes-update-2026-10-12.zip (4.3MB) + gabriel-homes-oneclick.zip (38MB), both built from the cleaned tree; preview gallery current.
+
+---
+Task ID: home-redesign-resume-3
+Agent: Super Z (main agent)
+Task: User said "CONTINUE WITH THE REDESIGN CYCLE" after another sandbox reset — recover the environment, re-verify every redesign cycle live, enforce the no-dead-files rule, and confirm nothing regressed.
+
+Work Log:
+- Found all 6 HOME-REDESIGN cycles already committed (7b98114/6fc5e46/b93ea2e/93f2709 + QA 159dd5f + purge e762be7); sandbox had reset again (no venv/db/media/server).
+- Cycle-0-style rebuild: venv + requirements, sandbox .env (dev settings + GABRIEL_PREVIEW_BRIDGE=1), migrate + seed_demo (61 locations, 80 listings), daemon_runserver on :3011; home/bridge :3000/gateway :81 all 200.
+- Media integrity restored from oneclick zip: media/property-images/real/ (nyali-real-*) + property-videos/real/nyali-real-tour.mp4 (6.3MB); apply_real_media.py rebound 10 real Harmony Nyali photos to flagship #77 (was 1 seed image); video FieldFile re-bound to property-videos/real/... (first bind missed the real/ subdir — caught and fixed by size check). Detail page shows 13 harmony-nyali refs; video streams 200.
+- Dead-file sweep (user's standing rule): gabriel_homes/docs/shots/ (23MB stale QA crops) -> archive/purge-2026-10-12/; gabriel_homes/property-images/ (7.4MB stale 287-file seed-art duplicate, originals in upload/) deleted. IMPORTANT correction to the prior purge: static real-04/07/08 are NOT dead — they are source inputs for apply_real_media.py (bootstrap chain), so they are now git-tracked to prevent the next reset from breaking re-seeding.
+- Runtime verification (verify_home_redesign.py): hero 4 slides hero-fade/hero-drift 24s @ 0/6/12/18s, motion-ready armed; bento 7 cards + spotlight, hover zoom matrix change confirmed; word reveal 4->16 lit; no overflow at 1200/849/390; /agents/ intact (7 agent cards); zero console errors.
+- Full pytest: 304 passed. Final full-page after-shots 390/849/1200 all scrollW==viewport (scripts/shots/after-2026-10-12/); full-page stitch showed phantom empty bands, disproved by per-section shots + opacity probes (philosophy/browse 0 hidden elements).
+- Committed a11ee97 (photos + verification scripts + cleanup). Workspace tree clean.
+
+Stage Summary:
+- Redesign fully live and re-verified end-to-end after the reset: slideshow hero, homes bento showcase, rich story, rhythm pass — 304 tests green, media pair intact, no dead files, /agents/ untouched. Update zip 2026-10-12 in download/ still matches this tree (no code changes since; only env restore + hygiene).
