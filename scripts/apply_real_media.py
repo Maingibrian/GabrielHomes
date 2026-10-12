@@ -82,8 +82,23 @@ def main() -> None:
         )
         made += 1
 
+    cache.delete("home:showcase_listings")
     cache.delete("home:featured_listings")
     print(f"  listing #{prop.id} '{prop.title}' now shows {made} real Harmony Nyali photos")
+
+    # Tour video — the sandbox reset unbinds it (fresh seed never sets it).
+    # Idempotent: only writes when missing or wrong.
+    VIDEO_REL = "property-videos/real/nyali-real-tour.mp4"
+    video_abs = Path("/home/z/my-project/gabriel_homes/media") / VIDEO_REL
+    if video_abs.exists():
+        if str(prop.video) != VIDEO_REL:
+            prop.video = VIDEO_REL
+            prop.save(update_fields=["video"])
+            print(f"  tour video bound to #{prop.id}: {VIDEO_REL}")
+        else:
+            print("  tour video already bound")
+    else:
+        print(f"  WARNING: tour video missing on disk: {video_abs}")
 
 
 if __name__ == "__main__":
