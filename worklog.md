@@ -405,3 +405,21 @@ Work Log:
 
 Stage Summary:
 - Sticky agent card CLOSED: verified working exactly as the user asked (pinned beside the listing, covering the white space) + the avatar polish makes it look finished after any reset. Remaining carried-over items: effects/animation audit; background: Loop 5 plan, coverage gate.
+
+---
+Task ID: video-recovery-5
+Agent: main (Super Z)
+Task: Answer "what items were fully lost" after another sandbox reset; recover what was recoverable.
+
+Work Log:
+- Found sandbox reset again: .venv/download/daemon gone; discovered sticky-agent-card work had landed pre-reset (commit bae5ae1, 323 tests).
+- KEY FIND: upload/WhatsApp Unknown 2026-10-09 zip contains "WhatsApp Video 2026-10-07 at 18.55.00.mp4" — the previously "lost" nyali-real-tour.mp4 (58.6s 720p h264/aac, 18.6MB). Earlier "unrecoverable" verdict was wrong; upload/ survived the resets.
+- Ran bootstrap_env.sh (venv/.env/media/migrate all green), extracted video to media/property-videos/real/nyali-real-tour.mp4, apply_real_media.py bound it to Property #77.
+- Hardened: git-tracked master copy at static/video/real/nyali-real-tour.mp4 (media/ is ignored); apply_real_media.py now copies master -> media before binding (self-healing, tested by deleting media copy).
+- Rebuilt download/ zips: oneclick 26.3MB (now WITH video, 406 files) + update 4.9MB. Rewrote download/README.md (video-gap note obsolete).
+- Cleaned 6 mode-only diffs (reset noise, 0 insertions/deletions). pytest: 323 passed. Committed e087368.
+- Verified: listing page 200, <video> renders, media file serves 200 with full 18,648,809 bytes.
+
+Stage Summary:
+- NOTHING is fully lost anymore. The only true loss (tour video) is recovered and now reset-proof via git-tracked master + self-healing bootstrap script.
+- All previous verdicts of data loss downgraded to "recovered" or "rebuildable".
