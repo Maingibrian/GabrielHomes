@@ -314,3 +314,22 @@ Work Log:
 Stage Summary:
 - Home page fully redesigned per docs/HOME-REDESIGN.md: real-photo slideshow hero, homes bento showcase (no agents), rich story with word reveal, alternating section rhythm. 304 tests green. Zips in download/: oneclick 35MB (fresh installs, new design + slimmer), update 4.7MB (existing installs via UPDATE-WEBSITE.sh).
 - Commits: 7b98114 (C1), 6fc5e46 (C2), b93ea2e (C3), 93f2709 (C4) + packaging changes uncommitted.
+
+---
+Task ID: home-redesign-qa-2
+Agent: Super Z (main agent)
+Task: Post-reset recovery + runtime verification of docs/HOME-REDESIGN.md cycles 1-5; fix issues found; repackage update zip. (User also cancelled the stale "~40MB zip" side-request as mistaken — dropped.)
+
+Work Log:
+- Sandbox had reset again: rebuilt venv + deps, created sandbox .env (DJANGO_SETTINGS_MODULE=dev, GABRIEL_PREVIEW_BRIDGE=1, ALLOWED_HOSTS 0.0.0.0), migrate + seed_demo (80 listings), bootstrap_env.sh restored media library from oneclick zip, assign_demo_images re-run -> 80/80 published listings have images; flagship #77 carries the 10 real Harmony Nyali photos.
+- Wrote scripts/daemon_runserver.py (double-fork, SIGINT-immune) — background servers kept dying between tool calls before this; runserver now stable on 0.0.0.0:3011 across calls.
+- Verified every cycle at runtime with scripts/verify_home_redesign.py + verify_fallbacks.py: hero = 4 slides, hero-fade/hero-drift 24s @ 0/6/12/18s delays, motion-ready armed; bento = 7 cards (6 photos + CTA tile), spotlight present, 3-col; bento bg hover zoom matrix(1.05) + grayscale 0 confirmed (earlier "failure" was a probe racing the reveal transition — pointer landed in the 12px gap while the card was mid-reveal); word reveal 4->16 words lit progressively; reduced-motion = static slide 1; no-JS = all content visible, zero console errors; /agents/ bento intact (7 cards); listing detail 200.
+- Found "Sign in"/mobile-menu ghosting in full-page captures + keyboard-focusable-while-invisible a11y bug: .mobile-menu hid by transform only -> added visibility:hidden closed / visible on .is-open with visibility transition delayed on close (components.css:647-672).
+- Fixed 849px horizontal overflow (scrollW 954): real culprit = numbers grid (min-width:810px forced repeat(4,1fr); "NEIGHBOURHOODS" mono label min-content ~197px blew out tracks). Now 2x2 at 810-979, 4-col at >=980 with minmax(0,1fr); border logic reworked per layout; hero overflow:hidden belt-and-braces for Ken Burns scale.
+- Fixed numbers-band counter overlap ("KES 1.3B+" ~4.4em wide overflowed its 1/4 track at --text-display-2 cap): .numbers .stat__number font-size clamp(1.9rem, -1rem + 5.2vw, 2.9rem) + cell padding 2.25rem 1.5rem at >=980. Verified fits at 980/1080/1200/1440 (numW <= cellW - padding at every width).
+- Fixed prod-config test contamination: repo .env (needed for the preview bridge) leaked into the subprocess under test because base.py always read it -> GABRIEL_SKIP_DOTENV=1 bypass added in base.py, set in test_prod_config._run_prod_import. apps/core 107 passed; full suite 304 passed.
+- Final after-shots 390/849/1200 all scrollW==viewport (no overflow), clean ghost-free captures in scripts/shots/after/.
+- Rebuilt update zip via scripts/build_update_zip.sh (rsync excludes .venv/media/db/staticfiles/__pycache__/.env/docs-shots/property-images): download/gabriel-homes-update-2026-10-12.zip 4.9MB, 269 files, rootless (manage.py top-level), no db/media/venv/.env — verified. Committed as 159dd5f.
+
+Stage Summary:
+- All six HOME-REDESIGN cycles verified green at runtime; four real defects fixed (mobile-menu a11y/ghosting, 849 overflow from numbers grid, KES counter overlap, non-hermetic prod tests). Full suite 304 passed. Update zip 2026-10-12 (4.9MB) in download/ for the user's existing install; oneclick zip unchanged (35MB, already carries the redesign).
