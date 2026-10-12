@@ -13,12 +13,15 @@ import environ
 # repo root: config/settings/base.py -> ../../
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
-# .env lives at repo root
+# .env lives at repo root. GABRIEL_SKIP_DOTENV=1 bypasses the file (used by
+# the prod-config tests so a developer's sandbox .env can't leak into the
+# subprocess under test — keeps those tests hermetic).
 env = environ.Env(
     DEBUG=(bool, False),
     ALLOWED_HOSTS=(list, []),
 )
-environ.Env.read_env(os.path.join(BASE_DIR, ".env"))
+if os.environ.get("GABRIEL_SKIP_DOTENV") != "1":
+    environ.Env.read_env(os.path.join(BASE_DIR, ".env"))
 
 SECRET_KEY = env("SECRET_KEY", default="dev-insecure-key-change-me")
 DEBUG = env.bool("DEBUG", default=False)

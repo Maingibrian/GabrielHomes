@@ -22,8 +22,10 @@
   min-height: min(92vh, 880px);
   display: flex;
   align-items: center;
-  padding-block: clamp(4.5rem, 3rem + 7vw, 8rem);
+  /* Clip the Ken Burns drift (slides scale to 1.06) so it never
+     widens the page at tablet widths. */
   overflow: hidden;
+  padding-block: clamp(4.5rem, 3rem + 7vw, 8rem);
 }
 .hero__bg {
   position: absolute;
@@ -334,11 +336,17 @@
 }
 .numbers__grid {
   display: grid;
-  grid-template-columns: 1fr;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 0;
 }
-@media (min-width: 810px) {
-  .numbers__grid { grid-template-columns: repeat(4, 1fr); }
+@media (max-width: 809px) {
+  /* Single file on phones — one counter per row. */
+  .numbers__grid { grid-template-columns: 1fr; }
+}
+@media (min-width: 980px) {
+  /* Four-across only when the viewport can hold the widest
+     unbreakable label ("NEIGHBOURHOODS") without blowing out. */
+  .numbers__grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 }
 .numbers__cell {
   padding: 2rem 1.5rem;
@@ -347,13 +355,34 @@
 .numbers__cell:nth-child(even) {
   border-left: 1px solid color-mix(in srgb, var(--sand) 32%, transparent);
 }
+@media (max-width: 809px) {
+  .numbers__cell:nth-child(even) { border-left: 0; }
+}
 @media (min-width: 810px) {
   .numbers__cell {
     padding: 2.5rem;
+  }
+  /* 2x2: bottom border stops after row 1, left border only on col 2. */
+  .numbers__cell:nth-child(n + 3) { border-bottom: 0; }
+}
+@media (min-width: 980px) {
+  .numbers__cell {
     border-bottom: 0;
+    /* 1.5rem side padding keeps "KES 1.3B+" inside the 1/4 track
+       once the stat number scales down (see .numbers .stat__number). */
+    padding: 2.25rem 1.5rem;
+  }
+  .numbers__cell:not(:first-child) {
     border-left: 1px solid color-mix(in srgb, var(--sand) 32%, transparent);
   }
-  .numbers__cell:first-child { border-left: 0; }
+}
+/* The "KES 1.3B+" counter is ~4.4em wide at display sizes — far wider
+   than a 1/4 track when --text-display-2 hits its 4rem cap. Scale the
+   numbers-band figures with the viewport (≈34px @980 → 46px @1440+)
+   so every counter stays inside its cell. Hero stats are untouched
+   (their values are short and their own clamps already fit). */
+.numbers .stat__number {
+  font-size: clamp(1.9rem, -1rem + 5.2vw, 2.9rem);
 }
 
 

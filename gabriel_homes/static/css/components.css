@@ -654,10 +654,22 @@
   flex-direction: column;
   padding: 1.25rem var(--gutter);
   transform: translateY(-100%);
-  transition: transform var(--t-med) var(--ease);
+  /* visibility keeps the closed menu out of tab order + paints nothing
+     (also stops full-page-capture ghosting); it flips AFTER the slide-out
+     on close and instantly on open. */
+  visibility: hidden;
+  transition:
+    transform var(--t-med) var(--ease),
+    visibility 0s var(--t-med);
   overflow-y: auto;
 }
-.mobile-menu.is-open { transform: translateY(0); }
+.mobile-menu.is-open {
+  transform: translateY(0);
+  visibility: visible;
+  transition:
+    transform var(--t-med) var(--ease),
+    visibility 0s;
+}
 .mobile-menu__header {
   display: flex;
   justify-content: space-between;

@@ -47,6 +47,9 @@ def _run_prod_import(overrides):
     env.pop("SECRET_KEY", None)
     env.pop("ALLOWED_HOSTS", None)
     env.pop("DATABASE_URL", None)
+    # Hermetic: a developer's repo-root .env must not fill in for the
+    # popped vars inside the subprocess under test.
+    env["GABRIEL_SKIP_DOTENV"] = "1"
     env.update(overrides)
     return subprocess.run(
         [sys.executable, "-c", "import django; django.setup(); print('IMPORT-OK')"],
