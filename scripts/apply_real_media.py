@@ -87,9 +87,16 @@ def main() -> None:
     print(f"  listing #{prop.id} '{prop.title}' now shows {made} real Harmony Nyali photos")
 
     # Tour video — the sandbox reset unbinds it (fresh seed never sets it).
-    # Idempotent: only writes when missing or wrong.
+    # Master copy is git-tracked at static/video/real/ (media/ is ignored),
+    # mirroring how the real photos live in static/img/real/. Copy first,
+    # then bind. Idempotent: only writes when missing or wrong.
     VIDEO_REL = "property-videos/real/nyali-real-tour.mp4"
     video_abs = Path("/home/z/my-project/gabriel_homes/media") / VIDEO_REL
+    video_src = Path("/home/z/my-project/gabriel_homes/static/video/real/nyali-real-tour.mp4")
+    if not video_abs.exists() and video_src.exists():
+        video_abs.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(video_src, video_abs)
+        print("  tour video restored from static/video/real/ master copy")
     if video_abs.exists():
         if str(prop.video) != VIDEO_REL:
             prop.video = VIDEO_REL
