@@ -369,3 +369,22 @@ Work Log:
 
 Stage Summary:
 - Redesign fully live and re-verified end-to-end after the reset: slideshow hero, homes bento showcase, rich story, rhythm pass — 304 tests green, media pair intact, no dead files, /agents/ untouched. Update zip 2026-10-12 in download/ still matches this tree (no code changes since; only env restore + hygiene).
+
+---
+Task ID: services-map-recovery-4
+Agent: Super Z (main agent)
+Task: User reported DisallowedHost on the preview iframe; asked whether cycles were finished; approved continuing with satellite-map + services-page work.
+
+Work Log:
+- Diagnosed DisallowedHost: sandbox had reset AGAIN (mid-session, deeper — download/ with all zips wiped, .env gone, venv/db/media gone). The preview iframe arrives with Host ws-….fcapp.run which the freshly rebuilt .env did not whitelist.
+- Made the fix reset-proof instead of .env-only: bootstrap_env.sh now recreates the sandbox .env (step 0) with EXTRA_ALLOWED_HOSTS=.fcapp.run + CSRF_TRUSTED_ORIGINS=http://*.fcapp.run; tolerates a missing oneclick zip (seed generates media). Verified 200 on direct :3011, bridge :3000, gateway :81 using the exact failing Host header.
+- Bootstrap gaps closed: apply_real_media.py now also re-binds the tour video idempotently (was a manual fix twice before).
+- Data loss found: nyali-real-tour.mp4 unrecoverable (not in git history, zips wiped, upload/ has no media). Listing page degrades gracefully (VIDEO TOUR band hides); user can restore from their own earlier download.
+- Satellite map: code was already v3 satellite-first; root-caused the "not working" report to nothing current — CSP already whitelists server.arcgisonline.com + *.basemaps.cartocdn.com; runtime paint test (verify_map_runtime.py) shows 12 Esri tiles loaded, marker+popup, layers control, 0 console errors. Item CLOSED with screenshot evidence.
+- Services page: discovered "04 Services" nav had ALWAYS been a stub to /agents/ (no page ever existed — grep + git history confirm). Built a real /services/ page: template core/services.html (hero + 4 numbered alternating photo rows reusing existing themes/copy + how-we-work principle cards + CTA), .svc CSS block in pages.css (cream-framed photos, mono kickers, responsive 1-col ≤900px), view+URL+nav (desktop+mobile)+sitemap entry, 12 new tests in test_services_page.py. Content uses ONLY existing site facts (verified-listing theme, offer-to-handover copy, live counts via _static_ctx).
+- Debugged: daemon runserver uses --noreload — stale process 404'd /services/ after the URL was added; killed + restarted. Full-page stitch again showed phantom empty sections; disproved with per-section opacity probes + viewport shots.
+- Full suite 316 passed. Rebuilt download/ deliverables lost in the reset: update zip 4.9MB (271 files) + oneclick 8.1MB (465 files, db+183 images, 10 real Nyali photos, db<->media 119/119 rows resolve); README.md rewritten incl. the video-gap note.
+
+Stage Summary:
+- DisallowedHost FIXED permanently (reset-proof). Map task closed (verified satellite). Services page shipped + tested. Zips restored in download/. Remaining carried-over items: sticky agent card on listing detail, effects/animation audit, (background) Loop 5 plan + coverage gate.
+- Commits: 7851dc0 (bootstrap resilience), b2205ef (services page), follow-up chore commit.
