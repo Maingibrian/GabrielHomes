@@ -7,3 +7,22 @@ node_modules/
 !.env.example
 upload/
 tool-results/
+
+# --- dead-weight hygiene (2026-10-12): never version binaries/scratch ---
+archive/
+download/
+gabriel_extract/
+scripts/stage/
+scripts/ziptest/
+scripts/ziptest-gate/
+scripts/design-audit/
+scripts/shots/
+scripts/real-assets/
+scripts/user-media/
+scripts/media-golden/
+scripts/browsertest/
+scripts/*.log
+scripts/*.png
+scripts/cookies.txt
+scripts/git-history.txt
+scripts/git_reword_map.txt

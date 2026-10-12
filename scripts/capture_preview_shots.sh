@@ -47,20 +47,20 @@ $AB set viewport 1440 900 >/dev/null 2>&1
 QUICK="${1:-full}"
 if [ "$QUICK" = "quick" ]; then
     shot "/agents/"                   03-agents-bento-desktop.png 3
-    shot "/listing/modern-beachfront-apartment-nyali-81/" 05-real-listing-desktop.png 4
+    shot "/listing/3br-bungalow-in-nyali-77/" 05-real-listing-desktop.png 4
 else
 shot "/"                          01-home-desktop.png        3
 shot "/property-for-sale/"        02-search-desktop.png      3
 shot "/agents/"                   03-agents-bento-desktop.png 3
 shot "/agents/coast-property-co/" 04-agent-detail-desktop.png 3
-shot "/listing/modern-beachfront-apartment-nyali-81/" 05-real-listing-desktop.png 4
+shot "/listing/3br-bungalow-in-nyali-77/" 05-real-listing-desktop.png 4
 shot "/about/"                    06-about-desktop.png       2
 shot "/contact/"                  07-contact-desktop.png     2
 VW=390; VH=844
 $AB set viewport 390 844 >/dev/null 2>&1
 shot "/"                          08-home-mobile.png         3
 shot "/agents/"                   09-agents-mobile.png       3
-shot "/listing/modern-beachfront-apartment-nyali-81/" 10-real-listing-mobile.png 4
+shot "/listing/3br-bungalow-in-nyali-77/" 10-real-listing-mobile.png 4
 fi
 
 "$AB" close >/dev/null 2>&1
