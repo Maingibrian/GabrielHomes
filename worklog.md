@@ -459,3 +459,20 @@ Work Log:
 
 Stage Summary:
 - User's complaint validated and fixed at the root: about team section had never been styled; now a designed dark band. Detail page proven healthy; sandbox fully green (323 tests). New zip + evidence gallery on the :3000 preview page; class-audit script added to prevent future ghost classes.
+
+---
+Task ID: hero-real-agents-contacts-8
+Agent: Super Z (main agent)
+Task: User: "the hero image is still not a real image... for the agents arrange them in a better styling have links to their contacts."
+
+Work Log:
+- Vision pass over static images: hero-bg.jpg (page-hero bg on About/Services/Contact/listing pages + og:image) was an AI-generated cliff-villa render; cta-bg.jpg (unused) and founder.jpg (home founder section) also AI.
+- Hero fix: scripts/make_page_hero.py crops real listing photo real-01-kitchen-island.jpg (unused by home slideshow) -> static/img/real/page-hero.jpg 1600x900 q85; pages.css repointed; og:image + twitter:image in base.html + listings/detail.html repointed; hero-bg.jpg + cta-bg.jpg deleted.
+- Agent cards redesigned (about.html + components.css): card was an <a> wrapping everything (would break with nested contact links) -> now <article> with monogram + verified check chip, office location + active listing count (Count annotation in about view), truncated bio, contact pill buttons (tel:, wa.me with pre-filled greeting, mailto:, website) with inline SVG icons, VIEW LISTINGS -> footer. Styleguide demo card synced.
+- CRITICAL catch during verification: contact links absent + old template served -> zombie runserver pid (13:19, survived pkill patterns) still held :3011; killed by pid, fresh daemon served the new template (24 contact links). Same stale-process class the user keeps hitting.
+- Second critical catch: agency bios read "X is a fictional agency seeded for demo purposes" on the live site (seed_demo leak). Fixed seed copy via AGENCY_BIOS map + new data migration agents/0003_fix_seed_agency_bios.py that rewrites demo-wording bios on `migrate` (runs automatically in UPDATE-WEBSITE.bat) so the user's deployed DB self-heals. Owner-customised bios (no demo markers) are left untouched.
+- Verified: 3-col grid desktop, 1-col mobile, 0px overflow, all 24 contact hrefs correct, hero shows real interior, 323 pytest passed.
+- Repackaged gabriel-homes-update-2026-10-13.zip (270 files, 3.2MB, rootless contract OK); :3000 delivery page refreshed (new headline, hero + agents evidence shots, all endpoints 200); committed.
+
+Stage Summary:
+- Hero now a real home photo everywhere .page-hero renders + social meta; AI hero-bg/cta-bg gone from repo. Agent cards are contact-ready (call/WhatsApp/email/website) with live listing counts. Demo bio leak fixed at seed + via self-healing migration. founder.jpg remains the only AI image (no real portrait available - user must supply one).
