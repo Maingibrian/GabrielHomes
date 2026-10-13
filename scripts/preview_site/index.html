@@ -62,9 +62,32 @@
 
   <header>
     <p class="kicker">[ Gabriel Homes · delivery ]</p>
-    <h1>Website Update — Windows Fix Included</h1>
-    <p class="sub">The updater now works on company laptops where Downloads is a network folder.</p>
+    <h1>Website Update — About Page Fix Included</h1>
+    <p class="sub">You were right: the About page was genuinely broken. Found it with a visual audit — and fixed it.</p>
   </header>
+
+  <div class="banner" style="border-left-color:#2f6b3a;background:var(--ok-bg);border-color:#cfe3cd">
+    <b>Vision audit verdict (2026-10-13):</b> the About page team section had
+    <b>four CSS classes that were never styled anywhere</b> — six agency cards rendered
+    as full-width 1,565&nbsp;px-tall gradient slabs and the section header was invisible
+    (cream text on cream background). This bug existed on every install, including ours.
+    <b>Fixed and verified</b>: dark editorial team band, 3-column card grid, all 323 tests
+    green. The property detail page was audited line-by-line and is healthy (0 console
+    errors, 0 broken links, sticky header correct, map + video render). If property pages
+    still fail on your machine after this update, it is the stale server process —
+    <b>STOP-WEBSITE, then START-GABRIEL-HOMES</b>.
+  </div>
+
+  <div class="cards" style="grid-template-columns:1fr 1fr;margin-bottom:34px">
+    <figure style="margin:0;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px">
+      <figcaption style="font-size:12px;font-family:Consolas,monospace;color:var(--ink-soft);margin-bottom:8px">BEFORE — team section as 1,565px slabs (the bug you saw)</figcaption>
+      <a href="files/about-1440.png" target="_blank"><img src="files/about-1440.png" alt="About page before the fix" style="width:100%;border-radius:6px;display:block"></a>
+    </figure>
+    <figure style="margin:0;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px">
+      <figcaption style="font-size:12px;font-family:Consolas,monospace;color:var(--ok-ink);margin-bottom:8px">AFTER — dark team band, 3-column grid (fixed)</figcaption>
+      <a href="files/about-FULL-AFTER.png" target="_blank"><img src="files/about-FULL-AFTER.png" alt="About page after the fix" style="width:100%;border-radius:6px;display:block"></a>
+    </figure>
+  </div>
 
   <div class="banner">
     <b>Why your last update failed:</b> your Downloads folder lives on the network
