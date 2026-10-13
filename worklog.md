@@ -423,3 +423,20 @@ Work Log:
 Stage Summary:
 - NOTHING is fully lost anymore. The only true loss (tour video) is recovered and now reset-proof via git-tracked master + self-healing bootstrap script.
 - All previous verdicts of data loss downgraded to "recovered" or "rebuildable".
+
+---
+Task ID: windows-unc-updater-6
+Agent: Super Z (main agent)
+Task: User stuck applying the update on Windows — Downloads is folder-redirected to corporate UNC share (\\KT-DC2\FolderRedir$\bkibet\Downloads); CMD cannot use UNC as cwd, so the old UPDATE-WEBSITE.bat's cd /d "%~dp0" failed, fell back to C:\Windows and every manage.py check failed. Fix the bat for UNC + extracted-update-folder case, rebuild deliverables, give working Windows instructions.
+
+Work Log:
+- Wrote gabriel_homes/UPDATE-WEBSITE.bat v3 (UNC-safe): pushd instead of cd /d (auto-maps temp drive for \\UNC paths); site auto-discovery — real site told apart from extracted update folder by presence of db.sqlite3; candidate list %LOCALAPPDATA%\GabrielHomes (where START-GABRIEL-HOMES.bat v3 installs), ~/gabriel-homes, Desktop/Documents/Downloads/C:\ variants; interactive drag-and-drop / set /p fallback with :trim routine (strips trailing spaces/backslashes that console drops leave); zip discovery resolves the REAL Downloads path from registry Shell Folders {374DE290-...} with skip=1 (header line contains a space that would corrupt parse); handles BOTH rootless and gabriel-homes/-wrapped zips (wrapped -> temp extract + robocopy up); migrate + manage.py check via .venv\Scripts\python.exe -> py -3 -> python fallback; final output explicitly instructs STOP + START restart (the stale-process cause of their broken about/property pages).
+- New scripts/audit_update_bat.py: static bat audit (block-paren, unbalanced blocks, cd /d-to-%~dp0 ban, delayed-expansion sanity). Clean on UPDATE-WEBSITE.bat + both launcher bats. Extra dry-run: all goto/call labels exist, all 12 delayed vars defined, behaviour anchors present.
+- Fixed scripts/build_update_zip.sh: it had silently started producing WRAPPED zips while UPDATE-WEBSITE.sh's sanity grep expects ROOTLESS — now stages truly rootless (rsync into $STAGE root), CRLF-converts *.bat, runs block-paren audit, fatal checks for manage.py/UPDATE-WEBSITE.bat at top + forbidden db/media/venv/.env. Excluded static/video/ (18.6MB tour-video master) so update zips stay lean: 23.5MB -> 3.4MB (269 files).
+- scripts/build_package.sh: CRLF list now includes UPDATE-WEBSITE.bat (oneclick picks it up from the tree).
+- Rebuilt download/gabriel-homes-update-2026-10-13.zip (3.4MB, rootless, dotfiles incl. .env.example, bat CRLF inside). Simulated the update over a fake site dir: db.sqlite3 + media/ preserved, code/templates/bat updated. download/UPDATE-WEBSITE.bat shipped standalone (CRLF).
+- Sandbox was reset again (.venv/db/media gone) — bootstrap_env.sh running in background; oneclick rebuild deferred until it finishes (previous oneclick stays canonical for fresh installs; user's site is already installed).
+- Delivery surface: scripts/preview_site/index.html replaced with the download-button delivery page (Coastal Editorial style, links to standalone bat + update zip, 3-step Windows instructions, restart warning, technical explainer). Served on :3000 via http.server (page 200, bat 200, zip 200). download/README.md rewritten with the Windows procedure + UNC root-cause.
+
+Stage Summary:
+- Windows update path unblocked: v3 updater handles redirected-Downloads UNC (pushd + registry-resolved Downloads), finds the real site wherever it is, applies rootless or wrapped zips, migrates, health-checks. Rootless zip contract restored for both .sh and .bat updaters. User instructions: put new bat in site folder, double-click, then STOP + START (restart also repairs about/property-detail pages). Deliverables on the :3000 preview page + download/ (README.md, UPDATE-WEBSITE.bat, gabriel-homes-update-2026-10-13.zip).
