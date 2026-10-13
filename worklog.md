@@ -440,3 +440,22 @@ Work Log:
 
 Stage Summary:
 - Windows update path unblocked: v3 updater handles redirected-Downloads UNC (pushd + registry-resolved Downloads), finds the real site wherever it is, applies rootless or wrapped zips, migrates, health-checks. Rootless zip contract restored for both .sh and .bat updaters. User instructions: put new bat in site folder, double-click, then STOP + START (restart also repairs about/property-detail pages). Deliverables on the :3000 preview page + download/ (README.md, UPDATE-WEBSITE.bat, gabriel-homes-update-2026-10-13.zip).
+
+---
+Task ID: about-page-vision-audit-7
+Agent: Super Z (main agent)
+Task: User: "the about page and property pages are still broken — find out what i mean, use vision, be very critical."
+
+Work Log:
+- Restored sandbox (bootstrap re-run in foreground after background instance died): venv, db, seed, real media + tour video bound to #77; site up on :3011.
+- Built scripts/capture_audit_shots.py (5 pages x desktop+mobile, console/failed-request/link audit): 0 console errors, 0 failed requests, 0 broken internal links, 0 overflow — all automated gates green, PROVING the breakage was visual, not server-side.
+- Vision pass on full-page shots found it: ABOUT page team section = giant empty slabs. DOM probe: .agents__grid computed display:block, cards 1203x1565px (aspect-ratio 4/5 portraits), section 9,648px tall; header text cream-on-cream invisible.
+- ROOT CAUSE: templates/core/about.html used .agents/.agents__grid/.agents__header/.agents__title — ZERO CSS rules for any of them, since the original client import (908a911). New scripts/audit_template_classes.py (class-token audit vs CSS) confirmed these 4 are the only ghosts across all key templates (styleguide sg-* are inline-styled false positives; .story__copy harmless).
+- Earlier "stale process" diagnosis explained the user's 500s but missed this real layout bug — the user has been right every time they said "about page is broken".
+- FIX: about.html section -> section section--dark agents; components.css gained the .agents block (numbers-band espresso + radial glows, header/title mirroring .bento-grid__title, 3-col grid 12px gap, 2-col <=1100px, 1-col <=700px); home.css .story__copy{min-width:0} hygiene. collectstatic run (174 files).
+- Verified live: grid 3 cols, cards 393x552, espresso bg, mobile 390 no overflow; full-page after-shot with human-like scroll (about-FULL-AFTER.png). pytest 323 passed. Full-page-capture "voids" (home bento/about sections) proven to be teleport-scroll capture artifacts — natural step-scroll reveals 20/20 and 37/37; no-JS context shows 0 hidden elements (D-MOTION-SAFE holds).
+- Property detail audited: header sticky at top:0 (mid-page header in full-page shots = artifact), gallery/video/map/sticky card all render, 13 internal links all 200. User's machine residual risk = stale process (old python + new templates/urls) — restart instructions reinforced.
+- Repackaged: gabriel-homes-update-2026-10-13.zip rebuilt (270 files, 3.4MB) with the fix; :3000 delivery page now leads with the audit verdict + before/after evidence images.
+
+Stage Summary:
+- User's complaint validated and fixed at the root: about team section had never been styled; now a designed dark band. Detail page proven healthy; sandbox fully green (323 tests). New zip + evidence gallery on the :3000 preview page; class-audit script added to prevent future ghost classes.
