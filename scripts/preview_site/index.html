@@ -62,30 +62,31 @@
 
   <header>
     <p class="kicker">[ Gabriel Homes · delivery ]</p>
-    <h1>Website Update — About Page Fix Included</h1>
-    <p class="sub">You were right: the About page was genuinely broken. Found it with a visual audit — and fixed it.</p>
+    <h1>Website Update — Real Hero Photo + Agent Contacts</h1>
+    <p class="sub">Both of your latest notes are done: the fake hero image is gone, and every agency card now carries live contact links.</p>
   </header>
 
   <div class="banner" style="border-left-color:#2f6b3a;background:var(--ok-bg);border-color:#cfe3cd">
-    <b>Vision audit verdict (2026-10-13):</b> the About page team section had
-    <b>four CSS classes that were never styled anywhere</b> — six agency cards rendered
-    as full-width 1,565&nbsp;px-tall gradient slabs and the section header was invisible
-    (cream text on cream background). This bug existed on every install, including ours.
-    <b>Fixed and verified</b>: dark editorial team band, 3-column card grid, all 323 tests
-    green. The property detail page was audited line-by-line and is healthy (0 console
-    errors, 0 broken links, sticky header correct, map + video render). If property pages
-    still fail on your machine after this update, it is the stale server process —
-    <b>STOP-WEBSITE, then START-GABRIEL-HOMES</b>.
+    <b>What changed in this update (2026-10-13):</b>
+    <b>1) Hero is a real home now</b> — the page hero on About / Services / Contact /
+    listings used an AI-generated cliff-villa render; it is now a real Gabriel Homes
+    interior photo, and the fake AI images were deleted from the site.
+    <b>2) Agent cards redesigned</b> — each agency card now shows office location, active
+    listing count, a short bio, and working <b>Call / WhatsApp / Email / Website</b>
+    buttons (WhatsApp opens with a pre-filled greeting), plus “View listings →”.
+    <b>3) Removed demo text</b> — agency bios no longer say “fictional agency seeded for
+    demo purposes”; a database migration rewrites them automatically during this update.
+    All 323 tests green.
   </div>
 
   <div class="cards" style="grid-template-columns:1fr 1fr;margin-bottom:34px">
     <figure style="margin:0;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px">
-      <figcaption style="font-size:12px;font-family:Consolas,monospace;color:var(--ink-soft);margin-bottom:8px">BEFORE — team section as 1,565px slabs (the bug you saw)</figcaption>
-      <a href="files/about-1440.png" target="_blank"><img src="files/about-1440.png" alt="About page before the fix" style="width:100%;border-radius:6px;display:block"></a>
+      <figcaption style="font-size:12px;font-family:Consolas,monospace;color:var(--ok-ink);margin-bottom:8px">HERO — real interior photo, no more AI render</figcaption>
+      <a href="files/about-hero.png" target="_blank"><img src="files/about-hero.png" alt="About page hero with a real photo" style="width:100%;border-radius:6px;display:block"></a>
     </figure>
     <figure style="margin:0;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px">
-      <figcaption style="font-size:12px;font-family:Consolas,monospace;color:var(--ok-ink);margin-bottom:8px">AFTER — dark team band, 3-column grid (fixed)</figcaption>
-      <a href="files/about-FULL-AFTER.png" target="_blank"><img src="files/about-FULL-AFTER.png" alt="About page after the fix" style="width:100%;border-radius:6px;display:block"></a>
+      <figcaption style="font-size:12px;font-family:Consolas,monospace;color:var(--ok-ink);margin-bottom:8px">AGENTS — contact buttons on every card</figcaption>
+      <a href="files/about-agents.png" target="_blank"><img src="files/about-agents.png" alt="Agent cards with contact links" style="width:100%;border-radius:6px;display:block"></a>
     </figure>
   </div>
 

@@ -140,6 +140,35 @@ AGENCIES = [
     ("Mombasa Bay Realty",       "hello@mombasabayrealty.co.ke",   "+254767890123", "+254767890123", "Mtwapa"),
 ]
 
+# Real-sounding agency bios — shown on the About team cards and the agent
+# profile page. Keyed by slug; unknown slugs fall back to a neutral line.
+AGENCY_BIOS = {
+    "gabriel-homes": (
+        "Our flagship Nyali office — curated homes across Mombasa with "
+        "verified details, honest photography, and support beyond the keys."
+    ),
+    "coast-property-co": (
+        "Bamburi-based agency covering Mombasa's north coast — apartments, "
+        "townhouses, and gated estates from Nyali to Shanzu."
+    ),
+    "pwani-realty": (
+        "Diani team handling beachfront homes, cottages, and short-stay "
+        "investments along Kwale's south coast."
+    ),
+    "highlands-estates": (
+        "Ruiru specialists in Nairobi's metropolitan north — gated "
+        "communities, townhouses, and family homes across Kiambu."
+    ),
+    "ngong-ridge-properties": (
+        "Ngong Hills specialists — family homes, farms, and gated estates "
+        "along Kajiado's rising ridge."
+    ),
+    "mombasa-bay-realty": (
+        "Mtwapa agency covering the creek and north coast — sea-view "
+        "apartments, villas, and holiday lets."
+    ),
+}
+
 
 # (title_template, type_slug_plural, beds, baths, size_sqm, land_acres,
 #  furnishing, base_sale_price, base_rent_monthly)
@@ -433,7 +462,10 @@ class Command(BaseCommand):
                     "website": f"https://{slugify(name).replace('-', '')}.co.ke",
                     "office_location": office,
                     "is_verified": True,
-                    "bio": f"{name} is a fictional agency seeded for demo purposes.",
+                    "bio": AGENCY_BIOS.get(
+                        slugify(name),
+                        f"{name} — a Gabriel Homes partner agency.",
+                    ),
                 },
             )
         return AgencyProfile.objects.count()

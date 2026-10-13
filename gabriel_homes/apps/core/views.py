@@ -4,6 +4,7 @@ Phase 2 makes the home page real-DB-driven per WORK.md §8.
 The static pages close the §7 URL-map gap: /about/ /contact/ /privacy/ /terms/.
 """
 from django.conf import settings
+from django.db.models import Count, Q
 from django.shortcuts import render
 
 from apps.agents.models import AgencyProfile
@@ -148,9 +149,21 @@ def _static_ctx(**extra):
 
 
 def about(request):
-    """About page — the Gabriel Homes story, values, and team intro."""
+    """About page — the Gabriel Homes story, values, and team intro.
+
+    Cards on this page carry live contact links, so each agency ships with
+    its office location and a count of active (published) listings —
+    annotated in SQL rather than per-card queries.
+    """
     agencies = list(
-        AgencyProfile.objects.select_related("user").order_by("name")[:8]
+        AgencyProfile.objects.select_related("user", "office_location")
+        .annotate(
+            active_listings=Count(
+                "properties",
+                filter=Q(properties__status=Property.Status.PUBLISHED),
+            )
+        )
+        .order_by("name")[:8]
     )
     return render(request, "core/about.html", _static_ctx(
         body_class="page-about",

@@ -29,7 +29,7 @@
   inset: 0;
   background:
     linear-gradient(90deg, rgba(28,21,17,0.85) 0%, rgba(28,21,17,0.62) 42%, rgba(28,21,17,0.15) 100%),
-    url("../img/hero-bg.jpg") 72% 50% / cover no-repeat,
+    url("../img/real/page-hero.jpg") 72% 50% / cover no-repeat,
     var(--espresso);
   z-index: 0;
 }
