@@ -99,8 +99,11 @@ import re
 from pathlib import Path
 
 pkg = Path("/home/z/my-project/scripts/stage/gabriel-homes")
-for name in ("START-GABRIEL-HOMES.bat", "STOP-WEBSITE.bat"):
+bat_names = ("START-GABRIEL-HOMES.bat", "STOP-WEBSITE.bat", "UPDATE-WEBSITE.bat")
+for name in bat_names:
     p = pkg / name
+    if not p.is_file():
+        continue  # launcher bats are copied in step 2; UPDATE lives in the tree
     text = p.read_bytes().replace(b"\r\n", b"\n").replace(b"\n", b"\r\n")
     p.write_bytes(text)
     print(f"  CRLF: {name} ({len(text)} bytes)")

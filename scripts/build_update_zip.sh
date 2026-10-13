@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 # Build a rootless Gabriel Homes UPDATE zip (code only — no db/media/venv/.env).
+# "Rootless" = manage.py sits at the TOP of the archive, so the update can be
+# extracted straight over an existing install (both UPDATE-WEBSITE.sh and
+# UPDATE-WEBSITE.bat rely on that contract).
 # Result: /home/z/my-project/download/gabriel-homes-update-YYYY-MM-DD.zip
 set -euo pipefail
 
@@ -8,8 +11,10 @@ OUT_DIR=/home/z/my-project/download
 DATE=$(date +%F)
 OUT="$OUT_DIR/gabriel-homes-update-$DATE.zip"
 STAGE=$(mktemp -d)
+trap 'rm -rf "$STAGE"' EXIT
 
 cd "$GH"
+# Rootless staging: rsync DIRECTLY into $STAGE (no gabriel-homes/ wrapper).
 rsync -a \
   --exclude '.venv/' \
   --exclude 'media/' \
@@ -24,17 +29,94 @@ rsync -a \
   --exclude 'htmlcov/' \
   --exclude 'docs/shots/' \
   --exclude 'property-images/' \
-  "$GH/" "$STAGE/gabriel-homes/"
+  --exclude 'static/video/' \
+  --exclude '*.sqlite3-journal' \
+  --exclude '*.sqlite3-wal' \
+  --exclude '*.sqlite3-shm' \
+  --exclude '.DS_Store' \
+  "$GH/" "$STAGE/"
+
+echo "== line endings: .bat -> CRLF =="
+python3 - "$STAGE" <<'PYEOF'
+import sys
+from pathlib import Path
+
+stage = Path(sys.argv[1])
+bats = sorted(stage.rglob("*.bat"))
+if not bats:
+    raise SystemExit("FATAL: no .bat files staged")
+for p in bats:
+    text = p.read_bytes().replace(b"\r\n", b"\n").replace(b"\n", b"\r\n")
+    p.write_bytes(text)
+    print(f"  CRLF: {p.relative_to(stage)} ({len(text)} bytes)")
+
+# .bat block-paren audit: an UNQUOTED ')' inside an echo/rem line that sits
+# within an if/for (...) block terminates the block early and corrupts the
+# script. Same audit as build_package.sh — we have no Windows box in CI.
+import re
+
+def strip_quotes(line: str) -> str:
+    return re.sub(r'"[^"]*"', "Q", line)
+
+for p in bats:
+    depth = 0
+    violations = []
+    for n, raw in enumerate(p.read_text(encoding="utf-8", errors="replace").splitlines(), 1):
+        code = strip_quotes(raw).strip()
+        if not code or code.lower().startswith("rem"):
+            if depth > 0:
+                no_esc = re.sub(r"\^\)", "", strip_quotes(raw).strip())
+                if ")" in no_esc:
+                    violations.append(f"line {n}: unquoted ')' inside block: {raw.strip()[:70]}")
+            continue
+        body = strip_quotes(raw)
+        stripped = body.strip()
+        cmd = stripped.split()[0].lower() if stripped.split() else ""
+        if cmd == "echo" and depth > 0:
+            no_esc = re.sub(r"\^\)", "", stripped)
+            if ")" in no_esc.rstrip(">").rstrip():
+                violations.append(f"line {n}: unquoted ')' in echo inside block: {raw.strip()[:70]}")
+        if stripped.endswith("("):
+            depth += 1
+        if stripped.startswith(")"):
+            depth -= 1
+    if depth != 0:
+        violations.append(f"unbalanced blocks: final depth {depth}")
+    assert not violations, f"{p.name} BLOCK-PAREN BUGS:\n" + "\n".join(violations)
+    print(f"  audit: {p.name} block-paren clean")
+PYEOF
+
+echo "== sanity checks =="
+if [ -f "$STAGE/gabriel-homes/manage.py" ]; then
+  echo "FATAL: zip is WRAPPED (gabriel-homes/ prefix) - the updaters need a ROOTLESS zip" >&2
+  exit 1
+fi
+for f in manage.py UPDATE-WEBSITE.sh UPDATE-WEBSITE.bat requirements.txt templates apps config static scripts; do
+  [ -e "$STAGE/$f" ] || { echo "FATAL: $f missing from staged update" >&2; exit 1; }
+done
+grep -q $'\r' "$STAGE/UPDATE-WEBSITE.bat" || { echo "FATAL: UPDATE-WEBSITE.bat is not CRLF" >&2; exit 1; }
+echo "  staged tree: rootless + all updaters present + bat is CRLF"
 
 mkdir -p "$OUT_DIR"
 rm -f "$OUT"
-cd "$STAGE"
-zip -rq "$OUT" gabriel-homes -x '*/.git/*'
-rm -rf "$STAGE"
+(cd "$STAGE" && zip -rq "$OUT" . -x '*/.git/*' -x '.git/*')
 
 echo "== built: $OUT =="
 ls -la "$OUT"
-echo "== sanity: rootless + no db/media =="
-unzip -l "$OUT" | grep -Eq '(^| )gabriel-homes/manage\.py$' && echo "manage.py at top: OK"
-unzip -l "$OUT" | grep -Eq 'db\.sqlite3|media/|\.venv/|\.env$' && echo "FATAL: forbidden file in zip" || echo "no db/media/venv/.env: OK"
-unzip -l "$OUT" | tail -2
+ZIP_LISTING="$(unzip -l "$OUT")"
+if ! echo "$ZIP_LISTING" | grep -Eq '(^| )manage\.py$'; then
+  echo "FATAL: manage.py is not at the top of the zip (layout changed?)" >&2
+  exit 1
+fi
+echo "  manage.py at top: OK"
+if ! echo "$ZIP_LISTING" | grep -Eq '(^| )UPDATE-WEBSITE\.bat$'; then
+  echo "FATAL: UPDATE-WEBSITE.bat missing from the zip top level" >&2
+  exit 1
+fi
+echo "  UPDATE-WEBSITE.bat at top: OK"
+if echo "$ZIP_LISTING" | grep -Eq 'db\.sqlite3|/media/|\.venv/| \.env$'; then
+  echo "FATAL: forbidden file (db/media/venv/.env) inside the zip" >&2
+  exit 1
+fi
+echo "  no db/media/venv/.env: OK"
+echo "$ZIP_LISTING" | tail -2
