@@ -476,3 +476,19 @@ Work Log:
 
 Stage Summary:
 - Hero now a real home photo everywhere .page-hero renders + social meta; AI hero-bg/cta-bg gone from repo. Agent cards are contact-ready (call/WhatsApp/email/website) with live listing counts. Demo bio leak fixed at seed + via self-healing migration. founder.jpg remains the only AI image (no real portrait available - user must supply one).
+
+---
+Task ID: agent-face-cards-9
+Agent: Super Z (main agent)
+Task: User: "there faces in the background: agents" — put the agents' faces in the card backgrounds.
+
+Work Log:
+- Generated 6 professional placeholder portraits via z-ai image CLI (864x1152); one had baked-in AI text artifacts ("TOP FIVE A MIDLAND...") and was regenerated with a clean-composition prompt; scripts/make_agent_faces.py converts to q85 JPGs at static/img/agents/<slug>.jpg (~100-175KB each, ships in update zip).
+- New core_tags filter agent_face: agency.logo -> static img/agents/<slug>.jpg (checked via finders.find) -> "" so callers fall back to the monogram chip; new agencies can never render broken images.
+- About cards: face fills the card background (center top), bottom scrim gradient, content overlaid at the bottom; min-height 430px; hover lifts grayscale + zooms 1.045; contact pills got glass backdrop (espresso 42% + blur 7px) so they read over photos; .agent-card--no-face preserves the compact monogram variant. agent detail profile circle uses the same face fallback (logo > face > gradient).
+- STALENESS FORENSICS: after face edits the server kept serving the pre-face template even though .env has DEBUG=True and no cached loader is configured — the daemon (started 13:46) was rendering with cached templates; restart fixed it. This is the same failure class the user keeps hitting: template changes are invisible until the server restarts. UPDATE-WEBSITE.bat's STOP+START instruction is mandatory, not optional.
+- Verified: 6 face cards desktop 3-col / mobile 1-col, 0px overflow, 24 contact links intact, agent detail 200 + face in circle, pytest 323 passed.
+- Rebuilt gabriel-homes-update-2026-10-13.zip (277 files, 4.0MB); :3000 delivery page updated (faces copy + desktop/mobile evidence); committed.
+
+Stage Summary:
+- Agent cards are now face-forward: portrait background, scrim, identity + contacts overlay. Portraits are AI placeholders pending real photos — swapping in a real photo is one file drop at static/img/agents/<slug>.jpg (or an uploaded agency.logo, which takes precedence). All gates green; zip + delivery page refreshed.
