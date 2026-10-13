@@ -19,7 +19,8 @@
     <span class="eyebrow" data-reveal>{% if agency.is_verified %}Verified agency{% else %}Agency{% endif %}</span>
     <div class="profile-header" data-reveal>
       <div class="profile-header__portrait" aria-hidden="true"
-           {% if agency.logo %}style="background-image: url('{{ agency.logo.url }}');"{% else %}{% endif %}></div>
+           {% if agency.logo %}style="background-image: url('{{ agency.logo.url }}');"
+           {% elif agency|agent_face %}style="background-image: url('{{ agency|agent_face }}');"{% endif %}></div>
       <div>
         <h1 class="profile-header__name">{{ agency.name }}</h1>
         <p class="profile-header__meta">

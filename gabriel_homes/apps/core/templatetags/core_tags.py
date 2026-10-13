@@ -147,6 +147,35 @@ def initials(name) -> str:
     return "".join(chars).upper()
 
 
+@register.filter
+def agent_face(agency) -> str:
+    """Static portrait URL for an agency, or "" when none exists.
+
+    Resolution order:
+      1. agency.logo          — an uploaded logo/headshot (media)
+      2. img/agents/<slug>.jpg — a shipped portrait (static, in the repo
+                                 and inside every update zip)
+      3. ""                   — caller falls back to the monogram chip
+
+    Checking static existence here (instead of hardcoding <img> tags in the
+    template) keeps new agencies from rendering broken images: no portrait
+    file, no face, graceful monogram.
+    """
+    if getattr(agency, "logo", None):
+        try:
+            return agency.logo.url
+        except Exception:
+            pass  # untracked/deleted file — fall through to static portrait
+    slug = getattr(agency, "slug", "") or ""
+    path = f"img/agents/{slug}.jpg"
+    try:
+        if finders.find(path):
+            return staticfiles_storage.url(path)
+    except Exception:
+        pass
+    return ""
+
+
 @register.simple_tag(takes_context=True)
 def absolute_url(context, path: str = "") -> str:
     """Build an absolute URL from a path, using the current request.
