@@ -13,7 +13,10 @@ If the bundle is OLDER than work the user remembers, SAY SO — never rebuild
 silently and never guess at lost work.
 
 ## 2. Restore the database (a rollback empties SQLite -> stats show 0)
-    cp /path/to/gabriel-homes-db-backup.sqlite3 gabriel_homes/db.sqlite3
+    # from the downloaded backup (zip; the :3000 server denies raw .sqlite3):
+    python3 -m zipfile -e /path/to/gabriel-homes-db-backup.zip scripts/stage/ 2>/dev/null \
+      || unzip -o /path/to/gabriel-homes-db-backup.zip -d scripts/stage/
+    cp scripts/stage/gabriel-homes-db-backup.sqlite3 gabriel_homes/db.sqlite3
     # no backup? reseed from scratch:
     cd /home/z/my-project/gabriel_homes
     .venv/bin/python manage.py migrate && .venv/bin/python manage.py seed_demo
