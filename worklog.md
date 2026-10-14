@@ -565,3 +565,24 @@ Stage Summary:
 - Full delivery chain restored AND improved: r5 = agents-only accounts (Plan A) + offline venv repair + network-drive relocation + locale-proof detection, in one zip.
 - Incident lesson: the sandbox can be restored to an old snapshot between turns - before editing, verify git log/worklog state; keep one idempotent patch script per bat-generation so the chain can be replayed quickly.
 - User steps: delete old zip, download r5, extract, UPDATE-WEBSITE.bat, START-GABRIEL-HOMES.bat (first start relocates to local disk); create agent accounts via /admin/.
+
+---
+Task ID: rollback-defenses-17
+Agent: main (Super Z)
+Task: User's directive after reviewing the rollback-recovery log: make the record survive sandbox rollbacks (bundle/GitHub), force rollback detection (LAST_COMMIT tripwire), split the docs small, commit all rebuild scripts; skip the graph plugin for now.
+
+Work Log:
+- Verified disk state first: Plan A already live (header phone+email only, CSS gone, index.html r5-only), r5 zip served, DB seeded (80 properties / 6 users), 328-test project healthy via .venv. GitHub reachable (git ls-remote OK) -> push viable once user supplies repo+PAT.
+- Slimmed git history (scripts/slim_history.sh, filter-branch): purged download/** (~206MB old oneclick zips), gabriel_homes/wheels/, scripts/preview_site/files/*.zip (55MB r5), scripts/design-audit/, scripts/shots/ QA pngs (~120MB) from ALL commits. Pack 453MB-equivalent -> 73.57 MiB (remaining = real site media + delivery-page screenshots).
+- LESSON: filter-branch's final read-tree updates the WORKTREE to the rewritten HEAD -> it deleted wheels/ + the r5 zip from disk. Restored r5 zip from download/ (untracked = untouched) + rebuilt 30 wheels via vendor_wheels.sh. Tree-diff vs safety bundle proved ONLY those 31 files changed.
+- scripts/session_check.sh (tripwire, run FIRST every session): recorded LAST_COMMIT must exist AND be an ancestor of HEAD. Exact-hash equality is impossible (a commit cannot contain its own hash) - ancestor check catches rollbacks with zero false alarms on new commits. Exit 0 OK / 1 ROLLBACK / 2 no baseline.
+- scripts/make_bundle.sh (session end): git bundle --all -> download/gabriel-homes.bundle + db snapshot -> download/gabriel-homes-db-backup.sqlite3 + both copied to scripts/preview_site/files/ for one-click :3000 download.
+- scripts/start-servers.sh: idempotent :3011 (daemon_runserver.py from repo root) + :3000 (workspace_server.py) with health checks.
+- Docs split: root WORK.md (<50 lines: 8 session rules, LAST_COMMIT baseline, NEXT, hard facts) / CODEMAP.md (per-app, per-script one-liners) / DECISIONS.md (9 settled choices incl. agents-only, Plan A, offline deploys, no graph plugin) / REBUILD.md (8-step recovery: detect -> bundle restore -> db backup/seed -> venv -> wheels -> servers -> verify -> zip). Big gabriel_homes/WORK.md renamed -> gabriel_homes/BRIEF.md (read-on-demand).
+- .gitignore hardened: gabriel_homes/wheels/, scripts/preview_site/files/*.zip, *.bundle, db.sqlite3.
+- :3000 page: new "Session Backup" card (bundle + db backup buttons).
+- Commits: e5d372c (defenses baseline, recorded as LAST_COMMIT) + this worklog commit. make_bundle.sh run after; pytest gate re-run pre-delivery.
+
+Stage Summary:
+- Rollback survivability now real: bundle + db backup live OUTSIDE the sandbox (user's Downloads), tripwire forces detection at session start, REBUILD.md turns recovery into commands instead of a from-scratch rewrite. All rebuild scripts (vendor_wheels.sh, build_update_zip.sh, patch_bats_v51.py, seed_demo, setup_accounts.py, start-servers.sh) are committed.
+- User actions: download gabriel-homes.bundle + db backup from :3000 NOW and after every session; optionally hand over a private GitHub repo + fine-grained PAT (network verified) for push-after-every-task.

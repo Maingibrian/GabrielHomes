@@ -17,7 +17,7 @@ Full project brief (mission, design law, non-copy rules): `gabriel_homes/BRIEF.m
 7. Never claim something works unless you ran it this session.
 8. Reply to the user in English only. Deliverables go on the :3000 page.
 
-LAST_COMMIT: PENDING
+LAST_COMMIT: e5d372c (2026-10-14 — defenses baseline; refresh at each session end)
 NEXT:
   1) User: download `gabriel-homes.bundle` + db backup from :3000 — after EVERY
      session. That copy is the only thing a rollback cannot destroy.
