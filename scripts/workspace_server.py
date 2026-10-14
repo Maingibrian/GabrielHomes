@@ -59,6 +59,7 @@ SCRIPTS_EXACT = frozenset({
     "scripts/preview_site/qa.html",
 })
 SCRIPTS_PREFIX_OK = "scripts/preview_site/qa-shots/"
+SCRIPTS_FILES_PREFIX_OK = "scripts/preview_site/files/"  # update zips + evidence shots (curated artifacts)
 
 # ---------------------------------------------------------------- allow rules
 ALLOW_EXACT = frozenset({
@@ -73,6 +74,7 @@ ALLOW_PREFIXES = (
     "gabriel_homes/docs/",
     "gabriel_homes/README",             # README* if present
     SCRIPTS_PREFIX_OK,
+    SCRIPTS_FILES_PREFIX_OK,
 )
 
 CONTENT_TYPE_OVERRIDES = {
@@ -104,7 +106,11 @@ def is_denied(rel: str) -> bool:
         return True
     if comps[0] == "scripts":
         joined = "/".join(comps)
-        if joined not in SCRIPTS_EXACT and not joined.startswith(SCRIPTS_PREFIX_OK):
+        if (
+            joined not in SCRIPTS_EXACT
+            and not joined.startswith(SCRIPTS_PREFIX_OK)
+            and not joined.startswith(SCRIPTS_FILES_PREFIX_OK)
+        ):
             return True  # scripts/ folder itself stays closed
     return False
 
@@ -142,6 +148,7 @@ padding:12px 16px;margin-top:36px}}</style></head><body><div class="wrap">
 loop previews. This server runs in <b>allow-list mode</b>: the paths below render,
 everything else returns 403.</p>
 <h2>Loop previews</h2><div class="grid">
+<div class="card"><b><a href="/scripts/preview_site/index.html">Update delivery &amp; downloads</a></b>The latest update zip, updaters and evidence shots.</div>
 <div class="card"><b><a href="/scripts/preview_site/plan.html">Plan</a></b>The build plan, task by task.</div>
 <div class="card"><b><a href="/scripts/preview_site/checklist.html">Launch checklist</a></b>Go-live checklist, twin of the docx.</div>
 <div class="card"><b><a href="/scripts/preview_site/qa.html">QA report</a></b>Verification pass with screenshots.</div>
