@@ -162,23 +162,57 @@ findstr /b /l /c:"gabriel-homes/" "!ZIPLIST!" >nul && set "WRAPPED=1"
 rem ---------------------------------------------------------------
 rem STEP 5 - copy the new code over the site. Only files carried
 rem by the zip are overwritten - db.sqlite3 and media survive.
+rem Written as goto-flow with NO parenthesized blocks on purpose:
+rem CMD misparses ( ... ) blocks when a batch file has Unix line
+rem endings, and paths containing ")" (e.g. "folder (1)") break
+rem blocks at parse time. Goto-flow is immune to both.
 rem ---------------------------------------------------------------
 echo   Applying the update...
 echo.
 
-if defined WRAPPED (
-    set "TMPX=%TEMP%\gabriel-update-x"
-    if exist "!TMPX!" rmdir /s /q "!TMPX!" 2>nul
-    mkdir "!TMPX!"
-    tar -xf "!ZIP!" -C "!TMPX!"
-    if errorlevel 1 goto :fail_extract
-    robocopy "!TMPX!\gabriel-homes" . /E /NFL /NDL /NJH /NJS /NP >nul
-    if errorlevel 8 goto :fail_extract
-    rmdir /s /q "!TMPX!"
-) else (
-    tar -xf "!ZIP!" -C .
-    if errorlevel 1 goto :fail_extract
-)
+rem -- Always extract into a FRESH staging folder first, then
+rem -- robocopy over the site. A failed or interrupted extraction
+rem -- then never leaves a half-written site behind.
+set "TMPX=%TEMP%\gabriel-update-x"
+if exist "!TMPX!" rmdir /s /q "!TMPX!"
+mkdir "!TMPX!"
+
+rem -- tar.exe ships with Windows 10 1803+. When it is missing we
+rem -- fall back to the .NET ZipFile extractor via PowerShell.
+set "UNZIP="
+where tar >nul 2>nul && set "UNZIP=tar"
+
+set "XSRC=!TMPX!"
+if defined WRAPPED set "XSRC=!TMPX!\gabriel-homes"
+
+if defined WRAPPED goto :x_wrap
+if defined UNZIP goto :x_tar_rootless
+goto :x_ps_stage
+
+:x_wrap
+if defined UNZIP goto :x_tar_wrap
+powershell -NoProfile -ExecutionPolicy Bypass -Command "Add-Type -AssemblyName System.IO.Compression.FileSystem; [IO.Compression.ZipFile]::ExtractToDirectory('!ZIP!', '!TMPX!')"
+if errorlevel 1 goto :fail_extract
+goto :x_copy
+
+:x_tar_rootless
+tar -xf "!ZIP!" -C "!TMPX!"
+if errorlevel 1 goto :fail_extract
+goto :x_copy
+
+:x_tar_wrap
+tar -xf "!ZIP!" -C "!TMPX!"
+if errorlevel 1 goto :fail_extract
+goto :x_copy
+
+:x_ps_stage
+powershell -NoProfile -ExecutionPolicy Bypass -Command "Add-Type -AssemblyName System.IO.Compression.FileSystem; [IO.Compression.ZipFile]::ExtractToDirectory('!ZIP!', '!TMPX!')"
+if errorlevel 1 goto :fail_extract
+
+:x_copy
+robocopy "!XSRC!" "!CD!" /E /NFL /NDL /NJH /NJS /NP >nul
+if errorlevel 8 goto :fail_extract
+rmdir /s /q "!TMPX!"
 
 rem ---------------------------------------------------------------
 rem STEP 6 - database migration + health check

@@ -510,3 +510,20 @@ Work Log:
 
 Stage Summary:
 - gabriel-homes-update-2026-10-14.zip (276 files, 4.0 MB) is the current deliverable, served by the :3000 delivery page download button; the copy in git under scripts/preview_site/files/ is now the FINAL build (previous session's was stale). Preview server allow-list fixed so files/ actually serves. Site preview fully restored after sandbox reset.
+
+---
+Task ID: bat-crlf-fix-11
+Agent: Super Z (main agent)
+Task: User's UPDATE-WEBSITE.bat run died mid-extract with "'.' is not recognized as an internal or external command" (site folder Z:\...gabriel-homes-oneclick (1)\gabriel-homes, zip found on \\KT-DC2 Downloads).
+
+Work Log:
+- Diagnosis: site discovery + registry Downloads lookup + pushd mapping all WORKED (v3 features confirmed live); failure was in the extraction step. Arithmetic smoking gun: the old delivery-page bat was 9935 bytes = repo's 9654 + exactly 281 CRs (a proper CRLF twin). Today's zip-redelivery repack had `cp`'d the RAW repo bat over it — and the repo bat is 100% LF-only (0 CRLF / 281 LF). The user downloaded my LF-only bat, pasted it into the site folder, and CMD misparsed the parenthesized if/else extraction block -> stray '.' token -> extract failed. Zip itself verified good.
+- Hardened bat STEP 5: rewrote as goto-flow with ZERO parenthesized blocks (immune to LF endings AND to ")" in folder names like "gabriel-homes-oneclick (1)"); always extracts into a fresh %TEMP%\gabriel-update-x staging dir then robocopy /E over the site (failed extract can no longer half-write the site); `where tar` pre-flight with .NET ZipFile ExtractToDirectory PowerShell fallback (covers Win10 <1803); no bare `-C .` token left.
+- Line endings fixed at the SOURCE: gabriel_homes/UPDATE-WEBSITE.bat + scripts/launcher/START-GABRIEL-HOMES.bat + STOP-WEBSITE.bat converted to CRLF; new .gitattributes (*.bat eol=crlf, *.sh/*.py eol=lf) so checkouts can never regress.
+- audit_update_bat.py hardened: bare-LF is now a FATAL violation (was a soft "convert at build" note) + bare '.'-command check. All 3 bats pass (exit 0).
+- build_update_zip.sh: --exclude '*.log' added (a stray preview_bridge.log had leaked into the previous build as file 277).
+- New scripts/sync_preview_files.sh: single entry point that copies zip+bat+shots into scripts/preview_site/files/ with CRLF enforcement and byte verification of the delivered zip (rootless, CRLF bat inside). Final: zip 276 files 4,017,147 bytes; bat 11,221 bytes CRLF-only both standalone and inside the zip; delivery page bat meta updated to 11 KB.
+- :3000/:3011 survived this round (no reset); served bytes re-verified live (zip 200 exact size, served bat 0 bare-LF).
+
+Stage Summary:
+- Root cause of the user's extract failure was my LF-only standalone bat (regression introduced during zip-redelivery-10), now fixed at source + guarded by .gitattributes, a FATAL audit rule, and a byte-verifying sync script. The updater is also structurally immune to parens-in-paths and missing tar.exe. User unblocked via Explorer manual extract immediately; next update attempt uses the fixed bat.

@@ -29,9 +29,21 @@ def strip_quotes(line: str) -> str:
 
 
 def audit(path: Path) -> list[str]:
-    text = path.read_text(encoding="utf-8", errors="replace")
+    raw_bytes = path.read_bytes()
+    text = raw_bytes.decode("utf-8", errors="replace")
     lines = text.splitlines()
     violations: list[str] = []
+
+    # HARD line-ending contract: CMD misparses ( ... ) blocks in batch
+    # files with Unix (LF-only) endings - shipped as '.'-is-not-recognized
+    # errors on the user's machine (2026-10-14 incident). Every line
+    # MUST end CRLF.
+    bare_lf = raw_bytes.count(b"\n") - raw_bytes.count(b"\r\n")
+    if bare_lf:
+        violations.append(
+            f"{bare_lf} bare-LF line(s): batch files must be CRLF-only "
+            "(CMD block misparse with LF endings)"
+        )
 
     depth = 0
     delayed_on = False
@@ -58,6 +70,11 @@ def audit(path: Path) -> list[str]:
         body = strip_quotes(raw)
         stripped = body.strip()
         cmd = stripped.split()[0].lower() if stripped.split() else ""
+
+        # a bare '.' (or any token starting with an unquoted '.') is never
+        # a valid command - it is the classic symptom of a misparsed block
+        if cmd == ".":
+            violations.append(f"line {n}: bare '.' command (misparse symptom)")
 
         # echo lines inside blocks: forbid unquoted ')'
         if cmd == "echo" and depth > 0:
@@ -98,9 +115,10 @@ def main() -> int:
     failed = False
     for t in targets:
         v = audit(t)
-        crlf = b"\r\n" in t.read_bytes()
+        rb = t.read_bytes()
+        crlf = rb.count(b"\n") == rb.count(b"\r\n") and rb.count(b"\n") > 0
         status = "OK" if not v else "FAIL"
-        print(f"{status}: {t.name}  (CRLF: {'yes' if crlf else 'NO - convert at build'})")
+        print(f"{status}: {t.name}  (CRLF: {'yes' if crlf else 'NO - FATAL for shipping'})")
         for line in v:
             failed = True
             print(f"  - {line}")

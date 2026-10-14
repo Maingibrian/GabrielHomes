@@ -24,6 +24,7 @@ rsync -a \
   --exclude '*.pyc' \
   --exclude '.env' \
   --exclude 'nohup.out' \
+  --exclude '*.log' \
   --exclude '.pytest_cache/' \
   --exclude '.coverage' \
   --exclude 'htmlcov/' \
