@@ -1,0 +1,43 @@
+# WORK.md — Gabriel Homes session state. READ FIRST, EVERY SESSION.
+
+Full project brief (mission, design law, non-copy rules): `gabriel_homes/BRIEF.md`
+— big file, read on demand only. Settled choices: `DECISIONS.md`. Code map:
+`CODEMAP.md`. Recovery: `REBUILD.md`. History: `worklog.md` (tail only).
+
+## SESSION RULES
+1. Run `bash scripts/session_check.sh` FIRST. ROLLBACK = STOP, tell the user,
+   restore from `download/gabriel-homes.bundle` (REBUILD.md step 1) before
+   touching anything.
+2. Never read worklog.md in full — read only its last ~30 lines.
+3. Find code via grep + CODEMAP.md; don't open whole files unless editing.
+4. Commit after every finished task. Small commits.
+5. Session end: update LAST_COMMIT below, append worklog.md, run
+   `bash scripts/make_bundle.sh`, tell the user to download the bundle.
+6. Respect DECISIONS.md — never reverse a user decision without asking.
+7. Never claim something works unless you ran it this session.
+8. Reply to the user in English only. Deliverables go on the :3000 page.
+
+LAST_COMMIT: PENDING
+NEXT:
+  1) User: download `gabriel-homes.bundle` + db backup from :3000 — after EVERY
+     session. That copy is the only thing a rollback cannot destroy.
+  2) Optional (best fix): private GitHub repo — sandbox network REACHES github
+     (verified 2026-10-14). User provides repo URL + fine-grained PAT; agent
+     pushes after each task. Bundle stays the offline fallback.
+  3) Backlog: password-reset pages still allauth-default styling.
+
+## HARD FACTS
+- Django 5.2 + allauth 65.x, SQLite (`gabriel_homes/db.sqlite3`, gitignored).
+- venv: `gabriel_homes/.venv` — system python3 has NO Django; always
+  `gabriel_homes/.venv/bin/python` for manage.py / pytest.
+- :3011 Django — `python3 scripts/daemon_runserver.py` FROM /home/z/my-project.
+- :3000 delivery page — `python3 scripts/workspace_server.py`; page at
+  `/scripts/preview_site/index.html`, artifacts in `scripts/preview_site/files/`.
+- Windows deploy is OFFLINE (pypi.org blocked on user network): build zip via
+  `UPDATE_TAG=rX bash scripts/build_update_zip.sh` then
+  `bash scripts/sync_preview_files.sh` (CRLF-enforced, byte-verified).
+- Test gate: `.venv/bin/python -m pytest` (328 green) + `manage.py check`.
+- History is SLIMMED (zips/wheels/QA shots purged 2026-10-14). NEVER `git add`
+  `*.zip`, `gabriel_homes/wheels/`, `db.sqlite3`, or anything under `download/`.
+- Sandbox rollbacks happen (2026-10-14: disk restored to old snapshot midday,
+  wiped half a session). The tripwire + bundle exist because of that.

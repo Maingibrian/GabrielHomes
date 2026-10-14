@@ -26,3 +26,12 @@ scripts/*.png
 scripts/cookies.txt
 scripts/git-history.txt
 scripts/git_reword_map.txt
+
+# --- rollback-defense hygiene (2026-10-14): keep the repo slim (see WORK.md) ---
+# wheels are regenerable via scripts/vendor_wheels.sh and ship inside the
+# update zip for the user; zips live in download/ and the delivery tree only.
+gabriel_homes/wheels/
+scripts/preview_site/files/*.zip
+*.bundle
+gabriel_homes/db.sqlite3
+gabriel_homes/db.sqlite3-journal
