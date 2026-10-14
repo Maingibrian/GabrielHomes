@@ -35,6 +35,10 @@
           <a href="/about/">About us</a>
           <a href="/contact/">Contact</a>
           <a href="/contact/">Careers</a>
+          {# Staff-only access point — public sign-up is closed. #}
+          {% if not request.user.is_authenticated %}
+            <a href="/account/login/">Agent sign in</a>
+          {% endif %}
         </div>
         <div class="footer-cols__col">
           <h4>Visit</h4>

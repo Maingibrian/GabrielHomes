@@ -21,8 +21,11 @@
     </div>
 
     <div class="site-header__actions">
-      {# Account links — anonymous visitors get Sign in; signed-in users get #}
-      {# Saved + (agents) Dashboard + a POST sign-out (allauth requires POST). #}
+      {# Account links — signed-in users get Saved + (agents) Dashboard + a #}
+      {# POST sign-out (allauth requires POST). Anonymous visitors get no #}
+      {# account links in the header at all: public sign-up is closed, the #}
+      {# header keeps its clean contact block, and agents sign in via the #}
+      {# footer link or the mobile menu. #}
       {% if request.user.is_authenticated %}
         <a class="nav-link" href="/account/saved/">Saved</a>
         {% if request.user.is_agent %}
@@ -31,8 +34,6 @@
         <form class="nav-signout" method="post" action="/account/logout/">{% csrf_token %}
           <button type="submit" class="nav-link nav-link--button">Sign out</button>
         </form>
-      {% else %}
-        <a class="nav-link" href="/account/login/">Sign in</a>
       {% endif %}
       <a class="btn btn--primary btn--sm site-header__cta" href="/#contact">
         Enquire
@@ -78,7 +79,7 @@
                 style="width: 100%; text-align: left;">Sign out</button>
       </form>
     {% else %}
-      <a class="mobile-menu__link" href="/account/login/">Sign in</a>
+      <a class="mobile-menu__link" href="/account/login/">Agent sign in</a>
     {% endif %}
   </nav>
   <div class="mobile-menu__contact">

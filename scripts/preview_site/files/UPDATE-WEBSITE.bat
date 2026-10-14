@@ -1,6 +1,6 @@
 @echo off
 rem ---------------------------------------------------------------------------
-rem Gabriel Homes - Website Updater (Windows)  [v3 - network-folder safe]
+rem Gabriel Homes - Website Updater (Windows)  [v5.1 - offline repair + network-drive safe]
 rem
 rem What it does:
 rem   1. Finds your REAL site folder - even when this file is started
@@ -91,6 +91,34 @@ if not defined SITE (
 
 if not defined SITE goto :fail_site
 if not exist "!SITE!\manage.py" goto :fail_site
+
+rem ---------------------------------------------------------------
+rem STEP 1b - if the site lives on a NETWORK drive (a mapped drive
+rem like Z: or a \\UNC path), the copy that actually RUNS is on the
+rem LOCAL disk: START-GABRIEL-HOMES.bat moves it there because
+rem databases stall on network drives. Update THAT local copy so
+rem the updater and the launcher always agree.
+rem ---------------------------------------------------------------
+set "PROBEDRV=!SITE:~0,2!"
+set "NETDRV="
+if "!PROBEDRV!"=="\\" set "NETDRV=1"
+if defined NETDRV goto :is_netdrive
+fsutil fsinfo drivetype !PROBEDRV! 2>nul | findstr /i "Network" >nul
+if not errorlevel 1 goto :is_netdrive
+rem -- Locale-proof fallback: fsutil's "Network" word changes with the
+rem -- Windows language, so when it found nothing, ask WMI for the
+rem -- numeric drive type instead - 4 means network on every locale.
+powershell -NoProfile -Command "if ((Get-CimInstance Win32_LogicalDisk | Where-Object { $_.DeviceID -eq '!PROBEDRV!' }).DriveType -eq 4) { exit 0 } else { exit 1 }" >nul 2>nul
+if errorlevel 1 goto :site_local_done
+:is_netdrive
+if not exist "!LOCALAPPDATA!\GabrielHomes\manage.py" goto :site_local_done
+if not exist "!LOCALAPPDATA!\GabrielHomes\db.sqlite3" goto :site_local_done
+set "SITE=!LOCALAPPDATA!\GabrielHomes"
+echo   Note: your website really runs from the local-disk copy at
+echo     !SITE!
+echo   because network drives stall the database - updating that copy.
+echo.
+:site_local_done
 
 rem ---------------------------------------------------------------
 rem STEP 2 - enter the site folder. pushd also works on NETWORK
@@ -221,30 +249,114 @@ rem folder has no .venv yet (START-GABRIEL-HOMES.bat creates it and
 rem runs this same migration on first start), so a Django-less
 rem system Python must skip quietly - not dump import tracebacks.
 rem ---------------------------------------------------------------
-set "PY="
-if exist ".venv\Scripts\python.exe" set "PY=.venv\Scripts\python.exe"
-if not defined PY (
-    py -3 -c "import django" >nul 2>nul
-    if not errorlevel 1 set "PY=py -3"
-)
-if not defined PY (
-    python -c "import django" >nul 2>nul
-    if not errorlevel 1 set "PY=python"
-)
+set "HOSTPY="
+py -3 -c "import sys; sys.exit(0 if sys.version_info>=(3,10) else 1)" >nul 2>nul
+if not errorlevel 1 set "HOSTPY=py -3"
+if defined HOSTPY goto :env_ready
+python -c "import sys; sys.exit(0 if sys.version_info>=(3,10) else 1)" >nul 2>nul
+if not errorlevel 1 set "HOSTPY=python"
+if defined HOSTPY goto :env_ready
+rem -- No Python on this machine at all. If a working .venv exists
+rem -- we can still use it; otherwise skip the DB step gracefully -
+rem -- START-GABRIEL-HOMES.bat installs Python and migrates on
+rem -- first start.
+if exist ".venv\Scripts\python.exe" goto :env_ready
+goto :skip_db
 
-if defined PY (
-    echo   Updating the database...
-    !PY! manage.py migrate --noinput
-    echo.
-    echo   Health check...
-    !PY! manage.py check
-) else (
-    echo   NOTE: Python with Django was not found in this folder, so
-    echo   the database step was skipped. That is normal for a fresh
-    echo   download and nothing is broken - START-GABRIEL-HOMES.bat
-    echo   prepares Python and applies this database update
-    echo   automatically on first start.
-)
+:env_ready
+if exist ".venv\Scripts\python.exe" goto :have_venv
+echo   Creating the Python environment (one time, about a minute)...
+!HOSTPY! -m venv .venv
+if errorlevel 1 goto :fail_env
+:have_venv
+set "VPY=.venv\Scripts\python.exe"
+"!VPY!" -c "import django" >nul 2>nul
+if not errorlevel 1 goto :db_step
+
+rem -- Django is missing or broken. OFFLINE repair from wheels first:
+rem -- the zip bundles every Windows install wheel in wheels\.
+if exist ".venv\.deps_ok" del ".venv\.deps_ok" >nul 2>nul
+echo   Fixing the Python environment from the bundled wheels
+echo   (works WITHOUT internet, about a minute)...
+if not exist "wheels" goto :fix_online
+"!VPY!" -m pip install --quiet --disable-pip-version-check --no-index --find-links wheels -r requirements.txt
+if errorlevel 1 goto :fix_online
+goto :fix_verify
+
+:fix_online
+echo   Bundled wheels unavailable - trying the internet...
+"!VPY!" -m pip install --quiet --disable-pip-version-check -r requirements.txt
+if errorlevel 1 goto :fix_rebuild
+goto :fix_verify
+
+:fix_rebuild
+echo   Repair failed - rebuilding the environment from scratch...
+if exist ".venv" rmdir /s /q ".venv"
+if not defined HOSTPY goto :fail_env
+!HOSTPY! -m venv .venv
+if errorlevel 1 goto :fail_lock
+if exist "wheels" goto :fix_rebuild_offline
+"!VPY!" -m pip install --quiet --disable-pip-version-check -r requirements.txt
+if errorlevel 1 goto :fail_db
+goto :fix_verify
+
+:fix_rebuild_offline
+"!VPY!" -m pip install --quiet --disable-pip-version-check --no-index --find-links wheels -r requirements.txt
+if errorlevel 1 goto :fail_db
+
+:fix_verify
+"!VPY!" -c "import django" >nul 2>nul
+if errorlevel 1 goto :fail_db
+
+:db_step
+echo   Updating the database...
+"!VPY!" manage.py migrate --noinput
+if errorlevel 1 goto :fail_db
+echo.
+echo   Health check...
+"!VPY!" manage.py check
+if errorlevel 1 goto :fail_db
+echo   Python environment, database and health check: all OK.
+goto :done_banner
+
+:skip_db
+echo   NOTE: Python was not found on this machine, so the database
+echo   step was skipped. That is normal for a fresh download and
+echo   nothing is broken - START-GABRIEL-HOMES.bat installs Python
+echo   and applies this database update automatically on first start.
+goto :done_banner
+
+:fail_env
+echo.
+echo   ERROR: no usable Python was found, so the database could not
+echo   be updated. The website files WERE copied, but you must run
+echo   START-GABRIEL-HOMES.bat once (it installs Python and finishes
+echo   the update) before the site will work.
+echo.
+pause
+exit /b 1
+
+:fail_lock
+echo.
+echo   ERROR: could not rebuild the Python environment.
+echo   Close other programs (especially the black website window)
+echo   and run UPDATE-WEBSITE.bat again.
+echo.
+pause
+exit /b 1
+
+:fail_db
+echo.
+echo   ERROR: the database step failed - the website files were
+echo   copied, but the update is NOT complete. Do NOT trust a
+echo   half-updated site. Send the text of this window to the
+echo   site administrator, then run UPDATE-WEBSITE.bat again.
+echo.
+pause
+exit /b 1
+
+:done_banner
+
 
 echo.
 echo ==============================================================

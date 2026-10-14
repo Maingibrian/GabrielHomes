@@ -62,22 +62,22 @@
 
   <header>
     <p class="kicker">[ Gabriel Homes · delivery ]</p>
-    <h1>Website Update — Real Hero Photo + Agent Contacts</h1>
-    <p class="sub">All of your latest notes are done: the fake hero image is gone, and every agency card now shows the agent's portrait with live contact links.</p>
+    <h1>Website Update — Agents-Only Accounts + Offline Repair</h1>
+    <p class="sub">Your latest notes are done: visitors no longer get accounts (agents + superusers only), the navbar sign-in button is gone, and the updater now repairs Python without internet and runs the site from your local disk so pages never hang again.</p>
   </header>
 
   <div class="banner" style="border-left-color:#2f6b3a;background:var(--ok-bg);border-color:#cfe3cd">
     <b>What changed in this update (2026-10-14):</b>
-    <b>1) Hero is a real home now</b> — the page hero on About / Services / Contact /
-    listings used an AI-generated cliff-villa render; it is now a real Gabriel Homes
-    interior photo, and the fake AI images were deleted from the site.
-    <b>2) Agent cards redesigned with faces</b> — every agency card now carries the
-    agent's portrait as the card background, plus office location, active
-    listing count, a short bio, and working <b>Call / WhatsApp / Email / Website</b>
-    buttons (WhatsApp opens with a pre-filled greeting), plus “View listings →”.
-    <b>3) Removed demo text</b> — agency bios no longer say “fictional agency seeded for
-    demo purposes”; a database migration rewrites them automatically during this update.
-    All 323 tests green.
+    <b>1) No public accounts — agents only</b> — visitors can no longer sign up:
+    the navbar <b>Sign in</b> button is removed (the header keeps its clean phone +
+    email block), sign-up is closed with a friendly “registration is closed” page,
+    and agents get a quiet <b>Agent sign in</b> link in the footer and the mobile
+    menu, leading to a redesigned sign-in page.
+    <b>2) Hero is a real home now</b> — the fake AI cliff-villa render is gone,
+    replaced with a real interior photo on About / Services / Contact / listings.
+    <b>3) Agent cards with faces</b> — every agency card carries the agent's
+    portrait plus working <b>Call / WhatsApp / Email</b> buttons.
+    All 328 tests green.
   </div>
 
   <div class="cards" style="grid-template-columns:1fr 1fr;margin-bottom:34px">
@@ -96,60 +96,80 @@
   </div>
 
   <div class="banner">
-    <b>Why your last update failed:</b> your Downloads folder lives on the network
-    (<code>\\KT-DC2\FolderRedir$\bkibet\Downloads</code>). Windows CMD cannot use a network
-    folder as its working directory, so the old updater silently ran from
-    <code>C:\Windows</code> and every check failed. The new updater detects this and
-    also finds your real site folder automatically.
+    <b>Two long-standing problems are fixed in this updater:</b>
+    <b>(a) Pages loading forever</b> — your site sits on <code>Z:\</code>, a mapped
+    <b>network drive</b>. Databases stall on network shares, so every page hangs.
+    On the next start the site is <b>copied to your local disk</b> and always runs
+    from there — fast and reliable. The drive detection now reads Windows' numeric
+    drive type, so it works on <b>any Windows language</b>.
+    <b>(b) “No module named 'django'”</b> — the update zip now bundles every
+    Windows install wheel, so a broken Python environment is <b>repaired without
+    internet</b>, and the <b>DONE</b> banner only prints when the database update
+    and health check genuinely passed.
   </div>
 
   <div class="cards">
     <div class="card">
-      <h2><span class="tag">recommended</span>&nbsp; Fixed Updater</h2>
-      <p>The repaired <b>UPDATE-WEBSITE.bat</b> on its own. Download it, then copy it
-         into your site folder (replacing the old one) and double-click it there.</p>
-      <span class="meta">UPDATE-WEBSITE.bat · 11.4 KB · Windows</span>
-      <a class="btn" href="files/UPDATE-WEBSITE.bat" download>Download the fixed updater</a>
+      <h2><span class="tag">recommended</span>&nbsp; Full Update Zip (r5)</h2>
+      <p>Everything in one download: the newest pages, the <b>self-repairing</b>
+         updater, the site launcher, and all Windows install wheels. Extract it,
+         then double-click <b>UPDATE-WEBSITE.bat</b> inside the extracted folder —
+         it finds your real site, fixes the Python environment offline, and
+         updates the database.</p>
+      <span class="meta">gabriel-homes-update-2026-10-14-r5.zip · 55 MB · 315 files — v5.1: agents-only accounts + offline repair + runs from local disk</span>
+      <a class="btn" href="files/gabriel-homes-update-2026-10-14-r5.zip" download>Download the update zip (r5)</a>
     </div>
     <div class="card">
-      <h2>Full Update Zip</h2>
-      <p>The site code update that goes <i>with</i> the fixed updater — it contains the
-         newest pages, the fixed updater and everything else the site needs. Data,
-         photos and videos are never touched.</p>
-      <span class="meta">gabriel-homes-update-2026-10-14.zip · 4.0 MB · 278 files — also refreshes the site launcher</span>
-      <a class="btn ghost" href="files/gabriel-homes-update-2026-10-14.zip" download>Download the update zip</a>
+      <h2>Self-Repairing Updater Only</h2>
+      <p>Just the new <b>UPDATE-WEBSITE.bat</b>. Copy it into your site folder
+         (replacing the old one) and double-click it there — it will use the
+         update zip you already downloaded.</p>
+      <span class="meta">UPDATE-WEBSITE.bat · 16.1 KB · v5.1 — repairs .venv offline, updates the local-disk site</span>
+      <a class="btn ghost" href="files/UPDATE-WEBSITE.bat" download>Download the updater</a>
     </div>
   </div>
 
-  <p class="kicker" style="margin-bottom:14px">[ how to apply the update — 3 steps ]</p>
+  <p class="kicker" style="margin-bottom:14px">[ how to apply the update — 4 steps ]</p>
   <ol class="steps">
-    <li><b>Download the fixed updater</b> (left button). It lands in your network
-        Downloads — that is fine, leave it there for a moment.</li>
-    <li><b>Move it into your site folder.</b> Open Downloads, right-click
-        <code>UPDATE-WEBSITE.bat</code> → <b>Cut</b>, then open your Gabriel Homes site
-        folder (the one with <code>manage.py</code> and <code>db.sqlite3</code>) and
-        <b>Paste</b> it there — choose <i>Replace</i> when asked.</li>
-    <li><b>Double-click</b> <code>UPDATE-WEBSITE.bat</code> in the site folder.
-        It finds the newest update zip in your redirected Downloads by itself,
-        applies it, updates the database and prints <b>OK</b>.</li>
+    <li><b>Delete the old update zip</b> from your Downloads folder, so the new
+        one cannot be confused with it.</li>
+    <li><b>Download the update zip (r5)</b> above and <b>extract it</b> — right-click →
+        <b>Extract All...</b></li>
+    <li><b>Open the extracted folder</b> and double-click <b>UPDATE-WEBSITE.bat</b>.
+        It finds your real site (even on the Z: drive), repairs Python offline if
+        needed, applies the update and updates the database — every step prints
+        its own result, and the <b>DONE</b> banner only appears when everything
+        truly passed.</li>
+    <li><b>Restart the website:</b> close the black website window (or run
+        <code>STOP-WEBSITE.bat</code>), then double-click
+        <b>START-GABRIEL-HOMES.bat</b>. The first start copies the site to your
+        local disk (one time, up to a minute) and then opens your browser.
+        From now on pages load fast.</li>
   </ol>
 
   <div class="note">
-    <b>After every update, restart the website</b> — close the black website window
-    (or double-click <code>STOP-WEBSITE</code>), then double-click
-    <code>START-GABRIEL-HOMES</code>, then refresh your browser. This is what makes the
-    About page and property pages work again.
+    <b>After the update, give agents their accounts:</b> open the site, go to
+    <code>/admin/</code> (admin@gabrielhomes.co.ke), add a User with <i>Staff</i>
+    and <i>Agent</i> ticked plus a password, then add an <b>AgencyProfile</b> linked
+    to that user. Agents sign in from the footer <b>Agent sign in</b> link.
   </div>
 
   <details class="why">
     <summary>What was actually wrong? (technical detail)</summary>
-    <p>CMD's <code>cd /d \\server\share\...</code> always fails on UNC paths, and CMD
-       falls back to <code>C:\Windows</code>. The new updater uses
-       <code>pushd</code> (which maps a temporary drive letter for network paths),
-       tells an <i>extracted update folder</i> apart from the <i>real site</i> by the
-       presence of <code>db.sqlite3</code>, resolves the true Downloads location from
-       the registry (even when redirected to <code>\\KT-DC2\...</code>), and can also
-       receive the update zip or the site folder by drag &amp; drop.</p>
+    <p>Three separate defects, all fixed in this delivery. <b>(1)</b> CMD's
+    <code>cd /d \\server\share\...</code> fails on UNC paths — the updater uses
+    <code>pushd</code>, tells an <i>extracted update folder</i> apart from the real
+    site by the presence of <code>db.sqlite3</code>, and resolves the true Downloads
+    folder from the registry. <b>(2)</b> A half-installed <code>.venv</code> (Django
+    missing) made every migrate/health-check crash with “No module named 'django'”
+    while the old script still printed DONE — the v5.1 updater now gates every step
+    on errorlevels and repairs the environment offline from the bundled
+    <code>wheels/</code> folder (30 win_amd64 wheels, CPython 3.10–3.13).
+    <b>(3)</b> SQLite stalls indefinitely on network filesystems, so a site on
+    <code>Z:\</code> hangs every request — the launcher now relocates the site to
+    <code>%LOCALAPPDATA%\GabrielHomes</code> on first start (detected via
+    <code>fsutil</code> with a locale-independent WMI <code>DriveType</code>
+    fallback), and the updater targets that same local copy.</p>
   </details>
 
   <footer>GABRIEL HOMES · update delivery · 2026-10-14 · served from workspace :3000</footer>

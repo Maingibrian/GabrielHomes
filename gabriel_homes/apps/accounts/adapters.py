@@ -13,6 +13,16 @@ class AccountAdapter(DefaultAccountAdapter):
     sure signup doesn't try to populate a username column.
     """
 
+    def is_open_for_signup(self, request):
+        """Public sign-up is closed by product decision (2026-10-14).
+
+        Only agents and superusers hold accounts; agents are provisioned
+        by an admin via Django admin (create User + AgencyProfile, set
+        password). With this returning False, allauth renders
+        account/signup_closed.html for anyone hitting /account/signup/.
+        """
+        return False
+
     def save_user(self, request, user, form, commit=True):
         # Populate `full_name` from the form if the field is present.
         full_name = form.cleaned_data.get("full_name") if form else None

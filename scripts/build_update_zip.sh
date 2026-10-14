@@ -9,9 +9,26 @@ set -euo pipefail
 GH=/home/z/my-project/gabriel_homes
 OUT_DIR=/home/z/my-project/download
 DATE=$(date +%F)
-OUT="$OUT_DIR/gabriel-homes-update-$DATE.zip"
+UPDATE_TAG="${UPDATE_TAG:-}"
+OUT="$OUT_DIR/gabriel-homes-update-$DATE${UPDATE_TAG:+-$UPDATE_TAG}.zip"
 STAGE=$(mktemp -d)
 trap 'rm -rf "$STAGE"' EXIT
+
+# The update zip MUST carry the Windows wheels: the user's corporate network
+# can block pypi.org, and the updaters repair a broken .venv OFFLINE from
+# wheels/ (see UPDATE-WEBSITE.bat STEP 6 / START-GABRIEL-HOMES.bat deps ladder).
+# Refresh them with scripts/vendor_wheels.sh whenever requirements.txt changes.
+if [ ! -e "$GH/requirements.txt" -o "$GH/requirements.txt" -nt "$GH/wheels" ]; then
+  echo "WARNING: requirements.txt is newer than wheels/ - run scripts/vendor_wheels.sh" >&2
+fi
+ls "$GH"/wheels/*.whl >/dev/null 2>&1 || {
+  echo "FATAL: gabriel_homes/wheels/ has no wheels - run scripts/vendor_wheels.sh first" >&2
+  exit 1
+}
+for pat in 'django-.*\.whl' 'pillow-.*\.whl' 'psycopg_binary-.*\.whl'; do
+  ls "$GH/wheels" | grep -Eiq "$pat" || { echo "FATAL: $pat wheel missing from wheels/" >&2; exit 1; }
+done
+echo "  wheels: $(ls "$GH"/wheels/*.whl | wc -l) files, $(du -sh "$GH/wheels" | cut -f1)"
 
 cd "$GH"
 # Rootless staging: rsync DIRECTLY into $STAGE (no gabriel-homes/ wrapper).

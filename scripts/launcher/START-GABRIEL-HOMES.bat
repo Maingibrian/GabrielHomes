@@ -1,10 +1,10 @@
 @echo off
 rem ---------------------------------------------------------------------------
-rem Gabriel Homes - one-click website launcher (Windows)  [v3]
+rem Gabriel Homes - one-click website launcher (Windows)  [v5.1]
 rem
 rem What it does:
 rem   1. Finds (or installs via winget) Python 3.10+
-rem   2. Creates a .venv and installs dependencies (first run, needs internet)
+rem   2. Creates a .venv and installs dependencies (bundled wheels work OFFLINE)
 rem   3. Migrates + seeds ~80 demo listings (skipped automatically if data exists)
 rem   4. Ensures demo accounts (admin + agent) exist
 rem   5. Picks a free port (8000-8010), waits until the site answers,
@@ -41,34 +41,54 @@ if not exist "%SRCDIR%manage.py" (
 
 set "RUNDIR=%SRCDIR%"
 
-rem -- Network path (UNC) handling. CMD does not support UNC paths as a
-rem -- current directory: "cd /d \\server\share\..." fails and CMD silently
-rem -- falls back to C:\Windows, where nothing of ours exists. Corporate
-rem -- machines often redirect Downloads to \\server\FolderRedir$\... .
-rem -- Fix: copy the site to the LOCAL disk and run it from there.
-if "%SRCDIR:~0,2%"=="\\" (
-    if not defined LOCALAPPDATA set "LOCALAPPDATA=%USERPROFILE%\AppData\Local"
-    set "LOCALDIR=!LOCALAPPDATA!\GabrielHomes"
-    echo   Your folder is on a NETWORK drive, which Windows does not
-    echo   allow Python to run from. Copying the website to your LOCAL
-    echo   disk at "!LOCALDIR!" - one time, a few seconds...
-    if not exist "!LOCALDIR!" mkdir "!LOCALDIR!"
-    robocopy "%SRCDIR:~0,-1%" "!LOCALDIR!" /E /XF db.sqlite3 /XD .venv __pycache__ /NFL /NDL /NJH /NJS >nul
-    if errorlevel 8 (
-        echo   ERROR: could not copy the site to your local disk.
-        echo   Workaround: copy the gabriel-homes folder manually to your
-        echo   Desktop or C:\ drive, then run START-GABRIEL-HOMES.bat there.
-        pause
-        exit /b 1
-    )
-    if not exist "!LOCALDIR!\db.sqlite3" (
-        copy /Y "%SRCDIR%db.sqlite3" "!LOCALDIR!\db.sqlite3" >nul
-    )
-    echo   Copied. The website will run from your local disk and your
-    echo   data - listings and enquiries - is saved in the copy at
-    echo   "!LOCALDIR!".
-    set "RUNDIR=!LOCALDIR!\"
-)
+rem -- Network location handling - UNC paths AND mapped drives.
+rem -- CMD cannot use a \UNC path as a working directory at all, and a
+rem -- MAPPED network drive (Z:) is nearly as bad: Python and the SQLite
+rem -- database stall on the share and pages hang forever. So when the
+rem -- site sits on ANY network drive, it is copied to the LOCAL disk
+rem -- once, and afterwards always runs from that local copy.
+set "NETDRV="
+if "%SRCDIR:~0,2%"=="\\" set "NETDRV=1"
+fsutil fsinfo drivetype %SRCDIR:~0,2% 2>nul | findstr /i "Network" >nul && set "NETDRV=1"
+rem -- Locale-proof fallback: fsutil's "Network" word changes with the
+rem -- Windows language, so when it found nothing, ask WMI for the
+rem -- numeric drive type instead - 4 means network on every locale.
+if defined NETDRV goto :netdrv_done
+powershell -NoProfile -Command "if ((Get-CimInstance Win32_LogicalDisk | Where-Object { $_.DeviceID -eq '%SRCDIR:~0,2%' }).DriveType -eq 4) { exit 0 } else { exit 1 }" >nul 2>nul
+if not errorlevel 1 set "NETDRV=1"
+:netdrv_done
+if not defined NETDRV goto :run_where_it_is
+
+if not defined LOCALAPPDATA set "LOCALAPPDATA=%USERPROFILE%\AppData\Local"
+set "LOCALDIR=!LOCALAPPDATA!\GabrielHomes"
+echo   Your website is on a NETWORK drive. The database stalls on
+echo   network drives and pages hang forever, so the site runs from
+echo   your LOCAL disk instead:
+echo     !LOCALDIR!
+if exist "!LOCALDIR!\manage.py" goto :use_local_copy
+echo   First run: copying the website over - one time, up to a minute...
+if not exist "!LOCALDIR!" mkdir "!LOCALDIR!"
+robocopy "%SRCDIR:~0,-1%" "!LOCALDIR!" /E /XF db.sqlite3 /XD .venv __pycache__ /NFL /NDL /NJH /NJS >nul
+if errorlevel 8 goto :fail_relocate
+if not exist "!LOCALDIR!\db.sqlite3" copy /Y "%SRCDIR%db.sqlite3" "!LOCALDIR!\db.sqlite3" >nul
+echo   Copied. The website and YOUR data - listings and enquiries -
+echo   now live in the local copy shown above.
+:use_local_copy
+set "RUNDIR=!LOCALDIR!\"
+goto :rundir_ready
+
+:fail_relocate
+echo   ERROR: could not copy the site to your local disk.
+echo   Workaround: copy the gabriel-homes folder manually to your
+echo   Desktop or C:\ drive, then run START-GABRIEL-HOMES.bat there.
+echo.
+pause
+exit /b 1
+
+:run_where_it_is
+set "RUNDIR=%SRCDIR%"
+
+:rundir_ready
 
 cd /d "!RUNDIR!"
 if not exist "manage.py" (
@@ -144,20 +164,54 @@ if not exist ".venv\Scripts\python.exe" (
 )
 set "VPY=.venv\Scripts\python.exe"
 
-if not exist ".venv\.deps_ok" (
-    echo   Installing dependencies - first run needs internet, 1-3 min...
-    "!VPY!" -m pip install --quiet --disable-pip-version-check -r requirements.txt
-    if errorlevel 1 (
-        echo   ERROR: pip install failed - check your internet connection.
-        echo   If you ran this from inside the zip window, extract the
-        echo   WHOLE zip first, then run it from the extracted folder.
-        pause
-        exit /b 1
-    )
-    type nul > ".venv\.deps_ok"
-) else (
-    echo   Dependencies: OK
-)
+rem -- Django gate: .venv can EXIST but be broken (an install that
+rem -- was interrupted, or a venv copied from another machine).
+rem -- Trust a working "import django", never the folder alone.
+"!VPY!" -c "import django" >nul 2>nul
+if not errorlevel 1 goto :deps_done
+
+rem -- Broken or missing dependencies. Try OFFLINE first: the
+rem -- update zip bundles every Windows wheel in wheels\, so no
+rem -- internet is needed on networks that block pypi.org.
+if exist ".venv\.deps_ok" del ".venv\.deps_ok" >nul 2>nul
+echo   Python packages need attention. Installing from the bundled
+echo   wheels folder - works WITHOUT internet, about a minute...
+if exist "wheels" goto :deps_offline
+echo   No wheels folder found next to the site. Trying the internet...
+goto :deps_online
+
+:deps_offline
+"!VPY!" -m pip install --quiet --disable-pip-version-check --no-index --find-links wheels -r requirements.txt
+if errorlevel 1 goto :deps_online
+goto :deps_verify
+
+:deps_online
+"!VPY!" -m pip install --quiet --disable-pip-version-check -r requirements.txt
+if errorlevel 1 goto :deps_rebuild
+goto :deps_verify
+
+:deps_rebuild
+echo   Repair failed. Rebuilding the Python environment from scratch...
+if exist ".venv" rmdir /s /q ".venv"
+!PYCMD! -m venv .venv
+if errorlevel 1 goto :deps_lock
+if exist "wheels" goto :deps_rebuild_offline
+"!VPY!" -m pip install --quiet --disable-pip-version-check -r requirements.txt
+if errorlevel 1 goto :deps_giveup
+goto :deps_verify
+
+:deps_rebuild_offline
+"!VPY!" -m pip install --quiet --disable-pip-version-check --no-index --find-links wheels -r requirements.txt
+if errorlevel 1 goto :deps_giveup
+goto :deps_verify
+
+:deps_verify
+"!VPY!" -c "import django" >nul 2>nul
+if errorlevel 1 goto :deps_giveup
+type nul > ".venv\.deps_ok"
+echo   Dependencies: OK
+
+:deps_done
 
 echo   Preparing database...
 "!VPY!" manage.py migrate --noinput >nul 2>nul
@@ -216,3 +270,21 @@ if not "!NOBROWSER!"=="1" (
 echo.
 echo   The website has stopped.
 pause
+
+
+:deps_giveup
+echo.
+echo   ERROR: could not install the Python packages, even from the
+echo   bundled wheels. The website cannot start.
+echo   Send the text of this window to the site administrator.
+echo.
+pause
+exit /b 1
+
+:deps_lock
+echo.
+echo   ERROR: could not rebuild the Python environment.
+echo   Close other programs and run START-GABRIEL-HOMES.bat again.
+echo.
+pause
+exit /b 1

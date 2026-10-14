@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% comment %}
+  Rendered when someone reaches /account/signup/ while sign-up is closed
+  (the adapter returns is_open_for_signup = False). Friendly explanation
+  plus routes back to the public site — no dead end.
+{% endcomment %}
+
+{% block title %}Registration closed — {{ SITE_NAME }}{% endblock %}
+{% block meta_description %}Gabriel Homes accounts are for agents and staff. Visitors can browse properties freely.{% endblock %}
+{% block body_class %}page-signup-closed{% endblock %}
+
+{% block styles %}{% include "account/_auth_styles.html" %}{% endblock %}
+
+{% block content %}
+<div class="container auth-wrap">
+  <div class="auth-card">
+    <p class="auth-card__tag">[ Notice ]</p>
+    <h1 class="auth-card__title">Registration is closed</h1>
+    <p class="auth-card__lede">
+      Accounts on Gabriel Homes are reserved for our agents and staff.
+      As a visitor you don&rsquo;t need one &mdash; every listing,
+      search and contact option is open to you.
+    </p>
+    <div class="auth-card__actions">
+      <a class="btn btn--primary" href="/#featured">Browse properties
+        <span class="btn__arrow" aria-hidden="true">&rarr;</span></a>
+    </div>
+    <p class="auth-card__footnote">
+      Team member who needs access? Contact the office at
+      <a href="mailto:hello@gabrielhomes.co.ke">hello@gabrielhomes.co.ke</a>.
+    </p>
+  </div>
+</div>
+{% endblock %}
