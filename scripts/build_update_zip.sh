@@ -38,6 +38,12 @@ rsync -a \
   "$GH/" "$STAGE/"
 
 echo "== line endings: .bat -> CRLF =="
+# Launcher bats must ride along with every update: otherwise a site
+# installed from an old oneclick keeps its OLD launcher forever (the
+# updater would never refresh it). Staged from the single source of
+# truth in scripts/launcher/.
+cp /home/z/my-project/scripts/launcher/START-GABRIEL-HOMES.bat "$STAGE/"
+cp /home/z/my-project/scripts/launcher/STOP-WEBSITE.bat "$STAGE/"
 python3 - "$STAGE" <<'PYEOF'
 import sys
 from pathlib import Path
@@ -92,7 +98,7 @@ if [ -f "$STAGE/gabriel-homes/manage.py" ]; then
   echo "FATAL: zip is WRAPPED (gabriel-homes/ prefix) - the updaters need a ROOTLESS zip" >&2
   exit 1
 fi
-for f in manage.py UPDATE-WEBSITE.sh UPDATE-WEBSITE.bat requirements.txt templates apps config static scripts; do
+for f in manage.py UPDATE-WEBSITE.sh UPDATE-WEBSITE.bat START-GABRIEL-HOMES.bat STOP-WEBSITE.bat requirements.txt templates apps config static scripts; do
   [ -e "$STAGE/$f" ] || { echo "FATAL: $f missing from staged update" >&2; exit 1; }
 done
 grep -q $'\r' "$STAGE/UPDATE-WEBSITE.bat" || { echo "FATAL: UPDATE-WEBSITE.bat is not CRLF" >&2; exit 1; }

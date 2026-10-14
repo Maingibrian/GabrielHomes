@@ -527,3 +527,19 @@ Work Log:
 
 Stage Summary:
 - Root cause of the user's extract failure was my LF-only standalone bat (regression introduced during zip-redelivery-10), now fixed at source + guarded by .gitattributes, a FATAL audit rule, and a byte-verifying sync script. The updater is also structurally immune to parens-in-paths and missing tar.exe. User unblocked via Explorer manual extract immediately; next update attempt uses the fixed bat.
+
+---
+Task ID: updater-django-skip-12
+Agent: Super Z (main agent)
+Task: User re-ran updater: extraction WORKED (CRLF/goto-flow fix confirmed in the field), then "Updating the database..." dumped ModuleNotFoundError: No module named 'django' twice, DONE banner still reached.
+
+Work Log:
+- Diagnosis: the update itself applied fine; the failure was the OPTIONAL STEP 6 db migration. The fresh oneclick download folder has NO .venv, so the bat's `import sys` probe accepted the Django-less system Python and manage.py crashed with tracebacks (scary but harmless). The site launcher (START-GABRIEL-HOMES.bat v3) creates .venv + runs migrate automatically on start - nothing was lost.
+- Read the launcher: on UNC paths it robocopies the site to %LOCALAPPDATA%\GabrielHomes EXCLUDING db.sqlite3/.venv, reuses the existing venv, runs migrate + seed guard + accounts, then runserver. So the user's REAL site+data live in %LOCALAPPDATA%\GabrielHomes; double-clicking the launcher in the updated (1) folder syncs new code over it while keeping their db.
+- GAP FOUND: the update zip never shipped START-GABRIEL-HOMES.bat / STOP-WEBSITE.bat - a site installed from an old oneclick keeps its OLD launcher forever. Fixed: build_update_zip.sh now stages both launchers from scripts/launcher/ (single source of truth) and sanity-checks their presence; zip grew 276 -> 278 files.
+- UPDATE-WEBSITE.bat STEP 6 hardened: probes `import django` instead of `import sys`; when no Django-capable Python exists it prints a friendly NOTE (fresh download, launcher does it on start) instead of tracebacks.
+- Incident note: a careless python one-liner (`open(p,'wb').write(open(p,'rb').read()...)`) TRUNCATED the bat during editing - receiver open('wb') evaluates before the read argument. Restored from git HEAD; re-applied edits with two-statement reads. Rule: never open-write the same path inside a single expression.
+- Final state: all 3 bats audit-OK (CRLF-only, no bare '.', balanced blocks); zip 278 files / 4,020,879 bytes, rootless, launchers CRLF inside; delivery page meta updated (11.4 KB bat, 278 files note); sync byte-verified; :3000 serving updated artifacts.
+
+Stage Summary:
+- User's updater run was actually a success - only the skippable db step "failed" loudly; now it fails silently-by-design with guidance. Update zips now carry the launcher bats so UNC-safe start flow can never go stale. User needs exactly one action: close the old site window, double-click START-GABRIEL-HOMES.bat in the updated folder - migration (incl. agents/0003 bio fix) runs automatically.

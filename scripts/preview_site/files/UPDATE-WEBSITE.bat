@@ -215,16 +215,20 @@ if errorlevel 8 goto :fail_extract
 rmdir /s /q "!TMPX!"
 
 rem ---------------------------------------------------------------
-rem STEP 6 - database migration + health check
+rem STEP 6 - database migration + health check. Only runs when a
+rem Python WITH Django is reachable: a freshly downloaded site
+rem folder has no .venv yet (START-GABRIEL-HOMES.bat creates it and
+rem runs this same migration on first start), so a Django-less
+rem system Python must skip quietly - not dump import tracebacks.
 rem ---------------------------------------------------------------
 set "PY="
 if exist ".venv\Scripts\python.exe" set "PY=.venv\Scripts\python.exe"
 if not defined PY (
-    py -3 -c "import sys" >nul 2>nul
+    py -3 -c "import django" >nul 2>nul
     if not errorlevel 1 set "PY=py -3"
 )
 if not defined PY (
-    python -c "import sys" >nul 2>nul
+    python -c "import django" >nul 2>nul
     if not errorlevel 1 set "PY=python"
 )
 
@@ -235,9 +239,11 @@ if defined PY (
     echo   Health check...
     !PY! manage.py check
 ) else (
-    echo   NOTE: Python was not found, so the database step was
-    echo   skipped. START-GABRIEL-HOMES.bat does it automatically
-    echo   on the next start - no action needed.
+    echo   NOTE: Python with Django was not found in this folder, so
+    echo   the database step was skipped. That is normal for a fresh
+    echo   download and nothing is broken - START-GABRIEL-HOMES.bat
+    echo   prepares Python and applies this database update
+    echo   automatically on first start.
 )
 
 echo.
