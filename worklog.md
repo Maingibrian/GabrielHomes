@@ -543,3 +543,25 @@ Work Log:
 
 Stage Summary:
 - User's updater run was actually a success - only the skippable db step "failed" loudly; now it fails silently-by-design with guidance. Update zips now carry the launcher bats so UNC-safe start flow can never go stale. User needs exactly one action: close the old site window, double-click START-GABRIEL-HOMES.bat in the updated folder - migration (incl. agents/0003 bio fix) runs automatically.
+
+---
+Task ID: rollback-recovery-16
+Agent: main (Super Z)
+Task: User approved "Plan A" header fix; on execution the workspace turned out to be ROLLED BACK to snapshot 139f456 - all session work (offline-repair updater, relocation, locale fallback, wheels, r4, agents-only accounts, worklog 13-15) lost from disk; :3000/:3011 dead; download page silently serving the ancient r1 zip again.
+
+Work Log:
+- Diagnosed scope: git log ends at 139f456; reflog has no trace of later commits (full dir restore, not a git reset); templates/account/, wheels/, vendor_wheels.sh, sync zips, .venv all missing; bats back to v3.
+- scripts/patch_bats_v51.py: single idempotent CRLF line-splice patch v3->v5.1 for BOTH bats. START: goto-flow network detection (UNC + fsutil + WMI DriveType fallback) + relocation to %LOCALAPPDATA%\GabrielHomes + deps ladder (import gate -> offline wheels -> online -> venv rebuild -> :deps_giveup/:deps_lock). Updater: STEP 1b local-copy probe (updates the live local copy) + STEP 6 HOSTPY detect -> .venv create -> import gate -> repair ladder -> migrate+check errorlevel-gated -> :done_banner only on real success; :fail_env/:fail_lock/:fail_db; graceful skip only when NO Python exists.
+- Recreated scripts/vendor_wheels.sh; re-vendored 30 win_amd64 wheels (53M, CPython 3.10-3.13, sanity greps pass).
+- build_update_zip.sh: added UPDATE_TAG + wheels FATAL checks (pre-build) - survived version predated r2.
+- Recreated agents-only accounts in Plan A form: adapter is_open_for_signup=False; templates/account/{_auth_styles,login,signup_closed,logout}.html; footer Company "Agent sign in" (anonymous only); mobile menu relabel; NO header contact-bar link; NO extra CSS. New test file updated for Plan A (header contact block must have exactly 2 links, no agent link).
+- Sandbox rebuilt: .venv recreated (pypi reachable), migrate + seed_demo (80 listings, 6 users), 328 tests green, check clean.
+- :3011 restarted (daemon_runserver); verified login agent-focused, signup closed, header has zero ">Sign in</a>" and exactly 2 contact links, footer+mobile have agent link, property pages 200 in ~10-30ms.
+- Screenshot proof: home-desktop header is back to clean two-line contact (scripts/shots/auth-review/home-desktop.png).
+- Built gabriel-homes-update-2026-10-14-r5.zip (315 files, 57,668,582 B; 30 wheels, v5.1 markers, CRLF bats, 4 account templates verified inside); stale r1 zip removed from files/; :3000 daemon restarted; page 200, r5 200 byte-exact, r1 404, updater bat 200.
+- Commit 7cfe697.
+
+Stage Summary:
+- Full delivery chain restored AND improved: r5 = agents-only accounts (Plan A) + offline venv repair + network-drive relocation + locale-proof detection, in one zip.
+- Incident lesson: the sandbox can be restored to an old snapshot between turns - before editing, verify git log/worklog state; keep one idempotent patch script per bat-generation so the chain can be replayed quickly.
+- User steps: delete old zip, download r5, extract, UPDATE-WEBSITE.bat, START-GABRIEL-HOMES.bat (first start relocates to local disk); create agent accounts via /admin/.
