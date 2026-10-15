@@ -606,3 +606,20 @@ Stage Summary:
 - Properties button now lands on a real all-listings page; bento spotlight animation matches the user's Framer reference without Framer code; 331 tests green.
 - Second snapshot incident in 24h: venv/wheels/db are the snapshot-exclusion victims; bundle + db backup + REBUILD.md made recovery a 5-minute checklist instead of a from-scratch rewrite. User still needs to keep downloading the bundle each session.
 - User steps: download r6 zip from :3000, extract, UPDATE-WEBSITE.bat, START-GABRIEL-HOMES.bat; ALSO download gabriel-homes.bundle + db backup zip (session backup).
+
+---
+Task ID: design-vision-audit-19
+Agent: main (Super Z) + 2 vision sub-agents (audit-19a Art Director, audit-19b UX Auditor)
+Task: User: "view the home page using vision...use graphic design and web design standards and norms to rate the pages...act as two separate agents".
+
+Work Log:
+- Captured 9 screenshots via scripts/audit_home_shots.py (Playwright): home desktop full/hero/bento/footer, mobile 390px@2x full/hero/bento/footer, /properties/ desktop full; reused 3 bento hover shots from scripts/shots/bento-spotlight/.
+- Ran two parallel vision agents: Agent A (graphic design) scored 5.8/10 C+, Agent B (UX) 4.8/10 D+. Both flagged P0s: no card photography, ghost/duplicate titles, huge blank spans (56-67% of page).
+- FORENSIC VERIFICATION (main agent, decisive): DB has 110 PropertyImage rows, all 80 properties covered, files exist, HTTP 200, computed background-image present in-browser, 0 console errors, 0 failed requests, CSP allows inline styles. Opened media JPG directly: seed_demo generates PLACEHOLDER JPGs (flat gradient + title baked into the image). Root cause of "no photos / ghost title / double title / spotlight reveals nothing" = placeholder demo art, NOT code. Card templates (bento __bg + _listing_card.html <img>) render images correctly; /properties/ page has 24 <img> tags.
+- Refuted by verification: copyright year drift (footer uses {% now "Y" %} -> always 2026); any CSP/template image bug.
+- Confirmed real: blank middle/footer in captures = [data-reveal] CSS-hidden until IntersectionObserver (motion.js) -> capture artifact for real users BUT no-JS fragility; mobile header has no call/WhatsApp; no enquire affordance on listing cards; IDs (#077) in titles; "Kilifi > Kilifi Town > Kilifi Town" seed data; pool + swimming-pool taxonomy split; mobile stats/search spacing cramped; ~9-11px caps labels; hover spotlight pointer-only with no at-rest affordance (deliberate scoping, revisit); heavy hero overlay (taste).
+- Audit shots kept OUT of git (history-slim rule); scripts committed.
+
+Stage Summary:
+- Verdict: code and design system are healthy (hero/search/footer/component consistency praised by both agents); the low grades are driven by demo placeholder art + missing media, which is a USER-supplied asset gap, plus a short polish list.
+- Next: user decision — supply real listing photos (10-20) to replace seed placeholders; approve code-side polish plan (at-rest card affordance, mobile call/WhatsApp, enquire on cards, data cleanups, no-JS reveal fallback, small-caps sizing).
