@@ -586,3 +586,23 @@ Work Log:
 Stage Summary:
 - Rollback survivability now real: bundle + db backup live OUTSIDE the sandbox (user's Downloads), tripwire forces detection at session start, REBUILD.md turns recovery into commands instead of a from-scratch rewrite. All rebuild scripts (vendor_wheels.sh, build_update_zip.sh, patch_bats_v51.py, seed_demo, setup_accounts.py, start-servers.sh) are committed.
 - User actions: download gabriel-homes.bundle + db backup from :3000 NOW and after every session; optionally hand over a private GitHub repo + fine-grained PAT (network verified) for push-after-every-task.
+
+---
+Task ID: properties-bento-18
+Agent: main (Super Z)
+Task: User: (a) "the property button still lands me in the index page", (b) bento grid on the index page must have the animation from a pasted Framer export ("Spotlight Bento Grid", upload/Pasted Content_1792040341107.txt).
+
+Work Log:
+- Tripwire OK at session start. INCIDENT: between turns the sandbox dropped .venv, wheels/ AND emptied db.sqlite3 (0 bytes) - the same snapshot-exclusion behaviour as incident 16; git history intact (tripwire passed), so NO code loss. Recovered by dogfooding REBUILD.md: venv rebuilt (step 3), wheels re-vendored (step 4, 30 files), db migrate + seed_demo (step 2, 80 listings / 6 users), servers restarted via start-servers.sh (step 5). The playbook worked end-to-end.
+- /properties/ page: new URL (listings/urls.py name="properties", kwargs listing_type=None) -> views.search shows ALL published listings (filter only when listing_type set). Guarded None-branches in _build_h1 ("Properties for Sale and Rent"), _build_breadcrumbs (Home > Properties), _build_canonical_url (/properties/), _build_related_searches (sale+rent + top counties). Deliberately outside the S7 SEO scheme; existing sale/rent URLs byte-identical behaviour.
+- Nav: desktop + mobile "Properties" -> /properties/ (was /#featured); footer Properties link too; home "View all" + BROWSE ALL CTA -> /properties/ (nav "03 Stays" keeps /property-for-rent/).
+- Spotlight bento (vanilla rebuild per BRIEF 1a - no Framer runtime): components.css .bento-card::before inner warm glow (radial at --mx/--my, rgba .30) + ::after 1px border ring (mask-composite exclude, @supports-guarded, rgba(240,138,57)); hover fade 0.4s ease-out; whole effect scoped to (hover:hover) and (prefers-reduced-motion: no-preference). motion.js setupBentoSpotlight(): rAF-throttled mousemove on .bento-grid writes card-relative --mx/--my; skipped for reduced-motion/touch. Shared component -> agents directory grid gets it too.
+- Tests: +3 in test_search.py (all-listings count, canonical+breadcrumbs+related, navbar href + zero /#featured). Gate: manage.py check clean, 331 passed.
+- Visual proof: scripts/shot_bento_spotlight.py (system python3 + Playwright) - hover big card at 72%/30%, then card 2; computed-style proof prints before/after opacity = 1/1 and --mx/--my set; shots in scripts/shots/bento-spotlight/ and served on :3000 page (new SPOTLIGHT BENTO figure).
+- Delivery: wheels re-vendored, UPDATE_TAG=r6 built (60,392,829 B, 315 files, bat CRLF, no db/media/venv), synced to files/, r5 archived to download/archive/; index.html updated to r6 (title, banner, card, steps, footer date).
+- Commits: 67f4ee7 (feature work) + LAST_COMMIT refresh + this entry.
+
+Stage Summary:
+- Properties button now lands on a real all-listings page; bento spotlight animation matches the user's Framer reference without Framer code; 331 tests green.
+- Second snapshot incident in 24h: venv/wheels/db are the snapshot-exclusion victims; bundle + db backup + REBUILD.md made recovery a 5-minute checklist instead of a from-scratch rewrite. User still needs to keep downloading the bundle each session.
+- User steps: download r6 zip from :3000, extract, UPDATE-WEBSITE.bat, START-GABRIEL-HOMES.bat; ALSO download gabriel-homes.bundle + db backup zip (session backup).

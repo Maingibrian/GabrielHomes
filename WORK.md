@@ -17,14 +17,16 @@ Full project brief (mission, design law, non-copy rules): `gabriel_homes/BRIEF.m
 7. Never claim something works unless you ran it this session.
 8. Reply to the user in English only. Deliverables go on the :3000 page.
 
-LAST_COMMIT: e5d372c (2026-10-14 — defenses baseline; refresh at each session end)
+LAST_COMMIT: 67f4ee7 (2026-10-15 — properties page + spotlight bento; refresh at each session end)
 NEXT:
-  1) User: download `gabriel-homes.bundle` + db backup from :3000 — after EVERY
-     session. That copy is the only thing a rollback cannot destroy.
+  1) User: apply r6 zip on Windows (extract -> UPDATE-WEBSITE.bat -> START),
+     and download the bundle + db backup after every session.
   2) Optional (best fix): private GitHub repo — sandbox network REACHES github
      (verified 2026-10-14). User provides repo URL + fine-grained PAT; agent
      pushes after each task. Bundle stays the offline fallback.
-  3) Backlog: password-reset pages still allauth-default styling.
+  3) Backlog: password-reset pages still allauth-default styling; real agent
+     portraits; demo images on reseeded sandbox DB are generated placeholders
+     (run scripts/assign_demo_images.py to re-attach real photos).
 
 ## HARD FACTS
 - Django 5.2 + allauth 65.x, SQLite (`gabriel_homes/db.sqlite3`, gitignored).
