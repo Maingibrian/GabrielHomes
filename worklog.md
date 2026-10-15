@@ -639,3 +639,18 @@ Work Log:
 Stage Summary:
 - r7 is the final deliverable of this session: r6 site code (Properties page + spotlight bento) + design-audit scripts; site behaviour unchanged; 331 tests green.
 - Third sandbox wipe in 24h; playbook recovery cost ~5 minutes. Bundle + db backup re-published - user must download both again (the copies on their machine predate the r7 scripts).
+
+---
+Task ID: wipe4-recovery-21
+Agent: main (Super Z)
+Task: User: "its not in this ui" (r7 zip missing from the delivery page).
+
+Work Log:
+- Diagnosis: :3000 root returned 000 - delivery server dead. INCIDENT #4, total wipe: BOTH processes gone, .venv GONE, db.sqlite3 MISSING, download/ DIRECTORY deleted (r7 zip, bundle, db backup, archives all gone - all gitignored untracked artifacts). Tracked worktree + .git intact (HEAD 20048f0, tripwire passed).
+- Recovery (fast path first): :3000 restarted directly (stdlib only, no venv needed). vendor_wheels.sh (30 wheels) -> UPDATE_TAG=r7 rebuilt (315 files) -> sync OK. Then venv rebuilt, migrate + seed_demo (80 listings), check clean, start-servers.sh both 200, pytest 331 passed.
+- make_bundle.sh re-published bundle + db backup. Verified on :3000: r7 zip 200 (57,676,314 B - differs from first build only by LAST_COMMIT hash inside WORK.md), bundle 200, db zip 200, index 5x r7 refs.
+- Root cause of the wipe pattern: every gitignored artifact (venv, wheels, db, download/, preview files) is snapshot-excluded; only tracked files + .git survive. Mitigation unchanged: user MUST download bundle + zips each session; everything else is regenerable via REBUILD.md.
+
+Stage Summary:
+- User-visible cause of "not in this ui": delivery server was dead during the wipe window; after restart + rebuild all artifacts are back and verified.
+- Total downtime ~6 minutes; playbook + committed scripts made r7 fully regenerable from git alone.
