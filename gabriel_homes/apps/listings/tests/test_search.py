@@ -401,3 +401,34 @@ def test_archived_listings_never_appear():
     body = r.content.decode()
     assert "No properties match" in body
     Property.objects.filter(status="archived").update(status="published")
+
+
+# ---------------------------------------------------------------------------
+# Combined browse-all page (/properties/) — navbar "Properties" target.
+# Deliberately outside the §7 SEO scheme; all published listings appear.
+# ---------------------------------------------------------------------------
+def test_properties_page_lists_all_published():
+    c = Client()
+    r = c.get("/properties/")
+    assert r.status_code == 200
+    assert b"Properties for Sale and Rent" in r.content
+    from apps.listings.models import Property
+    assert r.context["total_count"] == Property.objects.published().count()
+
+
+def test_properties_page_canonical_and_breadcrumbs():
+    c = Client()
+    r = c.get("/properties/")
+    body = r.content.decode()
+    assert 'rel="canonical"' in body
+    assert 'href="/properties/"' in body
+    assert ">Properties</" in body  # breadcrumb crumb
+    assert "Property for Sale" in body  # related searches block
+
+
+def test_navbar_properties_targets_properties_page():
+    c = Client()
+    home = c.get("/")
+    assert home.status_code == 200
+    assert 'href="/properties/"' in home.content.decode()
+    assert "/#featured" not in home.content.decode()

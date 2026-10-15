@@ -1145,6 +1145,50 @@ html.motion-ready [data-reveal].is-visible {
   isolation: isolate;
 }
 .bento-card--spotlight { grid-column: span 3; grid-row: span 2; }
+
+/* Spotlight bento — vanilla rebuild of the owner's Framer reference
+   ("Spotlight Bento Grid"; BRIEF 1a forbids the Framer runtime).
+   motion.js writes cursor-relative --mx/--my on every .bento-card as the
+   pointer moves over the grid; two layers respond:
+     ::before  soft warm inner glow that follows the cursor
+     ::after   1px border ring lit by the same radial (mask-composite)
+   Both fade on a 0.4s ease-out, and the whole effect only exists for
+   pointer devices that allow hover (touch/reduced-motion stay static). */
+.bento-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  z-index: 1;
+  opacity: 0;
+  pointer-events: none;
+  background: radial-gradient(480px circle at var(--mx, 50%) var(--my, 50%),
+      rgba(247, 233, 219, 0.30), rgba(247, 233, 219, 0.10) 30%, transparent 50%);
+  transition: opacity 0.4s ease-out;
+}
+@supports (-webkit-mask-composite: xor) or (mask-composite: exclude) {
+  .bento-card::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    z-index: 1;
+    padding: 1px;
+    opacity: 0;
+    pointer-events: none;
+    background: radial-gradient(280px circle at var(--mx, 50%) var(--my, 50%),
+        rgba(240, 138, 57, 1), rgba(240, 138, 57, 0.45) 45%, transparent 72%);
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+            mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+            mask-composite: exclude;
+    transition: opacity 0.4s ease-out;
+  }
+}
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .bento-card:hover::before { opacity: 1; }
+  .bento-card:hover::after { opacity: 1; }
+}
 /* Directory heading above the mosaic. The search now lives inside the
    hero, so the heading leads the section directly — tighter rhythm. */
 .bento-grid__heading { margin-top: 3.5rem; }

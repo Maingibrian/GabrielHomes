@@ -44,6 +44,16 @@ urlpatterns = [
         name="search_all_rent",
     ),
 
+    # Combined browse-all page — target of the navbar "Properties" button
+    # (all listing types, sale + rent together). Deliberately OUTSIDE the
+    # §7 SEO URL scheme; the patterns above remain the canonical surfaces.
+    path(
+        "properties/",
+        views.search,
+        {"listing_type": None, "type_slug": None},
+        name="properties",
+    ),
+
     # All-types + location (must come before the generic <type>-for-* patterns
     # so "property" doesn't get matched as a type_slug).
     path(

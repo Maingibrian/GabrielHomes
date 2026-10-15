@@ -58,6 +58,13 @@ def _build_h1(listing_type: str, ptype: PropertyType | None, location: Location 
         sale, None, Mombasa                 -> "Property for Sale in Mombasa"
     """
     type_name = ptype.name if ptype else "Property"
+    if listing_type is None:
+        # Combined browse-all page (/properties/) — no type filter applied.
+        if not ptype:
+            type_name = "Properties"
+        return f"{type_name} for Sale and Rent" + (
+            f" in {location.name}" if location else ""
+        )
     action = "for Sale" if listing_type == "sale" else "for Rent"
     h1 = f"{type_name} {action}"
     if location:
@@ -69,6 +76,12 @@ def _build_h1(listing_type: str, ptype: PropertyType | None, location: Location 
 def _build_breadcrumbs(listing_type: str, ptype: PropertyType | None, location: Location | None) -> list[dict]:
     """Build breadcrumb trail: Home > [Type] for [Sale/Rent] > [Location]."""
     crumbs = [{"name": "Home", "url": "/"}]
+    if listing_type is None:
+        # Combined page: Home > Properties > [Location]
+        crumbs.append({"name": "Properties", "url": ""})
+        if location:
+            crumbs.append({"name": location.name, "url": ""})
+        return crumbs
     action = "for Sale" if listing_type == "sale" else "for Rent"
     type_name = ptype.name if ptype else "Property"
 
@@ -85,6 +98,9 @@ def _build_breadcrumbs(listing_type: str, ptype: PropertyType | None, location: 
 
 def _build_canonical_url(listing_type: str, ptype: PropertyType | None, location: Location | None) -> str:
     """Canonical URL = the clean path without query params (per §7)."""
+    if listing_type is None:
+        # Combined browse-all page.
+        return "/properties/" + (f"{location.slug}/" if location else "")
     if ptype:
         base = f"/{ptype.slug_plural}-{'for-sale' if listing_type == 'sale' else 'for-rent'}/"
     else:
@@ -96,6 +112,22 @@ def _build_canonical_url(listing_type: str, ptype: PropertyType | None, location
 
 def _build_related_searches(listing_type: str, ptype: PropertyType | None, location: Location | None) -> list[dict]:
     """Build a 'Related searches' link block for the bottom of the page."""
+    if listing_type is None:
+        # Combined page — point people at the two canonical SEO surfaces
+        # plus the top counties.
+        related = [
+            {"name": "Property for Sale", "url": "/property-for-sale/"},
+            {"name": "Property for Rent", "url": "/property-for-rent/"},
+        ]
+        top_counties = Location.objects.filter(
+            level=Location.Level.COUNTY
+        ).order_by("name")[:6]
+        for county in top_counties:
+            related.append({
+                "name": f"Property for Sale in {county.name}",
+                "url": f"/property-for-sale/{county.slug}/",
+            })
+        return related[:8]
     related = []
     action_suffix = "for-sale" if listing_type == "sale" else "for-rent"
     action_label = "for Sale" if listing_type == "sale" else "for Rent"
@@ -173,7 +205,9 @@ def search(request, type_slug: str | None = None, location_slug: str | None = No
     # ------------------------------------------------------------------
     # Base queryset — only published listings, filtered by URL context
     # ------------------------------------------------------------------
-    qs = Property.objects.published().filter(listing_type=listing_type)
+    qs = Property.objects.published()
+    if listing_type:  # None on the combined /properties/ page — all types
+        qs = qs.filter(listing_type=listing_type)
 
     if ptype:
         qs = qs.filter(property_type=ptype)
