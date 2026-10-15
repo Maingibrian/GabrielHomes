@@ -623,3 +623,19 @@ Work Log:
 Stage Summary:
 - Verdict: code and design system are healthy (hero/search/footer/component consistency praised by both agents); the low grades are driven by demo placeholder art + missing media, which is a USER-supplied asset gap, plus a short polish list.
 - Next: user decision — supply real listing photos (10-20) to replace seed placeholders; approve code-side polish plan (at-rest card affordance, mobile call/WhatsApp, enquire on cards, data cleanups, no-JS reveal fallback, small-caps sizing).
+
+---
+Task ID: r7-delivery-20
+Agent: main (Super Z)
+Task: User: "give me the final zip i inspect it".
+
+Work Log:
+- Pre-gate found INCIDENT #3 (same snapshot-exclusion class): .venv GONE, wheels/ empty, db.sqlite3 MISSING, :3011 down. Git history intact (tripwire OK at cdca663) - no code loss.
+- Dogfooded REBUILD.md end-to-end: venv rebuilt (Django 5.2.18), 30 wheels re-vendored (53M), migrate + seed_demo (6 agencies / 80 listings / images generated), start-servers.sh both 200. Gate green: manage.py check clean + 331 passed.
+- Built UPDATE_TAG=r7: download/gabriel-homes-update-2026-10-15-r7.zip (57,670,137 B, 315 files; sanity OK: manage.py + bat at top, no db/media/venv/.env). Synced to files/ (sync byte-verified, old zip rotated out).
+- index.html updated r6 -> r7 (banner item 3: design-audit evidence scripts + incident note; card title/meta/button; steps). Verified :3000: index 200, r7 zip 200 with exact size match, 5 r7 refs.
+- make_bundle.sh refreshed: gabriel-homes.bundle + gabriel-homes-db-backup.zip published to :3000.
+
+Stage Summary:
+- r7 is the final deliverable of this session: r6 site code (Properties page + spotlight bento) + design-audit scripts; site behaviour unchanged; 331 tests green.
+- Third sandbox wipe in 24h; playbook recovery cost ~5 minutes. Bundle + db backup re-published - user must download both again (the copies on their machine predate the r7 scripts).
