@@ -41,9 +41,11 @@ sightlines): **real-01 kitchen-island** (opener, warm depth), **real-05 dining**
 (raw slab above balcony), real-04 (blank wall behind bed).
 
 Bento grid the user refers to = the /agents/ directory mosaic built from their
-Framer reference: `static/css/pages.css:211–310` (`.bento-grid` 3-col / 280px
+Framer reference: `static/css/components.css` (`bento-grid` 3-col / 280px
 rows / dense flow / 12px gap; `.bento-card` photo bg + scrim + `border-radius:16px`;
-spotlight spans 3×2; hover = `scale(1.05)` + grayscale 0.18→0 over 0.55s;
+spotlight spans 3×2; hover = Framer-reference de-zoom, photo rests at
+`scale(1.2)` full colour and springs to `scale(1)` over 1.05s (r9, measured
+from `design-reference/index.html`);
 stagger reveals 70ms/140ms under `html.motion-ready`; breakpoints 1020px/560px)
 + markup pattern in `templates/agents/agent_directory.html:54–88`
 (`__bg` / `__scrim` / `__body` with index, name, meta).

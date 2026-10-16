@@ -306,35 +306,6 @@
     }
   }
 
-  /* Spotlight bento — cursor-tracked --mx/--my on every card of a
-     .bento-grid (vanilla rebuild of the owner's Framer reference).
-     rAF-throttled; skipped entirely for reduced-motion or touch devices
-     (the CSS layers only fade in under (hover: hover) too). */
-  function setupBentoSpotlight() {
-    if (prefersReduced) return;
-    if (!window.matchMedia || !window.matchMedia("(hover: hover)").matches) return;
-    var grids = document.querySelectorAll(".bento-grid");
-    Array.prototype.forEach.call(grids, function (grid) {
-      var raf = 0;
-      var cx = 0;
-      var cy = 0;
-      function apply() {
-        raf = 0;
-        var cards = grid.querySelectorAll(".bento-card");
-        Array.prototype.forEach.call(cards, function (card) {
-          var r = card.getBoundingClientRect();
-          card.style.setProperty("--mx", Math.round(cx - r.left) + "px");
-          card.style.setProperty("--my", Math.round(cy - r.top) + "px");
-        });
-      }
-      grid.addEventListener("mousemove", function (e) {
-        cx = e.clientX;
-        cy = e.clientY;
-        if (!raf) raf = window.requestAnimationFrame(apply);
-      });
-    });
-  }
-
   function init() {
     setupCounters();
     setupQuoteReveal();
@@ -342,7 +313,6 @@
     setupHeaderScroll();
     setupMobileMenu();
     setupSearchSegment();
-    setupBentoSpotlight();
   }
 
   if (document.readyState === "loading") {
