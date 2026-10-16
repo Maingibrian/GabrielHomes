@@ -21,7 +21,12 @@ LAST_COMMIT: dc97a14 (2026-10-16 — homepage download cards; refresh at each se
 NEXT:
   1) User: apply r7 zip on Windows (extract -> UPDATE-WEBSITE.bat -> START),
      and download the bundle + db backup after every session.
-  2) GitHub push PENDING PAT: repo URL is https://github.com/Maingibrian/GabrielHomes
+  2) GitHub push LIVE: main -> github.com/Maingibrian/GabrielHomes (private) at a340648,
+     forced over the GitHub-Desktop snapshot (994aa75). Future pushes: user edits
+     the fine-grained token (same value) to keep Contents R/W active / or makes
+     a fresh 7-day token, then `bash scripts/push_github.sh <PAT>`. User advised
+     NEVER to push from PC GitHub Desktop (snapshot history diverged); re-clone
+     instead. Token never stored locally.
      (PRIVATE, created via user's GitHub Desktop; placeholder/snapshot history).
      User must create a FINE-GRAINED PAT (7 days, only GabrielHomes, Contents:
      Read and write) at github.com/settings/personal-access-tokens/new, then

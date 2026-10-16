@@ -29,4 +29,4 @@ fi
 git remote set-url origin "$REMOTE_URL"
 
 echo "== DONE =="
-echo "Verify: https://github.com/Maingibrian/Gabriel-Homes"
+echo "Verify: https://github.com/Maingibrian/GabrielHomes"
