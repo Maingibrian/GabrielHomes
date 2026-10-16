@@ -742,3 +742,23 @@ Work Log:
 Stage Summary:
 - r8 live on :3011 (hover the bento) and downloadable from the :3000 root page ("Download update zip (r8)").
 - Playwright container quirk: page crashes without --disable-dev-shm-usage/--no-sandbox args in this sandbox.
+
+---
+Task ID: bento-dezoom-r9-27
+Agent: main
+Task: Fix bento-grid hover animation — user rejected r8 desaturate-reveal ("this is not the animation that is seen when one hovers on one of the cards")
+
+Work Log:
+- Ground truth instead of guessing: opened gabriel_homes/design-reference/index.html (owner's Framer export) in headless agent-browser; scripted trusted-hover + computed-style diffs on the listing "Thumbnail Image" card
+- Measured: rest = transform scale(1.2) full colour; hover = spring to scale(1) (~1s, bounce 0.3, framer $n/er transitions); unhover = spring back to 1.2; nothing else animates (no desaturation, no text slide, no glow)
+- components.css: .bento-card__bg now rests at scale(1.2) full colour, :hover/:focus-visible -> scale(1), transition 1.05s cubic-bezier(0.34,1.2,0.5,1); deleted r8 .showcase desaturate/text-hide/scrim-hide block; deleted cursor-spotlight ::before/::after; reduced-motion keeps states but no transition; pure CSS (works with JS off)
+- motion.js: removed setupBentoSpotlight (~28 lines) and its init() call
+- docs/HOME-REDESIGN.md: hover description + CSS path corrected
+- Verified on :3011 with real mouse: rest matrix(1.2,1.2) -> hover matrix(1,1) -> unhover matrix(1.2,1.2) (smooth-scroll raced first two attempts; fixed by disabling scroll-behavior in the harness)
+- Gate: manage.py check clean; pytest 331 passed
+- UPDATE_TAG=r9 zip rebuilt (315 files, 57.7MB), sync_preview_files OK, r8 zip removed, bundle refreshed
+
+Stage Summary:
+- Bento hover now matches the owner's Framer reference exactly (measured, not guessed)
+- Spotlight glow removed per plan approval; commit 0a9d811; WORK.md fingerprint 0a9d811
+- Next: user pushes to GitHub when ready (bash scripts/push_github.sh <fresh PAT>)
