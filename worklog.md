@@ -654,3 +654,20 @@ Work Log:
 Stage Summary:
 - User-visible cause of "not in this ui": delivery server was dead during the wipe window; after restart + rebuild all artifacts are back and verified.
 - Total downtime ~6 minutes; playbook + committed scripts made r7 fully regenerable from git alone.
+
+---
+Task ID: ui-404-fix-22
+Agent: main (Super Z)
+Task: User: "needs to be in this ui and its not" (r7 still missing from the preview panel).
+
+Work Log:
+- Deep recon: user's UI does NOT hit :3000 directly - it goes through infra infra ports (12600/19001/19005/19006) and a reverse proxy on :81 (/app/Caddyfile, root-only). With :3000 dead the proxy returns Caddy 502 for every path -> user sees an error/blank page.
+- Wipe #5 had killed both server processes AND venv/db again. Rebuilt venv + migrate + seed (3rd time today), restarted both servers.
+- Discovered a SECOND, self-inflicted 404: build_update_zip.sh names the zip with $(date +%F); the post-midnight rebuild produced gabriel-homes-update-2026-10-16-r7.zip while index.html still linked ...-2026-10-15-r7.zip. FIXED PERMANENTLY: build script now emits DATELESS gabriel-homes-update-r7.zip; index.html links updated; stale dated zips removed from download/ + files/.
+- Added scripts/watchdog_once.sh + 45s nohup loop: revives :3011 (incl. venv/db rebuild if wiped) and :3000 automatically. Committed.
+- Verified through the UI's own proxy path (port :81, space-z Host header): index 200, gabriel-homes-update-r7.zip 200 with exact size (57,676,314 B), watchdog alive.
+- Note: vendor_wheels.sh stalled once (network) - retry with timeout guard succeeded.
+
+Stage Summary:
+- Two stacked causes found and fixed: infra wipes killing servers (mitigated by watchdog + per-turn checks) and date-drift 404 (fixed dateless naming forever).
+- GitHub push (needs user repo + PAT) remains the only way to serve downloads fully independent of sandbox wipes.

@@ -3,14 +3,15 @@
 # "Rootless" = manage.py sits at the TOP of the archive, so the update can be
 # extracted straight over an existing install (both UPDATE-WEBSITE.sh and
 # UPDATE-WEBSITE.bat rely on that contract).
-# Result: /home/z/my-project/download/gabriel-homes-update-YYYY-MM-DD.zip
+# Result: /home/z/my-project/download/gabriel-homes-update[-TAG].zip
+# Name is DATELESS: a rebuild after midnight must never orphan the
+# download link on the delivery page (that exact 404 happened with r7).
 set -euo pipefail
 
 GH=/home/z/my-project/gabriel_homes
 OUT_DIR=/home/z/my-project/download
-DATE=$(date +%F)
 UPDATE_TAG="${UPDATE_TAG:-}"
-OUT="$OUT_DIR/gabriel-homes-update-$DATE${UPDATE_TAG:+-$UPDATE_TAG}.zip"
+OUT="$OUT_DIR/gabriel-homes-update${UPDATE_TAG:+-$UPDATE_TAG}.zip"
 STAGE=$(mktemp -d)
 trap 'rm -rf "$STAGE"' EXIT
 
