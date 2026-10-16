@@ -671,3 +671,21 @@ Work Log:
 Stage Summary:
 - Two stacked causes found and fixed: infra wipes killing servers (mitigated by watchdog + per-turn checks) and date-drift 404 (fixed dateless naming forever).
 - GitHub push (needs user repo + PAT) remains the only way to serve downloads fully independent of sandbox wipes.
+
+---
+Task ID: github-setup-23
+Agent: main (Super Z)
+Task: User: "set it up. https://github.com/Maingibrian/Gabriel-Homes.git"
+
+Work Log:
+- Recon: GitHub repo is PUBLIC and reachable; contains only placeholder Initial commit 842f981 (README one-liner "# Gabriel-Homes"). No remote configured locally; no PAT stored anywhere (env, netrc, gh, ssh) - push therefore blocked until user provides a token.
+- Wipe #6 found (both servers 000, venv/download gone). Full REBUILD.md recovery: tripwire OK -> venv + 30 wheels -> migrate + seed (6 agencies/80 listings) -> start-servers -> manage.py check clean, pytest 331 green.
+- Rebuilt UPDATE_TAG=r7 (dateless gabriel-homes-update-r7.zip, 315 files, 57,676,314 B), sync_preview_files OK, bundle refreshed.
+- ROOT-CAUSED the recurring "not in this ui": :3000 root serves a generated dashboard (workspace_server.py PAGE) that had ZERO download links - the r7 card only existed one click deeper at /scripts/preview_site/index.html. Fixed permanently: added _downloads_html() to workspace_server.py - root homepage now auto-discovers gabriel-homes-update-*.zip / bundle / db-backup from ROOT/scripts/preview_site/files/ on EVERY request and renders download cards (newest zip first, styled .btn). No per-release maintenance ever again.
+- tests_preview_server.py 4/4 OK; :3000 restarted; verified root page now contains "Download update zip (r7)" + all 3 artifact links; zip URL 200 with exact byte size; deep page links consistent (dateless names).
+- GitHub setup committed: README.md (project overview, quick start Windows/Linux, repo layout, tests, release zips) + scripts/push_github.sh (takes PAT as argv, pushes main, falls back to force to replace placeholder, never stores token in git config). Remote origin added token-free.
+- WORK.md LAST_COMMIT refreshed (7a6a54c), NEXT updated: GitHub push pending user PAT; bundle remains offline fallback.
+
+Stage Summary:
+- HEAD 7a6a54c; tripwire OK; :3011 + :3000 healthy; r7 zip/bundle/db-backup all 200 on the :3000 ROOT page (now with direct buttons).
+- One command remains for GitHub: user creates a PAT (classic, repo scope) at github.com/settings/tokens and sends it; agent runs `bash scripts/push_github.sh <PAT>`. Repo then gives wipe-independent downloads forever.
