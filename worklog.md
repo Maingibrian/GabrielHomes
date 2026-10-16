@@ -689,3 +689,20 @@ Work Log:
 Stage Summary:
 - HEAD 7a6a54c; tripwire OK; :3011 + :3000 healthy; r7 zip/bundle/db-backup all 200 on the :3000 ROOT page (now with direct buttons).
 - One command remains for GitHub: user creates a PAT (classic, repo scope) at github.com/settings/tokens and sends it; agent runs `bash scripts/push_github.sh <PAT>`. Repo then gives wipe-independent downloads forever.
+
+---
+Task ID: github-retarget-24
+Agent: main (Super Z)
+Task: User changed repo to https://github.com/Maingibrian/GabrielHomes.git — continue push setup.
+
+Work Log:
+- Repo state: BOTH Maingibrian/Gabriel-Homes and GabrielHomes return 404 anonymously (private or deleted); user confirmed the repo is now GabrielHomes (created via their GitHub Desktop publish flow, likely private, holds their local r7-zip snapshot with a fresh single-commit history). Account Maingibrian exists (user page 200). GitHub API rate-limited from this egress IP (8.212.10.159) — used HTML endpoints instead.
+- Deploy-key plan dropped: no ssh binary, no ssh-keygen, no sudo/root in sandbox — cannot install openssh-client. HTTPS + fine-grained PAT is the only viable push channel.
+- Retargeted scripts/push_github.sh to GabrielHomes.git (usage line now demands fine-grained token with Contents: Read and write).
+- Added durable "GitHub — one-time push permission" section to the :3000 root PAGE: fine-grained token steps (7-day expiry, only-select-repositories -> GabrielHomes, Contents R/W, generate -> paste in chat), why it is NOT the classic-token risk the other AI warned about, and why GitHub Desktop cannot authorize this sandbox. Section renders verified via curl.
+- tests_preview_server.py 4/4 OK; :3000 restarted; root page shows downloads (r7 button intact) + new GitHub section; committed 09a8c62; tripwire OK; WORK.md NEXT item 2 rewritten (new URL, private, fine-grained-only policy).
+
+Stage Summary:
+- Ready state: HEAD 09a8c62; :3011 + :3000 healthy; r7 zip/bundle/db-backup all served; push script armed for GabrielHomes.
+- Sole remaining blocker: user must create the fine-grained PAT and paste it in chat; then `bash scripts/push_github.sh <PAT>` (force fallback replaces the GitHub-Desktop snapshot history), verify on github.com, and user may revoke the token immediately.
+- After push: advise user NOT to push from their PC's GitHub Desktop (their local history is a snapshot; sandbox main is authoritative) — instead re-clone after confirming.
