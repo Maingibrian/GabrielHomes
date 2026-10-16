@@ -194,6 +194,24 @@ everything else returns 403.</p>
 <h2>Downloads — latest release</h2><div class="grid">
 {downloads}
 </div>
+<h2>GitHub — one-time push permission</h2>
+<div class="card">
+<p style="margin-top:0">The agent pushes this workspace (full history, newest commits) to the private repo
+<b>github.com/Maingibrian/GabrielHomes</b>. One-time setup, about two minutes:</p>
+<ol style="padding-left:20px">
+<li>Open <a href="https://github.com/settings/personal-access-tokens/new">github.com/settings/personal-access-tokens/new</a>
+— <b>Fine-grained tokens</b>, not classic.</li>
+<li>Token name: <code>gabriel-sandbox-push</code> · Expiration: <b>7 days</b>.</li>
+<li>Repository access: <b>Only select repositories</b> → pick <b>GabrielHomes</b>.</li>
+<li>Permissions → Repository permissions → <b>Contents: Read and write</b>. Leave everything else as-is.</li>
+<li>Click <b>Generate token</b>, copy it (starts with <code>github_pat_</code>), and paste it into the agent chat.</li>
+</ol>
+<p style="margin-bottom:0">Why this is safe: the token reaches <b>only this one repository</b>, expires in 7 days, and can be
+revoked instantly at github.com/settings/personal-access-tokens right after the push is confirmed.
+A <i>classic</i> token with full <code>repo</code> scope is what security guides warn about — this is not that.
+GitHub Desktop on your PC backs up your local copy but cannot authorize this sandbox, which holds the
+authoritative full-history version.</p>
+</div>
 <h2>Loop previews</h2><div class="grid">
 <div class="card"><b><a href="/scripts/preview_site/index.html">Update delivery &amp; downloads</a></b>The latest update zip, updaters and evidence shots.</div>
 <div class="card"><b><a href="/scripts/preview_site/plan.html">Plan</a></b>The build plan, task by task.</div>

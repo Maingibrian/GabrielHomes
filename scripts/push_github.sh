@@ -4,9 +4,9 @@
 # The token is used for this one push only and is NOT saved to git config.
 set -euo pipefail
 
-PAT="${1:?Usage: bash scripts/push_github.sh <GITHUB_PAT>  (classic token with 'repo' scope)}"
-REMOTE_URL="https://github.com/Maingibrian/Gabriel-Homes.git"
-AUTH_URL="https://x-access-token:${PAT}@github.com/Maingibrian/Gabriel-Homes.git"
+PAT="${1:?Usage: bash scripts/push_github.sh <GITHUB_PAT>  (fine-grained token, GabrielHomes repo, Contents: Read and write)}"
+REMOTE_URL="https://github.com/Maingibrian/GabrielHomes.git"
+AUTH_URL="https://x-access-token:${PAT}@github.com/Maingibrian/GabrielHomes.git"
 
 cd /home/z/my-project
 

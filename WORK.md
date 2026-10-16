@@ -21,10 +21,13 @@ LAST_COMMIT: dc97a14 (2026-10-16 — homepage download cards; refresh at each se
 NEXT:
   1) User: apply r7 zip on Windows (extract -> UPDATE-WEBSITE.bat -> START),
      and download the bundle + db backup after every session.
-  2) GitHub push PENDING PAT: repo URL is https://github.com/Maingibrian/Gabriel-Homes
-     (public, placeholder Initial commit 842f981). User must create a PAT
-     (classic, repo scope) at github.com/settings/tokens, then agent runs
-     `bash scripts/push_github.sh <PAT>`. Token is never stored in git config.
+  2) GitHub push PENDING PAT: repo URL is https://github.com/Maingibrian/GabrielHomes
+     (PRIVATE, created via user's GitHub Desktop; placeholder/snapshot history).
+     User must create a FINE-GRAINED PAT (7 days, only GabrielHomes, Contents:
+     Read and write) at github.com/settings/personal-access-tokens/new, then
+     agent runs `bash scripts/push_github.sh <PAT>`. Token never stored in git
+     config; user can revoke right after. Setup steps also on the :3000 root
+     page ("GitHub — one-time push permission" section). Classic tokens: refuse.
      Bundle stays the offline fallback.
   3) Backlog: password-reset pages still allauth-default styling; real agent
      portraits; demo images on reseeded sandbox DB are generated placeholders
