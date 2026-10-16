@@ -129,6 +129,46 @@ def human_size(n: int) -> str:
     return f"{n:.1f} GB"
 
 
+def _downloads_html() -> str:
+    """Download cards for published artifacts, auto-discovered on every request.
+
+    Reads ROOT/scripts/preview_site/files/ live (module-level ROOT, so tests can
+    rebind it). This is what keeps the homepage truthful after every rebuild:
+    whatever build_update_zip.sh + sync_preview_files.sh published shows up here
+    automatically, newest zip first.
+    """
+    files = ROOT / "scripts" / "preview_site" / "files"
+    if not files.is_dir():
+        return ("<div class=\"card\"><b>No files published yet.</b>"
+                "Run scripts/build_update_zip.sh + scripts/sync_preview_files.sh.</div>")
+    cards = []
+    zips = sorted(files.glob("gabriel-homes-update-*.zip"),
+                  key=lambda p: p.stat().st_mtime, reverse=True)
+    for zp in zips:
+        tag = html.escape(zp.name[len("gabriel-homes-update-"):-len(".zip")] or "latest")
+        name = html.escape(zp.name)
+        cards.append(
+            f'<div class="card"><b><a class="btn" '
+            f'href="/scripts/preview_site/files/{name}" download>'
+            f'Download update zip ({tag})</a></b>'
+            f'<span class="dlmeta">{name} · {human_size(zp.stat().st_size)}</span></div>')
+    bundle = files / "gabriel-homes.bundle"
+    if bundle.is_file():
+        cards.append(
+            f'<div class="card"><b><a href="/scripts/preview_site/files/{bundle.name}" download>'
+            f'Git bundle — offline history backup</a></b>'
+            f'<span class="dlmeta">{bundle.name} · {human_size(bundle.stat().st_size)}</span></div>')
+    for db in sorted(files.glob("gabriel-homes-db-backup*.zip")):
+        name = html.escape(db.name)
+        cards.append(
+            f'<div class="card"><b><a href="/scripts/preview_site/files/{name}" download>'
+            f'Database backup — seeded SQLite (zip)</a></b>'
+            f'<span class="dlmeta">{name} · {human_size(db.stat().st_size)}</span></div>')
+    if not cards:
+        return '<div class="card"><b>No downloadable artifacts right now.</b></div>'
+    return "\n".join(cards)
+
+
 PAGE = """<!DOCTYPE html><html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Gabriel Homes — workspace preview</title><style>
@@ -141,12 +181,19 @@ a{{color:#c25e3a}}.grid{{display:grid;grid-template-columns:repeat(auto-fill,min
 .card{{background:#fff;border:1px solid #e6ddd1;border-radius:10px;padding:14px 16px}}
 .card b{{display:block;margin-bottom:4px}}code{{background:#f0e9df;padding:1px 6px;border-radius:4px}}
 .lock{{font-family:Menlo,monospace;font-size:12px;background:#f4efe7;border-left:3px solid #c25e3a;
-padding:12px 16px;margin-top:36px}}</style></head><body><div class="wrap">
+padding:12px 16px;margin-top:36px}}
+.btn{{display:inline-block;background:#c25e3a;color:#fff;text-decoration:none;padding:10px 18px;
+border-radius:8px;font-family:Menlo,monospace;font-size:13px}}.btn:hover{{background:#a94e30}}
+.dlmeta{{display:block;color:#7a6f63;font-family:Menlo,monospace;font-size:12px;margin-top:6px}}
+</style></head><body><div class="wrap">
 <div class="kicker">GABRIEL HOMES · LIVE WORKSPACE PREVIEW</div>
 <h1>The workspace, <em>on display</em>.</h1>
 <p class="lead">Browsing the real repo behind gabrielhomes.co.ke — templates, styling, docs and the
 loop previews. This server runs in <b>allow-list mode</b>: the paths below render,
 everything else returns 403.</p>
+<h2>Downloads — latest release</h2><div class="grid">
+{downloads}
+</div>
 <h2>Loop previews</h2><div class="grid">
 <div class="card"><b><a href="/scripts/preview_site/index.html">Update delivery &amp; downloads</a></b>The latest update zip, updaters and evidence shots.</div>
 <div class="card"><b><a href="/scripts/preview_site/plan.html">Plan</a></b>The build plan, task by task.</div>
@@ -259,7 +306,8 @@ class WorkspaceHandler(BaseHTTPRequestHandler):
         except (FileNotFoundError, NotADirectoryError, OSError):
             return self._not_found()
         if rel == "":  # homepage
-            return self._send_bytes(200, PAGE.format().encode("utf-8"), "text/html; charset=utf-8")
+            return self._send_bytes(200, PAGE.format(downloads=_downloads_html()).encode("utf-8"),
+                                    "text/html; charset=utf-8")
         if is_dir:
             if not self.path.split("?", 1)[0].endswith("/"):
                 return self._redirect(urllib.parse.unquote(self.path.split("?", 1)[0]) + "/")
