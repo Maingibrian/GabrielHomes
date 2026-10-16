@@ -722,3 +722,23 @@ Stage Summary:
 - GitHub is now the wipe-proof remote of record: github.com/Maingibrian/GabrielHomes (private) at a340648 with full history.
 - Token never persisted anywhere (script arg only, remote URL token-free); user free to revoke immediately; future pushes reuse the edit-token -> paste flow.
 - Sandbox: servers healthy, tripwire OK, r7 zip + bundle + db backup served on :3000 root page.
+
+---
+Task ID: bento-reveal-r8-26
+Agent: main (Super Z)
+Task: User pasted a Framer "Spotlight Bento Grid" HTML export — "the index page bento grid should have this animation".
+
+Work Log:
+- Forensic read of the 102KB Framer export: the actual effect is per-card rest state filter:saturate(0) + hidden Text Holder (opacity 0) + hidden bottom Overlay (mask: linear-gradient(transparent -> 0.6 black)); hover colorizes and reveals. ("Light" layer was just Framer's badge.) Animation JS lives in external Framer bundles — not extractable, rebuilt in CSS per BRIEF 1a.
+- Existing r7 build already had the cursor glow + border ring (motion.js --mx/--my) — the missing half was the rest->hover reveal. Added it scoped to .showcase (home only; agent directory untouched), pure CSS in components.css:
+  rest: bg saturate(0), body opacity 0 + translateY(14px), scrim opacity 0 (all under @media (hover:hover), :not(--cta));
+  hover/:focus-visible: colorize + scale(1.05), scrim + body fade/slide in (0.45s ease-out);
+  touch + reduced-motion: always colored/legible, no motion; CTA card never hides text; works JS-less.
+- Two bugs caught by the forensic probe script (scripts/verify_bento_reveal.py, committed): (1) bg desaturation initially outside the hover gate -> touch devices got gray cards; (2) :not() rest rule (0,4,0) outweighed the hover colorize (0,3,0) -> hover could not colorize. Both fixed, re-probed:
+  desktop rest {saturate(0), body 0, scrim 0} / desktop hover {saturate(1), body 1, scrim 1} / mobile {grayscale(0.18), body 1, scrim 1}. Screenshots in scripts/design-audit/bento-reveal-2026-10-16/ (kept out of git).
+- NOTE: placeholder JPGs have titles baked into the image, so at-rest cards still show a "ghost" title; real photos will clear this (pre-existing audit item, not a regression).
+- Gate: manage.py check clean, pytest 331 passed. Released UPDATE_TAG=r8 (315 files) -> download/ + files/, r7 zip retired, preview index.html rewritten for r8 (banner, card, steps), root :3000 page auto-shows r8 via download-card discovery. WORK.md LAST_COMMIT 132f529->df62f86, bundle refreshed.
+
+Stage Summary:
+- r8 live on :3011 (hover the bento) and downloadable from the :3000 root page ("Download update zip (r8)").
+- Playwright container quirk: page crashes without --disable-dev-shm-usage/--no-sandbox args in this sandbox.
