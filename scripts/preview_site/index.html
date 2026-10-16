@@ -70,26 +70,21 @@
   </header>
 
   <div class="banner" style="border-left-color:#2f6b3a;background:var(--ok-bg);border-color:#cfe3cd">
-    <b>What changed in this update (r7, 2026-10-16):</b>
-    <b>1) The Properties button works now</b> — it opens a real page at
-    <code>/properties/</code> showing <b>every listing, sale and rent together</b>,
-    with its own heading, breadcrumbs and canonical URL. Desktop nav, mobile menu
-    and the homepage “View all” buttons all point there. The sale/rent SEO pages
-    are untouched.
-    <b>2) Spotlight bento animation</b> — the homepage mosaic (and the agents
-    directory, which shares the component) now has the animation from your pasted
-    Framer reference: a warm glow plus a lit border ring that <b>follow the
-    cursor</b> over each card, fading on a 0.4s ease-out. Rebuilt as small vanilla
-    JS + CSS (no Framer runtime, per the design brief), and it switches itself off
-    for touch screens and reduced-motion users.
-    <b>3) Design-audit evidence scripts</b> — two independent design critics rated
-    the site and their screenshot/forensics tooling now ships in <code>scripts/</code>
-    (site behaviour itself is unchanged from r6). A third sandbox wipe hit this
-    session; the REBUILD.md playbook restored everything in minutes and the
-    fresh zip was re-verified.
-    <b>Still included from the previous update:</b> agents-only accounts (no public
-    sign-up, quiet Agent sign in links), the offline Python self-repair, and the
-    local-disk relocation that ended the endless page loads. All 331 tests green.
+    <b>What changed in this update (r8, 2026-10-16):</b>
+    <b>1) Full Framer-style bento reveal</b> — the homepage showcase mosaic now
+    behaves like the pasted “Spotlight Bento Grid” reference end-to-end: at rest
+    the cards are a quiet <b>desaturated photo grid with no text</b>; hovering a
+    card <b>colorizes it</b>, fades in the dark bottom scrim and <b>slides the
+    title, price and location up</b> from the bottom edge. The cursor-following
+    warm glow and lit border ring from r7 are still there. Touch phones and
+    reduced-motion users always see colored, fully legible cards, keyboard focus
+    triggers the same reveal, and it works with JavaScript disabled (pure CSS).
+    <b>2) Homepage download cards</b> — the :3000 preview root page now lists the
+    latest update zip, git bundle and database backup as direct download buttons,
+    auto-discovered on every page load.
+    <b>Still included from earlier updates:</b> the /properties/ page, agents-only
+    accounts, the offline Python self-repair, and the local-disk relocation that
+    ended the endless page loads. All 331 tests green.
   </div>
 
   <div class="cards" style="grid-template-columns:1fr 1fr;margin-bottom:34px">
@@ -127,14 +122,14 @@
 
   <div class="cards">
     <div class="card">
-      <h2><span class="tag">recommended</span>&nbsp; Full Update Zip (r7)</h2>
+      <h2><span class="tag">recommended</span>&nbsp; Full Update Zip (r8)</h2>
       <p>Everything in one download: the newest pages, the <b>self-repairing</b>
          updater, the site launcher, and all Windows install wheels. Extract it,
          then double-click <b>UPDATE-WEBSITE.bat</b> inside the extracted folder —
          it finds your real site, fixes the Python environment offline, and
          updates the database.</p>
-      <span class="meta">gabriel-homes-update-r7.zip · 58 MB · 315 files — audit-session refresh of r6: /properties/ page + spotlight bento + design-audit scripts</span>
-      <a class="btn" href="files/gabriel-homes-update-r7.zip" download>Download the update zip (r7)</a>
+      <span class="meta">gabriel-homes-update-r8.zip · 58 MB · 315 files — Framer-style bento reveal (grayscale → color + text slide-up) + homepage download cards</span>
+      <a class="btn" href="files/gabriel-homes-update-r8.zip" download>Download the update zip (r8)</a>
     </div>
     <div class="card">
       <h2>Self-Repairing Updater Only</h2>
@@ -163,7 +158,7 @@
   <ol class="steps">
     <li><b>Delete the old update zip</b> from your Downloads folder, so the new
         one cannot be confused with it.</li>
-    <li><b>Download the update zip (r7)</b> above and <b>extract it</b> — right-click →
+    <li><b>Download the update zip (r8)</b> above and <b>extract it</b> — right-click →
         <b>Extract All...</b></li>
     <li><b>Open the extracted folder</b> and double-click <b>UPDATE-WEBSITE.bat</b>.
         It finds your real site (even on the Z: drive), repairs Python offline if

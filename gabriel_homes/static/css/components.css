@@ -1231,6 +1231,46 @@ html.motion-ready .bento-grid .bento-card[data-reveal]:nth-child(3n) { transitio
   background: linear-gradient(180deg, rgba(28,21,17,0) 38%, rgba(28,21,17,0.88) 100%);
   z-index: -1;
 }
+/* ---- Framer-reference reveal (home showcase grid only) ----
+   The owner's "Spotlight Bento Grid" reference: at rest the mosaic is a
+   quiet, desaturated photo grid with no text; hovering a card colorizes
+   it, fades in the dark bottom scrim, and slides the title/price block
+   up. The reveal is pointer-luxury only — touch devices, reduced-motion
+   users and keyboard focus still get fully legible cards, and the CTA
+   card (no photo) is always visible. Pure CSS: works with JS disabled. */
+.showcase .bento-card:not(.bento-card--cta):hover .bento-card__bg,
+.showcase .bento-card:not(.bento-card--cta):focus-visible .bento-card__bg {
+  transform: scale(1.05);
+  filter: saturate(1);
+}
+.showcase .bento-card__scrim { transition: opacity 0.45s ease-out; }
+.showcase .bento-card__body {
+  transition: opacity 0.45s ease-out, transform 0.45s ease-out;
+}
+@media (hover: hover) {
+  /* Desaturate at rest ONLY where the hover reveal exists; touch devices
+     keep the normal (near-full-color) treatment from the base rule. */
+  .showcase .bento-card:not(.bento-card--cta) .bento-card__bg { filter: saturate(0); }
+  .showcase .bento-card:not(.bento-card--cta) .bento-card__body {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  .showcase .bento-card:not(.bento-card--cta):hover .bento-card__body,
+  .showcase .bento-card:not(.bento-card--cta):focus-visible .bento-card__body {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  .showcase .bento-card:not(.bento-card--cta) .bento-card__scrim { opacity: 0; }
+  .showcase .bento-card:not(.bento-card--cta):hover .bento-card__scrim,
+  .showcase .bento-card:not(.bento-card--cta):focus-visible .bento-card__scrim {
+    opacity: 1;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .showcase .bento-card__bg,
+  .showcase .bento-card__scrim,
+  .showcase .bento-card__body { transition: none; }
+}
 .bento-card__body { padding: 1.25rem 1.4rem 1.35rem; }
 .bento-card__index {
   font-family: var(--font-mono);
