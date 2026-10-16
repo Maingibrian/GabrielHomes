@@ -21,7 +21,7 @@ LAST_COMMIT: 0a9d811 (2026-10-16 — r9 bento de-zoom hover; refresh at each ses
 NEXT:
   1) User: apply r7 zip on Windows (extract -> UPDATE-WEBSITE.bat -> START),
      and download the bundle + db backup after every session.
-  2) GitHub push LIVE: main -> github.com/Maingibrian/GabrielHomes (private) at a340648,
+  2) GitHub push LIVE: main -> github.com/Maingibrian/GabrielHomes (private) at 90a3968 (r9),
      forced over the GitHub-Desktop snapshot (994aa75). Future pushes: user edits
      the fine-grained token (same value) to keep Contents R/W active / or makes
      a fresh 7-day token, then `bash scripts/push_github.sh <PAT>`. User advised

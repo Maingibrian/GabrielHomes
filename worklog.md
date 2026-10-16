@@ -762,3 +762,16 @@ Stage Summary:
 - Bento hover now matches the owner's Framer reference exactly (measured, not guessed)
 - Spotlight glow removed per plan approval; commit 0a9d811; WORK.md fingerprint 0a9d811
 - Next: user pushes to GitHub when ready (bash scripts/push_github.sh <fresh PAT>)
+
+---
+Task ID: github-push-r9-28
+Agent: main
+Task: Push r9 to GitHub (user confirmed old PAT not revoked)
+
+Work Log:
+- Ran scripts/push_github.sh with the still-valid fine-grained PAT (normal push, no force)
+- Verified via authenticated ls-remote: remote main = 90a3968 = local HEAD
+- WORK.md NEXT item 2 updated (a340648 -> 90a3968)
+
+Stage Summary:
+- Remote carries r9 bento de-zoom + worklog; user still advised to revoke/re-edit token after this push (it lives in chat history)
