@@ -951,6 +951,37 @@
   align-items: center;
   gap: 0.75rem;
 }
+/* Quick contact (r10) — Call + WhatsApp icon buttons, phones only.
+   <810px the Enquire CTA is hidden, leaving the header with no contact
+   affordance at all; these two circular buttons fill exactly that window.
+   >=810px they yield to Enquire (810-1199) and the full contact block
+   (>=1200), so the bar never crowds. 40px tap target (§10.8). */
+.site-header__quick {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.site-header__quick-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 1px solid color-mix(in srgb, var(--cream) 28%, transparent);
+  color: var(--cream);
+  transition: border-color var(--t-fast) var(--ease), color var(--t-fast) var(--ease),
+      background-color var(--t-fast) var(--ease);
+}
+.site-header__quick-btn:hover,
+.site-header__quick-btn:focus-visible {
+  border-color: var(--burnt);
+  color: var(--burnt);
+  background: color-mix(in srgb, var(--burnt) 12%, transparent);
+}
+@media (min-width: 810px) {
+  .site-header__quick { display: none; }
+}
 .site-header__cta {
   display: none;
 }
