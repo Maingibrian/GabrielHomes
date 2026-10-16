@@ -17,13 +17,15 @@ Full project brief (mission, design law, non-copy rules): `gabriel_homes/BRIEF.m
 7. Never claim something works unless you ran it this session.
 8. Reply to the user in English only. Deliverables go on the :3000 page.
 
-LAST_COMMIT: d922367 (2026-10-16 — dateless-zip + watchdog; refresh at each session end)
+LAST_COMMIT: 260c003 (2026-10-16 — GitHub setup: README + push script; refresh at each session end)
 NEXT:
-  1) User: apply r6 zip on Windows (extract -> UPDATE-WEBSITE.bat -> START),
+  1) User: apply r7 zip on Windows (extract -> UPDATE-WEBSITE.bat -> START),
      and download the bundle + db backup after every session.
-  2) Optional (best fix): private GitHub repo — sandbox network REACHES github
-     (verified 2026-10-14). User provides repo URL + fine-grained PAT; agent
-     pushes after each task. Bundle stays the offline fallback.
+  2) GitHub push PENDING PAT: repo URL is https://github.com/Maingibrian/Gabriel-Homes
+     (public, placeholder Initial commit 842f981). User must create a PAT
+     (classic, repo scope) at github.com/settings/tokens, then agent runs
+     `bash scripts/push_github.sh <PAT>`. Token is never stored in git config.
+     Bundle stays the offline fallback.
   3) Backlog: password-reset pages still allauth-default styling; real agent
      portraits; demo images on reseeded sandbox DB are generated placeholders
      (run scripts/assign_demo_images.py to re-attach real photos).
