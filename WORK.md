@@ -17,7 +17,7 @@ Full project brief (mission, design law, non-copy rules): `gabriel_homes/BRIEF.m
 7. Never claim something works unless you ran it this session.
 8. Reply to the user in English only. Deliverables go on the :3000 page.
 
-LAST_COMMIT: 260c003 (2026-10-16 — GitHub setup: README + push script; refresh at each session end)
+LAST_COMMIT: dc97a14 (2026-10-16 — homepage download cards; refresh at each session end)
 NEXT:
   1) User: apply r7 zip on Windows (extract -> UPDATE-WEBSITE.bat -> START),
      and download the bundle + db backup after every session.
