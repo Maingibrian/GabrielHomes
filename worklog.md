@@ -775,3 +775,20 @@ Work Log:
 
 Stage Summary:
 - Remote carries r9 bento de-zoom + worklog; user still advised to revoke/re-edit token after this push (it lives in chat history)
+
+---
+Task ID: mobile-header-quick-r10-29
+Agent: main
+Task: r10 mobile header Call/WhatsApp buttons (plan approved), executed through wipe #7
+
+Work Log:
+- Header quick-contact pair added to _header.html (.site-header__quick: tel: + wa.me, 40px circular outline buttons, aria-labels, same SVGs as detail bar); WhatsApp line added to mobile-menu contact block
+- components.css: buttons visible <810px only (the exact window where Enquire is hidden); >=810px hidden; burnt hover per tokens
+- WIPE #7 mid-task (venv, db, media, wheels/, download/ all untracked artifacts gone); tracked edits survived; r10 committed immediately as insurance (18f209a)
+- REBUILD playbook: venv + pip install, wheels re-vendored (30 files), migrate + seed_demo (6 agencies / 80 listings), servers healthy
+- Verified: 390px + 768px visible/40x40/no overlap; 1280px hidden; pytest 331 passed after rebuild
+- r10 zip (315 files), db backup, bundle rebuilt; sync OK; :3000 shows r10 card
+
+Stage Summary:
+- Reference mobile header = brand+Menu only (brochure); ours adds lead-gen quick contact by design
+- HEAD: r10 commit + fingerprint refresh; remote updated via push script
