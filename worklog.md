@@ -706,3 +706,19 @@ Stage Summary:
 - Ready state: HEAD 09a8c62; :3011 + :3000 healthy; r7 zip/bundle/db-backup all served; push script armed for GabrielHomes.
 - Sole remaining blocker: user must create the fine-grained PAT and paste it in chat; then `bash scripts/push_github.sh <PAT>` (force fallback replaces the GitHub-Desktop snapshot history), verify on github.com, and user may revoke the token immediately.
 - After push: advise user NOT to push from their PC's GitHub Desktop (their local history is a snapshot; sandbox main is authoritative) — instead re-clone after confirming.
+
+---
+Task ID: github-push-live-25
+Agent: main (Super Z)
+Task: User created fine-grained PAT and pasted it; push Maingibrian/GabrielHomes.
+
+Work Log:
+- First push attempt: 403 "Write access to repository not granted" - token had Contents Read-only. API verified read access (200, private:true) while write failed -> told user to EDIT the existing token (fine-grained tokens keep their value on permission edits) to Contents: Read and write.
+- User confirmed ("done"). Retry: normal push rejected (unrelated GitHub-Desktop snapshot history 994aa75) -> force fallback SUCCEEDED: 994aa75...a340648 main -> main (forced update).
+- Verified remote: ls-remote HEAD + refs/heads/main = a340648 (exact local HEAD); API contents listing shows full tree (README.md, REBUILD.md, WORK.md, CODEMAP.md, DECISIONS.md, gabriel_homes/, scripts/, package.json...).
+- Cleanup: push_github.sh verify-echo URL fixed (Gabriel-Homes -> GabrielHomes); WORK.md NEXT item 2 rewritten as "GitHub push LIVE" with the token-edit workflow for future pushes and the never-push-from-PC-Desktop warning; bundle refreshed; all committed.
+
+Stage Summary:
+- GitHub is now the wipe-proof remote of record: github.com/Maingibrian/GabrielHomes (private) at a340648 with full history.
+- Token never persisted anywhere (script arg only, remote URL token-free); user free to revoke immediately; future pushes reuse the edit-token -> paste flow.
+- Sandbox: servers healthy, tripwire OK, r7 zip + bundle + db backup served on :3000 root page.
