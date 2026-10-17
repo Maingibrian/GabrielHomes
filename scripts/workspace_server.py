@@ -142,6 +142,14 @@ def _downloads_html() -> str:
         return ("<div class=\"card\"><b>No files published yet.</b>"
                 "Run scripts/build_update_zip.sh + scripts/sync_preview_files.sh.</div>")
     cards = []
+    oneclick = files / "gabriel-homes-oneclick.zip"
+    if oneclick.is_file():
+        cards.append(
+            f'<div class="card"><b><a class="btn" '
+            f'href="/scripts/preview_site/files/{oneclick.name}" download>'
+            f'Download — one-click website (Linux / macOS / Windows)</a></b>'
+            f'<span class="dlmeta">{oneclick.name} · {human_size(oneclick.stat().st_size)}'
+            f' · extract, run START-GABRIEL-HOMES(.sh/.bat), site opens in your browser</span></div>')
     zips = sorted(files.glob("gabriel-homes-update-*.zip"),
                   key=lambda p: p.stat().st_mtime, reverse=True)
     for zp in zips:
