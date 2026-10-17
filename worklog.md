@@ -792,3 +792,27 @@ Work Log:
 Stage Summary:
 - Reference mobile header = brand+Menu only (brochure); ours adds lead-gen quick contact by design
 - HEAD: r10 commit + fingerprint refresh; remote updated via push script
+
+---
+Task ID: 30
+Agent: Super Z (main agent)
+Task: r11 — remove footer newsletter; demo/placeholder-data switch; role-aware owner dashboard; branded admin replacing the Django skin; bootstrap owner account.
+
+Work Log:
+- Wipe #8 hit mid-diagnosis (venv/wheels/db/media/download gone; tracked edits survived) — rebuilt via REBUILD playbook: venv, 30 wheels, migrate + seed_demo (6 agencies / 80 listings), servers up, 331 tests green before starting r11 edits.
+- Footer: removed newsletter label + form from _footer.html; removed .newsletter*/.site-footer__newsletter-label CSS + header-list renumber in components.css; styleguide section 11 removed and 12–16 renumbered; test pins updated (footer test now asserts newsletter/Subscribe ABSENT; styleguide component list drops "newsletter").
+- Demo switch: is_demo on Property + AgencyProfile (migrations backfill True for existing seeded rows, then default False for new content); seed_demo stamps is_demo=True on agencies + listings; new SiteSetting singleton (apps/core/models.py) with hide_demo_data; PropertyQuerySet.published() (the single public chokepoint) and new AgencyProfileQuerySet.public() exclude demo content when hidden — covers home bento, browse, detail (404), sitemaps, agent directory/profile, about-page counts; toggle invalidates the home showcase cache.
+- Owner dashboard: AgentRequiredMixin widened to superusers; DashboardHome dispatches superuser -> OwnerDashboardHomeView; new owner_views.py (OwnerRequiredMixin with real PermissionDenied gate, OwnerListingsView with agency/status/demo/q filters + pagination, OwnerAgenciesView with verify/deactivate/mark-demo/add-agency, OwnerDemoToggleView, OwnerImportView + sample CSV endpoint); CSV importer: dry-run validates without saving, utf-8-sig, 500-row cap, area-or-neighbourhood + icontains type/location fallbacks, slug-excluded full_clean, imports always is_demo=False; DashboardListingEdit/Images widened for owner; DashboardListingCreate gets an Agency select for the owner; DashboardInquiries role-aware (owner sees all agencies, template hides agency_profile subtitle).
+- Branded admin: apps/core/admin_site.py (GabrielHomesAdminSite, keeps "admin" namespace), all five admin.py files re-registered via @admin.register(Model, site=gabriel_admin) (first attempt @gabriel_admin.register failed — AdminSite.register is not a decorator), templates/admin/base_site.html (GH wordmark + Studio tag + dashboard link), static/css/admin-studio.css (cream/espresso/burnt/Geist tokens over Django admin CSS vars), /admin/ link from owner sidebar as "Advanced".
+- Admin bulk actions: mark_demo/mark_real on Property + AgencyProfile changelists (+ list_display/list_filter is_demo).
+- bootstrap_owner command (create-only, never resets; temp password printed once); created admin@gabrielhomes.co.ke (GH-7TPn-scN1-3tne-Hu2K) + download/OWNER-LOGIN.txt.
+- Flash messages: base.html renders django.contrib.messages (previously swallowed app-wide!) + .flash CSS in components.css + dismiss handler in motion.js.
+- Browser verification caught an r10 regression: the multi-line {# #} header comment renders literally in public HTML (Django single-line comments only) — collapsed to one line, added test_no_template_comment_leaks_into_html pin; also fixed an OwnerAgenciesView context bug (result dict not passed) and dry-run actually saving (parser ignored dry_run).
+- Tests: 381 green (331 -> 381: demo-switch 11, owner-dashboard 24, branded-admin 7 incl. bootstrap_owner + bulk actions + skin assertions); check + makemigrations --check clean.
+- Shipped: UPDATE_TAG=r11 zip (336 files) + db backup + bundle synced to :3000; committed 35810f5 (+WORK.md fingerprint commit) and pushed both to GitHub (main == 35810f5).
+
+Stage Summary:
+- Owner now has: /dashboard/ (overview, all listings w/ filters, agencies + accounts, demo switch, CSV import) and /admin/ "Studio" fully branded — never the Django skin; agents' dashboard unchanged; public site filters demo content on the owner's one click.
+- Owner login: admin@gabrielhomes.co.ke / GH-7TPn-scN1-3tne-Hu2K (change on first login; OWNER-LOGIN.txt on :3000 page).
+- Demo switch verified live both directions (properties list empties, demo detail 404s when hidden; restores when shown); default state = demo visible.
+- Deliverables on :3000: gabriel-homes-update-r11.zip, OWNER-LOGIN.txt, db backup, bundle. GitHub at 35810f5.
