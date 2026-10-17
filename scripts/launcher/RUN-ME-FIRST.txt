@@ -127,7 +127,7 @@ TROUBLESHOOTING
 
 
 WHAT'S INSIDE (for the curious)
-  manage.py, config/, apps/   the Django project (Django 5.1)
+  manage.py, config/, apps/   the Django project (Django 5.2)
   templates/, static/         the site's pages, styles and scripts
   requirements.txt            pinned Python dependencies
   WORK.md, DESIGN.md          full engineering & design documentation

@@ -60,6 +60,7 @@ rsync -a \
   --exclude 'htmlcov/' \
   --exclude '.coverage' \
   --exclude 'staticfiles/' \
+  --exclude '/wheels/' \
   --exclude '.DS_Store' \
   --exclude 'preview_bridge.log' \
   --exclude 'media/real-listing-src/' \

@@ -23,8 +23,11 @@ DATABASE_URL=
 TRUST_X_REAL_IP=False
 EMAIL_BACKEND=django.core.mail.backends.console.EmailBackend
 
-# In-process asyncio bridge: forwards gateway :3000 -> runserver :3011
-GABRIEL_PREVIEW_BRIDGE=1
+# Live-site TCP bridge on :3000 — DISABLED. :3000 must stay free for
+# scripts/workspace_server.py (the delivery page with the download cards;
+# the documented session topology). With this flag =1 the in-Django bridge
+# steals :3000 at runserver boot and the delivery page can never start.
+GABRIEL_PREVIEW_BRIDGE=0
 ENVEOF
   echo "   .env written"
 else
