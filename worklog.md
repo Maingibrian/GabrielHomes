@@ -816,3 +816,37 @@ Stage Summary:
 - Owner login: admin@gabrielhomes.co.ke / GH-7TPn-scN1-3tne-Hu2K (change on first login; OWNER-LOGIN.txt on :3000 page).
 - Demo switch verified live both directions (properties list empties, demo detail 404s when hidden; restores when shown); default state = demo visible.
 - Deliverables on :3000: gabriel-homes-update-r11.zip, OWNER-LOGIN.txt, db backup, bundle. GitHub at 35810f5.
+
+---
+Task ID: 31
+Agent: main (Z.ai)
+Task: One-try Linux download-and-run package for the owner's Linux machine
+
+Work Log:
+- Diagnosed wipe #8 (venv/db/media/download gone); restored via scripts/bootstrap_env.sh (Django 5.2.18, 80 listings, accounts, real media for #77)
+- pytest gate: 381 passed (r11 added 50 tests)
+- Patched build_package.sh: exclude /wheels/ from the oneclick zip (Windows wheels are useless on Linux; 53M bloat)
+- Fixed stale RUN-ME-FIRST.txt (Django 5.1 -> 5.2)
+- Built download/gabriel-homes-oneclick.zip (45M: code + pre-seeded db + 184 listing images + all launchers)
+- Wrote scripts/test_oneclick_linux.sh: fresh-extract -> bash START-GABRIEL-HOMES.sh -> up in 13s; / /properties/ /agents/ /admin/login/ 200, detail 200, CSS 200, listing image 200
+- Found + fixed delivery outage: bootstrap_env.sh set GABRIEL_PREVIEW_BRIDGE=1 so the in-Django TCP bridge stole :3000 and workspace_server (download cards) never started; set flag=0 in script + live .env, documented in both
+- Rebuilt delivery stack: wheels (30), update zip r11 (336 files), db backup, git bundle; all published to scripts/preview_site/files/ and verified 200 on :3000
+- Committed cefb09f and pushed to GitHub
+
+Stage Summary:
+- User-facing: ONE command boots the whole site on any Linux machine (python3 present): extract zip + bash START-GABRIEL-HOMES.sh; first run needs internet for pip, then offline
+- Delivery page (:3000) restored to documented topology; bridge conflict eliminated at the source (bootstrap_env.sh)
+- oneclick zip proven by automated first-run boot test, not just byte checks
+
+---
+Task ID: 31-b
+Agent: main (Z.ai)
+Task: Delivery page card for the one-click website zip
+
+Work Log:
+- _downloads_html() only globbed update-*/bundle/db-backup; the oneclick zip served 200 but had no card
+- Added a top card 'Download — one-click website (Linux / macOS / Windows)' to scripts/workspace_server.py, restarted :3000, verified card + 200 download
+- Committed + pushed (ed9687e)
+
+Stage Summary:
+- :3000 delivery page now lists all four artifacts incl. the one-click zip

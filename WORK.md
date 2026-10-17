@@ -17,7 +17,7 @@ Full project brief (mission, design law, non-copy rules): `gabriel_homes/BRIEF.m
 7. Never claim something works unless you ran it this session.
 8. Reply to the user in English only. Deliverables go on the :3000 page.
 
-LAST_COMMIT: 35810f5 (2026-10-17 — r11 owner dashboard + demo switch + branded admin; newsletter removed)
+LAST_COMMIT: ed9687e (2026-10-17 — oneclick Linux one-try package: wheels exclude, bridge-off delivery fix, boot test; r11 before it)
 NEXT:
   1) User: apply r11 zip on Windows (extract -> UPDATE-WEBSITE.bat -> START),
      and download the bundle + db backup after every session.
