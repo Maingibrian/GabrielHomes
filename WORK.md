@@ -17,10 +17,16 @@ Full project brief (mission, design law, non-copy rules): `gabriel_homes/BRIEF.m
 7. Never claim something works unless you ran it this session.
 8. Reply to the user in English only. Deliverables go on the :3000 page.
 
-LAST_COMMIT: 18f209a (2026-10-16 — r10 mobile header quick-contact; refresh at each session end)
+LAST_COMMIT: 35810f5 (2026-10-17 — r11 owner dashboard + demo switch + branded admin; newsletter removed)
 NEXT:
-  1) User: apply r7 zip on Windows (extract -> UPDATE-WEBSITE.bat -> START),
+  1) User: apply r11 zip on Windows (extract -> UPDATE-WEBSITE.bat -> START),
      and download the bundle + db backup after every session.
+     r11 highlights: owner account admin@gabrielhomes.co.ke (temp password in
+     OWNER-LOGIN.txt on the :3000 page — change on first login), owner
+     dashboard at /dashboard/ (all-agency listings/inquiries, agency +
+     account management, demo-data switch, CSV import), branded "Studio"
+     admin at /admin/ (no Django skin), footer newsletter removed, and the
+     r10 header-comment leak fixed (re-apply r10→r11 even if r10 applied).
   2) GitHub push LIVE: main -> github.com/Maingibrian/GabrielHomes (private) at 90a3968 (r9),
      forced over the GitHub-Desktop snapshot (994aa75). Future pushes: user edits
      the fine-grained token (same value) to keep Contents R/W active / or makes
@@ -36,7 +42,9 @@ NEXT:
      Bundle stays the offline fallback.
   3) Backlog: password-reset pages still allauth-default styling; real agent
      portraits; demo images on reseeded sandbox DB are generated placeholders
-     (run scripts/assign_demo_images.py to re-attach real photos).
+     (run scripts/assign_demo_images.py to re-attach real photos); listing-card
+     Enquire affordance; journal/blog for SEO; map search; saved-search alerts;
+     bond calculator.
 
 ## HARD FACTS
 - Django 5.2 + allauth 65.x, SQLite (`gabriel_homes/db.sqlite3`, gitignored).
