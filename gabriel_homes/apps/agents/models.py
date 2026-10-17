@@ -10,7 +10,24 @@ from django.conf import settings
 from django.db import models
 from django.utils.text import slugify
 
+from apps.core.models import SiteSetting
 from apps.listings.models import validate_image_file
+
+
+class AgencyProfileQuerySet(models.QuerySet):
+    """Queryset for agencies with the r11 demo-visibility helper."""
+
+    def public(self) -> "AgencyProfileQuerySet":
+        """Agencies visible on the public site (demo-aware).
+
+        Used by the public directory, agency profile pages and the about
+        page. When the owner hides demo data, seeded placeholder agencies
+        vanish from the directory and their profile pages 404.
+        """
+        qs = self
+        if SiteSetting.demo_hidden():
+            qs = qs.exclude(is_demo=True)
+        return qs
 
 
 class AgencyProfile(models.Model):
@@ -46,6 +63,17 @@ class AgencyProfile(models.Model):
     )
 
     is_verified = models.BooleanField(default=False)
+    # r11: stamped True by seed_demo; hidden from the public site while
+    # the owner's demo switch is on "hide demo data". Default False so
+    # agencies added by hand (dashboard / admin / import) are real.
+    is_demo = models.BooleanField(
+        default=False,
+        db_index=True,
+        help_text=(
+            "Seeded placeholder agency. Hidden from the public site while "
+            "the owner's demo switch is off-position (hide demo data)."
+        ),
+    )
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -61,6 +89,8 @@ class AgencyProfile(models.Model):
 
     def __str__(self) -> str:
         return self.name
+
+    objects = AgencyProfileQuerySet.as_manager()
 
     def save(self, *args, **kwargs):
         if not self.slug:

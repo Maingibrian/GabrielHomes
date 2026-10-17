@@ -462,6 +462,9 @@ class Command(BaseCommand):
                     "website": f"https://{slugify(name).replace('-', '')}.co.ke",
                     "office_location": office,
                     "is_verified": True,
+                    # r11: everything seed_demo creates is placeholder data,
+                    # hideable site-wide via the owner dashboard's demo switch.
+                    "is_demo": True,
                     "bio": AGENCY_BIOS.get(
                         slugify(name),
                         f"{name} — a Gabriel Homes partner agency.",
@@ -557,6 +560,8 @@ class Command(BaseCommand):
                 location=loc,
                 lat=loc.lat,
                 lng=loc.lng,
+                # r11: seeded placeholder content — hideable via the demo switch.
+                is_demo=True,
                 price=price,
                 price_period=price_period,
                 price_negotiable=random.random() < 0.3,

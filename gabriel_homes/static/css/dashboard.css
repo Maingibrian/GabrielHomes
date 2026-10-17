@@ -445,3 +445,82 @@
   font-size: var(--text-sm);
   margin-bottom: 1.5rem;
 }
+
+
+/* ---------- r11: owner dashboard ---------- */
+.demo-switch-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  background: var(--espresso);
+  color: var(--cream);
+  border-radius: var(--radius-md);
+  padding: 1.25rem 1.5rem;
+  margin-bottom: 1.5rem;
+}
+.demo-switch-card__title {
+  font-family: var(--font-display);
+  font-size: var(--text-xl);
+  margin: 0 0 0.25rem;
+}
+.demo-switch-card__body {
+  margin: 0;
+  font-size: var(--text-sm);
+  color: var(--sand);
+  max-width: 52ch;
+}
+.demo-switch-card .btn { flex-shrink: 0; }
+.demo-state {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  letter-spacing: var(--track-tight);
+  text-transform: uppercase;
+  padding: 0.3rem 0.7rem;
+  border-radius: var(--radius-pill);
+  margin-top: 0.6rem;
+}
+.demo-state--hidden { background: color-mix(in srgb, var(--burnt) 25%, transparent); color: var(--cream); }
+.demo-state--visible { background: color-mix(in srgb, var(--cream) 15%, transparent); color: var(--cream); }
+
+.dash-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  align-items: flex-end;
+  margin-bottom: 1.5rem;
+  background: var(--white);
+  border: 1px solid var(--sand-60);
+  border-radius: var(--radius-md);
+  padding: 1rem;
+}
+.dash-filters .dashboard-form__field { flex: 0 1 170px; margin: 0; }
+.dash-filters .dashboard-form__field--grow { flex: 1 1 220px; }
+.dash-filters__actions { display: flex; gap: 0.5rem; }
+
+.owner-cell-actions { display: flex; gap: 0.35rem; flex-wrap: wrap; }
+.owner-table-note {
+  font-size: var(--text-xs);
+  color: var(--taupe);
+  margin-top: 0.85rem;
+}
+.import-columns { width: 100%; border-collapse: collapse; font-size: var(--text-sm); margin-bottom: 1.5rem; }
+.import-columns th, .import-columns td { text-align: left; padding: 0.45rem 0.75rem; border-bottom: 1px solid var(--sand-60); }
+.import-columns th { font-size: var(--text-xs); text-transform: uppercase; letter-spacing: var(--track-tight); color: var(--taupe); }
+.import-columns code {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  background: color-mix(in srgb, var(--sand) 25%, transparent);
+  padding: 0.1rem 0.4rem;
+  border-radius: var(--radius-sm);
+}
+.import-result { margin-bottom: 1.5rem; }
+.import-result__summary {
+  font-weight: 500;
+  margin-bottom: 0.35rem;
+}
+.import-result__error { color: var(--burnt); font-size: var(--text-sm); margin: 0.2rem 0; }

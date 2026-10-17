@@ -1,10 +1,11 @@
 """Admin for the locations app."""
-from django.contrib import admin
+from django.contrib import admin  # noqa: F401 — decorators (admin.action/admin.display)
+from apps.core.admin_site import gabriel_admin
 
 from .models import Location
 
 
-@admin.register(Location)
+@admin.register(Location, site=gabriel_admin)
 class LocationAdmin(admin.ModelAdmin):
     list_display = ("name", "level", "parent", "full_path_display", "lat", "lng")
     list_filter = ("level",)

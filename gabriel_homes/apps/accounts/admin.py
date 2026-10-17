@@ -1,11 +1,12 @@
 """Admin for the accounts app."""
-from django.contrib import admin
+from django.contrib import admin  # noqa: F401 — decorators (admin.action/admin.display)
+from apps.core.admin_site import gabriel_admin
 from django.contrib.auth.admin import UserAdmin as DjangoUserAdmin
 
 from .models import SavedProperty, SavedSearch, User
 
 
-@admin.register(User)
+@admin.register(User, site=gabriel_admin)
 class UserAdmin(DjangoUserAdmin):
     """Email-based user admin — adapted from Django's default UserAdmin."""
 
@@ -33,7 +34,7 @@ class UserAdmin(DjangoUserAdmin):
     readonly_fields = ("date_joined", "last_login")
 
 
-@admin.register(SavedProperty)
+@admin.register(SavedProperty, site=gabriel_admin)
 class SavedPropertyAdmin(admin.ModelAdmin):
     list_display = ("user", "property", "created_at")
     list_filter = ("created_at",)
@@ -43,7 +44,7 @@ class SavedPropertyAdmin(admin.ModelAdmin):
     readonly_fields = ("created_at",)
 
 
-@admin.register(SavedSearch)
+@admin.register(SavedSearch, site=gabriel_admin)
 class SavedSearchAdmin(admin.ModelAdmin):
     list_display = ("name", "user", "created_at")
     list_filter = ("created_at",)

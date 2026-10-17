@@ -8,8 +8,21 @@ from django.db.models import Count, Q
 from django.shortcuts import render
 
 from apps.agents.models import AgencyProfile
+from apps.core.models import SiteSetting
 from apps.listings.models import Property, PropertyType
 from apps.locations.models import Location
+
+
+def published_property_q() -> Q:
+    """Q-filter matching Property.objects.published() for use in annotations.
+
+    published() can't be used inside Count(filter=...) directly, so this
+    mirrors it — including the r11 demo switch — for aggregate queries.
+    """
+    q = Q(properties__status=Property.Status.PUBLISHED)
+    if SiteSetting.demo_hidden():
+        q &= Q(properties__is_demo=False)
+    return q
 
 
 def home(request):
@@ -141,7 +154,7 @@ def styleguide(request):
 def _static_ctx(**extra):
     """Shared context for the static pages (agency count, listing count)."""
     ctx = {
-        "agency_count": AgencyProfile.objects.count(),
+        "agency_count": AgencyProfile.objects.public().count(),
         "listing_count": Property.objects.published().count(),
     }
     ctx.update(extra)
@@ -156,11 +169,12 @@ def about(request):
     annotated in SQL rather than per-card queries.
     """
     agencies = list(
-        AgencyProfile.objects.select_related("user", "office_location")
+        AgencyProfile.objects.public()
+        .select_related("user", "office_location")
         .annotate(
             active_listings=Count(
                 "properties",
-                filter=Q(properties__status=Property.Status.PUBLISHED),
+                filter=published_property_q(),
             )
         )
         .order_by("name")[:8]

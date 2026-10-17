@@ -1,0 +1,140 @@
+{% extends "base.html" %}
+{% load core_tags static %}
+
+{% block title %}All listings — Owner dashboard{% endblock %}
+{% block meta_description %}Every listing across every agency.{% endblock %}
+{% block body_class %}page-dashboard{% endblock %}
+
+{% block styles %}
+  <link rel="stylesheet" href="{% staticv 'css/dashboard.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<div class="dashboard-layout">
+
+  {# Sidebar (owner) #}
+  <aside class="dashboard-sidebar">
+    <div class="dashboard-sidebar__brand">Gabriel Homes</div>
+    <nav class="dashboard-sidebar__nav" aria-label="Dashboard">
+      <a class="dashboard-sidebar__link" href="{% url 'agents:dashboard_home' %}">Overview</a>
+      <a class="dashboard-sidebar__link is-active" href="{% url 'agents:owner_listings' %}">All listings</a>
+      <a class="dashboard-sidebar__link" href="{% url 'agents:dashboard_inquiries' %}">Inquiries</a>
+      <a class="dashboard-sidebar__link" href="{% url 'agents:owner_agencies' %}">Agencies</a>
+      <a class="dashboard-sidebar__link" href="{% url 'agents:owner_import' %}">Import listings</a>
+      <a class="dashboard-sidebar__link" href="/admin/">Advanced</a>
+      <a class="dashboard-sidebar__link" href="/">View site</a>
+    </nav>
+  </aside>
+
+  <main class="dashboard-main">
+    <div class="dashboard-header">
+      <div>
+        <h1 class="dashboard-header__title">All listings</h1>
+        <p class="dashboard-header__subtitle">[ EVERY AGENCY ]</p>
+      </div>
+      <a class="btn btn--primary btn--sm" href="{% url 'agents:dashboard_listing_create' %}">New listing</a>
+    </div>
+
+    {# Filters #}
+    <form class="dash-filters" method="get">
+      <div class="dashboard-form__field dashboard-form__field--grow">
+        <label class="dashboard-form__label" for="f-q">Search</label>
+        <input class="dashboard-form__input" type="search" id="f-q" name="q" value="{{ current.q }}" placeholder="Title or slug">
+      </div>
+      <div class="dashboard-form__field">
+        <label class="dashboard-form__label" for="f-agency">Agency</label>
+        <select class="dashboard-form__select" id="f-agency" name="agency">
+          <option value="">All agencies</option>
+          {% for agency in agencies %}
+          <option value="{{ agency.pk }}" {% if current.agency == agency.pk|stringformat:"s" %}selected{% endif %}>{{ agency.name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="dashboard-form__field">
+        <label class="dashboard-form__label" for="f-status">Status</label>
+        <select class="dashboard-form__select" id="f-status" name="status">
+          <option value="">Any status</option>
+          {% for value, label in statuses %}
+          <option value="{{ value }}" {% if current.status == value %}selected{% endif %}>{{ label }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="dashboard-form__field">
+        <label class="dashboard-form__label" for="f-demo">Data</label>
+        <select class="dashboard-form__select" id="f-demo" name="demo">
+          <option value="">All</option>
+          <option value="real" {% if current.demo == 'real' %}selected{% endif %}>Real only</option>
+          <option value="demo" {% if current.demo == 'demo' %}selected{% endif %}>Demo only</option>
+        </select>
+      </div>
+      <div class="dash-filters__actions">
+        <button class="btn btn--primary btn--sm" type="submit">Filter</button>
+        <a class="btn btn--outline btn--sm" href="{% url 'agents:owner_listings' %}">Reset</a>
+      </div>
+    </form>
+
+    {% if listings %}
+    <table class="listing-table">
+      <thead>
+        <tr>
+          <th>Title</th>
+          <th>Agency</th>
+          <th>Type</th>
+          <th>Status</th>
+          <th>Data</th>
+          <th>Price</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for property in listings %}
+        <tr>
+          <td class="listing-table__title">
+            <a href="{% url 'agents:dashboard_listing_edit' property.pk %}">{{ property.title|truncatechars:42 }}</a>
+          </td>
+          <td>{{ property.agent.name }}</td>
+          <td>{{ property.property_type.name }}</td>
+          <td>
+            <span class="status-badge status-badge--{{ property.status }}">{{ property.get_status_display }}</span>
+          </td>
+          <td>
+            {% if property.is_demo %}
+            <span class="status-badge status-badge--demo">Demo</span>
+            {% else %}
+            <span class="status-badge status-badge--real">Real</span>
+            {% endif %}
+          </td>
+          <td>{{ property.price|floatformat:0 }} KES</td>
+          <td>
+            <div class="listing-table__actions">
+              <a class="listing-table__action" href="{% url 'agents:dashboard_listing_edit' property.pk %}">Edit</a>
+              <a class="listing-table__action" href="{% url 'agents:dashboard_listing_images' property.pk %}">Images</a>
+              {% if property.status == 'published' %}
+              <a class="listing-table__action" href="{{ property.get_absolute_url }}" target="_blank" rel="noopener">View</a>
+              {% endif %}
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    {% if is_paginated %}
+    <div class="owner-table-note">
+      Page {{ page_obj.number }} of {{ paginator.num_pages }} &middot; {{ paginator.count }} listing{{ paginator.count|pluralize }}
+      {% if page_obj.has_next %}&middot; <a href="?{% if current.q %}q={{ current.q|urlencode }}&amp;{% endif %}agency={{ current.agency }}&amp;status={{ current.status }}&amp;demo={{ current.demo }}&amp;page={{ page_obj.next_page_number }}">Next &rarr;</a>{% endif %}
+    </div>
+    {% endif %}
+    {% else %}
+    <div class="dashboard-empty">
+      <p class="dashboard-empty__title">No listings match.</p>
+      <p class="dashboard-empty__body">Adjust the filters, or import real inventory.</p>
+      <a class="btn btn--primary" href="{% url 'agents:owner_import' %}">Import listings</a>
+    </div>
+    {% endif %}
+  </main>
+
+</div>
+
+{% endblock %}

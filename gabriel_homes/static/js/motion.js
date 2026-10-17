@@ -321,3 +321,11 @@
     init();
   }
 })();
+
+// r11: flash-message dismiss (event delegation, works for dynamically added flashes)
+document.addEventListener("click", function (e) {
+  var btn = e.target.closest("[data-flash-close]");
+  if (!btn) return;
+  var flash = btn.closest(".flash");
+  if (flash) flash.remove();
+});

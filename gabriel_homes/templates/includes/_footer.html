@@ -6,14 +6,6 @@
       <div>
         <p class="section-tag section-tag--light">[ FOOTER ]</p>
         <p class="site-footer__lead">Redefining how you find your next home.</p>
-
-        <span class="site-footer__newsletter-label">Stay in the know.</span>
-        <form class="newsletter" action="/" method="post" novalidate>
-          {% csrf_token %}
-          <input class="newsletter__input" type="email" name="email"
-                 placeholder="Your email" aria-label="Your email" required>
-          <button class="newsletter__btn" type="submit">Subscribe</button>
-        </form>
       </div>
 
       <nav class="footer-cols" aria-label="Footer">

@@ -1,10 +1,11 @@
 """Admin for the inquiries app."""
-from django.contrib import admin
+from django.contrib import admin  # noqa: F401 — decorators (admin.action/admin.display)
+from apps.core.admin_site import gabriel_admin
 
 from .models import Inquiry
 
 
-@admin.register(Inquiry)
+@admin.register(Inquiry, site=gabriel_admin)
 class InquiryAdmin(admin.ModelAdmin):
     list_display = (
         "name", "email", "phone", "property_ref",

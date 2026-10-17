@@ -17,6 +17,8 @@ from django.db.models import Q, UniqueConstraint
 from django.utils.text import slugify
 from django.utils.timezone import now
 
+from apps.core.models import SiteSetting
+
 
 # ---------------------------------------------------------------------------
 # Upload validators
@@ -136,11 +138,23 @@ class PropertyQuerySet(models.QuerySet):
     """Only `published` listings are shown on the public site."""
 
     def published(self) -> "PropertyQuerySet":
-        return self.filter(
+        """The single public-visibility chokepoint (WORK.md §6 + r11).
+
+        Status gate first, then the owner's demo switch: when
+        SiteSetting.hide_demo_data is on, everything stamped is_demo
+        (seeded placeholder content) disappears from the public site —
+        lists, detail pages (404), sitemaps and public counts all read
+        through this method. Dashboards never use .published() and keep
+        seeing everything.
+        """
+        qs = self.filter(
             status=Property.Status.PUBLISHED,
             published_at__isnull=False,
             published_at__lte=now(),
         )
+        if SiteSetting.demo_hidden():
+            qs = qs.exclude(is_demo=True)
+        return qs
 
     def for_sale(self) -> "PropertyQuerySet":
         return self.filter(listing_type=Property.ListingType.SALE)
@@ -262,6 +276,21 @@ class Property(models.Model):
 
     is_featured = models.BooleanField(default=False)
     is_verified = models.BooleanField(default=False)
+    # r11: seed_demo stamps everything it creates with is_demo=True; the
+    # owner can hide demo content site-wide (SiteSetting.hide_demo_data)
+    # or flip items to real via the dashboard / admin bulk actions. The
+    # model default is False so anything typed in by hand (dashboard,
+    # admin, CSV import) is treated as real from the start. The initial
+    # migration backfills existing rows to True — every pre-r11 row is
+    # seeded demo content.
+    is_demo = models.BooleanField(
+        default=False,
+        db_index=True,
+        help_text=(
+            "Seeded placeholder content. Hidden from the public site while "
+            "the owner's demo switch is off-position (hide demo data)."
+        ),
+    )
     views_count = models.PositiveIntegerField(default=0)
 
     created_at = models.DateTimeField(auto_now_add=True)

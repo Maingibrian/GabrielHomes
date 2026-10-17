@@ -47,6 +47,17 @@
   {% endblock %}
 
   <main id="main">
+    {# Django messages — action feedback (dashboard toggles, forms, import) #}
+    {% if messages %}
+    <div class="flash-stack" role="status">
+      {% for message in messages %}
+      <div class="flash flash--{{ message.level_tag }}">
+        <p class="flash__text">{{ message }}</p>
+        <button class="flash__close" type="button" aria-label="Dismiss" data-flash-close>&times;</button>
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
     {% block content %}{% endblock %}
   </main>
 

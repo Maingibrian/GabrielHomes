@@ -104,13 +104,13 @@ def test_home_page_has_three_header_states():
     assert 'data-mobile-menu-close' in body
 
 
-def test_home_page_has_footer_with_newsletter_and_wordmark():
+def test_home_page_has_footer_with_wordmark():
     c = Client()
     r = c.get("/")
     body = r.content.decode()
-    # Newsletter form
-    assert "newsletter" in body
-    assert "Subscribe" in body
+    # Newsletter removed (owner request) — must not come back by accident.
+    assert "newsletter" not in body
+    assert "Subscribe" not in body
     # Giant "Homes" wordmark
     assert "wordmark" in body
     # Footer location string — case matches template
@@ -125,6 +125,18 @@ def test_home_page_has_design_language_markers():
     bracket_tags = ["[ HOMES ]", "[ STORY ]", "[ NUMBERS ]", "[ PHILOSOPHY ]", "[ FOOTER ]"]
     for tag in bracket_tags:
         assert tag in body, f"Missing bracket tag {tag!r}"
+
+
+def test_no_template_comment_leaks_into_html():
+    """{# ... #} is single-line only — a multi-line comment renders literally.
+
+    Guards the r10 header-comment leak caught during r11 browser checks.
+    """
+    c = Client()
+    r = c.get("/")
+    body = r.content.decode()
+    assert "{#" not in body
+    assert "#}" not in body
 
 
 def test_home_page_loads_geist_fonts():
@@ -171,7 +183,6 @@ def test_styleguide_shows_every_component():
         "agent-card",
         "listing-card",
         "search-bar",
-        "newsletter",
         "footer-cols",
         "wordmark",
         "mobile-menu",

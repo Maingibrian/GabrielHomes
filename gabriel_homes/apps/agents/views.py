@@ -14,6 +14,7 @@ Per WORK.md §11 Phase 5 (dashboard):
 """
 from __future__ import annotations
 
+from django import forms
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.db.models import Q
@@ -45,7 +46,7 @@ class AgentDirectoryView(ListView):
     paginate_by = 12
 
     def get_queryset(self):
-        qs = AgencyProfile.objects.select_related("user", "office_location")
+        qs = AgencyProfile.objects.public().select_related("user", "office_location")
         q = self.request.GET.get("q", "").strip()
         if q:
             qs = qs.filter(
@@ -89,7 +90,7 @@ class AgentProfileView(DetailView):
     slug_field = "slug"
 
     def get_queryset(self):
-        return AgencyProfile.objects.select_related("user", "office_location")
+        return AgencyProfile.objects.public().select_related("user", "office_location")
 
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
@@ -128,15 +129,19 @@ class AgentProfileView(DetailView):
 class AgentRequiredMixin(LoginRequiredMixin, UserPassesTestMixin):
     """Only allow users with is_agent=True AND an AgencyProfile.
 
-    Redirects unauthenticated users to login; 403s authenticated non-agents.
+    Superusers (the site owner) also pass — the owner dashboard reuses
+    the listing create/edit/image views. Redirects unauthenticated users
+    to login; 403s authenticated non-agents.
     """
 
     def test_func(self) -> bool:
         user = self.request.user
         return bool(
             user.is_authenticated
-            and user.is_agent
-            and hasattr(user, "agency_profile")
+            and (
+                user.is_superuser
+                or (user.is_agent and hasattr(user, "agency_profile"))
+            )
         )
 
     def handle_no_permission(self):
@@ -151,7 +156,18 @@ class AgentRequiredMixin(LoginRequiredMixin, UserPassesTestMixin):
 # Dashboard index — listing table
 # ---------------------------------------------------------------------------
 class DashboardHome(AgentRequiredMixin, TemplateView):
-    """Dashboard index — the agent's listings table."""
+    """Dashboard index — role-aware (r11).
+
+    Superuser (site owner) -> cross-agency owner overview. Agent -> the
+    agent's own listings table, unchanged.
+    """
+
+    def dispatch(self, request, *args, **kwargs):
+        if request.user.is_authenticated and request.user.is_superuser:
+            from .owner_views import OwnerDashboardHomeView
+            return OwnerDashboardHomeView.as_view()(request, *args, **kwargs)
+        return super().dispatch(request, *args, **kwargs)
+
     template_name = "agents/dashboard_home.html"
 
     def get_context_data(self, **kwargs):
@@ -187,13 +203,30 @@ class PropertyFormMixin:
 
 
 class DashboardListingCreate(AgentRequiredMixin, PropertyFormMixin, CreateView):
-    """Create a new listing owned by the current agent."""
+    """Create a new listing owned by the current agent.
+
+    The owner (superuser) picks the owning agency from an extra field.
+    Owner-created listings are real content by default (is_demo=False).
+    """
     model = Property
     success_url = reverse_lazy("agents:dashboard_home")
 
+    def get_form(self, form_class=None):
+        form = super().get_form(form_class)
+        if self.request.user.is_superuser:
+            form.fields["agent"] = forms.ModelChoiceField(
+                queryset=AgencyProfile.objects.order_by("name"),
+                label="Agency",
+                help_text="The agency this listing belongs to.",
+            )
+        return form
+
     def form_valid(self, form):
         # Stamp the agent + auto-slug + published_at (model.save handles the rest).
-        form.instance.agent = self.request.user.agency_profile
+        if self.request.user.is_superuser:
+            form.instance.agent = form.cleaned_data["agent"]
+        else:
+            form.instance.agent = self.request.user.agency_profile
         response = super().form_valid(form)
         messages.success(self.request, f"Listing '{self.object.title}' created.")
         return response
@@ -214,7 +247,9 @@ class DashboardListingEdit(AgentRequiredMixin, PropertyFormMixin, UpdateView):
     success_url = reverse_lazy("agents:dashboard_home")
 
     def get_queryset(self):
-        """Agents can only edit their own listings."""
+        """Agents can only edit their own listings; the owner edits any."""
+        if self.request.user.is_superuser:
+            return Property.objects.all()
         return Property.objects.filter(agent=self.request.user.agency_profile)
 
     def form_valid(self, form):
@@ -252,6 +287,9 @@ class DashboardListingImages(AgentRequiredMixin, UpdateView):
     success_url = reverse_lazy("agents:dashboard_home")
 
     def get_queryset(self):
+        """Agents manage their own listing's images; the owner manages any."""
+        if self.request.user.is_superuser:
+            return Property.objects.all()
         return Property.objects.filter(agent=self.request.user.agency_profile)
 
     def get_formset(self, **kwargs):
@@ -293,18 +331,23 @@ class DashboardListingImages(AgentRequiredMixin, UpdateView):
 
 
 # ---------------------------------------------------------------------------
-# Inquiries inbox
+# Inquiries inbox — role-aware (r11): owner sees every agency's
 # ---------------------------------------------------------------------------
 class DashboardInquiries(AgentRequiredMixin, ListView):
-    """Inquiries for the agent's listings."""
+    """Inquiries for the agent's listings — or all of them for the owner."""
     template_name = "agents/dashboard_inquiries.html"
     context_object_name = "inquiries"
     paginate_by = 20
 
     def get_queryset(self):
-        agency = self.request.user.agency_profile
+        user = self.request.user
+        qs = Inquiry.objects.select_related(
+            "property_ref", "property_ref__property_type",
+        )
+        if user.is_superuser:
+            return qs.select_related("property_ref__agent").order_by("-created_at")
+        agency = user.agency_profile
         return (
-            Inquiry.objects.filter(property_ref__agent=agency)
-            .select_related("property_ref", "property_ref__property_type")
+            qs.filter(property_ref__agent=agency)
             .order_by("-created_at")
         )

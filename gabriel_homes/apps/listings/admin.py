@@ -1,5 +1,6 @@
 """Admin for the listings app."""
-from django.contrib import admin
+from django.contrib import admin  # noqa: F401 — decorators (admin.action/admin.display)
+from apps.core.admin_site import gabriel_admin
 
 from .models import Amenity, Property, PropertyImage, PropertyType
 
@@ -12,7 +13,7 @@ class PropertyImageInline(admin.TabularInline):
     ordering = ("position",)
 
 
-@admin.register(PropertyType)
+@admin.register(PropertyType, site=gabriel_admin)
 class PropertyTypeAdmin(admin.ModelAdmin):
     list_display = ("name", "slug_plural", "slug_single", "is_residential", "is_commercial", "is_land", "position")
     list_filter = ("is_residential", "is_commercial", "is_land")
@@ -20,7 +21,7 @@ class PropertyTypeAdmin(admin.ModelAdmin):
     ordering = ("position", "name")
 
 
-@admin.register(Amenity)
+@admin.register(Amenity, site=gabriel_admin)
 class AmenityAdmin(admin.ModelAdmin):
     list_display = ("name", "category", "icon", "slug")
     list_filter = ("category",)
@@ -29,14 +30,15 @@ class AmenityAdmin(admin.ModelAdmin):
     ordering = ("category", "name")
 
 
-@admin.register(Property)
+@admin.register(Property, site=gabriel_admin)
 class PropertyAdmin(admin.ModelAdmin):
     list_display = (
         "title", "listing_type", "property_type", "location",
-        "price", "status", "is_featured", "is_verified", "agent", "published_at",
+        "price", "status", "is_featured", "is_verified", "is_demo",
+        "agent", "published_at",
     )
     list_filter = (
-        "listing_type", "status", "is_featured", "is_verified",
+        "listing_type", "status", "is_featured", "is_verified", "is_demo",
         "property_type", "furnishing",
     )
     list_select_related = ("property_type", "location", "agent", "agent__user")
@@ -63,7 +65,7 @@ class PropertyAdmin(admin.ModelAdmin):
         }),
     )
 
-    actions = ["mark_published", "mark_archived"]
+    actions = ["mark_published", "mark_archived", "mark_demo", "mark_real"]
 
     @admin.action(description="Publish selected listings")
     def mark_published(self, request, queryset):
@@ -78,8 +80,24 @@ class PropertyAdmin(admin.ModelAdmin):
         updated = queryset.update(status="archived")
         self.message_user(request, f"Archived {updated} listing(s).")
 
+    @admin.action(description="Mark selected listings as demo data")
+    def mark_demo(self, request, queryset):
+        updated = queryset.filter(is_demo=False).update(is_demo=True)
+        self.message_user(
+            request,
+            f"Marked {updated} listing(s) as demo (hideable via the demo switch).",
+        )
 
-@admin.register(PropertyImage)
+    @admin.action(description="Mark selected listings as real data")
+    def mark_real(self, request, queryset):
+        updated = queryset.filter(is_demo=True).update(is_demo=False)
+        self.message_user(
+            request,
+            f"Marked {updated} listing(s) as real (always visible when published).",
+        )
+
+
+@admin.register(PropertyImage, site=gabriel_admin)
 class PropertyImageAdmin(admin.ModelAdmin):
     list_display = ("__str__", "property", "position", "is_cover", "caption")
     list_filter = ("is_cover",)

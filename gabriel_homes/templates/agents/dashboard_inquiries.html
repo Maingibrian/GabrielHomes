@@ -23,7 +23,7 @@
     <div class="dashboard-header">
       <div>
         <h1 class="dashboard-header__title">Inquiries</h1>
-        <p class="dashboard-header__subtitle">[ {{ request.user.agency_profile.name|upper }} ]</p>
+        <p class="dashboard-header__subtitle">{% if request.user.is_superuser %}[ ALL AGENCIES ]{% else %}[ {{ request.user.agency_profile.name|upper }} ]{% endif %}</p>
       </div>
     </div>
 
@@ -32,6 +32,7 @@
       <thead>
         <tr>
           <th>From</th>
+          {% if request.user.is_superuser %}<th>Agency</th>{% endif %}
           <th>Property</th>
           <th>Message</th>
           <th>Status</th>
@@ -47,6 +48,9 @@
             <a href="mailto:{{ inq.email }}" style="color: var(--burnt); font-size: var(--text-xs);">{{ inq.email }}</a>
             {% if inq.phone %}<br><span style="font-size: var(--text-xs); color: var(--taupe);">{{ inq.phone }}</span>{% endif %}
           </td>
+          {% if request.user.is_superuser %}
+          <td style="font-size: var(--text-xs); color: var(--taupe);">{{ inq.property_ref.agent.name }}</td>
+          {% endif %}
           <td>
             <a href="{{ inq.property_ref.get_absolute_url }}" style="color: var(--ink);">{{ inq.property_ref.title }}</a>
           </td>

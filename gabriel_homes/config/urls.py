@@ -1,13 +1,13 @@
 """Root URL configuration for Gabriel Homes."""
 from django.conf import settings
 from django.conf.urls.static import static
-from django.contrib import admin
 from django.contrib.sitemaps.views import sitemap as sitemap_view
 from django.urls import include, path
 from django.views.decorators.http import require_GET
 from django.views.generic import RedirectView
 
 from apps.core import views as core_views
+from apps.core.admin_site import gabriel_admin
 from apps.core.sitemaps import FlatSitemap, StaticSitemap
 from apps.listings.sitemaps import ListingSitemap, LocationTypeSitemap
 
@@ -42,7 +42,7 @@ def robots_txt(request):
 
 
 urlpatterns = [
-    path("admin/", admin.site.urls),
+    path("admin/", gabriel_admin.urls),
     path("", core_views.home, name="home"),
     path("styleguide/", core_views.styleguide, name="styleguide"),
     # Static pages (per WORK.md §7: /about/ /contact/ /privacy/ /terms/)
