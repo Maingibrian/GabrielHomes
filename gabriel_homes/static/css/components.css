@@ -1238,6 +1238,36 @@ html.motion-ready .bento-grid .bento-card[data-reveal]:nth-child(3n) { transitio
   .bento-card--spotlight .bento-card__body { padding: 1.25rem 1.4rem 1.35rem; }
 }
 
+/* ---- Framer-reference shape-shift (r13) ------------------------------
+   The hovered card swaps its grid geometry (span 1 -> span 2 columns)
+   and grid-auto-flow re-packs the siblings — the Framer "Spotlight
+   Bento Grid" behaviour. static/js/bento-shapeshift.js drives it:
+   it flips the class, measures boxes, and spring-animates every
+   card to its new slot (FLIP, like framer-motion's layout animation).
+
+   GATED: the span rule exists ONLY under html.bento-live-ready, which
+   the script sets after checking (min-width:1021px) + (hover:hover +
+   pointer:fine) + !prefers-reduced-motion. No JS -> nothing changes;
+   reduced-motion -> nothing animates. The spotlight card (3x2, already
+   max) never grows and keeps its de-zoom hover. */
+@media (min-width: 1021px) and (hover: hover) and (pointer: fine) {
+  html.bento-live-ready .bento-grid { position: relative; }
+  html.bento-live-ready .bento-grid .bento-card {
+    will-change: transform;
+    /* FLIP math in bento-shapeshift.js uses top-left boxes; the origin
+       must match or the first animation frame lands offset. */
+    transform-origin: top left;
+  }
+  html.bento-live-ready .bento-grid .bento-card.is-grown {
+    grid-column: span 2;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    html.bento-live-ready .bento-grid .bento-card.is-grown {
+      grid-column: span 1;
+    }
+  }
+}
+
 
 /* ============================================================
    Monogram avatar — agency initials over the brand gradient,
