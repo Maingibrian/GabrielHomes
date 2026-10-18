@@ -916,3 +916,21 @@ Work Log:
 Stage Summary:
 - The home-page bento now shape-shifts exactly like the Framer reference: hover any small tile and it morphs wider while siblings spring-repack; keyboard focus does the same; spotlight keeps its de-zoom hover; everything degrades to the pre-r13 mosaic without JS or under reduced-motion
 - r13 live on :3011, artifacts on :3000, GitHub main at 3453198
+
+---
+Task ID: 34
+Agent: main (Z.ai)
+Task: r14 — owner supplied their own corrected shape-shift implementation ("it works well") and asked for it to be engraved back into the site and shipped as a download
+
+Work Log:
+- Extracted the owner's standalone HTML (upload/Pasted Content_1792328241771.txt): full CSS for .bento-grid--shift + the complete js/bento-shift.js (the paste was truncated mid-base64; read the upload for the script section)
+- Integrated VERBATIM: js/bento-shift.js -> static/js/bento-shift.js (node --check OK); the "3c. Homes bento — shape shift (home page only)" CSS block -> home.css; .bento-grid--shift class -> home.html grid; base.html include swapped to bento-shift.js
+- Removed the superseded r13 pieces: bento-shapeshift.js deleted, .is-grown/bento-live-ready CSS block removed from components.css; components.css de-zoom comment updated to the corrected "shared base stays photo-only; home adds the shift" relationship
+- Why the owner's version is correct (documented in its header): the promoted card is placed on the hovered card's OWN row so its new box contains the old one — reflow can never slide a different card under a still cursor; hit-testing uses layout boxes (offset*), not elementFromPoint; intent/cooldown/leave delays; clip-path FLIP (grow reveals, no stretching); spotlight demotes to 1x1 while another card is promoted; desat->colour keyed to .is-spot gated on .is-live
+- Old r13 verify scripts deleted; new scripts/verify_bento_shift.py with CDP media emulation: 16/16 PASS — is-live, rest desaturation, promotion of the hovered card (full width 1203px, 2 rows, --spot-row=3, radius 32px, saturate(1)), spotlight demotion, single-spot stability, clip-path/transform mid-flight, reset on leave, keyboard promotion, /agents/ untouched, 0 JS errors; screenshots download/r14-*.png
+- pytest 381 green; committed b8f5adf; pushed to GitHub
+- Artifacts rebuilt + synced to :3000: gabriel-homes-update-r14.zip (389 files), oneclick refreshed; WORK.md fingerprint -> b8f5adf
+
+Stage Summary:
+- The owner's corrected shape-shift is now the live behaviour on the home page bento; r13's engine fully retired; everything downloads from :3000
+- GitHub main at b8f5adf
