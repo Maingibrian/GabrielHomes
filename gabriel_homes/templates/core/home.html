@@ -115,7 +115,7 @@
       </a>
     </div>
 
-    <div class="bento-grid">
+    <div class="bento-grid bento-grid--shift">
       {% for property in showcase_listings %}
         <a class="bento-card bento-card--home{% if forloop.first %} bento-card--spotlight{% endif %}"
            href="{{ property.get_absolute_url }}" data-reveal>

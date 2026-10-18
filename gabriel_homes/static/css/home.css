@@ -512,3 +512,79 @@
   content: "\00b7\00a0\00a0"; /* middot separator inside the meta line */
   color: var(--sand);
 }
+/* ============================================================
+   3c. Homes bento — "shape shift" (home page only)
+   Port of the Framer "Spotlight Bento Grid" card states. The grid
+   opts in with .bento-grid--shift; js/bento-shift.js adds .is-live,
+   .has-spot and .is-spot, sets --spot-row, and runs the FLIP move.
+   Layout only applies at 1021px+ (the 2- and 1-column grids keep
+   their normal tiles).
+   ============================================================ */
+.bento-grid--shift { position: relative; }   /* js measures offsets against it */
+
+@media (min-width: 1021px) {
+  .bento-grid--shift .bento-card {
+    grid-column: span 1;
+    grid-row: span 1;
+    border-radius: 16px;
+    transition: border-radius 0.5s cubic-bezier(0.34, 1.2, 0.5, 1);
+  }
+  /* Resting spotlight: the first card. */
+  .bento-grid--shift .bento-card--spotlight {
+    grid-column: span 3;
+    grid-row: span 2;
+  }
+  /* While another card is promoted, the resting spotlight is a tile again. */
+  .bento-grid--shift.has-spot .bento-card--spotlight:not(.is-spot) {
+    grid-column: span 1;
+    grid-row: span 1;
+  }
+  /* The promoted card: full width, two rows, starting on the row the JS
+     picked (--spot-row, 1-based) so it grows AROUND the pointer instead of
+     jumping away from it. It also takes the squircle corner (Framer
+     cornerShape). */
+  .bento-grid--shift .bento-card.is-spot {
+    grid-column: 1 / -1;
+    grid-row: var(--spot-row, 1) / span 2;
+    z-index: 2;
+    border-radius: 32px;
+  }
+  @supports (corner-shape: superellipse(1.6)) {
+    .bento-grid--shift .bento-card.is-spot {
+      corner-shape: superellipse(1.6);
+    }
+  }
+}
+
+/* Reveal transition restated for the shift cards so the corner radius
+   animates too. Matches components.css's reveal timing. */
+html.motion-ready .bento-grid--shift .bento-card[data-reveal] {
+  transition: opacity var(--t-slow) var(--ease-out),
+              transform var(--t-slow) var(--ease-out),
+              border-radius 0.5s cubic-bezier(0.34, 1.2, 0.5, 1);
+}
+
+/* Photos rest desaturated and zoomed; the PROMOTED card comes into colour
+   and springs to natural scale (Framer: saturate(0) -> saturate(1)). Keyed
+   to .is-spot, never :hover, so a card sliding under a still cursor can't
+   flash. Gated on .is-live (set by the JS), so with JS off nothing is grey. */
+@media (min-width: 1021px) and (hover: hover) and (pointer: fine) {
+  .bento-grid--shift.is-live .bento-card .bento-card__bg {
+    filter: saturate(0);
+    transform: scale(1.2);
+    transition: transform 1.05s cubic-bezier(0.34, 1.2, 0.5, 1),
+                filter 0.5s ease;
+  }
+  .bento-grid--shift.is-live .bento-card.is-spot .bento-card__bg {
+    filter: saturate(1);
+    transform: scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bento-grid--shift .bento-card { transition: none; }
+  .bento-grid--shift.is-live .bento-card .bento-card__bg { transition: none; }
+  html.motion-ready .bento-grid--shift .bento-card[data-reveal] {
+    transition: none;
+  }
+}
