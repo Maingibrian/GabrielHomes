@@ -934,3 +934,26 @@ Work Log:
 Stage Summary:
 - The owner's corrected shape-shift is now the live behaviour on the home page bento; r13's engine fully retired; everything downloads from :3000
 - GitHub main at b8f5adf
+
+---
+Task ID: 34
+Agent: main
+Task: Fix "downloads keep failing" — diagnose and repair the :3000 download path (r14-infra)
+
+Work Log:
+- Session check OK (HEAD b8f5adf r14). Diagnosed download path read-only.
+- Local full download of oneclick zip: 72MB in 0.07s, md5 match — server-to-LAN fine; failure is on the proxied public path + single-shot serving.
+- Found root causes: (1) workspace_server.py read whole file to RAM and wrote it in ONE call, no Accept-Ranges/Range -> no resume, browser restarts from byte 0 on any hiccup; (2) zip carried 24MB of dev evidence shots (docs/a11y) + 1.3MB design-reference — dead weight for a run package; (3) one big 69MB file is inherently fragile over flaky links.
+- Fixed workspace_server.py: _serve_file() streams 1MiB chunks from disk, sends Accept-Ranges, answers single-range requests with 206 + Content-Range, 416 + bytes */size when unsatisfiable, ignores malformed Range (RFC 7233), HEAD now reports real Content-Length; do_GET/do_HEAD rewired; BrokenPipe mid-transfer tolerated (resume continues).
+- Extended tests_preview_server.py: 5 new tests (stream+Accept-Ranges, 206 slice, open-ended + suffix ranges, 416, malformed ignored). 9/9 green.
+- build_package.sh: added --exclude docs/a11y/ and /design-reference/. Rebuilt: 69MB -> 47MB (48447644 bytes), dotfile guarantee + bat audits still pass.
+- New scripts/split_package.sh: splits zip into 4 x ~14MB parts (.bin, zero-padded), md5-verifies reassembly, writes MD5-CHECK.txt + REJOIN-WINDOWS.bat (copy /b + tar extract, CRLF enforced) + REJOIN-MAC-LINUX.sh (cat + md5 -c + unzip). Parts in scripts/preview_site/files/parts/ (inside the allow-list prefix).
+- _downloads_html(): new auto-discovered card "Big file keeps failing? Download in small parts" with per-part links + rejoin tool links.
+- Restarted :3000 via scripts/daemon_workspace.py (plain nohup gets reaped by the tool harness — daemon double-fork is mandatory).
+- Verified end-to-end: full download md5 3b0dbff27b75d4d1c58d8fabb8ae749b matches build; Range 1000000-1999999 -> 206 with correct slice; all 4 parts downloaded individually + cat-rejoined -> identical md5; rejoined zip extracts (START script, bento-shift.js, db present); homepage shows 4 part links + card; REJOIN bat/sh HTTP 200.
+- Committed 10a71d7 (r14-infra), pushed to GitHub.
+
+Stage Summary:
+- Downloads now survive flaky links three ways: resumable single file (Range/206), 32% smaller zip (47MB), and 4-part download + one-click rejoin.
+- Owner-facing: same :3000 page, new "small parts" card; old flow (one zip -> START-GABRIEL-HOMES) unchanged.
+- No site code touched; gabriel_homes tree unchanged; tests_preview_server.py 9/9.
