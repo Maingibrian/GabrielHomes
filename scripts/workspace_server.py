@@ -32,6 +32,7 @@ import html
 import io
 import mimetypes
 import os
+import re
 import urllib.parse
 from datetime import datetime, timezone
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
@@ -160,6 +161,23 @@ def _downloads_html() -> str:
             f'href="/scripts/preview_site/files/{name}" download>'
             f'Download update zip ({tag})</a></b>'
             f'<span class="dlmeta">{name} · {human_size(zp.stat().st_size)}</span></div>')
+    parts_dir = files / "parts"
+    part_files = sorted(parts_dir.glob("gabriel-homes-oneclick.part-*")) if parts_dir.is_dir() else []
+    if part_files and oneclick.is_file():
+        total = sum(p.stat().st_size for p in part_files)
+        links = " · ".join(
+            f'<a href="/scripts/preview_site/files/parts/{html.escape(p.name)}" '
+            f'download>part {i + 1}</a>'
+            for i, p in enumerate(part_files))
+        cards.append(
+            '<div class="card"><b><span style="color:#a03d18">Big file keeps failing? '
+            'Download in small parts</span></b>'
+            f'<span class="dlmeta">{len(part_files)} parts × ~14 MB · {human_size(total)} total · {links}</span>'
+            '<span class="dlmeta">grab the rejoin tool too: '
+            '<a href="/scripts/preview_site/files/parts/REJOIN-WINDOWS.bat" download>Windows (.bat)</a> · '
+            '<a href="/scripts/preview_site/files/parts/REJOIN-MAC-LINUX.sh" download>macOS/Linux (.sh)</a>'
+            ' — put all parts + the rejoin tool in ONE folder, double-click/run it,'
+            ' then run START-GABRIEL-HOMES as usual</span></div>')
     bundle = files / "gabriel-homes.bundle"
     if bundle.is_file():
         cards.append(
@@ -323,6 +341,68 @@ class WorkspaceHandler(BaseHTTPRequestHandler):
             ctype += "; charset=utf-8"
         return ctype
 
+    def _serve_file(self, full: Path, head_only: bool = False):
+        """Stream a file with HTTP Range support (resumable downloads).
+
+        v2 shipped the whole file via full.read_bytes() + one wfile.write —
+        fine on localhost, fatal for 70+ MB zips over the preview proxy: one
+        hiccup and the browser had to restart from byte 0. This streams in
+        1 MiB chunks, advertises Accept-Ranges, and answers Range requests
+        with 206 so interrupted downloads RESUME instead of restarting.
+        Single-range only (multi-range is rare for download managers; a
+        malformed header is ignored per RFC 7233 tolerance and the full
+        body is served).
+        """
+        try:
+            size = full.stat().st_size
+        except OSError:
+            return self._not_found(head_only=head_only)
+        start, end, status = 0, size - 1, 200
+        range_header = self.headers.get("Range")
+        if range_header and size > 0:
+            m = re.match(r"^bytes=(\d*)-(\d*)$", range_header.strip())
+            if m and (m.group(1) or m.group(2)):
+                if m.group(1):  # bytes=start-end  /  bytes=start-
+                    start = int(m.group(1))
+                    end = int(m.group(2)) if m.group(2) else size - 1
+                else:           # bytes=-suffix (last N bytes)
+                    start = max(0, size - int(m.group(2)))
+                    end = size - 1
+                if start >= size or start > end:
+                    # unsatisfiable: tell the client the real size, per RFC
+                    self.send_response(416)
+                    self.send_header("Content-Range", f"bytes */{size}")
+                    self.send_header("Content-Length", "0")
+                    self.end_headers()
+                    return
+                end = min(end, size - 1)
+                status = 206
+        self.send_response(status)
+        self.send_header("Content-Type", self._ctype_for(full.name))
+        self.send_header("Content-Length", str(end - start + 1))
+        self.send_header("Accept-Ranges", "bytes")
+        self.send_header("Cache-Control", "no-store")
+        self.send_header("X-Robots-Tag", "noindex")
+        if status == 206:
+            self.send_header("Content-Range", f"bytes {start}-{end}/{size}")
+        self.end_headers()
+        if head_only:
+            return
+        try:
+            with full.open("rb") as fh:
+                fh.seek(start)
+                remaining = end - start + 1
+                while remaining > 0:
+                    chunk = fh.read(min(1024 * 1024, remaining))
+                    if not chunk:
+                        break
+                    self.wfile.write(chunk)
+                    remaining -= len(chunk)
+        except (BrokenPipeError, ConnectionResetError, TimeoutError):
+            # client went away mid-transfer — its download manager will
+            # resume from the last acknowledged byte via Range
+            pass
+
     # ------------------------------------------------------------- verbs
     def do_GET(self):
         try:
@@ -340,8 +420,7 @@ class WorkspaceHandler(BaseHTTPRequestHandler):
             return self._serve_listing(rel, full)
         if not full.is_file():
             return self._not_found()
-        body = full.read_bytes()
-        self._send_bytes(200, body, self._ctype_for(full.name))
+        self._serve_file(full, head_only=False)
 
     def do_HEAD(self):
         try:
@@ -352,9 +431,10 @@ class WorkspaceHandler(BaseHTTPRequestHandler):
             return self._not_found(head_only=True)
         if is_dir:
             self._send_bytes(200, b"", "text/html; charset=utf-8", head_only=True)
+        elif full.is_file():
+            self._serve_file(full, head_only=True)
         else:
-            self._send_bytes(200, b"", self._ctype_for(full.name),
-                             head_only=True) if full.is_file() else self._not_found(head_only=True)
+            self._not_found(head_only=True)
 
     def _redirect(self, location: str):
         self.send_response(301)

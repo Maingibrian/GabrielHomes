@@ -66,6 +66,8 @@ rsync -a \
   --exclude 'media/real-listing-src/' \
   --exclude '/property-images/' \
   --exclude 'docs/shots/' \
+  --exclude 'docs/a11y/' \
+  --exclude '/design-reference/' \
   --exclude 'runserver.log' \
   --exclude '*.sqlite3-journal' \
   --exclude '*.sqlite3-wal' \

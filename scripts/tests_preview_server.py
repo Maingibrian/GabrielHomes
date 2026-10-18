@@ -44,6 +44,9 @@ def build_fake_workspace(root: Path) -> None:
     (gh / "docs").mkdir(parents=True)
     (gh / "media" / "property-images").mkdir(parents=True)
     (root / "scripts" / "preview_site" / "qa-shots").mkdir(parents=True)
+    (root / "scripts" / "preview_site" / "files").mkdir(parents=True)
+    (root / "scripts" / "preview_site" / "files" / "sample.zip").write_bytes(
+        bytes(range(256)) * 64)  # 16384 deterministic bytes
     (root / "download").mkdir()
     (root / "upload").mkdir()
     (root / ".git").mkdir()
@@ -158,6 +161,62 @@ class PreviewServerTest(unittest.TestCase):
         text = body.decode("utf-8", "replace")
         for needle in ("plan.html", "checklist.html", "qa.html"):
             self.assertIn(needle, text, f"homepage must link {needle}")
+
+    # ------------------------------------------------------------ range
+    def test_file_download_streams_with_accept_ranges(self):
+        req = urllib.request.Request(self.base + "/scripts/preview_site/files/sample.zip")
+        with urllib.request.urlopen(req, timeout=5) as resp:
+            self.assertEqual(resp.status, 200)
+            self.assertEqual(resp.headers.get("Accept-Ranges"), "bytes")
+            self.assertEqual(int(resp.headers["Content-Length"]), 16384)
+            self.assertEqual(resp.read(), (bytes(range(256)) * 64))
+
+    def test_range_request_returns_206_slice(self):
+        req = urllib.request.Request(
+            self.base + "/scripts/preview_site/files/sample.zip",
+            headers={"Range": "bytes=100-199"})
+        with urllib.request.urlopen(req, timeout=5) as resp:
+            self.assertEqual(resp.status, 206)
+            self.assertEqual(resp.headers.get("Content-Range"), "bytes 100-199/16384")
+            self.assertEqual(int(resp.headers["Content-Length"]), 100)
+            body = resp.read()
+        self.assertEqual(body, (bytes(range(256)) * 64)[100:200])
+
+    def test_range_open_ended_and_suffix(self):
+        data = (bytes(range(256)) * 64)
+        # bytes=16300- (open ended)
+        req = urllib.request.Request(
+            self.base + "/scripts/preview_site/files/sample.zip",
+            headers={"Range": "bytes=16300-"})
+        with urllib.request.urlopen(req, timeout=5) as resp:
+            self.assertEqual(resp.status, 206)
+            self.assertEqual(resp.read(), data[16300:])
+        # bytes=-50 (last 50 bytes)
+        req = urllib.request.Request(
+            self.base + "/scripts/preview_site/files/sample.zip",
+            headers={"Range": "bytes=-50"})
+        with urllib.request.urlopen(req, timeout=5) as resp:
+            self.assertEqual(resp.status, 206)
+            self.assertEqual(resp.read(), data[-50:])
+
+    def test_unsatisfiable_range_returns_416(self):
+        req = urllib.request.Request(
+            self.base + "/scripts/preview_site/files/sample.zip",
+            headers={"Range": "bytes=999999-"})
+        try:
+            urllib.request.urlopen(req, timeout=5)
+            self.fail("416 expected")
+        except urllib.error.HTTPError as err:
+            self.assertEqual(err.code, 416)
+            self.assertEqual(err.headers.get("Content-Range"), "bytes */16384")
+
+    def test_malformed_range_is_ignored_full_body_served(self):
+        req = urllib.request.Request(
+            self.base + "/scripts/preview_site/files/sample.zip",
+            headers={"Range": "bytes=banana"})
+        with urllib.request.urlopen(req, timeout=5) as resp:
+            self.assertEqual(resp.status, 200)
+            self.assertEqual(resp.read(), (bytes(range(256)) * 64))
 
 
 if __name__ == "__main__":
