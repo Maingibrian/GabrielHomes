@@ -182,17 +182,17 @@ PAGE = """<!DOCTYPE html><html lang="en"><head><meta charset="utf-8">
 <title>Gabriel Homes — workspace preview</title><style>
 body{{font-family:Georgia,'Times New Roman',serif;background:#faf7f2;color:#221a14;
 margin:0;line-height:1.6}}.wrap{{max-width:960px;margin:0 auto;padding:48px 24px 80px}}
-.kicker{{font-family:Menlo,monospace;font-size:12px;letter-spacing:.22em;color:#c25e3a}}
-h1{{font-size:clamp(28px,4vw,42px);margin:8px 0 12px}}p.lead{{color:#7a6f63;max-width:70ch}}
+.kicker{{font-family:Menlo,monospace;font-size:12px;letter-spacing:.22em;color:#a03d18}}
+h1{{font-size:clamp(28px,4vw,42px);margin:8px 0 12px}}p.lead{{color:#655a4e;max-width:70ch}}
 h2{{border-bottom:2px solid #221a14;padding-bottom:8px;margin-top:44px}}
-a{{color:#c25e3a}}.grid{{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px}}
+a{{color:#a03d18}}.grid{{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px}}
 .card{{background:#fff;border:1px solid #e6ddd1;border-radius:10px;padding:14px 16px}}
 .card b{{display:block;margin-bottom:4px}}code{{background:#f0e9df;padding:1px 6px;border-radius:4px}}
 .lock{{font-family:Menlo,monospace;font-size:12px;background:#f4efe7;border-left:3px solid #c25e3a;
 padding:12px 16px;margin-top:36px}}
-.btn{{display:inline-block;background:#c25e3a;color:#fff;text-decoration:none;padding:10px 18px;
+.btn{{display:inline-block;background:#b04a1a;color:#fff;text-decoration:none;padding:10px 18px;
 border-radius:8px;font-family:Menlo,monospace;font-size:13px}}.btn:hover{{background:#a94e30}}
-.dlmeta{{display:block;color:#7a6f63;font-family:Menlo,monospace;font-size:12px;margin-top:6px}}
+.dlmeta{{display:block;color:#655a4e;font-family:Menlo,monospace;font-size:12px;margin-top:6px}}
 </style></head><body><div class="wrap">
 <div class="kicker">GABRIEL HOMES · LIVE WORKSPACE PREVIEW</div>
 <h1>The workspace, <em>on display</em>.</h1>
@@ -244,19 +244,19 @@ LISTING_PAGE = """<!DOCTYPE html><html lang="en"><head><meta charset="utf-8">
 <title>{crumb} — Gabriel Homes workspace</title><style>
 body{{font-family:Georgia,serif;background:#faf7f2;color:#221a14;margin:0;line-height:1.5}}
 .wrap{{max-width:980px;margin:0 auto;padding:40px 24px 70px}}
-.kicker{{font-family:Menlo,monospace;font-size:12px;letter-spacing:.22em;color:#c25e3a}}
+.kicker{{font-family:Menlo,monospace;font-size:12px;letter-spacing:.22em;color:#a03d18}}
 h1{{font-size:26px;margin:6px 0 18px;word-break:break-all}}
 table{{width:100%;border-collapse:collapse;background:#fff;border:1px solid #e6ddd1;font-size:14.5px}}
 th,td{{text-align:left;padding:9px 12px;border-bottom:1px solid #e6ddd1}}
 th{{font-family:Menlo,monospace;font-size:11.5px;letter-spacing:.12em;text-transform:uppercase;
-color:#7a6f63;background:#f4efe7}}td.num{{font-family:Menlo,monospace;white-space:nowrap;color:#7a6f63}}
+color:#655a4e;background:#f4efe7}}td.num{{font-family:Menlo,monospace;white-space:nowrap;color:#655a4e}}
 .badge{{font-family:Menlo,monospace;font-size:11px;border:1px solid #e6ddd1;border-radius:999px;
-padding:2px 9px;background:#faf7f2}}a{{color:#c25e3a;text-decoration:none}}a:hover{{text-decoration:underline}}
+padding:2px 9px;background:#faf7f2}}a{{color:#a03d18;text-decoration:none}}a:hover{{text-decoration:underline}}
 .back{{font-family:Menlo,monospace;font-size:12.5px;margin-bottom:14px}}</style></head>
 <body><div class="wrap"><div class="kicker">GABRIEL HOMES · WORKSPACE</div>
 <h1>/{html_path}</h1><div class="back"><a href="/">← workspace home</a></div>
 <table><tr><th>Name</th><th>Type</th><th>Size</th><th>Modified</th></tr>{rows}</table>
-<div class="lock" style="font-family:Menlo,monospace;font-size:11.5px;color:#7a6f63;margin-top:18px">
+<div class="lock" style="font-family:Menlo,monospace;font-size:11.5px;color:#655a4e;margin-top:18px">
 allow-list preview · entries outside the allow-list are hidden and 403</div>
 </div></body></html>"""
 

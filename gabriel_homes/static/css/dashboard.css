@@ -218,6 +218,17 @@
   color: var(--burnt);
 }
 
+/* r12: horizontal scroll guard for wide owner tables on phones.
+   Wrap: <div class="table-scroll" role="region" aria-label="..." tabindex="0"> */
+.table-scroll {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+.table-scroll:focus-visible {
+  outline: 2px solid var(--burnt);
+  outline-offset: 2px;
+}
+
 /* Status badges */
 .status-badge {
   display: inline-block;
@@ -229,9 +240,9 @@
   text-transform: uppercase;
   font-weight: 500;
 }
-.status-badge--published { background: color-mix(in srgb, #25D366 18%, transparent); color: #128C7E; }
+.status-badge--published { background: color-mix(in srgb, #25D366 18%, transparent); color: var(--green-deep); } /* r12: was #128C7E — 3.61:1 */
 .status-badge--draft { background: color-mix(in srgb, var(--taupe) 20%, transparent); color: var(--brown); }
-.status-badge--under_offer { background: color-mix(in srgb, var(--burnt) 18%, transparent); color: var(--burnt); }
+.status-badge--under_offer { background: color-mix(in srgb, var(--burnt) 18%, transparent); color: var(--brown); } /* r12: was burnt-on-burnt-tint 4.2:1 */
 .status-badge--sold_let { background: var(--espresso); color: var(--cream); }
 .status-badge--archived { background: color-mix(in srgb, var(--ink) 12%, transparent); color: var(--ink); }
 

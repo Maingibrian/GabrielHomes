@@ -75,6 +75,7 @@
     </form>
 
     {% if listings %}
+    <div class="table-scroll" role="region" aria-label="Listings table" tabindex="0">
     <table class="listing-table">
       <thead>
         <tr>
@@ -119,6 +120,7 @@
         {% endfor %}
       </tbody>
     </table>
+    </div><!-- /.table-scroll -->
 
     {% if is_paginated %}
     <div class="owner-table-note">

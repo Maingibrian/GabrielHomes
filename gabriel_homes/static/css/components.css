@@ -87,10 +87,10 @@
   transition: opacity var(--t-fast) var(--ease), color var(--t-fast) var(--ease);
 }
 .nav-link__index {
-  color: var(--burnt);
+  color: var(--ember); /* r12: was --burnt — 2.8:1 on espresso; ember 7.4:1 */
   font-variant-numeric: tabular-nums;
 }
-.nav-link:hover { opacity: 1; color: var(--burnt); }
+.nav-link:hover { opacity: 1; color: var(--ember); }
 
 /* Sign-out is a <button> inside a form but must look like a nav link. */
 .nav-signout { display: inline-flex; }
@@ -341,8 +341,11 @@
   width: 1.15rem;
   height: 1.15rem;
   border-radius: 50%;
-  border: 1px solid color-mix(in srgb, var(--clay) 65%, transparent);
-  color: var(--clay);
+  /* r12: solid cream chip — the clay glyph had no guaranteed backdrop
+     over portrait photos; brown-on-cream is 8.9:1 on any image */
+  background: var(--cream);
+  border: 1px solid var(--cream);
+  color: var(--brown);
   font-size: 0.62rem;
   line-height: 1;
 }
@@ -642,7 +645,7 @@
 }
 .search-bar__label {
   font-family: var(--font-mono);
-  font-size: 0.71875rem; /* 11.5px — smallest text on the page, kept legible */
+  font-size: var(--text-xs); /* r12: was 11.5px — bumped to the 13px UI floor */
   letter-spacing: var(--track-mono);
   text-transform: uppercase;
   color: color-mix(in srgb, var(--taupe) 60%, var(--ink));
@@ -756,7 +759,7 @@
   display: inline-block;
   transition: color var(--t-med) var(--ease);
 }
-.wordmark__letter:hover { color: var(--burnt); }
+.wordmark__letter:hover { color: var(--ember); } /* r12: burnt hover failed on espresso footer */
 
 
 /* ============================================================
@@ -878,7 +881,7 @@
   align-items: baseline;
   gap: 0.5rem;
 }
-.site-header__brand span { color: var(--burnt); }
+.site-header__brand span { color: var(--ember); } /* r12: burnt failed on espresso */
 
 .site-header__nav {
   display: none;
@@ -1143,7 +1146,7 @@ html.motion-ready [data-reveal].is-visible {
   background: linear-gradient(135deg, var(--clay), var(--brown));
 }
 .bento-card--cta .bento-card__scrim {
-  background: linear-gradient(180deg, rgba(28,21,17,0.12) 0%, rgba(28,21,17,0.55) 100%);
+  background: linear-gradient(180deg, rgba(28,21,17,0.12) 0%, rgba(28,21,17,0.85) 100%);
 }
 .bento-card--cta .bento-card__name { font-style: italic; }
 .bento-card--cta .bento-card__meta { max-width: 34ch; }
@@ -1170,7 +1173,12 @@ html.motion-ready .bento-grid .bento-card[data-reveal]:nth-child(3n) { transitio
 .bento-card__scrim {
   position: absolute;
   inset: 0;
-  background: linear-gradient(180deg, rgba(28,21,17,0) 38%, rgba(28,21,17,0.88) 100%);
+  /* r12: strengthened — cream text must clear 4.5:1 even over a pure-white
+     photo; 0.66 at the mid text zone ≈ 5.5:1, bottom stop ≈ 12.9:1 */
+  background: linear-gradient(180deg,
+              rgba(28,21,17,0.10) 0%,
+              rgba(28,21,17,0.66) 45%,
+              rgba(28,21,17,0.96) 100%);
   z-index: -1;
 }
 /* ---- Framer-reference de-zoom (all bento grids) ----
@@ -1191,7 +1199,7 @@ html.motion-ready .bento-grid .bento-card[data-reveal]:nth-child(3n) { transitio
   font-size: var(--text-xs);
   letter-spacing: var(--track-mono);
   text-transform: uppercase;
-  color: var(--sand);
+  color: var(--cream); /* r12: was sand — 4.1:1 in the scrim's upper text zone */
   margin-bottom: 0.45rem;
 }
 .bento-card__name {
@@ -1204,7 +1212,7 @@ html.motion-ready .bento-grid .bento-card[data-reveal]:nth-child(3n) { transitio
   margin-top: 0.3rem;
   font-size: var(--text-sm);
   letter-spacing: var(--track-tight);
-  color: color-mix(in srgb, var(--cream) 78%, transparent);
+  color: var(--cream); /* r12: was cream @78% — unreadable over photos */
 }
 .bento-card--spotlight .bento-card__name { font-size: var(--text-3xl); max-width: 22ch; }
 .bento-card--spotlight .bento-card__body { padding: 2rem 2.25rem 2.1rem; }
@@ -1234,7 +1242,7 @@ html.motion-ready .bento-grid .bento-card[data-reveal]:nth-child(3n) { transitio
 .logo-monogram {
   font-family: var(--font-display);
   font-weight: 500;
-  color: var(--cream);
+  color: var(--espresso); /* r12: was cream — 1.5:1 on the sand circle; 9.7:1 now */
   letter-spacing: var(--track-tight);
   line-height: 1;
   user-select: none;
@@ -1284,5 +1292,5 @@ html.motion-ready .bento-grid .bento-card[data-reveal]:nth-child(3n) { transitio
 .flash__close:hover { color: var(--cream); }
 
 /* Demo / real content badges (r11) */
-.status-badge--demo { background: color-mix(in srgb, var(--burnt) 18%, transparent); color: var(--burnt); }
-.status-badge--real { background: color-mix(in srgb, #25D366 18%, transparent); color: #128C7E; }
+.status-badge--demo { background: color-mix(in srgb, var(--burnt) 18%, transparent); color: var(--brown); }
+.status-badge--real { background: color-mix(in srgb, #25D366 18%, transparent); color: var(--green-deep); }

@@ -46,12 +46,19 @@
   --cream:    #faf8f4;  /* page background, light sections */
   --white:    #ffffff;
   --sand:     #d8c9b8;  /* soft borders, chips, subtle fills */
-  --taupe:    #8a7d70;  /* muted text, divider lines */
-  --clay:     #a66a4d;  /* secondary accent */
+  --taupe:    #6b5e53;  /* muted text, divider lines (r12: was #8a7d70,
+                           3.77:1 on cream — darkened to 5.91:1, WCAG AA) */
+  --clay:     #965634;  /* secondary accent (r12: was #a66a4d, 4.13:1 on
+                           cream — darkened to 5.38:1, WCAG AA) */
   --brown:    #5a4032;  /* hover / secondary dark */
   --espresso: #2a211c;  /* main dark background (agents, CTA, footer) */
   --ink:      #211e1b;  /* body text on light */
   --burnt:    #af4715;  /* primary accent: key CTAs, highlights */
+  --ember:    #eda07a;  /* r12: accent for text ON dark espresso (brand
+                           "Homes", nav indices) — burnt fails there at
+                           2.8:1; ember passes at 7.4:1 */
+  --green-deep: #0b6b52; /* r12: readable green for text on green-tint
+                           badges (was #128c7e at 3.6:1; now 5.7:1) */
 
   /* Colour-mix helpers — used to fade solid colours without new tokens */
   --cream-90:  color-mix(in srgb, var(--cream) 90%, var(--espresso));
@@ -62,6 +69,9 @@
   --burnt-30:  color-mix(in srgb, var(--burnt) 30%, transparent);
   --sand-60:   color-mix(in srgb, var(--sand) 60%, transparent);
   --taupe-35:  color-mix(in srgb, var(--taupe) 35%, transparent);
+  /* r12: scrim gradients — bento-card text must clear 4.5:1 over the
+     worst-case (pure white) photo; see components.css .bento-card__scrim */
+  --scrim-deep: rgba(28, 21, 17, 0.96);
 
   /* --- Typography (WORK.md §10.2) --- */
   --font-sans: "Geist", "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;

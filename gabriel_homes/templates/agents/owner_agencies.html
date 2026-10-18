@@ -36,6 +36,7 @@
     </div>
 
     {% if agencies %}
+    <div class="table-scroll" role="region" aria-label="Agencies and accounts table" tabindex="0">
     <table class="listing-table">
       <thead>
         <tr>
@@ -96,6 +97,7 @@
         {% endfor %}
       </tbody>
     </table>
+    </div><!-- /.table-scroll -->
     <p class="owner-table-note">
       Deactivating an account blocks sign-in but keeps the agency's listings intact.
       "Mark demo" hides the agency (and can hide its listings individually) from the public site when the demo switch is on.

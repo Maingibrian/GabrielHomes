@@ -371,7 +371,9 @@
   border-color: var(--burnt);
 }
 .pagination__disabled {
-  opacity: 0.4;
+  /* r12: was 0.4 (2.46:1 on white); 0.55 keeps the muted "disabled"
+     look at 3.77:1 — clearly visible but still reads as inactive */
+  opacity: 0.55;
   cursor: not-allowed;
   pointer-events: none;
 }

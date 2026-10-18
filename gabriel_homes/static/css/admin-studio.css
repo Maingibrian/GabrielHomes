@@ -108,7 +108,7 @@ body {
 }
 .gh-brand__studio {
   font-family: "Geist Mono", monospace;
-  font-size: 0.68rem;
+  font-size: 0.8125rem; /* r12: was 0.68rem — bumped to the 13px UI floor */
   text-transform: uppercase;
   letter-spacing: 0.14em;
   color: #d8c9b8;

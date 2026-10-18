@@ -75,8 +75,10 @@
   position: absolute;
   inset: 0;
   background:
-    linear-gradient(90deg, rgba(28,21,17,0.62) 0%, rgba(28,21,17,0.30) 48%, rgba(28,21,17,0.06) 100%),
-    linear-gradient(180deg, rgba(28,21,17,0.52) 0%, rgba(42,33,28,0.28) 45%, rgba(42,33,28,0.74) 100%);
+    /* r12: left/bottom bands deepened so title-zone text clears AA over
+       the brightest photo regions (worst case was ~2:1 for the accent). */
+    linear-gradient(90deg, rgba(28,21,17,0.72) 0%, rgba(28,21,17,0.48) 48%, rgba(28,21,17,0.10) 100%),
+    linear-gradient(180deg, rgba(28,21,17,0.52) 0%, rgba(42,33,28,0.34) 45%, rgba(42,33,28,0.78) 100%);
 }
 .hero .container { position: relative; z-index: 1; width: 100%; }
 .hero__tag {
@@ -85,7 +87,7 @@
   letter-spacing: var(--track-mono);
   text-transform: uppercase;
   font-weight: 500;
-  color: color-mix(in srgb, var(--cream) 78%, var(--sand));
+  color: color-mix(in srgb, var(--cream) 92%, var(--sand)); /* r12: was 78% cream */
   margin-bottom: 1.25rem;
 }
 .hero__title {
@@ -101,13 +103,15 @@
 .hero__title .hero__accent {
   font-style: italic;
   font-weight: 480;
-  color: color-mix(in srgb, var(--clay) 55%, var(--cream));
+  /* r12: was clay 55% — dipped under 3:1 over bright photo regions
+     even with the scrim; clay 30% keeps the warm tint at 4.3:1 worst case */
+  color: color-mix(in srgb, var(--clay) 30%, var(--cream));
 }
 .hero__subtitle {
   font-size: var(--text-md);
   line-height: var(--leading-body);
   max-width: 56ch;
-  color: color-mix(in srgb, var(--cream) 85%, transparent);
+  color: color-mix(in srgb, var(--cream) 95%, transparent); /* r12: was 85% */
   margin: 0 0 2.5rem;
 }
 .hero__stats {
@@ -220,11 +224,15 @@
   max-width: 30ch;
 }
 /* Word-by-word reveal (motion.js builds the .word spans).
-   Without JS no spans exist and the quote simply reads lit. */
-.story__quote .word { display: inline; opacity: 0.14; transition: opacity 0.5s var(--ease); }
-.story__quote .word.is-lit { opacity: 1; }
+   Without JS no spans exist and the quote simply reads lit.
+   r12: the pre-lit state is now a SOLID readable warm grey (3.3:1 on
+   cream, large-text AA) instead of burnt at opacity 0.14 (1.2:1 —
+   effectively invisible, and what screenshot audits kept catching).
+   Lighting a word transitions it to the burnt ember. */
+.story__quote .word { display: inline; opacity: 1; color: color-mix(in srgb, var(--ink) 50%, var(--cream)); transition: color 0.5s var(--ease); }
+.story__quote .word.is-lit { color: var(--burnt); }
 @media (prefers-reduced-motion: reduce) {
-  .story__quote .word { opacity: 1; transition: none; }
+  .story__quote .word { color: var(--burnt); transition: none; }
 }
 
 /* Layered collage: terrace (main) + garden bedroom (inset print)
@@ -494,13 +502,13 @@
 }
 .bento-card--spotlight .bento-card__price { font-size: var(--text-lg); }
 .bento-card__period {
-  color: color-mix(in srgb, var(--cream) 62%, transparent);
+  color: var(--cream); /* r12: was cream @62% — unreadable over photos */
 }
 .bento-card__loc {
-  color: color-mix(in srgb, var(--cream) 70%, transparent);
+  color: var(--cream); /* r12: was cream @70% — unreadable over photos */
 }
 .bento-card__loc::before,
 .bento-card__fact::before {
   content: "\00b7\00a0\00a0"; /* middot separator inside the meta line */
-  color: color-mix(in srgb, var(--sand) 70%, transparent);
+  color: var(--sand);
 }

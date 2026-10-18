@@ -502,7 +502,8 @@
 .agent-card-sticky__btn--call:hover { background: color-mix(in srgb, var(--burnt) 85%, var(--brown)); }
 .agent-card-sticky__btn--whatsapp {
   background: #25D366;
-  color: var(--white);
+  /* r12: white on WhatsApp green was 1.98:1; this deep green is 6.3:1 */
+  color: #0b3b2e;
 }
 .agent-card-sticky__btn--whatsapp:hover { background: color-mix(in srgb, #25D366 85%, #128C7E); }
 .agent-card-sticky__btn--email {
@@ -586,7 +587,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #128C7E;
+  color: var(--green-deep); /* r12: was #128C7E — 3.6:1 on the green tint */
 }
 .enquiry-success__title {
   font-size: var(--text-md);
@@ -671,7 +672,7 @@
 }
 .mobile-contact-bar__btn--whatsapp {
   background: #25D366;
-  color: var(--white);
+  color: #0b3b2e; /* r12: was white — 1.98:1 */
 }
 @media (max-width: 809px) {
   .mobile-contact-bar { display: block; }

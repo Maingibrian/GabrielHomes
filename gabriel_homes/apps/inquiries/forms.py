@@ -39,21 +39,25 @@ class InquiryForm(forms.ModelForm):
                 "class": "form__input",
                 "placeholder": "Your name",
                 "autocomplete": "name",
+                "aria-label": "Your name",  # r12: placeholder-only label
             }),
             "email": forms.EmailInput(attrs={
                 "class": "form__input",
                 "placeholder": "you@example.com",
                 "autocomplete": "email",
+                "aria-label": "Your email address",  # r12
             }),
             "phone": forms.TextInput(attrs={
                 "class": "form__input",
                 "placeholder": "+254 7XX XXX XXX",
                 "autocomplete": "tel",
+                "aria-label": "Your phone number",  # r12
             }),
             "message": forms.Textarea(attrs={
                 "class": "form__textarea",
                 "placeholder": "I'm interested in this property. When can I view it?",
                 "rows": 4,
+                "aria-label": "Your message",  # r12
             }),
         }
 

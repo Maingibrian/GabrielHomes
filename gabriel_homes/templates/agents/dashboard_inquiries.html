@@ -28,6 +28,7 @@
     </div>
 
     {% if inquiries %}
+    <div class="table-scroll" role="region" aria-label="Enquiries table" tabindex="0">
     <table class="listing-table">
       <thead>
         <tr>
@@ -78,6 +79,7 @@
         {% endfor %}
       </tbody>
     </table>
+    </div><!-- /.table-scroll -->
 
     {% if is_paginated %}
     <nav class="pagination" aria-label="Pagination">

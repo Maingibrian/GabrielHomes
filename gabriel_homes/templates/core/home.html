@@ -74,14 +74,14 @@
       </div>
       <label class="search-bar__group">
         <span class="search-bar__label">Location</span>
-        <input class="search-bar__input" type="text" name="q" id="hero-search-q"
+        <input class="search-bar__input" type="text" name="q" id="hero-search-q" aria-label="Search by location or title"
                placeholder="Mombasa, Nairobi, Diani..." autocomplete="off">
         {# Hidden slug field — populated by the autocomplete JS when a suggestion is picked #}
         <input type="hidden" name="location_slug" id="hero-search-location" value="">
       </label>
       <label class="search-bar__group">
         <span class="search-bar__label">Type</span>
-        <select class="search-bar__select" name="type" id="hero-search-type">
+        <select class="search-bar__select" name="type" id="hero-search-type" aria-label="Property type">
           <option value="">All types</option>
           {% for entry in types_with_counts %}
             <option value="{{ entry.type.slug_plural }}">{{ entry.type.name }}</option>
