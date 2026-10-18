@@ -129,7 +129,8 @@
     </div>
 
     {% if recent_listings %}
-    <table class="listing-table">
+    <div class="table-scroll" role="region" aria-label="Recent listings table" tabindex="0">
+<table class="listing-table">
       <thead>
         <tr>
           <th>Title</th>
@@ -171,6 +172,7 @@
         {% endfor %}
       </tbody>
     </table>
+</div><!-- /.table-scroll -->
     {% else %}
     <div class="dashboard-empty">
       <p class="dashboard-empty__title">No listings yet.</p>
@@ -188,7 +190,8 @@
       </div>
       <a class="btn btn--outline btn--sm" href="{% url 'agents:owner_agencies' %}">Manage &rarr;</a>
     </div>
-    <table class="listing-table">
+    <div class="table-scroll" role="region" aria-label="Recent enquiries table" tabindex="0">
+<table class="listing-table">
       <thead>
         <tr>
           <th>Agency</th>
@@ -208,6 +211,7 @@
         {% endfor %}
       </tbody>
     </table>
+</div><!-- /.table-scroll -->
     {% endif %}
   </main>
 

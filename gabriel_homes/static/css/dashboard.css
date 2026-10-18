@@ -11,13 +11,15 @@
 /* ---------- Dashboard layout: sidebar + main ---------- */
 .dashboard-layout {
   display: grid;
-  grid-template-columns: 1fr;
+  /* r12: minmax(0,1fr) — a plain 1fr track grows to the widest unbreakable
+     child (grid blowout) and pushed the doc 272-346px past 390px phones */
+  grid-template-columns: minmax(0, 1fr);
   gap: 0;
   min-height: calc(100vh - 80px);  /* minus header */
 }
 @media (min-width: 1200px) {
   .dashboard-layout {
-    grid-template-columns: 240px 1fr;
+    grid-template-columns: 240px minmax(0, 1fr);
   }
 }
 
@@ -27,6 +29,8 @@
   background: var(--espresso);
   color: var(--cream);
   padding: 1.5rem 0;
+  min-width: 0; /* r12: shrinkable grid item */
+  max-width: 100%;
 }
 @media (max-width: 1199px) {
   .dashboard-sidebar {
@@ -69,6 +73,9 @@
   text-decoration: none;
   letter-spacing: var(--track-tight);
   transition: background var(--t-fast) var(--ease), color var(--t-fast) var(--ease);
+  /* r12: let label+count wrap instead of forcing the sidebar track wide */
+  flex-wrap: wrap;
+  min-width: 0;
 }
 .dashboard-sidebar__link:hover {
   background: color-mix(in srgb, var(--cream) 8%, transparent);
@@ -94,6 +101,8 @@
 /* ---------- Main content ---------- */
 .dashboard-main {
   padding: 1.5rem;
+  min-width: 0; /* r12: shrinkable grid item */
+  max-width: 100%;
 }
 @media (min-width: 1200px) {
   .dashboard-main { padding: 2rem 2.5rem; }

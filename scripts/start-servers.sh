@@ -22,8 +22,9 @@ if port_up 3000; then
   echo ":3000 already up"
 else
   echo "starting :3000 (delivery page)..."
-  nohup python3 "$ROOT/scripts/workspace_server.py" \
-    >"$ROOT/scripts/workspace-server.log" 2>&1 &
+  # r12: double-fork daemon — plain nohup children were being reaped by the
+  # tool harness between calls, repeatedly killing the download page.
+  python3 "$ROOT/scripts/daemon_workspace.py"
   sleep 1
 fi
 

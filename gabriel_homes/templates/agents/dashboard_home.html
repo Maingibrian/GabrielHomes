@@ -72,6 +72,7 @@
 
     {# Listing table #}
     {% if listings %}
+    <div class="table-scroll" role="region" aria-label="Recent listings table" tabindex="0">
     <table class="listing-table">
       <thead>
         <tr>
@@ -108,6 +109,7 @@
         {% endfor %}
       </tbody>
     </table>
+    </div><!-- /.table-scroll -->
     {% else %}
     <div class="dashboard-empty">
       <p class="dashboard-empty__title">No listings yet.</p>

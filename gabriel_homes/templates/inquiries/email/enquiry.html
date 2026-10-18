@@ -7,22 +7,22 @@
   <p>A new enquiry has been submitted for the following property:</p>
 
   <table style="width: 100%; border-collapse: collapse; margin: 16px 0;">
-    <tr><td style="padding: 8px 0; color: #8a7d70; width: 80px;">Title:</td><td>{{ property.title }}</td></tr>
-    <tr><td style="padding: 8px 0; color: #8a7d70;">Price:</td><td>KES {{ property.price|floatformat:0 }}{% if property.price_period == "monthly" %} / month{% endif %}</td></tr>
-    <tr><td style="padding: 8px 0; color: #8a7d70;">URL:</td><td><a href="{{ property.get_absolute_url }}" style="color: #af4715;">View listing</a></td></tr>
+    <tr><td style="padding: 8px 0; color: #6b5e53; width: 80px;">Title:</td><td>{{ property.title }}</td></tr>
+    <tr><td style="padding: 8px 0; color: #6b5e53;">Price:</td><td>KES {{ property.price|floatformat:0 }}{% if property.price_period == "monthly" %} / month{% endif %}</td></tr>
+    <tr><td style="padding: 8px 0; color: #6b5e53;">URL:</td><td><a href="{{ property.get_absolute_url }}" style="color: #af4715;">View listing</a></td></tr>
   </table>
 
   <h3 style="color: #211e1b; margin-top: 24px;">From</h3>
   <table style="width: 100%; border-collapse: collapse;">
-    <tr><td style="padding: 4px 0; color: #8a7d70; width: 80px;">Name:</td><td>{{ inquiry.name }}</td></tr>
-    <tr><td style="padding: 4px 0; color: #8a7d70;">Email:</td><td>{{ inquiry.email }}</td></tr>
-    <tr><td style="padding: 4px 0; color: #8a7d70;">Phone:</td><td>{{ inquiry.phone|default:"(not provided)" }}</td></tr>
+    <tr><td style="padding: 4px 0; color: #6b5e53; width: 80px;">Name:</td><td>{{ inquiry.name }}</td></tr>
+    <tr><td style="padding: 4px 0; color: #6b5e53;">Email:</td><td>{{ inquiry.email }}</td></tr>
+    <tr><td style="padding: 4px 0; color: #6b5e53;">Phone:</td><td>{{ inquiry.phone|default:"(not provided)" }}</td></tr>
   </table>
 
   <h3 style="color: #211e1b; margin-top: 24px;">Message</h3>
   <p style="background: #faf8f4; padding: 16px; border-radius: 8px; white-space: pre-wrap;">{{ inquiry.message }}</p>
 
   <hr style="border: 0; border-top: 1px solid #d8c9b8; margin: 24px 0;">
-  <p style="font-size: 12px; color: #8a7d70;">This enquiry was submitted via {{ site_name }}. Reply directly to this email to contact the enquirer.</p>
+  <p style="font-size: 12px; color: #6b5e53;">This enquiry was submitted via {{ site_name }}. Reply directly to this email to contact the enquirer.</p>
 </body>
 </html>

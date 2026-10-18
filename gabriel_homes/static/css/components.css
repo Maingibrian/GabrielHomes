@@ -912,6 +912,17 @@
   align-items: center;
   gap: 0.75rem;
 }
+/* r12: signed-in mobile users get Saved+Dashboard+sign-out here, which
+   blew the 390px header (55px doc overflow on dashboard pages). Wrap
+   gracefully instead of pushing the hamburger off-screen. */
+@media (max-width: 809px) {
+  .site-header__actions {
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    row-gap: 0.25rem;
+    gap: 0.5rem;
+  }
+}
 /* Quick contact (r10) — Call + WhatsApp icon buttons, phones only.
    <810px the Enquire CTA is hidden, leaving the header with no contact
    affordance at all; these two circular buttons fill exactly that window.

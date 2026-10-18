@@ -32,7 +32,7 @@
   --accent: #af4715;
   --body-fg: #211e1b;                 /* ink */
   --body-bg: #faf8f4;                 /* cream */
-  --body-quiet-color: #8a7d70;        /* taupe */
+  --body-quiet-color: #6b5e53;  /* r12: was old taupe #8a7d70 — 3.37:1; taupe */
   --body-loud-color: #211e1b;
   --darkened-bg: #f0ebe3;             /* pressed cream */
   --selected-row: #f5e9e0;            /* burnt wash */
@@ -41,7 +41,7 @@
   --button-hover-bg: #5a4032;         /* brown */
   --default-button-bg: #af4715;
   --default-button-hover-bg: #8f3811;
-  --close-button-bg: #8a7d70;
+  --close-button-bg: #6b5e53;
   --close-button-hover-bg: #5a4032;
   --delete-button-bg: #a3402a;
   --delete-button-hover-bg: #7d2f1e;
