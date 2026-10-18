@@ -850,3 +850,20 @@ Work Log:
 
 Stage Summary:
 - :3000 delivery page now lists all four artifacts incl. the one-click zip
+
+---
+Task ID: 32
+Agent: main (Z.ai)
+Task: Download-button location + site-wide accessibility/contrast audit
+
+Work Log:
+- Wipe #9 hit between messages: venv/db/media/files/ + all delivery zips gone; bootstrap restored, wheels+r11 zip+oneclick+bundle rebuilt, download cards verified back on :3000
+- Wrote scripts/a11y_audit.py (playwright): WCAG contrast for every visible text node (alpha/color-mix/opacity compositing), unlabeled controls, missing alts, tiny text, no-name links, mobile overflow; 24 surfaces + delivery page; desktop+mobile shots to docs/a11y/
+- scripts/a11y_analyze.py: global dedup -> 62 distinct contrast issues + 50 other findings
+- Verified scroll-reveal voids are capture artifacts (sections DO reveal on scroll; no 404s on fresh loads; agent portraits git-tracked)
+- Key confirmed failures: muted #8a7d70 on cream 3.77:1 (~30 components); header brand 'Homes'+nav index burnt-on-dark 2.57-2.8; WhatsApp white-on-green 1.98; hero rotating word burnt 2.7; status badges 3.61; founder meta 3.73; pagination disabled 2.46; admin muted 3.37 + 11px; enquiry/search/filter forms placeholder-only labels; owner tables overflow at 390px
+
+Stage Summary:
+- Full report delivered in chat; fix plan awaiting approval (token darkening, scrim, WhatsApp pair, form labels, owner table scroll, no-JS reveal fallback)
+- Audit evidence: gabriel_homes/docs/a11y/ (findings.json, scrolled-findings.json, summary.txt, shots/)
+- GitHub at 95a8f56

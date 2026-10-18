@@ -1,0 +1,26 @@
+404                    
+_console               console:2
+about                  contrast:15
+admin-dash             contrast:8  tiny:12
+admin-listings         contrast:61  no-name:4  tiny:32  unlabeled:2
+agents                 contrast:41
+contact                contrast:15
+dashboard-agent        login-failed:1
+dashboard-owner        contrast:47  h-overflow:1
+delivery-3000          contrast:26
+for-rent               contrast:59  unlabeled:5
+for-sale               contrast:65  unlabeled:5
+home                   contrast:123  tiny:4  unlabeled:4
+listing-77             contrast:36  img-alt:26  unlabeled:10
+listing-80             contrast:34  img-alt:26  unlabeled:10
+loc-page               contrast:37  unlabeled:5
+owner-agencies         contrast:41  h-overflow:1
+owner-all-listings     contrast:39  h-overflow:1
+owner-import           contrast:27  h-overflow:1
+privacy                contrast:7
+properties             contrast:67  unlabeled:5
+services               contrast:23
+styleguide             contrast:83  tiny:22  unlabeled:4
+terms                  contrast:7
+
+TOTAL significant findings: 974
