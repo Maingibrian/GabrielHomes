@@ -17,7 +17,7 @@ Full project brief (mission, design law, non-copy rules): `gabriel_homes/BRIEF.m
 7. Never claim something works unless you ran it this session.
 8. Reply to the user in English only. Deliverables go on the :3000 page.
 
-LAST_COMMIT: 95a8f56 (2026-10-17 — oneclick Linux one-try package: wheels exclude, bridge-off delivery fix, boot test; r11 before it)
+LAST_COMMIT: 7a9af69 (2026-10-18 — r12 accessibility: WCAG AA contrast site-wide, form labels, owner table scroll, mobile overflow fixes; a11y audit tooling + findings before it)
 NEXT:
   1) User: apply r11 zip on Windows (extract -> UPDATE-WEBSITE.bat -> START),
      and download the bundle + db backup after every session.

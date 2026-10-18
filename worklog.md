@@ -867,3 +867,32 @@ Stage Summary:
 - Full report delivered in chat; fix plan awaiting approval (token darkening, scrim, WhatsApp pair, form labels, owner table scroll, no-JS reveal fallback)
 - Audit evidence: gabriel_homes/docs/a11y/ (findings.json, scrolled-findings.json, summary.txt, shots/)
 - GitHub at 95a8f56
+
+---
+Task ID: 32-b
+Agent: main (Z.ai)
+Task: r12 accessibility fix plan execution ("go" from owner) + delivery-button location
+
+Work Log:
+- Wipe #10 hit this session: venv/db/media/download/wheels all gone again; bootstrap_env.sh restored runtime (Django 5.2.18, 80 listings, accounts, real media #77); servers restarted
+- Both :3000/:3011 were DOWN at session start -> root cause of "can't find the download button": the whole delivery page was offline; rebuilt artifacts + verified cards
+- Recurring :3000 death solved permanently: scripts/daemon_workspace.py (double-fork daemon, mirrors daemon_runserver.py) — the tool harness reaped nohup'd children between calls
+- Item 1: --taupe #8a7d70 -> #6b5e53 (5.91:1 on cream; ~30 components); --clay -> #965634 (5.38:1); NEW tokens --ember #eda07a (accent-on-dark) + --green-deep #0b6b52
+- Item 2: brand "Homes" + nav indices + hovers burnt -> ember (2.8 -> 7.4:1 on espresso)
+- Item 3: WhatsApp CTAs white -> deep-green text (1.98 -> 6.31:1); enquiry icon green-deep
+- Item 4: story-quote pre-lit state solid warm grey (1.2 -> 3.19:1), lit = burnt; hero scrim deepened + accent clay30 (3.13:1 worst case)
+- Item 5: bento scrim strengthened (cream text 6.3-13.2:1 over worst-case white photo); index/meta/period/loc solid cream; founder chip espresso-88 + cream meta; monogram espresso-on-sand (9.7:1); verified badge solid cream chip (8.9:1); badges published/real -> green-deep, demo/under_offer -> brown; pagination disabled 0.4 -> 0.55 (3.77:1, WCAG-exempt disabled)
+- Item 6: aria-labels on enquiry fields (forms.py), hero+styleguide search bars, filter min/max + label for=ids; .table-scroll wrappers on ALL 5 dashboard tables (incl. owner overview x2 + dashboard_home); admin taupe literal + email template taupe fixed; search-bar label + admin studio tag to 13px floor
+- NEW finding during fix: mobile h-overflow on 4 owner surfaces (55-346px) — root causes grid blowout (1fr tracks), unwrapped tables in owner overview, header actions row; ALL FIXED (probe: 0px everywhere)
+- runserver --noreload serves STALE TEMPLATES until restart — restart required after template edits (cost an hour of confusion)
+- Delivery page (:3000) own CSS to AA too (kicker/lead/btn)
+- scripts/contrast_check.py verify mode: 23/23 pairs PASS (math proof); live audit re-run x2: distinct contrast 62 -> 17 (remaining = bento-over-image tool limitation w/ scrim math, styleguide demo swatches, count-up capture artifact), h-overflow 4 -> 0
+- pytest 381 green (ran 3x during the round)
+- Committed 842557a (r12) + 7a9af69 (r12b), pushed to GitHub
+- Artifacts REBUILT with r12b + synced: oneclick 68M, update-r12 (388 files), bundle, db backup; all 200 on :3000
+
+Stage Summary:
+- All six r12 plan items implemented + verified; every real contrast pair now >=4.5:1 (>=3:1 large text/disabled), forms labelled, owner tables scroll on phones, no horizontal overflow anywhere probed
+- The download button the owner asked about: top card of the :3000 page — "Download — one-click website (Linux / macOS / Windows)" (was missing because artifacts + server were wiped; restored)
+- Deliverables on :3000: gabriel-homes-oneclick.zip (68M), gabriel-homes-update-r12.zip, gabriel-homes.bundle, db backup
+- GitHub main at 7a9af69
