@@ -896,3 +896,23 @@ Stage Summary:
 - The download button the owner asked about: top card of the :3000 page — "Download — one-click website (Linux / macOS / Windows)" (was missing because artifacts + server were wiped; restored)
 - Deliverables on :3000: gabriel-homes-oneclick.zip (68M), gabriel-homes-update-r12.zip, gabriel-homes.bundle, db backup
 - GitHub main at 7a9af69
+
+---
+Task ID: 33
+Agent: main (Z.ai)
+Task: r13 — replicate the Framer "Spotlight Bento Grid" shape-shift animation on the home-page bento (user supplied the component URL + pasted its rendered HTML)
+
+Work Log:
+- Decoded the Framer component from its published modules (ltg_o7Rff.js + BentoCard xMGI42EfE.js): hover sets a GRID-level variant ("Card N Active"); each variant swaps grid geometry (hovered card -> grid-column: span 3, siblings collapse to span 1 and reorder); framer-motion LayoutGroup/layoutId animates the swap as a FLIP spring {bounce:.12, duration:.45}; children are inverse-scaled so text/photos don't distort; BentoCard hover dressing = masked bottom scrim fade
+- Implemented as zero-dep replica: static/js/bento-shapeshift.js (~230 lines) — grid-level pointermove tracking with rAF-throttled elementFromPoint hit-testing, single-grown-card invariant, bounded settle passes after each morph (kills the reflow-under-stationary-cursor ping-pong), FLIP via WAAPI translate+scale->none, counter-scaled __bg/__scrim/__body, per-axis border-radius correction, easing cubic-bezier(0.3,1.4,0.45,1) ~= bounce .12 @ 450ms, keyboard focusin/focusout parity, context-change disarm
+- CSS (components.css): .is-grown { grid-column: span 2 } gated behind html.bento-live-ready + (min-width:1021px)+(hover:hover)+(pointer:fine); transform-origin: top left on cards (FLIP math requirement); no-JS/no-match = mosaic unchanged; spotlight card (3x2, already max) exempt
+- Script included in base.html scripts block (defer); works on home AND /agents/ (shared component)
+- Two bugs found and fixed during verification: (1) default center transform-origin made the first FLIP frame land offset -> cursor hit-tested a gap -> per-card enter/leave then oscillated forever (Playwright log: "element is not stable" x53); (2) rewrite to grid-level tracking + settle passes removed the loop class of bugs entirely
+- Verification (scripts/verify_bento_shapeshift.py, verify_bento_agents.py; CDP media emulation hover:hover/pointer:fine): gate arms, hovered tile 393->798px, neighbors re-pack via dense flow, mid-flight transform matrix present, exactly 1 grown card at settle, spotlight hover = no-op, unhover restores geometry, 0 JS errors; screenshots in download/r13-bento-*.png
+- Pre-existing observation (NOT r13): small-tile demo photos have the property title baked into the poster image (e.g. harmony-nyali-hero-poster.jpg) so a dim oversized title shows above the card body — demo media artifact, flagged for owner
+- pytest 381 green; committed 3453198; pushed to GitHub
+- Artifacts rebuilt + synced to :3000: gabriel-homes-update-r13.zip (389 files), oneclick refreshed (69M); WORK.md fingerprint -> 3453198
+
+Stage Summary:
+- The home-page bento now shape-shifts exactly like the Framer reference: hover any small tile and it morphs wider while siblings spring-repack; keyboard focus does the same; spotlight keeps its de-zoom hover; everything degrades to the pre-r13 mosaic without JS or under reduced-motion
+- r13 live on :3011, artifacts on :3000, GitHub main at 3453198
