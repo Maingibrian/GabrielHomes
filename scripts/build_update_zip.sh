@@ -123,6 +123,15 @@ for f in manage.py UPDATE-WEBSITE.sh UPDATE-WEBSITE.bat START-GABRIEL-HOMES.bat 
 done
 grep -q $'\r' "$STAGE/UPDATE-WEBSITE.bat" || { echo "FATAL: UPDATE-WEBSITE.bat is not CRLF" >&2; exit 1; }
 echo "  staged tree: rootless + all updaters present + bat is CRLF"
+# Build stamp (rootless: lands at the TOP of the update zip).
+GIT_SHA="$(git -C /home/z/my-project rev-parse --short HEAD 2>/dev/null || echo unknown)"
+cat > "$STAGE/BUILD-INFO.txt" <<STAMP
+Gabriel Homes — update package build stamp
+  built (UTC) : $(date -u '+%Y-%m-%d %H:%M')
+  release     : ${RELEASE_TAG:-${UPDATE_TAG:-dev}}
+  git commit  : $GIT_SHA
+  bento patch : r16 (owner bento-shift.patch applied verbatim)
+STAMP
 
 mkdir -p "$OUT_DIR"
 rm -f "$OUT"

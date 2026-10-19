@@ -173,6 +173,18 @@ chmod +x "$PKG/START-GABRIEL-HOMES.sh" "$PKG/START-GABRIEL-HOMES.command" \
          "$PKG/STOP-WEBSITE.sh" "$PKG/STOP-WEBSITE.command"
 
 echo "== 4. Zip =="
+# Build stamp so the user can verify WHICH build they extracted (releases
+# share one zip filename; a stale download is invisible otherwise).
+GIT_SHA="$(git -C /home/z/my-project rev-parse --short HEAD 2>/dev/null || echo unknown)"
+cat > "$PKG/BUILD-INFO.txt" <<STAMP
+Gabriel Homes — package build stamp
+  built (UTC) : $(date -u '+%Y-%m-%d %H:%M')
+  release     : ${RELEASE_TAG:-dev}
+  git commit  : $GIT_SHA
+  bento patch : r16 (owner bento-shift.patch applied verbatim)
+Check the zip you downloaded matches the md5 shown on the delivery page,
+and that THIS file exists at the top of your extracted gabriel-homes folder.
+STAMP
 mkdir -p /home/z/my-project/download
 rm -f "$OUT"
 # zip by directory NAME (not by glob): 'zip -rq out *' would silently drop
