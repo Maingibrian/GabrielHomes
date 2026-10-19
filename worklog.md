@@ -1036,3 +1036,22 @@ Stage Summary:
 - Sandbox bento behaviour proven correct with fresh evidence; user gets a visible BUILD-INFO.txt to verify their extract + two proof screenshots on :3000.
 - New canonical md5: 45ee2e2c811b45ec3d0a277bd64f6fe3; update artifact now update-r16.zip.
 - Standing advice: revoke the exposed GitHub PAT.
+
+---
+Task ID: 39
+Agent: main
+Task: "continue" — resume the interrupted r17 content audit (context window died mid-task after commit d4f50d3)
+
+Work Log:
+- FORENSICS: worklog ended at Task 38 (1692443) but git had two newer commits: 7905db9 (worklog+screenshot auto-commit) and d4f50d3 11:33 "r17 content audit" — views.py dropped the 4 demo counters (number_years/tx_value_bn/referrals_pct/neighbourhoods), added number_founded=2026 + number_checks=5, rewrote hero stats to static owner facts + about() meta. INTERRUPTED: home.html numbers band still had 4 data-count cells bound to the REMOVED vars -> live page rendered "0+/KES 0B+/0%/0". number_founded/number_checks were added to context but consumed NOWHERE. :3011 was still serving pre-d4f50d3 (noreload process, pid 1360).
+- COMPLETED the audit: numbers band -> 4 static owner-confirmed facts (2026 Founded on the Kenyan coast / 5 Checks before a listing goes live / 3 Areas served — Mombasa, Nairobi & Kilifi / 100% Listings verified before they go live), consuming number_founded + number_checks; zero data-count on the page (motion.js setupCounters() no-ops at len 0 — verified line 67). home.css comments de-counter'd (KES 1.3B+ era refs). Test test_home_page_has_three_hero_stats -> test_home_page_stats_are_owner_confirmed_facts (asserts NO data-count anywhere + facts verbatim).
+- SERVER: killed pid 1360 by exact PID (ss+sed; rg \K unsupported), relaunched via daemon_runserver.py (new pid 3408). Live page: 0 data-count, hero 2026/5/Kenya, band 2026/5/3/100%.
+- PACKAGES (commit-first so stamps match): commit 582307a BEFORE builds. RELEASE_TAG=r17 build_package.sh -> oneclick 50,792,043 B md5 b85337714b46b3ff069def2b5249a4fb; UPDATE_TAG/RELEASE_TAG=r17 build_update_zip.sh -> update-r17 (57,455,570 B, 337 files, manage.py-at-top OK); split_package.sh -> 4 parts, rejoin md5 verified b8533771; BUILD-INFO in both zips: release r17 / commit 582307a / bento patch r16.
+- SYNC: new zips -> :3000 files/; REMOVED stale update-r16.zip (files/) AND update-r15.zip (download/ leftover); parts card shows 4 fresh parts. Round-trip: served oneclick md5 == source == b8533771; zip's home.html has 0 data-count + owner facts; Range 1000000-1999999 -> 206 byte-EXACT; delivery page lists oneclick + update-r17 only. bundle + db-backup rebuilt via make_bundle.sh (post-commit snapshot).
+- pytest 381/381 green (after test rewrite). Sandbox bundle/parts committed to git (75ae167 precedent).
+- PUSH PENDING: push_github.sh needs the owner's fresh PAT as argv (old one exposed -> revoke; token not stored by design). Unpushed: d4f50d3, 582307a.
+
+Stage Summary:
+- r17 complete: NO hand-typed or demo-derived counters anywhere on the home page; numbers band = static owner-confirmed facts, layout/CSS rhythm unchanged.
+- New canonical md5: b85337714b46b3ff069def2b5249a4fb (BUILD-INFO says release: r17). :3000 fully synced; 381 tests green.
+- Standing advice: revoke the exposed GitHub PAT; send a fresh one to push d4f50d3+582307a.
