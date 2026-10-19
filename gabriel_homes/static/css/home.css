@@ -319,7 +319,7 @@
 
 
 /* ============================================================
-   5. Numbers — animated counters separated by thin taupe lines
+   5. Numbers — owner-confirmed facts separated by thin taupe lines
    ============================================================ */
 .numbers {
   background:
@@ -377,19 +377,20 @@
 @media (min-width: 980px) {
   .numbers__cell {
     border-bottom: 0;
-    /* 1.5rem side padding keeps "KES 1.3B+" inside the 1/4 track
-       once the stat number scales down (see .numbers .stat__number). */
+    /* 1.5rem side padding keeps the widest fact ("100%", "2026")
+       inside the 1/4 track once the stat number scales down
+       (see .numbers .stat__number). */
     padding: 2.25rem 1.5rem;
   }
   .numbers__cell:not(:first-child) {
     border-left: 1px solid color-mix(in srgb, var(--sand) 32%, transparent);
   }
 }
-/* The "KES 1.3B+" counter is ~4.4em wide at display sizes — far wider
-   than a 1/4 track when --text-display-2 hits its 4rem cap. Scale the
-   numbers-band figures with the viewport (≈34px @980 → 46px @1440+)
-   so every counter stays inside its cell. Hero stats are untouched
-   (their values are short and their own clamps already fit). */
+/* The numbers-band facts stay well inside a 1/4 track at display
+   sizes ("2026", "100%"), but keep the viewport-scaled figure size
+   (≈34px @980 → 46px @1440+) from the counter era so the band's
+   rhythm is unchanged. Hero stats are untouched (their values are
+   short and their own clamps already fit). */
 .numbers .stat__number {
   font-size: clamp(1.9rem, -1rem + 5.2vw, 2.9rem);
 }

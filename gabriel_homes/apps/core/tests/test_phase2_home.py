@@ -71,13 +71,22 @@ def test_home_page_has_no_agents_section():
     assert "bento-card--cta" in body
 
 
-def test_home_page_has_three_hero_stats():
+def test_home_page_stats_are_owner_confirmed_facts():
+    """Content audit r17 — no hand-typed or demo-derived counters:
+    the hero and the numbers band render static owner-confirmed facts."""
     c = Client()
     r = c.get("/")
     body = r.content.decode()
-    assert body.count("data-count=") >= 3  # at least 3 stat counters in hero
-    assert "stat__number" in body
+    # No animated counters left anywhere on the page.
+    assert "data-count=" not in body
+    # Hero keeps its three stat blocks (static text now).
+    assert body.count("stat__number") >= 3
     assert "stat__label" in body
+    # Numbers band: the owner-confirmed facts render verbatim.
+    assert "2026" in body
+    assert "Checks before a listing goes live" in body
+    assert "Mombasa, Nairobi &amp; Kilifi" in body
+    assert "Listings verified before they go live" in body
 
 
 def test_home_page_has_search_bar_with_buy_rent_segment():

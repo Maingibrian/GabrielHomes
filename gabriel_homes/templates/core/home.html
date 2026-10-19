@@ -260,7 +260,9 @@
 
 
 {# =========================================================== #}
-{# 5. Numbers — animated counters, taupe dividers               #}
+{# 5. Numbers — owner-confirmed facts only (content audit r17:  #}
+{#    no hand-typed or demo-derived counters on the page).      #}
+{#    Static text, taupe dividers — nothing animated.           #}
 {# =========================================================== #}
 <section class="section numbers" id="numbers">
   <div class="container">
@@ -270,29 +272,29 @@
     <div class="numbers__grid">
       <div class="numbers__cell" data-reveal>
         <div class="stat">
-          <span class="stat__number"><span data-count="{{ number_years }}">0</span>+</span>
-          <span class="stat__label">Years on the coast</span>
+          <span class="stat__number">{{ number_founded }}</span>
+          <span class="stat__label">Founded on the Kenyan coast</span>
           <div class="stat__line"></div>
         </div>
       </div>
       <div class="numbers__cell" data-reveal>
         <div class="stat">
-          <span class="stat__number">KES&nbsp;<span data-count="{{ number_tx_value_bn }}" data-decimals="1">0</span>B+</span>
-          <span class="stat__label">Transaction value</span>
+          <span class="stat__number">{{ number_checks }}</span>
+          <span class="stat__label">Checks before a listing goes live</span>
           <div class="stat__line"></div>
         </div>
       </div>
       <div class="numbers__cell" data-reveal>
         <div class="stat">
-          <span class="stat__number"><span data-count="{{ number_referrals_pct }}">0</span>%</span>
-          <span class="stat__label">Verified-listing ratio</span>
+          <span class="stat__number">3</span>
+          <span class="stat__label">Areas served — Mombasa, Nairobi &amp; Kilifi</span>
           <div class="stat__line"></div>
         </div>
       </div>
       <div class="numbers__cell" data-reveal>
         <div class="stat">
-          <span class="stat__number"><span data-count="{{ number_neighbourhoods }}">0</span></span>
-          <span class="stat__label">Neighbourhoods covered</span>
+          <span class="stat__number">100%</span>
+          <span class="stat__label">Listings verified before they go live</span>
           <div class="stat__line"></div>
         </div>
       </div>
