@@ -65,7 +65,9 @@
     {% include "includes/_footer.html" %}
   {% endblock %}
 
-  {% block scripts %}
+    <link rel="preload" href="{% staticv 'fonts/Geist-Variable.woff2' %}" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="{% staticv 'fonts/Fraunces-Variable-normal.woff2' %}" as="font" type="font/woff2" crossorigin>
+{% block scripts %}
     <script src="{% staticv 'js/motion.js' %}" defer></script>
     <script src="{% staticv 'js/bento-shift.js' %}" defer></script>
   {% endblock %}

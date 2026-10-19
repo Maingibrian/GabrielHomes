@@ -130,7 +130,7 @@
 .dashboard-header__subtitle {
   font-family: var(--font-mono);
   font-size: var(--text-xs);
-  letter-spacing: var(--track-tight);
+  letter-spacing: var(--track-mono);
   text-transform: uppercase;
   color: var(--taupe);
   margin-top: 0.25rem;
@@ -163,7 +163,7 @@
 .dashboard-stat__label {
   font-family: var(--font-mono);
   font-size: var(--text-xs);
-  letter-spacing: var(--track-tight);
+  letter-spacing: var(--track-mono);
   text-transform: uppercase;
   color: var(--taupe);
   margin-top: 0.25rem;
@@ -189,7 +189,7 @@
 .listing-table th {
   font-family: var(--font-mono);
   font-size: var(--text-xs);
-  letter-spacing: var(--track-tight);
+  letter-spacing: var(--track-mono);
   text-transform: uppercase;
   color: var(--taupe);
   font-weight: 500;
@@ -244,8 +244,8 @@
   padding: 0.2rem 0.6rem;
   border-radius: var(--radius-pill);
   font-family: var(--font-mono);
-  font-size: 10px;
-  letter-spacing: var(--track-tight);
+  font-size: var(--text-xs);
+  letter-spacing: var(--track-mono);
   text-transform: uppercase;
   font-weight: 500;
 }
@@ -278,7 +278,7 @@
 .dashboard-form__label {
   font-family: var(--font-mono);
   font-size: var(--text-xs);
-  letter-spacing: var(--track-tight);
+  letter-spacing: var(--track-mono);
   text-transform: uppercase;
   color: var(--taupe);
 }
@@ -385,8 +385,8 @@
 }
 .image-formset__label {
   font-family: var(--font-mono);
-  font-size: 10px;
-  letter-spacing: var(--track-tight);
+  font-size: var(--text-xs);
+  letter-spacing: var(--track-mono);
   text-transform: uppercase;
   color: var(--taupe);
 }
@@ -498,7 +498,7 @@
   gap: 0.4rem;
   font-family: var(--font-mono);
   font-size: var(--text-xs);
-  letter-spacing: var(--track-tight);
+  letter-spacing: var(--track-mono);
   text-transform: uppercase;
   padding: 0.3rem 0.7rem;
   border-radius: var(--radius-pill);

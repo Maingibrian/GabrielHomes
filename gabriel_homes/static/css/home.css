@@ -206,9 +206,9 @@
    Restate the people / transparency / support themes only. */
 .story__body p {
   font-size: var(--text-base);
-  line-height: 1.65;
+  line-height: var(--leading-prose);
   color: color-mix(in srgb, var(--ink) 78%, var(--taupe));
-  max-width: 58ch;
+  max-width: 47ch; /* r15: 58ch measured 84-98 real chars; 47ch ~68 */
 }
 .story__body p + p { margin-top: 1rem; }
 .story__quote {

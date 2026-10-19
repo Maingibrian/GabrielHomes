@@ -190,7 +190,7 @@
 .value-card__tag {
   font-family: var(--font-mono);
   font-size: var(--text-xs);
-  letter-spacing: var(--track-tight);
+  letter-spacing: var(--track-mono);
   text-transform: uppercase;
   color: var(--burnt);
   margin-bottom: 1rem;
@@ -232,7 +232,7 @@
 .principle-card__index {
   font-family: var(--font-mono);
   font-size: var(--text-xs);
-  letter-spacing: var(--track-tight);
+  letter-spacing: var(--track-mono);
   text-transform: uppercase;
   color: var(--burnt);
 }
@@ -509,7 +509,7 @@
   color: var(--cream);
   font-family: var(--font-mono);
   font-size: var(--text-xs);
-  letter-spacing: var(--track-tight);
+  letter-spacing: var(--track-mono);
   text-transform: uppercase;
   padding: 0.4rem 0.85rem;
   border-radius: var(--radius-pill);
@@ -523,7 +523,7 @@
   color: var(--white);
   font-family: var(--font-mono);
   font-size: var(--text-xs);
-  letter-spacing: var(--track-tight);
+  letter-spacing: var(--track-mono);
   text-transform: uppercase;
   padding: 0.4rem 0.85rem;
   border-radius: var(--radius-pill);
@@ -591,7 +591,7 @@
   font-family: var(--font-mono);
   font-size: var(--text-xs);
   color: var(--taupe);
-  letter-spacing: var(--track-tight);
+  letter-spacing: var(--track-mono);
   margin-top: 0.5rem;
   padding-top: 0.85rem;
   border-top: 1px solid var(--sand-60);
@@ -608,7 +608,7 @@
   font-family: var(--font-mono);
   font-size: var(--text-xs);
   color: var(--burnt);
-  letter-spacing: var(--track-tight);
+  letter-spacing: var(--track-mono);
   text-transform: uppercase;
 }
 
@@ -718,7 +718,7 @@
 .footer-cols__col h4 {
   font-family: var(--font-mono);
   font-size: var(--text-xs);
-  letter-spacing: var(--track-tight);
+  letter-spacing: var(--track-mono);
   text-transform: uppercase;
   color: var(--sand);
   margin-bottom: 1rem;
@@ -799,7 +799,7 @@
 .mobile-menu__close {
   font-family: var(--font-mono);
   font-size: var(--text-xs);
-  letter-spacing: var(--track-tight);
+  letter-spacing: var(--track-mono);
   text-transform: uppercase;
   color: var(--cream);
   background: transparent;
@@ -826,7 +826,7 @@
   padding-top: 2rem;
   font-family: var(--font-mono);
   font-size: var(--text-xs);
-  letter-spacing: var(--track-tight);
+  letter-spacing: var(--track-mono);
   text-transform: uppercase;
   color: var(--sand);
   display: flex;
@@ -970,7 +970,7 @@
   border: 0;
   font-family: var(--font-mono);
   font-size: var(--text-xs);
-  letter-spacing: var(--track-tight);
+  letter-spacing: var(--track-mono);
   text-transform: uppercase;
   cursor: pointer;
   padding: 0.5rem;
@@ -1064,14 +1064,14 @@ html.motion-ready [data-reveal].is-visible {
 .site-footer__meta {
   font-family: var(--font-mono);
   font-size: var(--text-xs);
-  letter-spacing: var(--track-tight);
+  letter-spacing: var(--track-mono);
   text-transform: uppercase;
   color: var(--sand);
 }
 .site-footer__copyright {
   font-family: var(--font-mono);
   font-size: var(--text-xs);
-  letter-spacing: var(--track-tight);
+  letter-spacing: var(--track-mono);
   color: var(--sand);
 }
 
