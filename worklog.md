@@ -1019,3 +1019,20 @@ Stage Summary:
 - Owner's bento patch applied verbatim: home-only include via {% block scripts %} + block.super, comment aligned; no double-load; 16/16 behaviour checks green.
 - Third rollback fully recovered; r16 packages on :3000 (oneclick 47MB eb5d29a2, update-r15, parts, bundle, db-backup, report).
 - Standing advice: revoke the exposed GitHub PAT.
+
+---
+Task ID: 38
+Agent: main
+Task: "the bento grid does not have the patch update...failure" — diagnose user-side failure; stale-download defence
+
+Work Log:
+- READ-ONLY DIAGNOSIS (no rollback this time): session_check OK; tree has include once on home.html / zero on base.html / grid--shift present; ONECLICK ZIP CONTENTS VERIFIED (base.html no include, home.html block + grid class); served zip == download zip; :3011 renders bento-shift.js exactly once (src=/static/js/bento-shift.js?v=...); verify_bento_shift.py 16/16 true with fresh screenshots (download/r14-*.png rewritten 10:56). Sandbox is provably correct -> user's failure is on their extracted copy.
+- ROOT CAUSE (most probable): every release ships as the SAME filename gabriel-homes-oneclick.zip — r14/r15/r16 indistinguishable in a Downloads folder; stale extract runs the pre-patch engine setup. Secondary suspects ruled out by evidence: template inheritance fine (home.html extends base.html directly), no double-load, no new rollback.
+- FIX SHIPPED: BUILD-INFO.txt stamp generated at STAGE time inside both zips (release tag, UTC build time, git commit, patch status) — build_package.sh + build_update_zip.sh edited; git tree stays clean (stamp lives only in packages). Update zip renamed gabriel-homes-update-r16.zip (was update-r15) and stale update-r15 removed from :3000.
+- REBUILT CHAIN: oneclick 47MB md5 45ee2e2c811b45ec3d0a277bd64f6fe3 (BUILD-INFO verified inside zip); parts re-split -> rejoin md5 == oneclick; full :3000 download md5 == source; proof shots r16-bento-shift-promoted/-rest.png on :3000 (200).
+- COMMIT 1692443 pushed (== DONE on GitHub). Note: no origin/main tracking ref exists (push script pushes by URL) — git log origin/main is not a valid check; use the push script output.
+
+Stage Summary:
+- Sandbox bento behaviour proven correct with fresh evidence; user gets a visible BUILD-INFO.txt to verify their extract + two proof screenshots on :3000.
+- New canonical md5: 45ee2e2c811b45ec3d0a277bd64f6fe3; update artifact now update-r16.zip.
+- Standing advice: revoke the exposed GitHub PAT.
