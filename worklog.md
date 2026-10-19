@@ -1055,3 +1055,19 @@ Stage Summary:
 - r17 complete: NO hand-typed or demo-derived counters anywhere on the home page; numbers band = static owner-confirmed facts, layout/CSS rhythm unchanged.
 - New canonical md5: b85337714b46b3ff069def2b5249a4fb (BUILD-INFO says release: r17). :3000 fully synced; 381 tests green.
 - Standing advice: revoke the exposed GitHub PAT; send a fresh one to push d4f50d3+582307a.
+
+---
+Task ID: 40
+Agent: main
+Task: "new pat" — push pending r17 commits to GitHub with the owner's fresh token
+
+Work Log:
+- Ran scripts/push_github.sh with the new fine-grained PAT -> normal push (no force fallback), DONE.
+- Verified: git ls-remote (authenticated) refs/heads/main == c6c7dee07ec3 == local HEAD. Repo is private (unauthenticated ls-remote refused).
+- Pushed chain: d4f50d3 (r17 views/hero/about owner-facts) + 582307a (numbers band completion) + c6c7dee (parts re-split b8533771 + worklog).
+- Token used for this push + one ls-remote verify only; remote URL left token-free per script design; token not stored in git config or worklog.
+- Reminder to owner: this new PAT has now appeared in chat too — rotate it when convenient; keep the standing revoke-the-old-PAT advice.
+
+Stage Summary:
+- GitHub main == local c6c7dee: r17 fully published (code + packages + evidence).
+- Next action stays with owner: re-download oneclick from :3000, check md5 b85337714b46b3ff069def2b5249a4fb and BUILD-INFO release: r17.
