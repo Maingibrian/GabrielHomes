@@ -999,3 +999,23 @@ Stage Summary:
 - r15 is downloadable again from :3000 (oneclick 46.2MB, update-r15 54.8MB, 4 parts + rejoin tools, bundle, db-backup, audit report).
 - Full recovery from second sandbox rollback; everything md5-verified; 381 tests green.
 - Standing advice: revoke the exposed GitHub PAT.
+
+---
+Task ID: 37
+Agent: main
+Task: "kindly apply" — apply owner's bento-shift.patch; THIRD sandbox rollback recovered along the way
+
+Work Log:
+- Session check flagged rollback ("recorded commit see" = my WORK.md prose broke the hash parser). Diagnosed: git history INTACT through f32daf3 (+ sandbox system commit cec2bc9); gitignored artifacts wiped again (download/, media/, db, venv, wheels). Rollback #3.
+- PATCH RECONCILIATION (upload/bento-shift.patch vs tree): neither git-apply nor reverse-apply clean (partial overlap from r14's base.html-include deviation). Measured deltas with scripts/diff_bento_patch.py: bento-shift.js IDENTICAL; home.css 3c block IDENTICAL; grid--shift already present. REAL deltas: (1) home.html lacked the {% block scripts %} include; (2) base.html carried the include instead (would double-load if naively applied); (3) components.css de-zoom comment still had the old r8 sentence in a hybrid form.
+- APPLIED: include moved base.html -> home.html child block with {{ block.super }} (script loads exactly once, home page only; motion.js stays global); components.css comment set to the patch's exact wording. End state now == patch end state.
+- RECOVERY: parts reassembled md5-perfect 6f63d9c6 -> db + media (30MB) restored; venv + wheels rebuilt (foreground — background & gets reaped by the harness, another confirmed instance).
+- VALIDATE: pytest 381/381 green; bento-shift.js rendered exactly 1x on home, 0x on /listings/; scripts/verify_bento_shift.py 16/16 true (promotion, demotion, clip-path flight, leave reset, keyboard, agents untouched, 0 JS errors).
+- PACKAGES: vendor_wheels 30 files; oneclick rebuilt 49,248,274 B md5 eb5d29a218f8c498452ec6c7ec34c573; update-r15 rebuilt (336 files); parts re-split (rejoin md5 == eb5d29a2 verified); bundle + db-backup regenerated; all synced to :3000; full-download md5 == source; Range 206 OK.
+- COMMITS: 135c256 (patch verbatim), 75ae167 (parts re-split), 0574952 (WORK.md fingerprint fix — amend orphaned the first hash, second bug of its kind; session_check now OK). Pushed to origin/main 0574952.
+- typography-audit-r15.html was wiped from download/ by rollback #3; restored from the git-tracked docs/ copy.
+
+Stage Summary:
+- Owner's bento patch applied verbatim: home-only include via {% block scripts %} + block.super, comment aligned; no double-load; 16/16 behaviour checks green.
+- Third rollback fully recovered; r16 packages on :3000 (oneclick 47MB eb5d29a2, update-r15, parts, bundle, db-backup, report).
+- Standing advice: revoke the exposed GitHub PAT.
