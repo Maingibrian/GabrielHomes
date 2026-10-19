@@ -957,3 +957,27 @@ Stage Summary:
 - Downloads now survive flaky links three ways: resumable single file (Range/206), 32% smaller zip (47MB), and 4-part download + one-click rejoin.
 - Owner-facing: same :3000 page, new "small parts" card; old flow (one zip -> START-GABRIEL-HOMES) unchanged.
 - No site code touched; gabriel_homes tree unchanged; tests_preview_server.py 9/9.
+
+---
+Task ID: 35
+Agent: main
+Task: r15 typography audit + implementation; sandbox-rollback media recovery
+
+Work Log:
+- Session check OK (HEAD b8f5adf). Both servers down (sandbox idle) — revived via watchdog.
+- AUDIT (read-only, measured via Playwright + CSS inventory; scripts/typography_audit.py + typography_followup.py):
+  - System: self-hosted variable Geist + Fraunces + Geist Mono, 4 woff2 = 290KB, font-display swap, all load (document.fonts.check true).
+  - Token scale --text-xs(13)..--text-wordmark with fluid clamps; measured hierarchy 16→18/20→24/28→36→64→80 desktop, sane mobile (h1 57px @390).
+  - WCAG 1.4.4 zoom-200% PASS via REAL 720px viewport (body.zoom=2 simulation was a false alarm); 1.4.12 text-spacing PASS; no sub-13px text on public pages (DOM-wide walk).
+  - Findings: 38 mono blocks with NEGATIVE tracking (own token rule violated); 10px dashboard badges/labels + 12-12.8px admin text (below own 13px floor); measure overshoot (ch units ~20% wider than char counts): story 84-98 real cpl, .prose ~100; hardcoded families in admin-studio; no font preloads.
+- SCORE current: 8.7/10 (87%) weighted. Alternatives scored (expert estimates, labeled): Inter+SourceSerif 8.3, IBM Plex 8.1, system stack 7.6 — all lose brand character for no measured gain. WINNER: retain fonts, targeted fixes. Detail in chat report.
+- IMPLEMENT (scripts/typography_fix_r15.py, atomic): 38 mono blocks → track-mono; 10px→--text-xs (x2); admin 0.8/0.75rem→0.8125rem + families→tokens (x4); story 58ch→47ch, prose 72ch→44ch (after 50ch still measured 81cpl), detail description 52ch cap; --leading-prose:1.65 token; preload Geist+Fraunces woff2.
+- VALIDATE (scripts/typography_validate_r15.py): mono computed +0.02em across 5 pages; story 70cpl, prose 69cpl; zoom/text-spacing still PASS; fonts load; before/after PNGs in scripts/design-audit/typography-2026-10-18/. pytest 381 green.
+- COMMIT f3d5f12, pushed.
+- INCIDENT: sandbox rollback (05:17) wiped gitignored artifacts (media/ 74MB→5.1MB, files/*.zip, wheels/, db). Watchdog reseeded db. RECOVERY: r14 split-parts reassembled md5-perfect (3b0dbff2...) → media/ + videos restored (368 files/30MB); vendor_wheels.sh re-run; update zip rebuilt (UPDATE_TAG=r15, now slimmed with same docs/a11y excludes); parts re-split from r15 oneclick; db-backup + git bundle regenerated.
+- All :3000 artifacts verified (Range 206s): oneclick 47MB, update-r15 54MB, parts rejoin md5 6f63d9c6 == oneclick, db-backup, bundle 151MB. WORK.md fingerprint updated.
+
+Stage Summary:
+- Typography: fonts retained (evidence-based), 50+ targeted fixes shipped, measured to target, 381 tests green.
+- Infra: full recovery from sandbox rollback; :3000 fully re-stocked (r15).
+- Standing advice: revoke the exposed GitHub PAT.

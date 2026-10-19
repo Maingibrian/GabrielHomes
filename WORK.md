@@ -17,7 +17,7 @@ Full project brief (mission, design law, non-copy rules): `gabriel_homes/BRIEF.m
 7. Never claim something works unless you ran it this session.
 8. Reply to the user in English only. Deliverables go on the :3000 page.
 
-LAST_COMMIT: b8f5adf (2026-10-18 — r14: owner-corrected bento shape-shift engine integrated verbatim (bento-shift.js — promotion geometry, layout-box hit-testing, clip-path FLIP); replaces r13)
+LAST_COMMIT: f3d5f12 (2026-10-19 — r15: typography audit, Geist+Fraunces+Mono retained (8.7/10); 38 mono blocks re-tracked to --track-mono, sub-13px dashboard/admin text to floor, measures capped (story 47ch, prose 44ch), --leading-prose token, font preloads. Sandbox rollback 2026-10-19 05:17 wiped gitignored artifacts; media restored from r14 split-parts rejoin (md5-verified).)
 NEXT:
   1) User: apply r11 zip on Windows (extract -> UPDATE-WEBSITE.bat -> START),
      and download the bundle + db backup after every session.

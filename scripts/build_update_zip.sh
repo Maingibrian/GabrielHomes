@@ -47,6 +47,8 @@ rsync -a \
   --exclude '.coverage' \
   --exclude 'htmlcov/' \
   --exclude 'docs/shots/' \
+  --exclude 'docs/a11y/' \
+  --exclude '/design-reference/' \
   --exclude 'property-images/' \
   --exclude 'static/video/' \
   --exclude '*.sqlite3-journal' \
