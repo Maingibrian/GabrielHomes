@@ -411,3 +411,8 @@
 </section>
 
 {% endblock %}
+
+{% block scripts %}
+  {{ block.super }}
+  <script src="{% staticv 'js/bento-shift.js' %}" defer></script>
+{% endblock %}

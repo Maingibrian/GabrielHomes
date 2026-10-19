@@ -1197,12 +1197,11 @@ html.motion-ready .bento-grid .bento-card[data-reveal]:nth-child(3n) { transitio
    computed-style diffs: the card photo rests at scale(1.2), full colour,
    with its title/price always visible; hovering springs the photo out to
    scale(1) — the full shot is revealed — and unhover springs it back.
-   No desaturation, no hidden text, no glow (r8's desaturate-reveal was a
-   misread of the reference and is gone). Pure CSS: works with JS off.
-   The HOME grid adds its own spotlight shift + desaturation on top
-   (static/css/home.css, .bento-grid--shift); this shared base stays
-   photo-only. Touch devices get the tap-through card as-is; reduced-
-   motion users get the same states without the animated transition. */
+   No hidden text, no glow. The home grid adds its own spotlight shift and
+   desaturation on top (static/css/home.css, .bento-grid--shift); this
+   shared base stays photo-only. Pure CSS: works with JS off.
+   Touch devices get the tap-through card as-is; reduced-motion users get
+   the same states without the animated transition. */
 @media (prefers-reduced-motion: reduce) {
   .bento-card__bg { transition: none; }
 }

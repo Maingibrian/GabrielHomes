@@ -17,7 +17,7 @@ Full project brief (mission, design law, non-copy rules): `gabriel_homes/BRIEF.m
 7. Never claim something works unless you ran it this session.
 8. Reply to the user in English only. Deliverables go on the :3000 page.
 
-LAST_COMMIT: see git log (r15 shipped f3d5f12; r15-post recovery + report delivery). r15: typography audit, Geist+Fraunces+Mono retained (8.7/10); 38 mono blocks re-tracked to --track-mono, sub-13px dashboard/admin text to floor, measures capped (story 47ch, prose 44ch), --leading-prose token, font preloads. Sandbox rollback 2026-10-19 ~06:20 (second) wiped gitignored artifacts again; media/db restored from r15 split-parts rejoin (md5 6f63d9c6); typography-audit-r15.html report added to :3000.
+LAST_COMMIT: 839e296 (2026-10-19 — r16: owner bento-shift.patch applied verbatim; include moved base.html -> home.html scripts block; third rollback recovered from parts rejoin eb5d29a2)
 NEXT:
   1) User: apply r11 zip on Windows (extract -> UPDATE-WEBSITE.bat -> START),
      and download the bundle + db backup after every session.
