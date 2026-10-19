@@ -100,11 +100,10 @@ def home(request):
         "stat_published": total_published,
         "stat_verified_pct": verified_pct,
         "stat_neighbourhoods": active_neighbourhoods,
-        # Numbers section
-        "number_years": 12,
-        "number_tx_value_bn": 1.4,
-        "number_referrals_pct": verified_pct,
-        "number_neighbourhoods": active_neighbourhoods,
+        # Numbers section — owner-confirmed facts only (content audit r17:
+        # no hand-typed or demo-derived counters on the page).
+        "number_founded": 2026,
+        "number_checks": 5,
     }
     return render(request, "core/home.html", context)
 
@@ -183,9 +182,9 @@ def about(request):
         body_class="page-about",
         page_title="About us — Gabriel Homes",
         meta_description=(
-            "Gabriel Homes is a Kenyan real estate agency with a human point "
-            "of view — curated properties, verified details, and full support "
-            "across Mombasa, Nairobi, Kilifi, Diani, Kiambu and Kajiado."
+            "Gabriel Homes is a Kenyan property agency founded in 2026 and "
+            "centred on the coast — every listing is checked by our team "
+            "before it goes live. Serving Mombasa, Nairobi and Kilifi."
         ),
         canonical_url="/about/",
         agencies=agencies,
