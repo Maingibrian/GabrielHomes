@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Gabriel Homes — Typography Audit Report (r15)</title>
+<style>
+  :root { --ink:#221a14; --sub:#655a4e; --line:#e6ddd1; --accent:#a03d18; --bg:#faf7f2; --card:#fff; }
+  * { box-sizing: border-box; }
+  body { font-family: Georgia, 'Times New Roman', serif; background: var(--bg); color: var(--ink);
+         margin: 0; line-height: 1.65; }
+  .wrap { max-width: 860px; margin: 0 auto; padding: 48px 24px 90px; }
+  .kicker { font-family: Menlo, Consolas, monospace; font-size: 12px; letter-spacing: .22em; color: var(--accent); }
+  h1 { font-size: clamp(28px, 4vw, 40px); margin: 8px 0 6px; line-height: 1.2; }
+  .meta { color: var(--sub); font-size: 14px; margin-bottom: 34px; }
+  h2 { border-bottom: 2px solid var(--ink); padding-bottom: 8px; margin-top: 48px; font-size: 24px; }
+  h3 { font-size: 18px; margin: 26px 0 8px; }
+  p, li { max-width: 68ch; }
+  table { border-collapse: collapse; width: 100%; margin: 16px 0 8px; background: var(--card);
+          border: 1px solid var(--line); border-radius: 8px; overflow: hidden; font-size: 15px; }
+  th, td { text-align: left; padding: 9px 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  th { background: #f0e9df; font-family: Menlo, Consolas, monospace; font-size: 12px; letter-spacing: .06em; }
+  tr:last-child td { border-bottom: none; }
+  .num { font-family: Menlo, Consolas, monospace; white-space: nowrap; }
+  .verdict { background: var(--card); border: 1px solid var(--line); border-left: 4px solid var(--accent);
+             border-radius: 8px; padding: 18px 22px; margin: 18px 0; }
+  .verdict b { font-size: 18px; }
+  .tag { display: inline-block; font-family: Menlo, Consolas, monospace; font-size: 11px; letter-spacing: .08em;
+         background: #f0e9df; border-radius: 4px; padding: 2px 8px; color: var(--sub); }
+  .tag.est { background: #fdf3e7; color: #8a5a12; }
+  .tag.pass { background: #e8f2e6; color: #2e6b2a; }
+  .tag.fix { background: #fdeaea; color: #a03d18; }
+  code { background: #f0e9df; padding: 1px 6px; border-radius: 4px; font-size: 0.9em; }
+  .foot { margin-top: 56px; border-top: 1px solid var(--line); padding-top: 14px; color: var(--sub);
+          font-size: 13px; }
+  .scale { font-family: Menlo, Consolas, monospace; font-size: 13px; background: var(--card);
+           border: 1px solid var(--line); border-radius: 8px; padding: 14px 18px; margin: 12px 0; }
+  @media print { body { background:#fff; } .wrap { padding: 10mm; max-width: none; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+<div class="kicker">GABRIEL HOMES · TYPOGRAPHY AUDIT · RELEASE r15</div>
+<h1>Typography Audit &amp; Implementation Report</h1>
+<p class="meta">Baseline commit b8f5adf (r14) → shipped f3d5f12 (r15) · Audit + validation re-run 2026-10-19
+· Method: Playwright-rendered computed styles on the live Django site (http://127.0.0.1:3011), DOM-wide walks,
+CSS token inventory · Accessibility conformance reported separately (§7) · All numbers measured unless marked
+<span class="tag est">ESTIMATE</span></p>
+
+<h2>1 · Executive verdict</h2>
+<div class="verdict">
+<b>Keep the fonts. Fix the details. That is what shipped.</b>
+<p style="margin:8px 0 0">The r15 audit measured the existing type system — self-hosted variable
+<b>Geist</b> (UI/body), <b>Fraunces</b> (display serif), <b>Geist Mono</b> (labels/data) — at a weighted
+<b>8.7 / 10 (87%)</b> against the fixed rubric in §4. Three credible alternative families scored lower on the
+same rubric (<span class="tag est">ESTIMATE</span>), because they trade away the site's brand character for
+gains the measurements did not support. Per the selection rule — switch only on meaningful measured
+improvement — no alternative cleared the bar. Instead r15 shipped <b>50+ targeted fixes</b> to the weak spots
+the audit measured (mono tracking, sub-floor sizes, line measure, missing preloads), all centralized in the
+existing token system, and re-validated with rendered evidence (§7). Full test suite: <b>381 / 381 green</b>.</p>
+</div>
+
+<h2>2 · Audit — what the site uses (measured)</h2>
+<table>
+<tr><th>Property</th><th>Measured value</th><th>Evidence</th></tr>
+<tr><td>Body / UI family</td><td>Geist Variable (self-hosted woff2, <code>font-display: swap</code>)</td><td class="num">document.fonts.check → true</td></tr>
+<tr><td>Display serif</td><td>Fraunces Variable (self-hosted woff2)</td><td class="num">document.fonts.check → true</td></tr>
+<tr><td>Mono</td><td>Geist Mono (self-hosted woff2)</td><td class="num">document.fonts.check → true</td></tr>
+<tr><td>Font payload</td><td>4 woff2 files ≈ 290 KB total</td><td class="num">static/fonts inventory</td></tr>
+<tr><td>Scale system</td><td>Tokens <code>--text-xs</code> (13px) … <code>--text-wordmark</code>, fluid <code>clamp()</code></td><td class="num">static/css/tokens.css</td></tr>
+<tr><td>Desktop hierarchy</td><td class="num">16 → 18/20 → 24/28 → 36 → 64 → 80 px</td><td class="num">computed styles @1440</td></tr>
+<tr><td>Mobile hierarchy</td><td>h1 renders 57px at 390px viewport — no cramped headings</td><td class="num">computed styles @390</td></tr>
+<tr><td>Fallbacks</td><td>System stacks declared behind every webfont</td><td class="num">CSS inventory</td></tr>
+</table>
+<p>The foundation was already strong: a real token scale, fluid clamps, self-hosting (no third-party font
+requests), and a distinctive serif display face. The deductions were in the details — tracking, floor sizes,
+line measure, and loading hints — which is exactly what r15 targeted.</p>
+
+<h2>3 · Font-size audit — hierarchy, floors, small text</h2>
+<ul>
+<li><b>Public pages:</b> a DOM-wide walk found <b>no text below 13px</b> on any public page — the token floor
+<code>--text-xs</code> holds everywhere.</li>
+<li><b>Violations of the site's own floor (fixed in r15):</b> dashboard badges/labels rendered at
+<b>10px</b> (2 spots → moved to <code>--text-xs</code> = 13px) and admin panels used <b>12–12.8px</b>
+(<code>0.8rem / 0.75rem</code> → raised to <code>0.8125rem</code> = 13px).</li>
+<li><b>Hierarchy:</b> the desktop ladder 16 → 18/20 → 24/28 → 36 → 64 → 80 gives clear 1.25–1.5× steps; every
+level is distinct — no ambiguous neighbours. Judged <span class="tag pass">PASS</span>.</li>
+<li><b>Long-form measure:</b> the audit's worst readability finding — <code>.story__body</code> set 58ch but
+rendered <b>84–98 real characters per line</b> (ch units measure the "0" glyph; real prose runs wider), and
+<code>.prose</code> rendered ≈ <b>100 cpl</b>. Comfortable reading range is 45–75 cpl.</li>
+</ul>
+
+<h2>4 · Alternatives compared — same rubric, same weights</h2>
+<p>Rubric weights (fixed by the audit brief): readability 20% · font-size &amp; hierarchy 20% · accessibility 20%
+· responsive behaviour 15% · visual hierarchy &amp; consistency 10% · product suitability 10% · loading
+performance 5%.</p>
+<table>
+<tr><th>Candidate</th><th>Score</th><th>Basis</th><th>Why it lost / won</th></tr>
+<tr><td><b>Current: Geist + Fraunces + Geist Mono (retained, then fixed)</b></td>
+<td class="num"><b>8.7 / 10 (87%)</b></td><td>Measured audit</td>
+<td>Deductions concentrated in fixable details (mono tracking −, sub-floor sizes, over-long measure, no preloads)
+— not in the font choices themselves.</td></tr>
+<tr><td>Inter + Source Serif 4</td>
+<td class="num">8.3 / 10 (83%) <span class="tag est">ESTIMATE</span></td>
+<td>Expert estimate</td>
+<td>Inter's readability at small sizes is excellent, but Fraunces' display character is a brand asset; swapping
+families would not move any measured number on this site.</td></tr>
+<tr><td>IBM Plex Sans + Plex Serif + Plex Mono</td>
+<td class="num">8.1 / 10 (81%) <span class="tag est">ESTIMATE</span></td>
+<td>Expert estimate</td>
+<td>Strong three-style system with a real mono, but heavier payload than 290 KB self-hosted and no measured
+readability edge at 16px/1.5.</td></tr>
+<tr><td>System font stack (no webfonts)</td>
+<td class="num">7.6 / 10 (76%) <span class="tag est">ESTIMATE</span></td>
+<td>Expert estimate</td>
+<td>Saves the 290 KB payload and loads instantly, but loses the serif display pairing, the mono consistency
+across OSes, and fluid-clamp control — a visible brand downgrade.</td></tr>
+</table>
+<p><b>Selection rule applied:</b> switch only on <i>meaningful</i> measured improvement. Best alternative was
+−0.4 points vs the audited baseline (<span class="tag est">ESTIMATE</span>) — the opposite of an improvement.
+<b>Winner: retain the current families; implement targeted fixes.</b></p>
+
+<h2>5 · Selection decision</h2>
+<div class="verdict">
+<b>Decision: retain Geist + Fraunces + Geist Mono; fix the measured weaknesses in place.</b>
+<p style="margin:8px 0 0">Rationale in three lines: (1) every observed deduction was fixable without touching
+font files — tracking, sizes, measure, preloads are pure CSS; (2) any family swap is a brand decision that the
+measurements did not justify; (3) keeping the families keeps the risk surface to CSS-only changes, which the
+381-test suite and rendered validation cover end-to-end.</p>
+</div>
+
+<h2>6 · Implementation — what actually shipped (commit f3d5f12)</h2>
+<table>
+<tr><th>Area</th><th>Change</th><th>Where</th></tr>
+<tr><td>Mono tracking</td><td>38 mono blocks with <i>negative</i> letter-spacing (a violation of the site's own
+token rule) → <code>+0.02em</code> via the mono tracking token</td><td>component CSS</td></tr>
+<tr><td>Sub-floor sizes</td><td>10px dashboard badges/labels → <code>--text-xs</code> (13px), 2 occurrences</td><td>dashboard CSS</td></tr>
+<tr><td>Admin text</td><td><code>0.8rem / 0.75rem</code> → <code>0.8125rem</code> (13px floor), 4 occurrences;
+hardcoded font-families → tokens</td><td>admin CSS</td></tr>
+<tr><td>Story measure</td><td><code>.story__body p</code> 58ch → <b>47ch</b> (renders 70 real cpl, target ≤75)</td><td>home.css</td></tr>
+<tr><td>Prose measure</td><td><code>.prose &gt; *</code> 72ch → <b>44ch</b> (renders 69 real cpl; 50ch still measured 81)</td><td>pages.css</td></tr>
+<tr><td>Detail page</td><td>Property description capped at <b>52ch</b></td><td>detail CSS</td></tr>
+<tr><td>Leading token</td><td>New <code>--leading-prose: 1.65</code> applied to story paragraphs</td><td>tokens.css + home.css</td></tr>
+<tr><td>Font loading</td><td><code>&lt;link rel="preload"&gt;</code> for Geist + Fraunces woff2 (removes FOUT on
+first paint)</td><td>base.html</td></tr>
+</table>
+<p>All values flow through the existing token system (<code>static/css/tokens.css</code>) — no new magic
+numbers outside tokens, so future audits adjust one file.</p>
+
+<h2>7 · Validation — measured after the fixes (re-verified 2026-10-19)</h2>
+<table>
+<tr><th>Check</th><th>Result</th><th>Status</th></tr>
+<tr><td>Mono tracking computes positive</td><td class="num">+0.26px @13px (=0.02em) on home / listing / about probes</td><td><span class="tag pass">PASS</span></td></tr>
+<tr><td>Story measure ≤ 75 real cpl</td><td class="num">70 cpl (width 517px) — was 84–98</td><td><span class="tag pass">PASS</span></td></tr>
+<tr><td>Prose measure ≤ 75 real cpl</td><td class="num">69 cpl (width 484px) — was ≈100</td><td><span class="tag pass">PASS</span></td></tr>
+<tr><td>WCAG 1.4.4 — 200% zoom (real 720px viewport)</td><td class="num">no horizontal overflow on home</td><td><span class="tag pass">PASS</span></td></tr>
+<tr><td>WCAG 1.4.12 — text-spacing override</td><td class="num">no overflow with spacing overrides applied</td><td><span class="tag pass">PASS</span></td></tr>
+<tr><td>Preloads present in served HTML</td><td class="num">Geist-Variable.woff2 · Fraunces-Variable-normal.woff2</td><td><span class="tag pass">PASS</span></td></tr>
+<tr><td>All three fonts load</td><td class="num">Geist ✓ · Fraunces ✓ · Mono ✓</td><td><span class="tag pass">PASS</span></td></tr>
+<tr><td>Full test suite</td><td class="num">381 / 381 passed (re-run after sandbox recovery)</td><td><span class="tag pass">PASS</span></td></tr>
+</table>
+<p><b>Post-fix score:</b> the fixes close every deduction the audit recorded in the fixable categories
+(readability/measure, size floors, consistency, loading hints). Applying the same rubric to the post-fix state
+scores ≈ <b>9.2 / 10 (92%)</b> <span class="tag est">ESTIMATE</span> — the residual gap sits in items listed in
+§8. This is an estimate, not a re-run of the full measured audit.</p>
+<p><b>Accessibility conformance (reported separately, per the audit brief):</b> WCAG 1.4.4 (resize text) and
+1.4.12 (text spacing) verified passing by rendered simulation; contrast and the full WCAG 2.x checklist are
+covered by the separate a11y workstream, not re-claimed here.</p>
+<p>Evidence: <code>scripts/design-audit/typography-2026-10-18/</code> — after-shots (home desktop/mobile,
+about, agents) + <code>validation.json</code>. Reproduce with:
+<code>python3 scripts/typography_audit.py</code> → <code>python3 scripts/typography_validate_r15.py</code>
+(servers up on :3011).</p>
+
+<h2>8 · Remaining issues (honest ledger)</h2>
+<ul>
+<li><b><code>.prose</code> leading is 1.3, not 1.65.</b> The new <code>--leading-prose</code> token was applied
+to the home-page story block; docs-style <code>.prose</code> pages still use <code>--leading-body</code>
+(measured 20.8px @16px = 1.3). Compliant with 1.4.12 but tighter than ideal for long reading — candidate for
+r16: point <code>.prose p/li</code> at <code>--leading-prose</code>.</li>
+<li><b>Alternative scores are expert estimates.</b> The rubric was measured for the incumbent; the three
+alternatives were scored analytically (labelled above). A measured A/B would require temporarily shipping each
+family — judged not worth the churn given the decision.</li>
+<li><b>Admin sits at the 13px floor.</b> Compliant with the site's own floor, but dashboards are dense; if the
+admin grows, consider a dedicated <code>--text-sm-plus</code> token.</li>
+<li><b>Ultra-wide behaviour not screenshot-verified.</b> Fluid clamps were verified at 390/720/1024/1440;
+≥2560px widths were reasoning-checked only.</li>
+<li><b>Before-shots lost to the sandbox rollback.</b> The pre-fix screenshots were wiped in the 2026-10-19
+rollback; after-shots + validation JSON were regenerated from the live site the same day.</li>
+</ul>
+
+<div class="foot">
+Gabriel Homes · r15 typography audit · baseline b8f5adf → shipped f3d5f12 · scripts:
+<code>typography_audit.py</code>, <code>typography_followup.py</code>, <code>typography_fix_r15.py</code>,
+<code>typography_validate_r15.py</code> · this report regenerated from measured evidence on 2026-10-19
+</div>
+</div>
+</body>
+</html>

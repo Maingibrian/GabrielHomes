@@ -161,6 +161,13 @@ def _downloads_html() -> str:
             f'href="/scripts/preview_site/files/{name}" download>'
             f'Download update zip ({tag})</a></b>'
             f'<span class="dlmeta">{name} · {human_size(zp.stat().st_size)}</span></div>')
+    for rpt in sorted(files.glob("typography-audit-*.html")):
+        name = html.escape(rpt.name)
+        cards.append(
+            f'<div class="card"><b><a href="/scripts/preview_site/files/{name}" download>'
+            f'Typography audit report (r15)</a></b>'
+            f'<span class="dlmeta">{name} · {human_size(rpt.stat().st_size)} '
+            f'· 8-section measured audit — open in browser / print to PDF</span></div>')
     parts_dir = files / "parts"
     part_files = sorted(parts_dir.glob("gabriel-homes-oneclick.part-*")) if parts_dir.is_dir() else []
     if part_files and oneclick.is_file():
