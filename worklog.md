@@ -981,3 +981,21 @@ Stage Summary:
 - Typography: fonts retained (evidence-based), 50+ targeted fixes shipped, measured to target, 381 tests green.
 - Infra: full recovery from sandbox rollback; :3000 fully re-stocked (r15).
 - Standing advice: revoke the exposed GitHub PAT.
+
+---
+Task ID: 36
+Agent: main
+Task: "i want to download the new r15" — verify/restore r15 delivery after second sandbox rollback; publish the r15 typography audit report
+
+Work Log:
+- Session check: HEAD 20c1348 (r15 shipped f3d5f12). BOTH servers down; scripts/preview_site/files/ lost all top-level artifacts (only UPDATE-WEBSITE.bat + parts/ survived); download/ dir fully wiped; gabriel_homes/media/ gone (0); db.sqlite3 missing; .venv + wheels/ wiped. Second sandbox rollback (dirs stamped 06:21).
+- RECOVERY: reassembled oneclick zip from the 4 surviving split parts -> md5 6f63d9c6215b294def9dabb5554c0200 == MD5-CHECK.txt (md5-perfect). Restored db.sqlite3 + media/ (30MB) from the zip's own copy. Recreated .venv + requirements. Re-ran vendor_wheels.sh (30 wheels, 53MB). Rebuilt update zip: UPDATE_TAG=r15 -> gabriel-homes-update-r15.zip (57,449,243 B, rootless, 335 files, bat CRLF OK). make_bundle.sh regenerated bundle (161MB) + db-backup.zip (48KB). All synced to scripts/preview_site/files/.
+- Servers revived via daemon launchers (daemon_runserver.py + daemon_workspace.py). Learned: pgrep pattern "python3 scripts/workspace_server.py" does NOT match the venv cmdline "/home/z/.venv/bin/python3 /home/z/my-project/scripts/workspace_server.py" — old server survived a "restart"; must kill by exact PID (ps + ss -ltnp to identify).
+- REPORT: typography-audit-r15.html written (8 sections: verdict 87% baseline + ~92% post-fix estimate -> audit -> font-size -> 3 alternatives with labeled ESTIMATE tags -> selection -> implementation -> validation PASS table -> remaining issues incl. .prose leading 1.3 vs story 1.65). All numbers measured from typography_audit/validate scripts; estimates explicitly tagged. Regenerated after-evidence via typography_validate_r15.py (mono +0.26px, story 70cpl, prose 69cpl, zoom/text-spacing no-overflow, preloads present, fonts load).
+- workspace_server.py: new _downloads_html() card glob typography-audit-*.html. tests_preview_server.py 9/9 green. Committed f32daf3, pushed.
+- FINAL VERIFY: :3000 homepage lists oneclick / update-r15 / parts card / bundle / db-backup / typography report; full oneclick download md5 == source; Range 1000000-1999999 -> 206 correct slice; part-00 200 full 14,680,064 B; Django :3011 200, media img 200 (earlier 404 was my regex grabbing "');" from inline CSS url()); pytest 381/381 green.
+
+Stage Summary:
+- r15 is downloadable again from :3000 (oneclick 46.2MB, update-r15 54.8MB, 4 parts + rejoin tools, bundle, db-backup, audit report).
+- Full recovery from second sandbox rollback; everything md5-verified; 381 tests green.
+- Standing advice: revoke the exposed GitHub PAT.
