@@ -17,7 +17,7 @@ Full project brief (mission, design law, non-copy rules): `gabriel_homes/BRIEF.m
 7. Never claim something works unless you ran it this session.
 8. Reply to the user in English only. Deliverables go on the :3000 page.
 
-LAST_COMMIT: 839e296 (2026-10-19 — r16: owner bento-shift.patch applied verbatim; include moved base.html -> home.html scripts block; third rollback recovered from parts rejoin eb5d29a2)
+LAST_COMMIT: 75ae167 (2026-10-19 — r16: owner bento-shift.patch applied verbatim; include moved base.html -> home.html scripts block; third rollback recovered from parts rejoin eb5d29a2)
 NEXT:
   1) User: apply r11 zip on Windows (extract -> UPDATE-WEBSITE.bat -> START),
      and download the bundle + db backup after every session.
