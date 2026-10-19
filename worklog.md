@@ -1071,3 +1071,20 @@ Work Log:
 Stage Summary:
 - GitHub main == local c6c7dee: r17 fully published (code + packages + evidence).
 - Next action stays with owner: re-download oneclick from :3000, check md5 b85337714b46b3ff069def2b5249a4fb and BUILD-INFO release: r17.
+
+---
+Task ID: 41
+Agent: main
+Task: "generete a new index page ... one block html css and js" — standalone company+services index page, owner-confirmed facts only
+
+Work Log:
+- FACTS INVENTORY (no invented info): mined approved copy from templates/core/services.html (4 services + 4 principles), contact.html (phone/WhatsApp/email/office + hours), about meta (r17). FILTERED OUT: listing_count/agency_count (demo DB), "years of trading on the coast" (conflicts with founded 2026), all counts, agent names, testimonials.
+- CONTENT POLICY enforced and audited: grep + DOM-text number scan of the built page — only 2026 (founded), 5 (checks), 3 (areas), phone parts, 8:00–18:00, section indices remain. Policy documented in an HTML comment source-map at the top of the file.
+- BUILT: download/gabriel-homes-index-v2.html — ONE file (HTML+CSS+JS inline), 40,123 B, 8 sections: hero w/ static facts row (2026/5/3), company editorial + quote, 4 principle cards, 4 long service rows (Buy/Rent&stays/Sell&list/Support), dark five-check promise band (giant ember 5 + 4 outcome cards; explicitly notes the checklist itself isn't published), 3 area cards (Mombasa home base w/ Nyali office, Nairobi, Kilifi), 4-step how-it-works, dark contact band (real tel:/wa.me/mailto:/maps links), footer. Design mirrors tokens.css exactly (Geist/Fraunces/Geist Mono via Google Fonts w/ fallbacks, cream/espresso/ember/burnt). JS: IO reveal (no-JS/reduced-motion safe), header shadow, mobile menu; zero counters. Source chunks in scripts/page_parts/.
+- :3000: workspace_server.py new glob gabriel-homes-index-*.html -> "New index page — standalone preview" card (view link + download btn); tests_preview_server.py 9/9 green; page serves as text/html 200; title verified.
+- VISUAL VERIFY (agent-browser): desktop 1440px hero + promise + contact screenshots on-brand; .reveal all fired (0 unrevealed); zero JS errors; mobile 390px no horizontal overflow, hamburger works. Proof shots index-v2-{desktop-hero,promise,contact,mobile}.png on :3000 + download/.
+- Not integrated into Django (owner asked for standalone one-file generation); integration offered as next step.
+
+Stage Summary:
+- Standalone one-file index page shipped: longer, company+services focus, facts-only (audited), brand-matched, :3000 viewable + downloadable with 4 proof shots.
+- Standing advice: rotate the PAT that passed through chat; revoke the old one.

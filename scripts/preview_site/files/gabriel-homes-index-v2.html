@@ -1,0 +1,845 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Gabriel Homes — Kenyan property agency on the coast</title>
+<meta name="description" content="Gabriel Homes is a Kenyan property agency founded in 2026 and centred on the coast. Every listing passes five checks before it goes live. Serving Mombasa, Nairobi and Kilifi.">
+<!--
+  ============================================================================
+  GABRIEL HOMES — standalone index page (one file: HTML + CSS + JS)
+  Content policy (r17 content audit): owner-confirmed facts ONLY.
+  Every claim below traces to approved site copy or the r17 fact set:
+    - Founded 2026, based on the Kenyan coast (views.py / about meta, r17)
+    - Serving Mombasa, Nairobi & Kilifi (about meta, r17)
+    - 5 checks before a listing goes live (hero facts, r17)
+    - Every listing checked by the team before it goes live (about meta)
+    - Services copy: templates/core/services.html (approved, DB counts removed)
+    - Principles: templates/core/services.html (years-of-trading claim removed)
+    - Contact: templates/core/contact.html (phone / WhatsApp / email / office)
+  Deliberately EXCLUDED: demo-DB counts, listing/agency counters, years of
+  experience, agent names, testimonials, awards — nothing invented.
+  ============================================================================
+-->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&display=swap" rel="stylesheet">
+<style>
+/* ================= tokens (mirrors static/css/tokens.css) ================ */
+:root{
+  --cream:#faf8f4; --white:#fff; --sand:#d8c9b8; --taupe:#6b5e53;
+  --clay:#965634; --brown:#5a4032; --espresso:#2a211c; --ink:#211e1b;
+  --burnt:#af4715; --ember:#eda07a;
+  --font-sans:"Geist","Inter",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --font-mono:"Geist Mono","JetBrains Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;
+  --font-display:"Fraunces","Iowan Old Style",Georgia,"Times New Roman",serif;
+  --track-tight:-.02em; --track-display:-.04em; --track-mono:.02em;
+  --leading-tight:1.2; --leading-prose:1.65;
+  --radius-card:20px; --radius-pill:100px;
+  --shadow-card:0 .6px 1.57px -1.5px rgba(42,33,28,.14),0 2.29px 5.95px -3px rgba(42,33,28,.12),0 10px 26px -4.5px rgba(42,33,28,.03);
+  --shadow-card-hover:0 24px 48px -14px rgba(42,33,28,.24),0 8px 16px -6px rgba(42,33,28,.10),0 2px 4px rgba(42,33,28,.06);
+  --container-max:1280px;
+  --gutter:clamp(1rem,.6rem + 2vw,2.5rem);
+  --section-pad-y:clamp(3rem,2rem + 4vw,6rem);
+  --section-pad-y-lg:clamp(4.5rem,3rem + 6vw,8rem);
+  --ease:cubic-bezier(.2,.6,.2,1);
+  --t-med:.3s;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+body{
+  font-family:var(--font-sans);background:var(--cream);color:var(--ink);
+  line-height:var(--leading-prose);font-size:1rem;
+  -webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;
+}
+img,svg{display:block;max-width:100%}
+a{color:inherit}
+.container{max-width:var(--container-max);margin-inline:auto;padding-inline:var(--gutter)}
+.section{padding-block:var(--section-pad-y)}
+.section--lg{padding-block:var(--section-pad-y-lg)}
+
+/* type helpers */
+.section-tag{
+  font-family:var(--font-mono);font-size:.8125rem;letter-spacing:var(--track-mono);
+  text-transform:uppercase;color:var(--clay);margin-bottom:1.25rem;
+}
+.section-tag--light{color:var(--ember)}
+.eyebrow{
+  display:inline-block;font-family:var(--font-mono);font-size:.8125rem;
+  letter-spacing:var(--track-mono);text-transform:uppercase;color:var(--taupe);
+  margin-bottom:.75rem;
+}
+.display{
+  font-family:var(--font-display);font-weight:500;line-height:var(--leading-tight);
+  letter-spacing:var(--track-display);
+}
+h1.display{font-size:clamp(2.75rem,2rem + 3.4vw,4.75rem);max-width:16ch}
+h2.display{font-size:clamp(2rem,1.7rem + 1.6vw,3rem);max-width:22ch}
+.prose{max-width:62ch;color:#3d362f}
+.prose p+p{margin-top:1.1em}
+.lede{font-size:clamp(1.0625rem,1rem + .5vw,1.25rem);color:var(--taupe);max-width:52ch}
+
+/* buttons */
+.btn{
+  display:inline-flex;align-items:center;gap:.5rem;text-decoration:none;
+  font-weight:500;font-size:.9375rem;border-radius:var(--radius-pill);
+  padding:.8rem 1.5rem;transition:background var(--t-med) var(--ease),color var(--t-med) var(--ease),box-shadow var(--t-med) var(--ease);
+}
+.btn--primary{background:var(--burnt);color:var(--white)}
+.btn--primary:hover{background:var(--brown)}
+.btn--outline{box-shadow:inset 0 0 0 1px var(--ink);color:var(--ink)}
+.btn--outline:hover{background:var(--ink);color:var(--cream)}
+.btn--onlight-ghost{color:var(--clay);padding-inline:0;border-radius:0}
+.btn--onlight-ghost:hover{color:var(--brown)}
+.btn__arrow{font-family:var(--font-sans)}
+:focus-visible{outline:2px solid var(--burnt);outline-offset:3px;border-radius:4px}
+
+/* reveal-on-scroll (JS adds .is-in; no-JS fallback shows everything) */
+.reveal{opacity:0;transform:translateY(24px);transition:opacity .6s var(--ease),transform .6s var(--ease)}
+.reveal.is-in{opacity:1;transform:none}
+@media (prefers-reduced-motion:reduce){.reveal{opacity:1;transform:none;transition:none}}
+.no-js .reveal{opacity:1;transform:none}
+
+/* ============================ header ==================================== */
+.site-header{
+  position:sticky;top:0;z-index:50;background:color-mix(in srgb,var(--cream) 88%,transparent);
+  backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+  border-bottom:1px solid color-mix(in srgb,var(--sand) 55%,transparent);
+  transition:box-shadow var(--t-med) var(--ease);
+}
+.site-header.is-scrolled{box-shadow:var(--shadow-card)}
+.header-in{display:flex;align-items:center;justify-content:space-between;gap:1rem;min-height:64px}
+.wordmark{
+  font-family:var(--font-display);font-weight:600;font-size:1.25rem;
+  letter-spacing:var(--track-tight);text-decoration:none;white-space:nowrap;
+}
+.wordmark b{color:var(--clay);font-weight:600}
+.main-nav{display:flex;align-items:center;gap:1.75rem}
+.main-nav a{
+  text-decoration:none;font-size:.875rem;font-weight:500;color:var(--taupe);
+  transition:color var(--t-med) var(--ease);
+}
+.main-nav a:hover{color:var(--ink)}
+.main-nav .nav-cta{
+  color:var(--white);background:var(--ink);border-radius:var(--radius-pill);
+  padding:.5rem 1.1rem;
+}
+.main-nav .nav-cta:hover{background:var(--burnt);color:var(--white)}
+.nav-toggle{
+  display:none;border:0;background:none;cursor:pointer;padding:.5rem;
+  color:var(--ink);border-radius:8px;
+}
+.nav-toggle svg{width:24px;height:24px}
+@media (max-width:809px){
+  .nav-toggle{display:block}
+  .main-nav{
+    position:absolute;top:100%;left:0;right:0;flex-direction:column;align-items:flex-start;
+    gap:0;background:var(--cream);border-bottom:1px solid var(--sand);
+    padding:.5rem var(--gutter) 1.25rem;display:none;
+  }
+  .main-nav.is-open{display:flex}
+  .main-nav a{padding:.75rem 0;font-size:1rem;width:100%}
+  .main-nav .nav-cta{margin-top:.5rem;text-align:center;justify-content:center;display:inline-flex}
+}
+
+/* ============================= hero ===================================== */
+.hero{padding-block:clamp(4rem,3rem + 5vw,7.5rem) clamp(3.5rem,2.5rem + 4vw,6rem)}
+.hero__tagline{margin-bottom:1.5rem}
+.hero h1{margin-bottom:1.5rem}
+.hero h1 em{font-style:italic;color:var(--clay)}
+.hero__sub{margin-bottom:2.5rem}
+.hero__actions{display:flex;flex-wrap:wrap;gap:.75rem;margin-bottom:3.5rem}
+.facts-row{
+  display:grid;grid-template-columns:repeat(3,1fr);gap:0;
+  border-top:1px solid color-mix(in srgb,var(--sand) 70%,transparent);
+}
+.fact{padding:1.75rem 1.5rem 0 0}
+.fact+.fact{border-left:1px solid color-mix(in srgb,var(--sand) 70%,transparent);padding-left:1.5rem}
+.fact__number{
+  font-family:var(--font-display);font-weight:500;font-size:clamp(1.9rem,1.5rem + 1.8vw,2.75rem);
+  line-height:var(--leading-tight);letter-spacing:var(--track-display);display:block;
+}
+.fact__label{
+  font-size:.875rem;color:var(--taupe);display:block;margin-top:.4rem;max-width:24ch;
+}
+@media (max-width:640px){
+  .facts-row{grid-template-columns:1fr}
+  .fact{padding:1.25rem 0 0}
+  .fact+.fact{border-left:0;border-top:1px solid color-mix(in srgb,var(--sand) 70%,transparent);padding-left:0;margin-top:1.25rem}
+}
+
+/* =========================== two-col editorial ========================== */
+.split{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);gap:clamp(2rem,1rem + 4vw,5rem)}
+@media (max-width:900px){.split{grid-template-columns:1fr}}
+.quote-block{
+  border-left:3px solid var(--clay);padding:.25rem 0 .25rem 1.5rem;margin-top:2rem;
+  font-family:var(--font-display);font-size:clamp(1.25rem,1.1rem + .8vw,1.5rem);
+  line-height:1.4;color:var(--brown);max-width:34ch;
+}
+.quote-block cite{
+  display:block;font-family:var(--font-mono);font-style:normal;font-size:.8125rem;
+  letter-spacing:var(--track-mono);text-transform:uppercase;color:var(--taupe);margin-top:.9rem;
+}
+
+/* =========================== principle cards ============================ */
+.principles{background:color-mix(in srgb,var(--sand) 26%,var(--cream))}
+.principles-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-top:2.5rem}
+@media (max-width:1000px){.principles-grid{grid-template-columns:repeat(2,1fr)}}
+@media (max-width:640px){.principles-grid{grid-template-columns:1fr}}
+.principle-card{
+  background:var(--white);border-radius:var(--radius-card);padding:1.75rem 1.5rem;
+  box-shadow:var(--shadow-card);transition:box-shadow var(--t-med) var(--ease),transform var(--t-med) var(--ease);
+}
+.principle-card:hover{box-shadow:var(--shadow-card-hover);transform:translateY(-2px)}
+.principle-card__index{
+  font-family:var(--font-mono);font-size:.75rem;letter-spacing:var(--track-mono);
+  color:var(--clay);text-transform:uppercase;margin-bottom:1rem;
+}
+.principle-card__title{
+  font-family:var(--font-display);font-weight:500;font-size:1.375rem;
+  letter-spacing:var(--track-tight);margin-bottom:.6rem;
+}
+.principle-card__body{font-size:.9375rem;color:var(--taupe)}
+
+/* ============================ service rows ============================== */
+.svc-tag{margin-bottom:2rem}
+.svc-row{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:clamp(2rem,1rem + 3vw,4.5rem);align-items:start}
+.svc-row+.svc-row{margin-top:clamp(3rem,2rem + 3vw,5rem)}
+@media (max-width:900px){.svc-row{grid-template-columns:1fr}}
+.svc-row__index{
+  font-family:var(--font-display);font-weight:400;font-size:clamp(3.5rem,2.5rem + 4vw,5.5rem);
+  line-height:1;color:color-mix(in srgb,var(--sand) 80%,var(--taupe));
+  letter-spacing:var(--track-display);user-select:none;
+}
+.svc-row__title{margin-bottom:1rem}
+.svc-row__body{display:flex;flex-direction:column;gap:1rem}
+.svc-row__link{margin-top:.5rem}
+.svc-alt{background:color-mix(in srgb,var(--sand) 26%,var(--cream))}
+.svc-num{
+  display:grid;grid-template-columns:auto minmax(0,1fr);gap:1.25rem;align-items:baseline;
+}
+@media (max-width:640px){.svc-num{grid-template-columns:1fr}}
+
+/* ========================== five-check promise ========================== */
+.promise{background:var(--espresso);color:var(--cream)}
+.promise .display{color:var(--cream)}
+.promise__grid{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,6fr);gap:clamp(2rem,1rem + 4vw,5rem)}
+@media (max-width:900px){.promise__grid{grid-template-columns:1fr}}
+.promise__big{
+  font-family:var(--font-display);font-weight:500;line-height:.9;
+  font-size:clamp(6rem,4rem + 9vw,11rem);letter-spacing:var(--track-display);color:var(--ember);
+}
+.promise__big small{
+  display:block;font-family:var(--font-mono);font-size:.8125rem;letter-spacing:var(--track-mono);
+  text-transform:uppercase;color:color-mix(in srgb,var(--ember) 70%,var(--cream));margin-top:1rem;
+}
+.outcome-list{list-style:none;display:grid;gap:1rem;margin-top:2rem}
+.outcome-list li{
+  display:grid;grid-template-columns:auto minmax(0,1fr);gap:1rem;align-items:baseline;
+  border-top:1px solid color-mix(in srgb,var(--sand) 26%,transparent);padding-top:1rem;
+}
+.outcome-list .n{font-family:var(--font-mono);font-size:.8125rem;color:var(--ember);letter-spacing:var(--track-mono)}
+.outcome-list h3{font-size:1.0625rem;font-weight:600;letter-spacing:var(--track-tight);margin-bottom:.3rem}
+.outcome-list p{font-size:.9375rem;color:color-mix(in srgb,var(--cream) 72%,var(--espresso))}
+.promise__note{margin-top:2rem;font-size:.875rem;color:color-mix(in srgb,var(--cream) 60%,var(--espresso))}
+
+/* ============================== areas =================================== */
+.areas-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin-top:2.5rem}
+@media (max-width:900px){.areas-grid{grid-template-columns:1fr}}
+.area-card{
+  background:var(--white);border-radius:var(--radius-card);padding:2rem 1.75rem;
+  box-shadow:var(--shadow-card);border-top:3px solid var(--sand);
+}
+.area-card--home{border-top-color:var(--burnt)}
+.area-card__name{font-family:var(--font-display);font-weight:500;font-size:1.625rem;letter-spacing:var(--track-tight);margin-bottom:.4rem}
+.area-card__role{
+  font-family:var(--font-mono);font-size:.75rem;letter-spacing:var(--track-mono);
+  text-transform:uppercase;color:var(--clay);margin-bottom:1rem;display:block;
+}
+.area-card p{font-size:.9375rem;color:var(--taupe)}
+
+/* ============================ how it works ============================== */
+.steps{background:color-mix(in srgb,var(--sand) 26%,var(--cream))}
+.steps-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-top:2.5rem}
+@media (max-width:1000px){.steps-grid{grid-template-columns:repeat(2,1fr)}}
+@media (max-width:640px){.steps-grid{grid-template-columns:1fr}}
+.step{
+  background:var(--white);border-radius:var(--radius-card);padding:1.75rem 1.5rem;
+  box-shadow:var(--shadow-card);position:relative;
+}
+.step__n{
+  font-family:var(--font-mono);font-size:.8125rem;letter-spacing:var(--track-mono);
+  color:var(--burnt);display:block;margin-bottom:.9rem;
+}
+.step__title{font-family:var(--font-display);font-weight:500;font-size:1.25rem;letter-spacing:var(--track-tight);margin-bottom:.5rem}
+.step p{font-size:.9375rem;color:var(--taupe)}
+.step::after{
+  content:"→";position:absolute;right:-.85rem;top:50%;transform:translateY(-50%);
+  color:var(--taupe);font-size:1.1rem;
+}
+.step:last-child::after{display:none}
+@media (max-width:1000px){.step::after{display:none}}
+
+/* ============================== contact ================================= */
+.contact{background:var(--espresso);color:var(--cream)}
+.contact .display{color:var(--cream)}
+.contact-cards{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-top:2.5rem}
+@media (max-width:1000px){.contact-cards{grid-template-columns:repeat(2,1fr)}}
+@media (max-width:640px){.contact-cards{grid-template-columns:1fr}}
+.contact-card{
+  background:color-mix(in srgb,var(--white) 6%,var(--espresso));
+  border:1px solid color-mix(in srgb,var(--sand) 22%,transparent);
+  border-radius:var(--radius-card);padding:1.75rem 1.5rem;
+  display:flex;flex-direction:column;gap:.75rem;
+}
+.contact-card__tag{font-family:var(--font-mono);font-size:.75rem;letter-spacing:var(--track-mono);text-transform:uppercase;color:var(--ember)}
+.contact-card__title{font-family:var(--font-display);font-weight:500;font-size:1.25rem;letter-spacing:var(--track-tight)}
+.contact-card p{font-size:.875rem;color:color-mix(in srgb,var(--cream) 70%,var(--espresso));flex:1}
+.contact-card .btn{align-self:flex-start;font-size:.875rem;padding:.6rem 1.2rem}
+.btn--ember{background:var(--ember);color:var(--espresso)}
+.btn--ember:hover{background:var(--cream)}
+.btn--ghostlight{box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--sand) 45%,transparent);color:var(--cream)}
+.btn--ghostlight:hover{background:color-mix(in srgb,var(--white) 10%,transparent)}
+
+/* ============================== footer ================================== */
+.site-footer{background:#211a16;color:color-mix(in srgb,var(--cream) 62%,#211a16);padding-block:3rem 2rem}
+.footer-in{display:flex;flex-wrap:wrap;gap:2rem;justify-content:space-between;align-items:flex-start}
+.footer-brand{font-family:var(--font-display);font-weight:600;font-size:1.5rem;color:var(--cream)}
+.footer-brand b{color:var(--ember);font-weight:600}
+.footer-note{font-size:.875rem;max-width:44ch;margin-top:.75rem}
+.footer-nav{display:flex;flex-wrap:wrap;gap:1.5rem;list-style:none}
+.footer-nav a{color:color-mix(in srgb,var(--cream) 62%,#211a16);text-decoration:none;font-size:.875rem}
+.footer-nav a:hover{color:var(--cream)}
+.footer-legal{
+  margin-top:2.5rem;padding-top:1.5rem;border-top:1px solid color-mix(in srgb,var(--cream) 12%,#211a16);
+  font-family:var(--font-mono);font-size:.75rem;letter-spacing:var(--track-mono);
+  display:flex;flex-wrap:wrap;gap:1rem;justify-content:space-between;
+}
+</style>
+</head>
+<body>
+<script>document.documentElement.classList.add('js');</script>
+
+<header class="site-header" id="top">
+  <div class="container header-in">
+    <a class="wordmark" href="#top">Gabriel<b> Homes</b></a>
+    <button class="nav-toggle" aria-expanded="false" aria-controls="mainnav" aria-label="Open menu">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+    </button>
+    <nav class="main-nav" id="mainnav" aria-label="Main">
+      <a href="#company">The company</a>
+      <a href="#services">Services</a>
+      <a href="#promise">Our promise</a>
+      <a href="#areas">Areas</a>
+      <a class="nav-cta" href="#contact">Talk to a human</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+<!-- ============================ 1. HERO ================================= -->
+<section class="hero">
+  <div class="container">
+    <p class="section-tag hero__tagline reveal">[ GABRIEL HOMES — KENYAN PROPERTY AGENCY ]</p>
+    <h1 class="display reveal">Real estate with a <em>human</em> point of view.</h1>
+    <p class="lede hero__sub reveal">
+      Gabriel Homes is a Kenyan property agency founded in 2026 and centred on
+      the coast. Every listing you see here has been checked by our team before
+      it went live — verified details, honest photography, and a named person
+      behind every enquiry.
+    </p>
+    <div class="hero__actions reveal">
+      <a class="btn btn--primary" href="#services">What we do <span class="btn__arrow" aria-hidden="true">&rarr;</span></a>
+      <a class="btn btn--outline" href="#contact">Start a conversation</a>
+    </div>
+    <div class="facts-row reveal">
+      <div class="fact">
+        <span class="fact__number">2026</span>
+        <span class="fact__label">Founded on the Kenyan coast</span>
+      </div>
+      <div class="fact">
+        <span class="fact__number">5</span>
+        <span class="fact__label">Checks before a listing goes live</span>
+      </div>
+      <div class="fact">
+        <span class="fact__number">3</span>
+        <span class="fact__label">Areas served — Mombasa, Nairobi &amp; Kilifi</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ========================= 2. THE COMPANY ============================== -->
+<section class="section section--lg" id="company">
+  <div class="container split">
+    <div>
+      <p class="section-tag reveal">[ THE COMPANY ]</p>
+      <h2 class="display reveal">New on paper. Deliberate by design.</h2>
+      <blockquote class="quote-block reveal">
+        &ldquo;Radical transparency isn't a slogan; it's how a listing earns
+        enquiries.&rdquo;
+        <cite>— how we list, in one line</cite>
+      </blockquote>
+    </div>
+    <div class="prose reveal">
+      <p>
+        Gabriel Homes was founded in 2026 and makes its home on the Kenyan
+        coast, with an office at Nyali Centre on Links Road, Mombasa. We are a
+        young agency, and we say so plainly rather than dressing the age up.
+        What we lack in history we make up for in how we work: carefully,
+        openly, and with the kind of attention that is easy to promise and
+        hard to fake.
+      </p>
+      <p>
+        The rule that shapes everything else is simple — nothing goes live
+        unchecked. Every listing on Gabriel Homes passes five separate checks
+        by our team before it appears on the site. The details are verified,
+        the photography is honest, and if something about a property is
+        imperfect, we tell you before you ask. No vague descriptions, no
+        surprises at the viewing.
+      </p>
+      <p>
+        We serve three areas — Mombasa, Nairobi and Kilifi — and we would
+        rather know three places properly than claim a map we don't. The
+        people who answer your enquiry are the same people who checked the
+        listing, so the person you talk to actually knows the property you
+        are asking about.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- ======================= 3. WHAT WE STAND FOR ========================== -->
+<section class="section principles" id="principles">
+  <div class="container">
+    <p class="section-tag reveal">[ WHAT WE STAND FOR ]</p>
+    <h2 class="display reveal">Smart property search, genuine human perspective.</h2>
+    <div class="principles-grid">
+      <article class="principle-card reveal">
+        <p class="principle-card__index">[ 001 — Understand ]</p>
+        <h3 class="principle-card__title">Listen first.</h3>
+        <p class="principle-card__body">
+          Before we show you a single property, we sit down and listen.
+          Schools, commute, budget, neighbours, what you don't like about
+          where you live now.
+        </p>
+      </article>
+      <article class="principle-card reveal">
+        <p class="principle-card__index">[ 002 — Insight ]</p>
+        <h3 class="principle-card__title">Know the market.</h3>
+        <p class="principle-card__body">
+          We are on the coast, watching it daily — which neighbourhoods are
+          quiet in low season, which have water issues in the dry season, and
+          which are about to benefit from new infrastructure.
+        </p>
+      </article>
+      <article class="principle-card reveal">
+        <p class="principle-card__index">[ 003 — Support ]</p>
+        <h3 class="principle-card__title">Stay involved.</h3>
+        <p class="principle-card__body">
+          From offer to handover we're in the room. We attend the
+          inspections, flag the small print, and chase the lawyers so you
+          don't have to.
+        </p>
+      </article>
+      <article class="principle-card reveal">
+        <p class="principle-card__index">[ 004 — Results ]</p>
+        <h3 class="principle-card__title">Make the right move.</h3>
+        <p class="principle-card__body">
+          We measure ourselves on long-term fit, not transaction count. A
+          property you still love five years later is the only metric that
+          matters.
+        </p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- =========================== 4. SERVICES =============================== -->
+<section class="section section--lg" id="services">
+  <div class="container">
+    <p class="section-tag reveal">[ SERVICES ]</p>
+    <h2 class="display reveal">What we do, end to end.</h2>
+    <p class="lede reveal" style="margin-top:1rem;margin-bottom:3rem">
+      Buying, renting, short stays, and listing your property — with verified
+      details, honest photography, and support that doesn't end when the keys
+      change hands.
+    </p>
+
+    <div class="svc-num">
+      <p class="section-tag svc-tag reveal">[ 001 — Buy ]</p>
+    </div>
+    <article class="svc-row reveal">
+      <div>
+        <span class="svc-row__index" aria-hidden="true">01</span>
+        <h3 class="display svc-row__title" style="font-size:clamp(1.75rem,1.5rem+1.2vw,2.5rem)">Buy with your eyes open.</h3>
+      </div>
+      <div class="svc-row__body prose">
+        <p>
+          Every listing on Gabriel Homes carries verified details and honest
+          photography. If something is wrong with a property, we tell you
+          before you ask — no vague descriptions, no surprises at the
+          viewing. The five checks happen before a home ever reaches the
+          site, so what you see is what is actually there.
+        </p>
+        <p>
+          When you enquire, your message goes straight to a named person with
+          the property details attached — not an inbox nobody watches. From
+          the first question to the viewing to the negotiation, you deal with
+          people who know the home, not a call centre reading a screen.
+        </p>
+        <a class="btn btn--onlight-ghost svc-row__link" href="#contact">
+          Ask about buying <span class="btn__arrow" aria-hidden="true">&rarr;</span>
+        </a>
+      </div>
+    </article>
+
+    <div class="svc-alt" style="margin-block:clamp(2rem,1rem+3vw,4rem);padding-block:clamp(2.5rem,2rem+3vw,4.5rem);border-radius:var(--radius-card)">
+      <div class="container" style="padding-inline:clamp(1.25rem,1rem+1.5vw,2.5rem)">
+        <p class="section-tag svc-tag reveal">[ 002 — Rent &amp; stays ]</p>
+        <article class="svc-row reveal">
+          <div>
+            <span class="svc-row__index" aria-hidden="true">02</span>
+            <h3 class="display svc-row__title" style="font-size:clamp(1.75rem,1.5rem+1.2vw,2.5rem)">Rent a home, or stay a while.</h3>
+          </div>
+          <div class="svc-row__body prose">
+            <p>
+              From family homes to short stays along the coast, the same
+              standard applies: verified details, real photographs, and a
+              clear word on what a place is really like before you commit.
+              Renting through Gabriel Homes starts with the same five checks
+              as buying — the standard does not drop because the lease is
+              shorter.
+            </p>
+            <p>
+              Tell us how you live — schools, commute, budget, the coast or
+              the city — and we will point you at the places that fit how you
+              actually live, not just what is available this week.
+            </p>
+            <a class="btn btn--onlight-ghost svc-row__link" href="#contact">
+              Ask about renting <span class="btn__arrow" aria-hidden="true">&rarr;</span>
+            </a>
+          </div>
+        </article>
+      </div>
+    </div>
+
+    <div class="svc-num">
+      <p class="section-tag svc-tag reveal">[ 003 — Sell &amp; list ]</p>
+    </div>
+    <article class="svc-row reveal">
+      <div>
+        <span class="svc-row__index" aria-hidden="true">03</span>
+        <h3 class="display svc-row__title" style="font-size:clamp(1.75rem,1.5rem+1.2vw,2.5rem)">List it once. List it properly.</h3>
+      </div>
+      <div class="svc-row__body prose">
+        <p>
+          Your property goes live with the full treatment — verified details,
+          honest photography, and a paper trail at every step. Radical
+          transparency isn't a slogan; it's how a listing earns enquiries. A
+          listing that hides things wastes everybody's time, including the
+          owner's.
+        </p>
+        <p>
+          Enquiries reach a named person — the one who checked your listing —
+          so questions from buyers get answered by someone who has actually
+          stood in the rooms they are asking about.
+        </p>
+        <a class="btn btn--onlight-ghost svc-row__link" href="#contact">
+          Talk to us about your property <span class="btn__arrow" aria-hidden="true">&rarr;</span>
+        </a>
+      </div>
+    </article>
+
+    <div class="svc-num" style="margin-top:clamp(2rem,1rem+3vw,4rem)">
+      <p class="section-tag svc-tag reveal">[ 004 — Support ]</p>
+    </div>
+    <article class="svc-row reveal">
+      <div>
+        <span class="svc-row__index" aria-hidden="true">04</span>
+        <h3 class="display svc-row__title" style="font-size:clamp(1.75rem,1.5rem+1.2vw,2.5rem)">From offer to handover, we're in the room.</h3>
+      </div>
+      <div class="svc-row__body prose">
+        <p>
+          We attend the inspections, flag the small print, and chase the
+          lawyers so you don't have to. Property moves are decided in the
+          unglamorous middle — the searches, the clauses, the timelines — and
+          that is exactly where we stay closest.
+        </p>
+        <p>
+          The relationship doesn't end at completion. We stay involved after
+          the deal closes — handover, fit-out, and connecting you with
+          trusted local trades. That is what &ldquo;support beyond the
+          keys&rdquo; means, and it shapes every part of how we work.
+        </p>
+        <a class="btn btn--onlight-ghost svc-row__link" href="#contact">
+          Meet the people behind it <span class="btn__arrow" aria-hidden="true">&rarr;</span>
+        </a>
+      </div>
+    </article>
+  </div>
+</section>
+
+<!-- ====================== 5. THE FIVE-CHECK PROMISE ====================== -->
+<section class="section section--lg promise" id="promise">
+  <div class="container">
+    <p class="section-tag section-tag--light reveal">[ OUR PROMISE ]</p>
+    <div class="promise__grid" style="margin-top:.5rem">
+      <div class="reveal">
+        <p class="promise__big">5<small>checks — every listing, no exceptions</small></p>
+      </div>
+      <div class="reveal">
+        <h2 class="display">Five checks before a listing goes live.</h2>
+        <p class="prose" style="margin-top:1rem;color:color-mix(in srgb,var(--cream) 74%,var(--espresso))">
+          Nothing appears on Gabriel Homes until our team has taken it through
+          five separate checks. The checks happen before publication — not
+          after someone complains — so the site you browse is already the
+          filtered version. What that means for you, in practice:
+        </p>
+        <ul class="outcome-list">
+          <li>
+            <span class="n">01</span>
+            <div>
+              <h3>Verified details</h3>
+              <p>The facts on the listing — location, size, price, terms — are checked by our team, not copy-pasted from an advert.</p>
+            </div>
+          </li>
+          <li>
+            <span class="n">02</span>
+            <div>
+              <h3>Honest photography</h3>
+              <p>Real photographs of the actual property. If a room is small, the photo will tell you.</p>
+            </div>
+          </li>
+          <li>
+            <span class="n">03</span>
+            <div>
+              <h3>A clear word before you ask</h3>
+              <p>If something is imperfect, we say so up front. No vague descriptions, no surprises at the viewing.</p>
+            </div>
+          </li>
+          <li>
+            <span class="n">04</span>
+            <div>
+              <h3>A named person on every enquiry</h3>
+              <p>Your message reaches the person who checked the listing — with the property details already attached.</p>
+            </div>
+          </li>
+        </ul>
+        <p class="promise__note">
+          We don't publish the checklist item by item — the checks evolve as
+          we learn — but the count is the count: five, every listing, before
+          it goes live.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================ 6. AREAS ================================= -->
+<section class="section section--lg" id="areas">
+  <div class="container">
+    <p class="section-tag reveal">[ WHERE WE WORK ]</p>
+    <h2 class="display reveal">Three places, known properly.</h2>
+    <p class="lede reveal" style="margin-top:1rem">
+      We serve Mombasa, Nairobi and Kilifi — and we keep the list at three
+      because knowing a place properly takes presence, not a pin on a map.
+    </p>
+    <div class="areas-grid">
+      <article class="area-card area-card--home reveal">
+        <span class="area-card__role">Home base</span>
+        <h3 class="area-card__name">Mombasa</h3>
+        <p>
+          Where Gabriel Homes lives. Our office is at Nyali Centre, Links
+          Road — ground floor, street parking, and the door is open Monday to
+          Saturday, 8:00–18:00 EAT.
+        </p>
+      </article>
+      <article class="area-card reveal">
+        <span class="area-card__role">Served</span>
+        <h3 class="area-card__name">Nairobi</h3>
+        <p>
+          The same five-check standard, carried inland. Every Nairobi listing
+          on the site has been checked by our team before it went live.
+        </p>
+      </article>
+      <article class="area-card reveal">
+        <span class="area-card__role">Served</span>
+        <h3 class="area-card__name">Kilifi</h3>
+        <p>
+          Coast, north of Mombasa. Family homes and short stays along the
+          Kenyan shoreline, with honest photography and a clear word on what
+          a place is really like.
+        </p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ========================== 7. HOW IT WORKS ============================ -->
+<section class="section steps" id="how">
+  <div class="container">
+    <p class="section-tag reveal">[ HOW IT WORKS ]</p>
+    <h2 class="display reveal">From first message to keys in hand.</h2>
+    <div class="steps-grid">
+      <article class="step reveal">
+        <span class="step__n">Step 01</span>
+        <h3 class="step__title">Tell us what you're looking for.</h3>
+        <p>
+          Call, WhatsApp, email, or walk into the Nyali office. Before we show
+          you a single property, we listen — schools, commute, budget, what
+          you don't like about where you live now.
+        </p>
+      </article>
+      <article class="step reveal">
+        <span class="step__n">Step 02</span>
+        <h3 class="step__title">We point you at checked listings.</h3>
+        <p>
+          Everything we suggest has already passed the five checks — verified
+          details, honest photography, and a clear word on anything imperfect.
+        </p>
+      </article>
+      <article class="step reveal">
+        <span class="step__n">Step 03</span>
+        <h3 class="step__title">Viewings, with us in the room.</h3>
+        <p>
+          We attend the inspections with you, flag the small print, and tell
+          you what we see — not just what the photos showed.
+        </p>
+      </article>
+      <article class="step reveal">
+        <span class="step__n">Step 04</span>
+        <h3 class="step__title">Offer to handover — and beyond.</h3>
+        <p>
+          We chase the lawyers so you don't have to, stay through handover and
+          fit-out, and connect you with trusted local trades afterwards.
+        </p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ============================ 8. CONTACT =============================== -->
+<section class="section section--lg contact" id="contact">
+  <div class="container">
+    <p class="section-tag section-tag--light reveal">[ CONTACT ]</p>
+    <h2 class="display reveal">Talk to a human.</h2>
+    <p class="lede reveal" style="margin-top:1rem;color:color-mix(in srgb,var(--cream) 74%,var(--espresso))">
+      No call centres, no ticket numbers. You'll reach a person who knows the
+      listings — usually within minutes during office hours.
+    </p>
+    <div class="contact-cards">
+      <article class="contact-card reveal">
+        <p class="contact-card__tag">[ 001 — Call ]</p>
+        <h3 class="contact-card__title">Phone</h3>
+        <p>Monday to Saturday, 8:00–18:00 EAT. For viewings, price negotiations and anything urgent.</p>
+        <a class="btn btn--ghostlight" href="tel:+254712345678">+254 712 345 678</a>
+      </article>
+      <article class="contact-card reveal">
+        <p class="contact-card__tag">[ 002 — Chat ]</p>
+        <h3 class="contact-card__title">WhatsApp</h3>
+        <p>Send us the property you have in mind and we'll reply with details, extra photos, or a viewing slot.</p>
+        <a class="btn btn--ember" href="https://wa.me/254712345678?text=Hello%20Gabriel%20Homes%2C%20I%27d%20like%20to%20ask%20about%20a%20property." target="_blank" rel="noopener">Message us</a>
+      </article>
+      <article class="contact-card reveal">
+        <p class="contact-card__tag">[ 003 — Email ]</p>
+        <h3 class="contact-card__title">Email</h3>
+        <p>For partnership enquiries, media requests, and detailed questions. We reply within one working day.</p>
+        <a class="btn btn--ghostlight" href="mailto:hello@gabrielhomes.co.ke">hello@gabrielhomes.co.ke</a>
+      </article>
+      <article class="contact-card reveal">
+        <p class="contact-card__tag">[ 004 — Visit ]</p>
+        <h3 class="contact-card__title">Office</h3>
+        <p>Nyali Centre, Links Road, Mombasa. Street parking is available and the office is on the ground floor.</p>
+        <a class="btn btn--ghostlight" href="https://maps.google.com/?q=Nyali+Centre+Links+Road+Mombasa" target="_blank" rel="noopener">Get directions</a>
+      </article>
+    </div>
+  </div>
+</section>
+</main>
+
+<!-- ============================= FOOTER ================================== -->
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-in">
+      <div>
+        <p class="footer-brand">Gabriel<b> Homes</b></p>
+        <p class="footer-note">
+          Founded 2026 on the Kenyan coast. Every listing on this site is
+          checked by our team before it goes live — five checks, every
+          listing, no exceptions.
+        </p>
+      </div>
+      <ul class="footer-nav">
+        <li><a href="#company">The company</a></li>
+        <li><a href="#services">Services</a></li>
+        <li><a href="#promise">Our promise</a></li>
+        <li><a href="#areas">Areas</a></li>
+        <li><a href="#contact">Contact</a></li>
+      </ul>
+    </div>
+    <div class="footer-legal">
+      <span>Gabriel Homes — Mombasa · Nairobi · Kilifi</span>
+      <span>Mon–Sat, 8:00–18:00 EAT</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+/* Gabriel Homes — standalone index page. Minimal, dependency-free JS.
+   1. Reveal-on-scroll: IntersectionObserver, adds .is-in once.
+      No-JS / no-IO / reduced-motion => elements stay visible (CSS handles it).
+   2. Header shadow after scroll.
+   3. Mobile menu toggle (aria-expanded kept in sync). */
+(function () {
+  'use strict';
+
+  /* 1 — reveals */
+  var revealEls = document.querySelectorAll('.reveal');
+  var reduceMotion = window.matchMedia &&
+    window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (!('IntersectionObserver' in window) || reduceMotion || !revealEls.length) {
+    revealEls.forEach ? revealEls.forEach(function (el) { el.classList.add('is-in'); })
+      : null;
+  } else {
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('is-in');
+          io.unobserve(entry.target);
+        }
+      });
+    }, { rootMargin: '0px 0px -8% 0px', threshold: 0.08 });
+    revealEls.forEach(function (el) { io.observe(el); });
+  }
+
+  /* 2 — header shadow */
+  var header = document.querySelector('.site-header');
+  var onScroll = function () {
+    if (window.scrollY > 8) { header.classList.add('is-scrolled'); }
+    else { header.classList.remove('is-scrolled'); }
+  };
+  window.addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
+
+  /* 3 — mobile menu */
+  var toggle = document.querySelector('.nav-toggle');
+  var nav = document.getElementById('mainnav');
+  if (toggle && nav) {
+    toggle.addEventListener('click', function () {
+      var open = nav.classList.toggle('is-open');
+      toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+      toggle.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
+    });
+    nav.addEventListener('click', function (e) {
+      if (e.target && e.target.tagName === 'A') {
+        nav.classList.remove('is-open');
+        toggle.setAttribute('aria-expanded', 'false');
+      }
+    });
+  }
+})();
+</script>
+</body>
+</html>
