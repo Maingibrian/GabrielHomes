@@ -1088,3 +1088,18 @@ Work Log:
 Stage Summary:
 - Standalone one-file index page shipped: longer, company+services focus, facts-only (audited), brand-matched, :3000 viewable + downloadable with 4 proof shots.
 - Standing advice: rotate the PAT that passed through chat; revoke the old one.
+
+---
+Task ID: 42
+Agent: main
+Task: "GIVE ME WHERE I CAN DOWNLOAD THE ENTIRE ZIP" — fourth sandbox rollback hit mid-answer; recovered delivery first
+
+Work Log:
+- ROLLBACK #4: download/ + files/*.zip + wheels/ + venv + db/media wiped AGAIN; git-tracked artifacts survived (parts c6c7dee, index page 541ff45). Both servers down.
+- FAST PATH (user wants the zip): reassembled oneclick from the 4 tracked parts -> md5 b85337714b46b3ff069def2b5249a4fb EXACT match; cp -> download/ + files/; :3000 restarted via daemon_workspace.py; round-trip download md5 verified; BUILD-INFO release r17 intact inside.
+- :3011 restored: venv rebuilt (django 5.2.18), db.sqlite3 + media (35M) extracted FROM the oneclick zip itself, migrate no-op, daemon_runserver.py up; home 200, r17 facts render (2026), media 200.
+- Rebuilt wheels (30 files, 53M) + update-r17 zip (337 files) + synced to files/; :3000 page lists oneclick + update-r17 + index-page cards (all 200).
+- Standing advice: rotate the PAT that passed through chat.
+
+Stage Summary:
+- Full recovery #4 complete in ~3 min using the git-tracked parts chain: user can download the ENTIRE zip again from :3000 (oneclick 47MB, md5 b8533771, release r17) with 4-part fallback intact.
