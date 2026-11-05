@@ -1,0 +1,545 @@
+/* pages.css — shared styles for static pages (about/contact/privacy/terms)
+   and the public agent directory/profile.
+   Uses only tokens from tokens.css (WORK.md §10). No new colours. */
+
+/* Page hero — full-bleed photo header matching the home hero treatment,
+   so every inner page (about/contact/terms/privacy/agents) opens with the
+   same visual language as the home page.
+
+   Legibility contract (the "washed-out hero" fix):
+   1. Photo focus shifted right (72%) so the bright villa never sits
+      behind the headline column.
+   2. Two graded scrims — a left-anchored column gradient that keeps the
+      text zone near-black, plus a vertical grade that grounds the bottom.
+   3. The [ TAG ] becomes a frosted pill chip and the eyebrow warms to
+      cream, so both survive even a sky-bright patch of photo. */
+.page-hero {
+  position: relative;
+  background: var(--espresso);
+  color: var(--cream);
+  min-height: clamp(430px, 58vh, 640px);
+  display: flex;
+  align-items: flex-end;
+  padding: calc(var(--section-pad-y-lg) * 0.9) 0 calc(var(--section-pad-y-lg) * 0.85);
+  overflow: hidden;
+}
+.page-hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(90deg, rgba(28,21,17,0.85) 0%, rgba(28,21,17,0.62) 42%, rgba(28,21,17,0.15) 100%),
+    url("../img/real/page-hero.jpg") 72% 50% / cover no-repeat,
+    var(--espresso);
+  z-index: 0;
+}
+.page-hero::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(28,21,17,0.42) 0%, rgba(42,33,28,0.08) 42%, rgba(28,21,17,0.68) 100%);
+  z-index: 0;
+  pointer-events: none;
+}
+.page-hero .container { position: relative; z-index: 1; width: 100%; }
+.page-hero .section-tag {
+  color: var(--cream);
+  background: var(--espresso-70);
+  border: 1px solid color-mix(in srgb, var(--sand) 38%, transparent);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  padding: 0.45rem 0.95rem;
+  border-radius: var(--radius-pill);
+  margin-bottom: 1.1rem;
+}
+.page-hero .eyebrow {
+  color: color-mix(in srgb, var(--cream) 76%, var(--sand));
+  margin-top: 0.75rem;
+}
+.page-hero__title {
+  font-size: var(--text-display-2);
+  font-weight: 520;
+  font-variation-settings: "opsz" 100;
+  letter-spacing: -0.015em;
+  line-height: 1.08;
+  max-width: 18ch;
+  margin-top: 0.75rem;
+  text-wrap: balance;
+  text-shadow: 0 2px 28px rgba(28,21,17,0.45);
+}
+.page-hero__subtitle {
+  color: color-mix(in srgb, var(--cream) 88%, transparent);
+  font-size: var(--text-md);
+  line-height: var(--leading-body);
+  max-width: 52ch;
+  margin-top: 1rem;
+  letter-spacing: var(--track-tight);
+  text-shadow: 0 1px 16px rgba(28,21,17,0.4);
+}
+/* Search pill living INSIDE the page hero (agent directory). Mirrors the
+   home search-bar language: white pill, icon slot, dark submit. */
+.page-hero .directory-search {
+  margin-top: 2rem;
+  max-width: 620px;
+  background: var(--white);
+  border-radius: var(--radius-pill);
+  padding: 0.4rem 0.5rem 0.4rem 1.35rem;
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  box-shadow: var(--shadow-card-hover);
+}
+.page-hero .directory-search input[type="search"] {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  background: transparent;
+  padding: 0.65rem 0;
+  font-size: var(--text-sm);
+  font-family: var(--font-sans);
+  color: var(--ink);
+}
+.page-hero .directory-search input[type="search"]::placeholder { color: var(--taupe); }
+.page-hero .directory-search input[type="search"]:focus { outline: none; }
+.directory-search__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--taupe);
+  flex-shrink: 0;
+}
+.directory-search__icon svg { width: 18px; height: 18px; }
+@media (max-width: 560px) {
+  .page-hero .directory-search { flex-wrap: nowrap; padding-left: 1rem; }
+  .page-hero .directory-search .btn--sm { padding: 0.6rem 1rem; }
+}
+
+/* Prose blocks — privacy / terms / about body copy.
+   The container keeps the page grid; each child is capped at 72ch and
+   left-aligned so text edges line up with the hero above (no floating
+   centered block). */
+.prose {
+  max-width: none;
+}
+.prose > * {
+  max-width: 72ch;
+}
+.prose h2 {
+  font-size: var(--text-2xl);
+  font-weight: 500;
+  letter-spacing: var(--track-tighter);
+  margin: var(--section-pad-y) 0 1rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--sand-60);
+}
+.prose h3 {
+  font-size: var(--text-lg);
+  font-weight: 500;
+  letter-spacing: var(--track-tight);
+  margin: 2rem 0 0.6rem;
+}
+.prose p, .prose li {
+  color: color-mix(in srgb, var(--ink) 82%, var(--cream));
+  font-size: var(--text-base);
+  line-height: var(--leading-body);
+  letter-spacing: var(--track-tight);
+}
+.prose p + p { margin-top: 0.6rem; }
+.prose ul, .prose ol { padding-left: 1.4rem; margin-top: 0.6rem; }
+.prose li + li { margin-top: 0.4rem; }
+.prose strong { font-weight: 500; color: var(--ink); }
+.prose a { color: var(--burnt); text-decoration: underline; text-underline-offset: 3px; }
+.prose a:hover { color: var(--brown); }
+.prose__updated {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--taupe);
+  letter-spacing: var(--track-tight);
+}
+
+/* Contact channel cards — same icon-chip language as the home value
+   cards, a clay hairline on hover, and a gentle lift. */
+.contact-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1.5rem;
+  margin-top: 2rem;
+}
+.contact-card {
+  background: var(--white);
+  border-radius: var(--radius-card);
+  padding: 2rem;
+  box-shadow: var(--shadow-card);
+  border: 1px solid var(--sand-60);
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  transition: transform var(--t-med) var(--ease), box-shadow var(--t-med) var(--ease), border-color var(--t-med) var(--ease);
+}
+.contact-card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-card-hover);
+  border-color: color-mix(in srgb, var(--clay) 45%, var(--sand-60));
+}
+.contact-card__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  background: var(--burnt-12);
+  color: var(--burnt);
+  margin-bottom: 0.9rem;
+}
+.contact-card__icon svg { width: 22px; height: 22px; }
+.contact-card__tag {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--burnt);
+  letter-spacing: var(--track-tight);
+  text-transform: uppercase;
+}
+.contact-card__title {
+  font-size: var(--text-xl);
+  font-weight: 500;
+  letter-spacing: var(--track-tighter);
+}
+.contact-card__body { color: var(--taupe); font-size: var(--text-sm); line-height: var(--leading-body); }
+.contact-card .btn { align-self: flex-start; margin-top: 0.4rem; }
+
+/* Bento mosaic (.bento-*) lives in components.css now so the home
+   showcase and this directory share the exact same component. */
+
+
+.directory-search {
+  margin-top: 2rem;
+  display: flex;
+  gap: 0.75rem;
+  max-width: 560px;
+}
+.directory-search input[type="search"] {
+  flex: 1;
+  border-radius: 100px;
+  border: 1px solid var(--sand-60);
+  background: var(--white);
+  padding: 0.85rem 1.4rem;
+  font-size: var(--text-sm);
+  font-family: var(--font-sans);
+  color: var(--ink);
+}
+.directory-search input[type="search"]:focus {
+  outline: 2px solid var(--burnt);
+  outline-offset: 2px;
+  border-color: transparent;
+}
+
+/* Agent profile page. */
+.profile-header {
+  display: flex;
+  gap: 2rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.profile-header__portrait {
+  width: 132px;
+  height: 132px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--clay), var(--brown));
+  background-size: cover;
+  background-position: center;
+  flex-shrink: 0;
+}
+.profile-header__name {
+  font-size: var(--text-3xl);
+  font-weight: 500;
+  letter-spacing: var(--track-tighter);
+  margin-top: 0.5rem;
+}
+.profile-header__meta { color: var(--taupe); font-size: var(--text-sm); margin-top: 0.35rem; letter-spacing: var(--track-tight); }
+.profile-actions { display: flex; gap: 0.75rem; flex-wrap: wrap; margin-top: 1.5rem; }
+.profile-bio { max-width: 68ch; color: color-mix(in srgb, var(--ink) 82%, var(--cream)); line-height: var(--leading-body); letter-spacing: var(--track-tight); margin-top: 1.5rem; }
+
+/* Responsive: shrink hero type on small screens. */
+@media (max-width: 809px) {
+  .page-hero { padding: var(--section-pad-y) 0; }
+  .page-hero__title { font-size: var(--text-3xl); }
+  .profile-header { flex-direction: column; align-items: flex-start; }
+}
+
+/* ============================================================
+   SERVICES page (/services/) — numbered alternating rows.
+   Editorial: photo panel + body column, mirroring the home
+   story collage (cream borders, mono kickers).
+   ============================================================ */
+.svc { row-gap: 0; }
+.svc .section-tag { margin-bottom: 1.25rem; }
+.svc-row {
+  display: grid;
+  grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+  gap: clamp(2rem, 5vw, 4.5rem);
+  align-items: center;
+  padding-bottom: var(--section-pad-y);
+}
+.svc-row--flip .svc-row__media { order: 2; }
+.svc-row--flip .svc-row__body { order: 1; }
+.svc-row__media {
+  aspect-ratio: 16 / 11;
+  border-radius: var(--radius-card);
+  background-size: cover;
+  background-position: center;
+  box-shadow: var(--shadow-outline);
+  /* cream print border, echoing the story collage */
+  border: 10px solid var(--cream);
+  outline: 1px solid var(--sand-60);
+}
+.svc-row__body { max-width: 56ch; }
+.svc-row__body .eyebrow { display: block; margin-bottom: 0.9rem; }
+.svc-row__title {
+  font-family: var(--font-display);
+  font-size: var(--text-3xl);
+  font-weight: 500;
+  letter-spacing: var(--track-tighter);
+  line-height: var(--leading-tight, 1.1);
+  margin-bottom: 1.1rem;
+  text-wrap: balance;
+}
+.svc-row__body p {
+  color: color-mix(in srgb, var(--ink) 82%, var(--cream));
+  line-height: var(--leading-body);
+  letter-spacing: var(--track-tight);
+}
+.svc-row__body p + p { margin-top: 0.85rem; }
+.svc-row__link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 1.4rem;
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  letter-spacing: var(--track-mono);
+  text-transform: uppercase;
+  color: var(--burnt);
+  border-bottom: 1px solid var(--burnt-30);
+  padding-bottom: 0.2rem;
+  transition: border-color 0.18s ease, color 0.18s ease;
+}
+.svc-row__link:hover { color: var(--espresso); border-color: var(--espresso); }
+
+@media (max-width: 900px) {
+  .svc-row,
+  .svc-row--flip .svc-row__media,
+  .svc-row--flip .svc-row__body { order: initial; }
+  .svc-row { grid-template-columns: 1fr; gap: 1.75rem; padding-bottom: 4.5rem; }
+  .svc-row__media { aspect-ratio: 16 / 10; border-width: 7px; }
+  .svc-row__title { font-size: var(--text-2xl); }
+}
+
+/* ============================================================
+   r13 — Contact page: channels, audience paths, How-we-check band
+   Fixes the "smudged together" layout: each block is a visually
+   distinct unit (cards / bordered paths / tinted band) with clear
+   breathing room, reusing existing tokens only.
+   ============================================================ */
+.contact-channels__title {
+  font-family: var(--font-display);
+  font-size: var(--text-3xl);
+  font-weight: 500;
+  letter-spacing: var(--track-tighter);
+  margin: 0.4rem 0 2rem;
+}
+.contact-channels__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr));
+  gap: 1.25rem;
+}
+.contact-channel {
+  display: grid;
+  gap: 0.45rem;
+  justify-items: start;
+  padding: 1.75rem 1.75rem 1.9rem;
+  background: var(--cream);
+  border: 1px solid var(--sand-60);
+  border-radius: var(--radius-card, 18px);
+  text-decoration: none;
+  color: var(--ink);
+  transition: transform 0.25s var(--ease), border-color 0.25s var(--ease), box-shadow 0.25s var(--ease);
+}
+.contact-channel:hover {
+  transform: translateY(-4px);
+  border-color: var(--burnt);
+  box-shadow: 0 18px 45px rgba(45, 31, 23, 0.12);
+}
+.contact-channel__label {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  letter-spacing: var(--track-mono);
+  text-transform: uppercase;
+  color: var(--burnt);
+}
+.contact-channel__value {
+  font-family: var(--font-display);
+  font-size: var(--text-xl);
+  font-weight: 500;
+  letter-spacing: var(--track-tight);
+}
+.contact-channel__hint {
+  font-size: var(--text-sm);
+  color: var(--taupe);
+}
+.contact-channel__hint span { color: var(--burnt); }
+
+.contact-paths__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr));
+  gap: 1.5rem;
+}
+.contact-path {
+  display: grid;
+  gap: 0.9rem;
+  justify-items: start;
+  align-content: start;
+  padding: 2.2rem 2.2rem 2.4rem;
+  background: #fff;
+  border: 1px solid var(--sand-60);
+  border-radius: var(--radius-card, 18px);
+  box-shadow: 0 10px 35px rgba(45, 31, 23, 0.06);
+}
+.contact-path__tag {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  letter-spacing: var(--track-mono);
+  text-transform: uppercase;
+  color: var(--burnt);
+}
+.contact-path__title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: var(--text-2xl);
+  font-weight: 500;
+  letter-spacing: var(--track-tighter);
+  line-height: var(--leading-tight, 1.12);
+}
+.contact-path__body {
+  margin: 0;
+  color: color-mix(in srgb, var(--ink) 82%, var(--cream));
+  line-height: var(--leading-body);
+  letter-spacing: var(--track-tight);
+}
+.contact-path .btn { margin-top: 0.6rem; }
+
+.contact-checks {
+  background: color-mix(in srgb, var(--sand) 30%, var(--cream));
+}
+.contact-checks__inner {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) auto;
+  gap: 2.5rem;
+  align-items: center;
+}
+.contact-checks__title {
+  font-family: var(--font-display);
+  font-size: var(--text-3xl);
+  font-weight: 500;
+  letter-spacing: var(--track-tighter);
+  margin: 0.4rem 0 0.8rem;
+}
+.contact-checks__body {
+  margin: 0;
+  max-width: 62ch;
+  color: color-mix(in srgb, var(--ink) 82%, var(--cream));
+  line-height: var(--leading-body);
+  letter-spacing: var(--track-tight);
+}
+.contact-checks__link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 1.05em 1.7em;
+  background: var(--espresso);
+  color: var(--cream);
+  border-radius: 999px;
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: background 0.2s var(--ease), transform 0.2s var(--ease);
+}
+.contact-checks__link:hover { background: var(--burnt); transform: translateY(-2px); }
+@media (max-width: 900px) {
+  .contact-checks__inner { grid-template-columns: 1fr; }
+  .contact-checks__link { justify-self: start; }
+}
+
+/* ============================================================
+   r13 — About page story split: paragraphs left, real house photo
+   right (fills the white space beside the 72ch prose column).
+   ============================================================ */
+.about-story {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
+  gap: clamp(2.5rem, 5vw, 4.5rem);
+  align-items: start;
+}
+.about-story__copy > * { max-width: 62ch; }
+.about-story__copy h2 {
+  font-size: var(--text-2xl);
+  font-weight: 500;
+  letter-spacing: var(--track-tighter);
+  margin: var(--section-pad-y) 0 1rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--sand-60);
+}
+.about-story__copy p {
+  color: color-mix(in srgb, var(--ink) 82%, var(--cream));
+  font-size: var(--text-base);
+  line-height: var(--leading-body);
+  letter-spacing: var(--track-tight);
+}
+.about-story__copy p + p { margin-top: 0.6rem; }
+.about-story__figure {
+  position: sticky;
+  top: 96px;
+  margin: 0;
+}
+.about-story__figure img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 4 / 4.4;
+  object-fit: cover;
+  border-radius: var(--radius-card, 18px);
+  box-shadow: 0 20px 55px rgba(45, 31, 23, 0.16);
+}
+.about-story__figure figcaption {
+  display: flex;
+  gap: 0.6rem;
+  align-items: baseline;
+  margin-top: 0.9rem;
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  letter-spacing: var(--track-mono);
+  text-transform: uppercase;
+  color: var(--taupe);
+}
+.about-story__figure figcaption span { color: var(--burnt); }
+@media (max-width: 900px) {
+  .about-story { grid-template-columns: 1fr; }
+  .about-story__figure { position: static; }
+  .about-story__figure img { aspect-ratio: 16 / 11; }
+}
+
+/* r13 — small mono crumb for the How-we-check sub-page under Contact. */
+.page-hero__crumb {
+  margin: 1.4rem 0 0;
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  letter-spacing: var(--track-mono);
+  text-transform: uppercase;
+}
+.page-hero__crumb a { color: inherit; text-decoration: none; border-bottom: 1px solid currentColor; padding-bottom: 0.15rem; }
+.page-hero__crumb a:hover { color: var(--ember, var(--burnt)); }
+
+/* r13 completion — band the process and audience-path interludes so the
+   white cards sit on the warm sand band (same language as the home page). */
+.hv2-process { background: #f4eee6; }
+.contact-paths { background: #f4eee6; }

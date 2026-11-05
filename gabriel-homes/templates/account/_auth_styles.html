@@ -1,0 +1,84 @@
+{# Shared styles for the agent auth pages (login / signup_closed / logout). #}
+{# Scoped under .auth-card so nothing leaks into site pages. #}
+<style>
+  .auth-wrap {
+    display: flex;
+    justify-content: center;
+    padding: 5rem 0 6rem;
+  }
+  .auth-card {
+    width: min(460px, 100%);
+    background: var(--white);
+    border: 1px solid var(--sand-60);
+    border-radius: var(--radius-md, 8px);
+    padding: 2.5rem 2.25rem 2.25rem;
+  }
+  .auth-card__tag {
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    letter-spacing: var(--track-tight);
+    text-transform: uppercase;
+    color: var(--burnt);
+    margin: 0 0 0.75rem;
+  }
+  .auth-card__title {
+    font-size: clamp(1.6rem, 3vw, 2rem);
+    line-height: 1.1;
+    margin: 0 0 0.5rem;
+    color: var(--ink);
+  }
+  .auth-card__lede {
+    font-size: var(--text-sm);
+    color: var(--taupe);
+    margin: 0 0 1.75rem;
+    line-height: 1.55;
+  }
+  .auth-card .auth-field { margin-bottom: 1.1rem; }
+  .auth-card .auth-field label {
+    display: block;
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    letter-spacing: var(--track-tight);
+    text-transform: uppercase;
+    color: var(--taupe);
+    margin-bottom: 0.35rem;
+  }
+  .auth-card .auth-input {
+    width: 100%;
+    border: 1px solid var(--sand-60);
+    border-radius: var(--radius-sm);
+    padding: 0.65rem 0.85rem;
+    font-size: var(--text-sm);
+    color: var(--ink);
+    background: var(--white);
+  }
+  .auth-card .auth-input:focus {
+    outline: 2px solid var(--burnt);
+    outline-offset: -1px;
+  }
+  .auth-card .auth-errors {
+    color: #b3261e;
+    font-size: var(--text-xs);
+    margin-top: 0.4rem;
+  }
+  .auth-card .auth-errors ul { margin: 0; padding-left: 1rem; list-style: disc; }
+  .auth-card__actions { margin-top: 1.5rem; }
+  .auth-card__actions .btn { width: 100%; justify-content: center; }
+  .auth-card__footnote {
+    margin: 1.25rem 0 0;
+    font-size: var(--text-xs);
+    color: var(--taupe);
+    line-height: 1.6;
+  }
+  .auth-card__footnote a { color: var(--burnt); }
+  .auth-card__ok {
+    background: color-mix(in srgb, var(--burnt) 8%, var(--white));
+    border: 1px solid var(--sand-60);
+    border-radius: var(--radius-sm);
+    padding: 0.85rem 1rem;
+    font-size: var(--text-sm);
+    color: var(--ink);
+    margin-bottom: 1.5rem;
+    line-height: 1.5;
+  }
+</style>

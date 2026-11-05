@@ -1,0 +1,136 @@
+{% extends "base.html" %}
+{% load core_tags static %}
+
+{% block title %}{{ page_title }}{% endblock %}
+{% block meta_description %}{{ meta_description }}{% endblock %}
+{% block canonical %}<link rel="canonical" href="{{ SITE_DOMAIN }}{{ canonical_url }}">{% endblock %}
+
+{% block styles %}
+  <link rel="stylesheet" href="{% staticv 'css/pages.css' %}">
+  <link rel="stylesheet" href="{% staticv 'css/home.css' %}">
+  {# P0-3: reuses the shared .empty-state component from search.css (same tokens). #}
+  <link rel="stylesheet" href="{% staticv 'css/search.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<section class="page-hero">
+  <div class="container">
+    <p class="section-tag" data-reveal>[ AGENTS ]</p>
+    <span class="eyebrow" data-reveal>Directory</span>
+    <h1 class="page-hero__title" data-reveal>Meet the people behind your next move.</h1>
+    <p class="page-hero__subtitle" data-reveal>
+      The agencies currently listing on Gabriel Homes. Browse
+      the directory, or search by name, speciality, or location.
+    </p>
+
+    {# Search lives IN the hero (same pill language as the home search bar) #}
+    <form class="directory-search" method="get" action="{% url 'agents:agent_directory' %}" role="search" data-reveal>
+      <span class="directory-search__icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.8-3.8"/></svg>
+      </span>
+      <input type="search" name="q" value="{{ q }}" placeholder="Search agencies, specialities, or locations…" aria-label="Search agencies">
+      <button type="submit" class="btn btn--dark btn--sm">Search</button>
+      {% if q %}<a class="btn btn--outline btn--sm" href="{% url 'agents:agent_directory' %}">Clear</a>{% endif %}
+    </form>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+
+    {% if q %}
+      <p style="color: var(--taupe); font-size: var(--text-sm); letter-spacing: var(--track-tight);">
+        {{ paginator.count }} result{{ paginator.count|pluralize }} for “{{ q }}”
+      </p>
+    {% endif %}
+
+    {% if paginator.count %}
+    <div class="bento-grid__heading" data-reveal>
+      <p class="section-tag">[ The directory ]</p>
+      <h2 class="bento-grid__title">
+        {{ paginator.count }} agenc{{ paginator.count|pluralize:"y,ies" }}
+        on Gabriel Homes.
+      </h2>
+    </div>
+    {% endif %}
+
+    <div class="bento-grid" >
+      {% for agency in agencies %}
+        <a class="bento-card{% if forloop.first %} bento-card--spotlight{% endif %}"
+           href="{% url 'agents:agent_detail' agency.slug %}" data-reveal>
+          <div class="bento-card__bg" aria-hidden="true"
+               {% if agency.logo %}style="background-image: url('{{ agency.logo.url }}');"{% endif %}></div>
+          <div class="bento-card__scrim" aria-hidden="true"></div>
+          <div class="bento-card__body">
+            <p class="bento-card__index">{{ forloop.counter|stringformat:"02d" }}{% if forloop.first %} · SPOTLIGHT{% endif %}</p>
+            <h2 class="bento-card__name">{{ agency.name }}</h2>
+            <p class="bento-card__meta">
+              Agency
+              · {{ agency.active_listings }} active listing{{ agency.active_listings|pluralize }}
+            </p>
+          </div>
+        </a>
+      {% empty %}
+        {# P0-3: designed empty state — the grid is never blank. #}
+        <div class="empty-state" style="grid-column: 1 / -1;" data-reveal>
+          {% if q %}
+            <p class="empty-state__tag">[ NO MATCHES ]</p>
+            <h2 class="empty-state__title">No agencies match “{{ q }}”.</h2>
+            <p class="empty-state__body">
+              Try a different name, speciality, or location.
+            </p>
+            <div class="empty-state__suggestions">
+              <a class="empty-state__suggestion" href="{% url 'agents:agent_directory' %}">Clear search</a>
+            </div>
+          {% else %}
+            <p class="empty-state__tag">[ THE DIRECTORY ]</p>
+            <h2 class="empty-state__title">The directory is empty right now.</h2>
+            <p class="empty-state__body">
+              No partner agencies are listed yet. Every property on Gabriel
+              Homes is handled directly by us — browse the listings or get
+              in touch.
+            </p>
+            <div class="empty-state__suggestions">
+              <a class="empty-state__suggestion" href="/properties/">Browse properties</a>
+              <a class="empty-state__suggestion" href="/contact/">Contact us</a>
+            </div>
+          {% endif %}
+        </div>
+      {% endfor %}
+
+      {# Partner CTA — fills the final grid slot so the mosaic reads even. #}
+      {# P0-3: hidden when empty — a lone join-us card in a blank grid reads broken. #}
+      {% if agencies %}
+      <a class="bento-card bento-card--cta" href="/contact/" data-reveal>
+        <div class="bento-card__scrim" aria-hidden="true"></div>
+        <div class="bento-card__body">
+          <p class="bento-card__index">JOIN US</p>
+          <h2 class="bento-card__name">Your agency here.</h2>
+          <p class="bento-card__meta">
+            List your portfolio on Gabriel Homes — reach buyers and renters
+            across the coast. Get in touch&nbsp;&rarr;
+          </p>
+        </div>
+      </a>
+      {% endif %}
+    </div>
+
+    {% if is_paginated %}
+      <nav class="pagination" style="margin-top: 2.5rem;" aria-label="Agency pages">
+        {% if page_obj.has_previous %}
+          <a class="btn btn--outline btn--sm" href="?page={{ page_obj.previous_page_number }}{% if q %}&q={{ q|urlencode }}{% endif %}">← Previous</a>
+        {% endif %}
+        <span style="color: var(--taupe); font-size: var(--text-sm); align-self: center;">
+          Page {{ page_obj.number }} of {{ paginator.num_pages }}
+        </span>
+        {% if page_obj.has_next %}
+          <a class="btn btn--outline btn--sm" href="?page={{ page_obj.next_page_number }}{% if q %}&q={{ q|urlencode }}{% endif %}">Next →</a>
+        {% endif %}
+      </nav>
+    {% endif %}
+
+  </div>
+</section>
+
+{% endblock %}

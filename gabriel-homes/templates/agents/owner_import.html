@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+{% load core_tags static %}
+
+{% block title %}Import listings — Owner dashboard{% endblock %}
+{% block meta_description %}Real-listing CSV import.{% endblock %}
+{% block body_class %}page-dashboard{% endblock %}
+
+{% block styles %}
+  <link rel="stylesheet" href="{% staticv 'css/dashboard.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<div class="dashboard-layout">
+
+  {# Sidebar (owner) #}
+  <aside class="dashboard-sidebar">
+    <div class="dashboard-sidebar__brand">Gabriel Homes</div>
+    <nav class="dashboard-sidebar__nav" aria-label="Dashboard">
+      <a class="dashboard-sidebar__link" href="{% url 'agents:dashboard_home' %}">Overview</a>
+      <a class="dashboard-sidebar__link" href="{% url 'agents:owner_listings' %}">All listings</a>
+      <a class="dashboard-sidebar__link" href="{% url 'agents:dashboard_inquiries' %}">Inquiries</a>
+      <a class="dashboard-sidebar__link" href="{% url 'agents:owner_agencies' %}">Agencies</a>
+      <a class="dashboard-sidebar__link is-active" href="{% url 'agents:owner_import' %}">Import listings</a>
+      <a class="dashboard-sidebar__link" href="/admin/">Advanced</a>
+      <a class="dashboard-sidebar__link" href="/">View site</a>
+    </nav>
+  </aside>
+
+  <main class="dashboard-main">
+    <div class="dashboard-header">
+      <div>
+        <h1 class="dashboard-header__title">Import real listings</h1>
+        <p class="dashboard-header__subtitle">[ CSV &middot; DRY-RUN FIRST ]</p>
+      </div>
+      <a class="btn btn--outline btn--sm" href="{% url 'agents:owner_import_sample' %}">Download template CSV</a>
+    </div>
+
+    {% if result %}
+    <section class="import-result">
+      <p class="import-result__summary">
+        {% if result.dry_run %}Dry run:{% endif %} {{ result.summary }}
+      </p>
+      {% if result.errors %}
+        {% for err in result.errors %}
+        <p class="import-result__error">{{ err }}</p>
+        {% endfor %}
+      {% endif %}
+    </section>
+    {% endif %}
+
+    <form class="dashboard-form" method="post" enctype="multipart/form-data">
+      {% csrf_token %}
+      <div class="dashboard-form__row dashboard-form__row--2">
+        <div class="dashboard-form__field">
+          <label class="dashboard-form__label" for="i-file">CSV file</label>
+          <input class="dashboard-form__input" type="file" id="i-file" name="csv_file" accept=".csv,text/csv" required>
+        </div>
+        <div class="dashboard-form__field">
+          <label class="dashboard-form__label" for="i-dry">Mode</label>
+          <select class="dashboard-form__select" id="i-dry" name="dry_run">
+            <option value="on" selected>Dry run — validate only, save nothing</option>
+            <option value="off">Import — create the listings</option>
+          </select>
+          <p class="owner-table-note">Always dry-run a new file first. Every imported listing is marked <strong>real</strong> (never demo) and lands as a draft unless the row says <code>published</code>.</p>
+        </div>
+      </div>
+      <div class="dashboard-form__actions">
+        <button class="btn btn--primary" type="submit">Run import</button>
+      </div>
+    </form>
+
+    <div class="dashboard-header" style="margin-top: 2.5rem;">
+      <div>
+        <h2 class="dashboard-header__title" style="font-size: var(--text-xl);">Expected columns</h2>
+        <p class="dashboard-header__subtitle">[ FIRST ROW = HEADER ]</p>
+      </div>
+    </div>
+
+    <table class="import-columns">
+      <thead>
+        <tr><th>Column</th><th></th><th>Notes</th></tr>
+      </thead>
+      <tbody>
+        {% for name, kind, note in columns %}
+        <tr>
+          <td><code>{{ name }}</code></td>
+          <td>{{ kind }}</td>
+          <td>{{ note }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    <p class="owner-table-note">
+      Up to {{ row_cap }} rows per file. Location must be an existing neighbourhood (e.g. Nyali, Milimani);
+      property type must exist (e.g. Apartment, Townhouse). The agency column takes the agency's
+      login email or its exact name. Extra columns are ignored.
+    </p>
+  </main>
+
+</div>
+
+{% endblock %}

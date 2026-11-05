@@ -1,0 +1,26 @@
+{% load core_tags %}
+{# r13: large feature card — first listing of the "Homes for sale" group. #}
+<article class="market-feature" data-reveal>
+  <a class="market-feature__media" href="{{ property.get_absolute_url }}">
+    {% if property.images.all.0.image %}
+      <img src="{{ property.images.all.0.image.url }}" alt="{{ property.title }}" loading="lazy" width="1200" height="900">
+    {% endif %}
+    {% if property.is_demo %}<span class="demo-chip demo-chip--on-media">Demo listing</span>{% endif %}
+    <span class="market-feature__price">{{ property.price|kes }}{% if property.price_period == "monthly" %} <small>/ month</small>{% elif property.price_period == "nightly" %} <small>/ night</small>{% endif %}</span>
+  </a>
+  <div class="market-feature__body">
+    <p class="market-feature__eyebrow">{{ property.get_listing_type_display }} · {{ property.location.full_path }}</p>
+    <h3 class="market-feature__title"><a href="{{ property.get_absolute_url }}">{{ property.title }}</a></h3>
+    <p class="market-feature__copy">{{ property.description|truncatewords:52 }}</p>
+    <p class="market-card__facts">
+      {% if property.bedrooms %}{{ property.bedrooms }} beds{% endif %}
+      {% if property.bathrooms %}{% if property.bedrooms %} · {% endif %}{{ property.bathrooms }} baths{% endif %}
+      {% if property.size_sqm %}{% if property.bedrooms or property.bathrooms %} · {% endif %}{{ property.size_sqm }}m²{% endif %}
+    </p>
+    <div class="market-card__actions">
+      <a class="market-card__actions-main" href="{{ property.get_absolute_url }}">View details <span aria-hidden="true">→</span></a>
+      {% if brand.whatsapp %}<a href="https://wa.me/{{ brand.whatsapp_digits }}" rel="noopener">WhatsApp</a>{% elif property.agent.display_whatsapp %}<a href="https://wa.me/{{ property.agent.display_whatsapp }}" rel="noopener">WhatsApp</a>{% endif %}
+      {% if brand.phone %}<a href="tel:{{ brand.phone }}">Call</a>{% elif property.agent.display_phone %}<a href="tel:{{ property.agent.display_phone }}">Call</a>{% endif %}
+    </div>
+  </div>
+</article>

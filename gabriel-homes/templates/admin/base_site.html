@@ -1,0 +1,33 @@
+{% extends "admin/base.html" %}
+{% load static %}
+
+{% comment %}
+Gabriel Homes branded admin chrome (r11). The owner never sees the
+stock Django skin: the wordmark below + static/css/admin-studio.css
+re-skin every page (index, changelists, forms, login) with the site's
+own tokens. Extends only blocks — no admin internals copied.
+{% endcomment %}
+
+{% block title %}{{ title }} | Gabriel Homes{% endblock %}
+
+{% block extrastyle %}
+  {{ block.super }}
+  <link rel="stylesheet" href="{% static 'css/admin-studio.css' %}">
+  <link rel="icon" type="image/svg+xml" href="{% static 'img/favicon.svg' %}">
+{% endblock %}
+
+{% block branding %}
+  <div class="gh-brand">
+    <span class="gh-brand__mark" aria-hidden="true">GH</span>
+    <span class="gh-brand__name">Gabriel&nbsp;Homes</span>
+    <span class="gh-brand__studio">Studio</span>
+  </div>
+{% endblock %}
+
+{% block usertools %}
+  {{ block.super }}
+  <p class="gh-studio-note">
+    Gabriel Homes power area — day-to-day work lives in the
+    <a href="{% url 'agents:dashboard_home' %}">dashboard</a>.
+  </p>
+{% endblock %}

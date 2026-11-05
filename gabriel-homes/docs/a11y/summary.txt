@@ -1,0 +1,26 @@
+404                    
+_console               console:2
+about                  tiny:2
+admin-dash             tiny:16
+admin-listings         contrast:2  no-name:4  tiny:36  unlabeled:2
+agents                 contrast:34
+contact                
+dashboard-agent        login-failed:1
+dashboard-owner        tiny:4
+delivery-3000          
+for-rent               contrast:2
+for-sale               contrast:2
+home                   contrast:68
+listing-77             contrast:2  img-alt:26  unlabeled:2
+listing-80             contrast:2  img-alt:26  unlabeled:2
+loc-page               
+owner-agencies         tiny:2
+owner-all-listings     tiny:4
+owner-import           
+privacy                
+properties             contrast:2
+services               
+styleguide             contrast:18  tiny:38
+terms                  
+
+TOTAL significant findings: 197

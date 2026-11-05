@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% load core_tags static %}
+{% block title %}{{ page_title }}{% endblock %}
+{% block meta_description %}{{ meta_description }}{% endblock %}
+{% block canonical %}<link rel="canonical" href="{{ SITE_DOMAIN }}{{ canonical_url }}">{% endblock %}
+{% block styles %}<link rel="stylesheet" href="{% staticv 'css/pages.css' %}">{% endblock %}
+{% block content %}
+<section class="page-hero">
+  <div class="container">
+    <p class="section-tag">[ NEWSLETTER ]</p>
+    <h1 class="page-hero__title">{{ heading }}</h1>
+    <p class="page-hero__subtitle">{{ message }}</p>
+    <p style="margin-top:28px"><a class="btn btn--primary" href="/">Back to the home page</a></p>
+  </div>
+</section>
+{% endblock %}

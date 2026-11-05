@@ -1,0 +1,568 @@
+{% extends "base.html" %}
+{% load core_tags static %}
+
+{% block title %}Gabriel Homes — Homes for sale, rent and short stays in Mombasa{% endblock %}
+{% block meta_description %}Homes for sale, long-term rentals and short stays across Mombasa. Every listing is checked by Gabriel and the team before it is published.{% endblock %}
+
+{% block canonical %}
+  <link rel="canonical" href="{{ request.build_absolute_uri }}">
+{% endblock %}
+
+{% block og_title %}Gabriel Homes — Homes for sale, rent and short stays in Mombasa{% endblock %}
+{% block og_description %}Homes for sale, long-term rentals and short stays across Mombasa. Every listing is checked before it is published.{% endblock %}
+{% block twitter_title %}Gabriel Homes — Homes for sale, rent and short stays in Mombasa{% endblock %}
+{% block twitter_description %}Homes for sale, rent and short stays in Mombasa. Checked before it is published.{% endblock %}
+
+{% block styles %}
+  <link rel="preload" as="image" href="{% staticv 'img/real/hero-slide-1.jpg' %}" fetchpriority="high">
+  <link rel="stylesheet" href="{% staticv 'css/home.css' %}">
+{% endblock %}
+
+{% block content %}
+
+{# ============================================================ #}
+{# 1. HERO — slideshow of real photos, confirmed facts only      #}
+{# ============================================================ #}
+<section class="hero" id="top">
+  <div class="hero__bg" aria-hidden="true">
+    <div class="hero__slide" style="--slide-img: url('{% staticv 'img/real/hero-slide-1.jpg' %}')"></div>
+    <div class="hero__slide" style="--slide-img: url('{% staticv 'img/real/hero-slide-2.jpg' %}')"></div>
+    <div class="hero__slide" style="--slide-img: url('{% staticv 'img/real/hero-slide-3.jpg' %}')"></div>
+    <div class="hero__slide" style="--slide-img: url('{% staticv 'img/real/hero-slide-4.jpg' %}')"></div>
+  </div>
+  <div class="container hv2-hero">
+    <p class="hero__tag hv2-rise" style="--d:0">[ {{ brand.hero_tag }} ]</p>
+    <h1 class="hero__title hv2-rise" style="--d:1">{{ brand.hero_heading_lead }} <em class="hero__accent">{{ brand.hero_heading_accent }}</em> {{ brand.hero_heading_tail }}</h1>
+    <p class="hero__subtitle hv2-rise" style="--d:2">{{ brand.hero_subtitle }}</p>
+
+    <div class="hero__stats hv2-rise" style="--d:3">
+      <div class="stat stat--light">
+        <span class="stat__number">2026</span>
+        <span class="stat__label">Year founded</span>
+        <div class="stat__line"></div>
+      </div>
+      <div class="stat stat--light">
+        <span class="stat__number">5</span>
+        <span class="stat__label">Checks on every listing</span>
+        <div class="stat__line"></div>
+      </div>
+      <div class="stat stat--light">
+        <span class="stat__number">Kenya</span>
+        <span class="stat__label">Where we are based</span>
+        <div class="stat__line"></div>
+      </div>
+    </div>
+
+    <form class="search-bar hero__search hv2-rise" style="--d:4" action="/property-for-sale/" method="get" data-search-bar role="search" id="hero-search-form">
+      <input type="hidden" name="listing_type" value="sale">
+      <div class="search-bar__segment" role="group" aria-label="Buy or Rent">
+        <button type="button" class="search-bar__segment-btn is-active" data-segment="sale">Buy</button>
+        <button type="button" class="search-bar__segment-btn" data-segment="rent">Rent</button>
+      </div>
+      <label class="search-bar__group">
+        <span class="search-bar__label">Location</span>
+        <input class="search-bar__input" type="text" name="q" id="hero-search-q" aria-label="Search by location or title"
+               placeholder="Town, county or area" autocomplete="off">
+        <input type="hidden" name="location_slug" id="hero-search-location" value="">
+      </label>
+      <label class="search-bar__group">
+        <span class="search-bar__label">Type</span>
+        <select class="search-bar__select" name="type" id="hero-search-type" aria-label="Property type">
+          <option value="">All types</option>
+          {% for entry in types_with_counts %}
+            <option value="{{ entry.type.slug_plural }}">{{ entry.type.name }}</option>
+          {% endfor %}
+        </select>
+      </label>
+      <button class="search-bar__submit" type="submit">
+        Search
+        <span aria-hidden="true">&rarr;</span>
+      </button>
+    </form>
+  </div>
+  <a class="hv2-scroll" href="#checks" aria-label="Scroll to how we check listings"><span></span></a>
+</section>
+
+{# ============================================================ #}
+{# 2. MARQUEE — the five checks, running                          #}
+{# ============================================================ #}
+<div class="hv2-marquee" id="checks" aria-label="The five checks every listing goes through">
+  <div class="hv2-marquee__track">
+    {% for i in "x"|ljust:"2" %}
+    <span>Ownership</span><i aria-hidden="true">✦</i>
+    <span>Written mandate</span><i aria-hidden="true">✦</i>
+    <span>Site visit where possible</span><i aria-hidden="true">✦</i>
+    <span>Price confirmed in writing</span><i aria-hidden="true">✦</i>
+    <span>Encumbrances checked</span><i aria-hidden="true">✦</i>
+    {% endfor %}
+  </div>
+</div>
+
+{# ============================================================ #}
+{# 3. SHOWCASE — real published listings, or the five checks     #}
+{#    while there are none. Same bento component + shape shift. #}
+{# ============================================================ #}
+<section class="section showcase" id="showcase">
+  <span class="visually-hidden">{% if showcase_listings %}HOMES · Published homes, each one checked before it went live.{% else %}HOW WE CHECK · Five checks before anything goes live. We check who has the right to let or sell.{% endif %}</span>
+  <div class="container">
+    <div class="featured__header" data-reveal>
+      <div>
+        <p class="section-tag">[ {% if showcase_listings %}HOMES{% else %}HOW WE CHECK{% endif %} ]</p>
+        <h2 class="featured__title">
+          {% if showcase_listings %}Featured homes, ready to view.{% else %}Five checks before anything goes live.{% endif %}
+        </h2>
+      </div>
+      {% if showcase_listings %}
+      <a class="btn btn--outline" href="/properties/">
+        View all
+        <span class="btn__arrow" aria-hidden="true">&rarr;</span>
+      </a>
+      {% endif %}
+    </div>
+
+    <div class="bento-grid bento-grid--shift">
+      {% if showcase_listings %}
+        {% for property in showcase_listings %}
+          <a class="bento-card bento-card--home{% if forloop.first %} bento-card--spotlight{% endif %}"
+             href="{{ property.get_absolute_url }}" data-reveal>
+            <div class="bento-card__bg" aria-hidden="true"
+                 {% if property.images.all.0.image %}style="background-image: url('{{ property.images.all.0.image.url }}');"{% endif %}></div>
+            <div class="bento-card__scrim" aria-hidden="true"></div>
+            <div class="bento-card__body">
+              <p class="bento-card__index">[ {{ forloop.counter|stringformat:"03d" }} ]{% if property.is_demo %} &middot; DEMO{% elif property.is_featured %} &middot; FEATURED{% endif %}</p>
+              <h3 class="bento-card__name">{{ property.title }}</h3>
+              <p class="bento-card__meta">
+                <span class="bento-card__price">{{ property.price|kes }}</span>
+                {% if property.price_period == "monthly" %}<span class="bento-card__period"> / month</span>{% endif %}
+                <span class="bento-card__loc">{{ property.location.full_path }}</span>
+                {% if property.bedrooms %}<span class="bento-card__fact">{{ property.bedrooms }} bed</span>{% endif %}
+                {% if property.bathrooms %}<span class="bento-card__fact">{{ property.bathrooms }} bath</span>{% endif %}
+              </p>
+            </div>
+          </a>
+        {% endfor %}
+      {% else %}
+        <a class="bento-card bento-card--home bento-card--spotlight" href="#checks" data-reveal>
+          <div class="bento-card__bg" aria-hidden="true" style="background-image: url('{% staticv 'img/real/real-02-living.jpg' %}');"></div>
+          <div class="bento-card__scrim" aria-hidden="true"></div>
+          <div class="bento-card__body">
+            <p class="bento-card__index">[ 01 ] · OWNERSHIP</p>
+            <h3 class="bento-card__name">We check who has the right to let or sell.</h3>
+            <p class="bento-card__meta"><span class="bento-card__loc">For lettings, ownership is checked against the rental contract.</span></p>
+          </div>
+        </a>
+        <a class="bento-card bento-card--home" href="#checks" data-reveal>
+          <div class="bento-card__bg" aria-hidden="true" style="background-image: url('{% staticv 'img/real/real-05-dining.jpg' %}');"></div>
+          <div class="bento-card__scrim" aria-hidden="true"></div>
+          <div class="bento-card__body">
+            <p class="bento-card__index">[ 02 ] · MANDATE</p>
+            <h3 class="bento-card__name">Written authority first.</h3>
+            <p class="bento-card__meta"><span class="bento-card__loc">A written mandate from the owner or agent to sell or let.</span></p>
+          </div>
+        </a>
+        <a class="bento-card bento-card--home" href="#checks" data-reveal>
+          <div class="bento-card__bg" aria-hidden="true" style="background-image: url('{% staticv 'img/real/real-06-living-terrace.jpg' %}');"></div>
+          <div class="bento-card__scrim" aria-hidden="true"></div>
+          <div class="bento-card__body">
+            <p class="bento-card__index">[ 03 ] · SITE VISIT</p>
+            <h3 class="bento-card__name">Seen in person, where possible.</h3>
+            <p class="bento-card__meta"><span class="bento-card__loc">Gabriel or a team member visits and takes on-site photographs.</span></p>
+          </div>
+        </a>
+        <a class="bento-card bento-card--home" href="#checks" data-reveal>
+          <div class="bento-card__bg" aria-hidden="true" style="background-image: url('{% staticv 'img/real/real-08-aerial.jpg' %}');"></div>
+          <div class="bento-card__scrim" aria-hidden="true"></div>
+          <div class="bento-card__body">
+            <p class="bento-card__index">[ 04 ] · PRICE &amp; DETAILS</p>
+            <h3 class="bento-card__name">Confirmed in writing.</h3>
+            <p class="bento-card__meta"><span class="bento-card__loc">Price, size, bedrooms and bathrooms, agreed with the owner or agent.</span></p>
+          </div>
+        </a>
+        <a class="bento-card bento-card--home" href="#checks" data-reveal>
+          <div class="bento-card__bg" aria-hidden="true" style="background-image: url('{% staticv 'img/real/real-07-balcony.jpg' %}');"></div>
+          <div class="bento-card__scrim" aria-hidden="true"></div>
+          <div class="bento-card__body">
+            <p class="bento-card__index">[ 05 ] · ENCUMBRANCES</p>
+            <h3 class="bento-card__name">Nothing hidden underneath.</h3>
+            <p class="bento-card__meta"><span class="bento-card__loc">Caveats, outstanding rates or service charge, and any disputes.</span></p>
+          </div>
+        </a>
+      {% endif %}
+
+      <a class="bento-card bento-card--cta" href="{% if showcase_listings %}/properties/{% else %}/contact/{% endif %}" data-reveal>
+        <div class="bento-card__scrim" aria-hidden="true"></div>
+        <div class="bento-card__body">
+          <p class="bento-card__index">[ {% if showcase_listings %}BROWSE ALL{% else %}ASK US{% endif %} ]</p>
+          <h3 class="bento-card__name">{% if showcase_listings %}Every listing, checked first.{% else %}Ask about any property.{% endif %}</h3>
+          <p class="bento-card__meta">
+            {% if showcase_listings %}Each listing is checked before it goes live. Browse all&nbsp;&rarr;{% else %}Tell us what you are looking for. A person replies.&nbsp;&rarr;{% endif %}
+          </p>
+        </div>
+      </a>
+    </div>
+  </div>
+</section>
+
+{% comment %} Curated Mombasa presentation listings. Owner-replaceable demo data. r13: each market gets its own editorial layout — sale = feature + rail, rent = wide banners, short stays = staggered portraits — instead of twin side-by-side cards. {% endcomment %}
+{% if sale_listings or rent_listings or short_stay_listings %}
+<section class="section home-market" id="recommended">
+  <div class="container">
+    <div class="home-market__head">
+      <div class="home-market__head-main">
+        <p class="section-tag section-tag--rule" data-reveal>[ RECOMMENDED IN MOMBASA ]</p>
+        <h2 class="home-market__title" data-reveal>Homes for the way you want to move.</h2>
+      </div>
+      <div class="home-market__aside" data-reveal>
+        <p>A small, hand-picked set of homes for sale, long-term rent and short stays across Mombasa. Every one is visited and checked by the Gabriel Homes team before it appears here.</p>
+        <a class="home-market__aside-cta" href="/properties/">Browse every checked home <span aria-hidden="true">→</span></a>
+      </div>
+    </div>
+
+    {% if sale_listings %}
+    <div class="home-market__group home-market__group--sale">
+      <div class="home-market__heading" data-reveal>
+        <div><span>01</span><h3>Homes for sale</h3></div>
+        <a class="home-market__more" href="/properties/?market=sale">See all for sale →</a>
+      </div>
+      {% comment %} r18: feature card left, the compact cards + closing tile in a real rail wrapper right — before this the cards auto-placed into a 2x2 grid and left the right column mostly empty. {% endcomment %}
+      <div class="market-sale">
+        {% for property in sale_listings %}
+          {% if forloop.first %}{% include "includes/_home_card_feature.html" %}{% endif %}
+        {% endfor %}
+        <div class="market-rail">
+          {% for property in sale_listings %}
+            {% if not forloop.first %}{% include "includes/_home_card_rail.html" %}{% endif %}
+          {% endfor %}
+          <a class="market-rail__more" href="/properties/?market=sale" data-reveal>
+            <small>Full sale list</small>
+            Every home for sale
+            <span aria-hidden="true">→</span>
+          </a>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+
+    {% if rent_listings %}
+    <div class="home-market__group home-market__group--rent">
+      <div class="home-market__heading" data-reveal>
+        <div><span>02</span><h3>Long-term rentals</h3></div>
+        <a class="home-market__more" href="/properties/?market=rent">See all rentals →</a>
+      </div>
+      <div class="market-rent">
+        {% for property in rent_listings %}{% include "includes/_home_card_banner.html" %}{% endfor %}
+      </div>
+    </div>
+    {% endif %}
+
+    {% if short_stay_listings %}
+    <div class="home-market__group home-market__group--stay">
+      <div class="home-market__heading" data-reveal>
+        <div><span>03</span><h3>Short stays &amp; BnB</h3></div>
+        <a class="home-market__more" href="/properties/?market=bnb">See all short stays →</a>
+      </div>
+      <div class="market-stagger">
+        {% for property in short_stay_listings %}{% include "includes/_home_card_stay.html" %}{% endfor %}
+        <a class="market-stay market-stay--more" href="/properties/?market=bnb" data-reveal>
+          <div class="market-stay__more-inner">
+            <p class="market-stay__eyebrow">Nightly rates · coast-wide</p>
+            <h3>More short stays around Mombasa.</h3>
+            <span class="market-stay__more-link">Browse all stays <span aria-hidden="true">→</span></span>
+          </div>
+        </a>
+      </div>
+    </div>
+    {% endif %}
+  </div>
+</section>
+{% endif %}
+
+{# Talk-to-us band — the social links the owner asked for (WhatsApp /   #}
+{# Call / Email). Renders only when the brand row carries a channel.   #}
+{% if brand.whatsapp or brand.phone or brand.email %}
+<section class="section home-social" id="talk-to-us">
+  <div class="container">
+    <p class="section-tag" data-reveal>[ TALK TO US ]</p>
+    <h2 class="home-social__title" data-reveal>One message, three ways to send it.</h2>
+    <p class="home-social__sub" data-reveal>Ask about any home on this page — a person replies, whatever the channel.</p>
+    <div class="home-social__links">
+      {% if brand.whatsapp %}
+      <a class="home-social__link" href="https://wa.me/{{ brand.whatsapp_digits }}" rel="noopener" data-reveal>
+        <strong>WhatsApp</strong><span>Message us any time</span>
+      </a>
+      {% endif %}
+      {% if brand.phone %}
+      <a class="home-social__link" href="tel:{{ brand.phone }}" data-reveal>
+        <strong>Call</strong><span>{{ brand.phone }}</span>
+      </a>
+      {% endif %}
+      {% if brand.email %}
+      <a class="home-social__link" href="mailto:{{ brand.email }}" data-reveal>
+        <strong>Email</strong><span>{{ brand.email }}</span>
+      </a>
+      {% endif %}
+    </div>
+  </div>
+</section>
+{% endif %}
+
+{# 3b. NEARBY — homes around amenities (mall, beach, schools). The   #}
+{# owner asked for this as the closing listings section of the page. #}
+{% if amenity_listings %}
+<section class="section home-nearby" id="nearby">
+  <div class="container">
+    <div class="home-market__heading" data-reveal>
+      <div><span>04</span><h2>Homes close to what matters.</h2><p>Malls, beaches, schools, parks and daily connections around Mombasa.</p></div>
+      <a href="/properties/">Explore the map →</a>
+    </div>
+    <div class="home-nearby__grid">
+      {% for property in amenity_listings %}
+      <a class="nearby-card" href="{{ property.get_absolute_url }}" data-reveal>
+        {% if property.images.all.0.image %}<img src="{{ property.images.all.0.image.url }}" alt="{{ property.title }}" loading="lazy" width="600" height="460">{% endif %}
+        <span>{% if property.is_demo %}Demo · {% endif %}{{ property.address_text }}</span>
+        <h3>{{ property.title }}</h3>
+        <p>{{ property.price|kes }}{% if property.price_period == "monthly" %} / month{% elif property.price_period == "nightly" %} / night{% endif %}</p>
+      </a>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
+
+{# ============================================================ #}
+{# 4. ABOUT — who we are, with the founder and a real-photo set  #}
+{# ============================================================ #}
+<section class="section hv2-about" id="about">
+  <div class="container hv2-split">
+    <div class="hv2-collage" data-reveal>
+      <figure class="hv2-collage__tall"><img src="{% staticv 'img/real/real-02-living.jpg' %}" alt="" loading="lazy" width="1200" height="800"></figure>
+      <figure class="hv2-collage__short"><img src="{% staticv 'img/real/real-05-dining.jpg' %}" alt="" loading="lazy" width="1200" height="800"></figure>
+      <figure class="hv2-collage__wide"><img src="{% staticv 'img/real/real-06-living-terrace.jpg' %}" alt="" loading="lazy" width="1200" height="800"></figure>
+    </div>
+
+    <div class="hv2-about__copy">
+      <p class="section-tag" data-reveal>[ WHO WE ARE ]</p>
+      <h2 class="hv2-h2" data-reveal>{{ brand.about_heading }}</h2>
+      <p class="hv2-lede" data-reveal>{{ brand.about_intro }}</p>
+      <p data-reveal>Gabriel Omulu founded the company. He and the team check each listing before it is published. We would rather publish fewer homes that we have checked than many that we have not.</p>
+      <p data-reveal>If we could not check something, we tell you. Buyers pay Gabriel Homes a fee, and we tell you the exact amount before you commit to anything.</p>
+
+      <div class="hv2-founder" data-reveal>
+        <div class="hv2-founder__mark" aria-hidden="true">GO</div>
+        <div>
+          <p class="hv2-founder__role">Founder</p>
+          <p class="hv2-founder__name">Gabriel Omulu</p>
+          <p class="hv2-founder__note">Founded Gabriel Homes in 2026 and leads the listing checks.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+{# ============================================================ #}
+{# 5. SERVICES — image cards                                     #}
+{# ============================================================ #}
+<section class="section hv2-services" id="services">
+  <div class="container">
+    <div class="hv2-head" data-reveal>
+      <p class="section-tag">[ SERVICES ]</p>
+      <h2 class="hv2-h2">{{ brand.services_heading }}</h2>
+      <p class="hv2-sub">{{ brand.services_intro }}</p>
+    </div>
+
+    <div class="hv2-cards">
+      <article class="hv2-card" data-reveal id="buying">
+        <div class="hv2-card__img"><img src="{% staticv 'img/real/real-01-kitchen-island.jpg' %}" alt="" loading="lazy" width="1200" height="800"></div>
+        <div class="hv2-card__body">
+          <p class="hv2-card__tag">Buying</p>
+          <h3>Find a home to buy</h3>
+          <p>Browse listings for sale that have passed our checks. Enquire on any listing, and a person replies.</p>
+          <a class="hv2-link" href="{% if showcase_listings %}/properties/{% else %}/contact/{% endif %}">{% if showcase_listings %}See listings for sale{% else %}Ask about buying{% endif %} <span aria-hidden="true">&rarr;</span></a>
+        </div>
+      </article>
+
+      <article class="hv2-card" data-reveal id="renting">
+        <div class="hv2-card__img"><img src="{% staticv 'img/real/real-03-bedroom-garden.jpg' %}" alt="" loading="lazy" width="1200" height="800"></div>
+        <div class="hv2-card__body">
+          <p class="hv2-card__tag">Renting</p>
+          <h3>Find a home to rent</h3>
+          <p>Rental listings are checked against the rental contract before publication, with the price and rooms confirmed in writing.</p>
+          <a class="hv2-link" href="{% if showcase_listings %}/properties/{% else %}/contact/{% endif %}">{% if showcase_listings %}See rental listings{% else %}Ask about renting{% endif %} <span aria-hidden="true">&rarr;</span></a>
+        </div>
+      </article>
+
+      <article class="hv2-card" data-reveal>
+        <div class="hv2-card__img"><img src="{% staticv 'img/real/real-08-aerial.jpg' %}" alt="" loading="lazy" width="1200" height="800"></div>
+        <div class="hv2-card__body">
+          <p class="hv2-card__tag">Enquiries</p>
+          <h3>Talk to a person</h3>
+          <p>Enquiries go to a named person who knows the listing. Ask what has been checked, and what has not.</p>
+          <a class="hv2-link" href="/contact/">Contact us <span aria-hidden="true">&rarr;</span></a>
+        </div>
+      </article>
+
+      <article class="hv2-card" data-reveal>
+        <div class="hv2-card__img"><img src="{% staticv 'img/real/cta-balcony.jpg' %}" alt="" loading="lazy" width="1200" height="800"></div>
+        <div class="hv2-card__body">
+          <p class="hv2-card__tag">Owners &amp; agents</p>
+          <h3>List a property with us</h3>
+          <p>We need written authority to sell or let. The five checks run before anything is published.</p>
+          <a class="hv2-link" href="/contact/">Ask about listing <span aria-hidden="true">&rarr;</span></a>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+{# ============================================================ #}
+{# 6. HOW BUYING WORKS — moved to the Services page (r12): the       #}
+{#    home page shows homes; process explanations live on other      #}
+{#    pages, per the owner's direction.                              #}
+{# ============================================================ #}
+{# ============================================================ #}
+{# 7. COMMITMENTS — full-bleed photo band (r13: plain words) #}
+{# ============================================================ #}
+<section class="hv2-commit" id="commitments" style="--bg: url('{% staticv 'img/real/real-04-bedroom-sea.jpg' %}')">
+  <div class="container">
+    <p class="section-tag section-tag--light" data-reveal>[ OUR COMMITMENTS ]</p>
+    <h2 class="hv2-h2 hv2-h2--light" data-reveal>What you can hold us to.</h2>
+    <div class="hv2-commit__grid">
+      <div class="hv2-commit__item" data-reveal>
+        <span class="hv2-commit__num">01</span>
+        <h3>No home goes live unchecked.</h3>
+        <p>If a check cannot be finished, the listing does not make the website — whatever the deadline or the asking price.</p>
+      </div>
+      <div class="hv2-commit__item" data-reveal>
+        <span class="hv2-commit__num">02</span>
+        <h3>We say what we could not verify.</h3>
+        <p>Nobody can check everything. When something is unconfirmed, you hear it from us first — not after you have paid.</p>
+      </div>
+      <div class="hv2-commit__item" data-reveal>
+        <span class="hv2-commit__num">03</span>
+        <h3>No invented track record.</h3>
+        <p>We will not quote years, sales totals or client numbers we cannot back — we would rather show you our working.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+{# ============================================================ #}
+{# 8. BROWSE — only areas and types with real published listings #}
+{# ============================================================ #}
+{% if live_counties or live_types %}
+<section class="section browse" id="browse">
+  <div class="container">
+    <p class="section-tag" data-reveal>[ BROWSE ]</p>
+    <div class="browse__grid">
+      {% if live_counties %}
+      <div data-reveal>
+        <h2 class="browse__title">By location</h2>
+        <div class="browse__list">
+          {% for county in live_counties %}
+            <a class="browse__link" href="/property-for-sale/{{ county.slug }}/">
+              {{ county.name }}
+              <span class="browse__link-count">{{ county.listing_count }} listings</span>
+            </a>
+          {% endfor %}
+        </div>
+      </div>
+      {% endif %}
+      {% if live_types %}
+      <div data-reveal>
+        <h2 class="browse__title">By property type</h2>
+        <div class="browse__list">
+          {% for entry in live_types %}
+            <a class="browse__link" href="/{{ entry.type.slug_plural }}-for-sale/">
+              {{ entry.type.name }}
+              <span class="browse__link-count">{{ entry.count }} listings</span>
+            </a>
+          {% endfor %}
+        </div>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</section>
+{% endif %}
+
+{# ============================================================ #}
+{# 9. FAQ                                                        #}
+{# ============================================================ #}
+<section class="section hv2-faq" id="faq">
+  <div class="container hv2-faq__inner">
+    <div data-reveal>
+      <p class="section-tag">[ QUESTIONS ]</p>
+      <h2 class="hv2-h2">Things people ask us.</h2>
+    </div>
+    <div class="hv2-faq__list" data-reveal>
+      <details>
+        <summary>Where are you based?</summary>
+        <p>Gabriel Homes is centred in Kenya.</p>
+      </details>
+      <details>
+        <summary>Who pays your fee?</summary>
+        <p>Buyers pay Gabriel Homes a fee. We tell you the exact amount before you commit.</p>
+      </details>
+      <details>
+        <summary>How do you check a listing?</summary>
+        <p>Gabriel and the team run five checks before a listing is published: ownership, written mandate, site visit where possible, price and details in writing, and encumbrances.</p>
+      </details>
+      <details>
+        <summary>Do you rent as well as sell?</summary>
+        <p>Yes. Rental listings are checked against the rental contract, as well as the other checks.</p>
+      </details>
+    </div>
+  </div>
+</section>
+
+{# ============================================================ #}
+{# NEWSLETTER — opt-in, double-confirmed                          #}
+{# ============================================================ #}
+<section class="section band-soft" id="newsletter">
+  <div class="container hv2-split" style="align-items:start">
+    <div data-reveal>
+      <p class="section-tag">[ NEWSLETTER ]</p>
+      <h2 class="featured__title">New listings, by email.</h2>
+      <p class="hv2-lede">We send a newsletter once ten new listings have been published since the last one. It goes only to people who opt in and confirm by email.</p>
+      <p class="hv2-sub">You can unsubscribe from any email with one click.</p>
+    </div>
+    <div data-reveal>
+      <form class="newsletter-form newsletter-form--light" method="post" action="{% url 'newsletter_subscribe' %}">
+        {% csrf_token %}
+        <input type="hidden" name="next" value="/#newsletter">
+        <label class="newsletter-form__label" for="nl-email">Email</label>
+        <input class="newsletter-form__input" id="nl-email" type="email" name="email" required autocomplete="email" placeholder="you@example.com">
+        <label class="newsletter-form__consent">
+          <input type="checkbox" name="consent" value="yes" required>
+          <span>I agree to receive the Gabriel Homes newsletter. I can unsubscribe at any time.</span>
+        </label>
+        <button class="btn btn--primary" type="submit">Sign up</button>
+      </form>
+    </div>
+  </div>
+</section>
+
+{# ============================================================ #}
+{# 10. CTA                                                        #}
+{# ============================================================ #}
+<section class="section hv2-cta" id="cta" style="--bg: url('{% staticv 'img/real/real-07-balcony.jpg' %}')">
+  <div class="container hv2-cta__inner">
+    <p class="section-tag section-tag--light" data-reveal>[ GET IN TOUCH ]</p>
+    <h2 class="cta__title" data-reveal>{{ brand.cta_heading }}</h2>
+    <p class="hv2-cta__sub" data-reveal>{{ brand.cta_intro }}</p>
+    <div class="hv2-cta__actions" data-reveal>
+      <a class="btn btn--primary btn--lg" href="/contact/">
+        Contact Gabriel Homes
+        <span class="btn__arrow" aria-hidden="true">&rarr;</span>
+      </a>
+      <a class="btn btn--outline btn--lg hv2-btn-light" href="/properties/">Explore listings</a>
+    </div>
+  </div>
+</section>
+
+{% endblock %}
+
+{% block scripts %}
+  {{ block.super }}
+  <script src="{% staticv 'js/bento-shift.js' %}" defer></script>
+{% endblock %}

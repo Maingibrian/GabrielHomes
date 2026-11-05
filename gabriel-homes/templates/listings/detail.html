@@ -1,0 +1,298 @@
+{% extends "base.html" %}
+{% load core_tags static %}
+
+{% block body_class %}page-detail{% if brand.phone or whatsapp_url %} has-contact-bar{% endif %}{% endblock %}
+
+{% block title %}{{ page_title }} — {{ SITE_NAME }}{% endblock %}
+{% block meta_description %}{{ meta_description }}{% endblock %}
+
+{% block canonical %}
+  <link rel="canonical" href="{{ canonical_url }}">
+{% endblock %}
+
+{% block og_type %}article{% endblock %}
+{% block og_title %}{{ property.title }} — {{ property.get_listing_type_display }} in {{ property.location.name }}{% endblock %}
+{% block og_description %}{{ meta_description }}{% endblock %}
+{% block twitter_title %}{{ property.title }} — {{ property.get_listing_type_display }} in {{ property.location.name }}{% endblock %}
+{% block twitter_description %}{{ meta_description }}{% endblock %}
+{% block og_image %}
+  {% if property.images.first %}
+  <meta property="og:image" content="{% absolute_url property.images.first.image.url %}">
+  <meta property="og:image:width" content="1280">
+  <meta property="og:image:height" content="960">
+  {% else %}
+  <meta property="og:image" content="{% static 'img/real/page-hero.jpg' %}">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  {% endif %}
+{% endblock %}
+{% block twitter_image %}
+  {% if property.images.first %}
+  <meta name="twitter:image" content="{% absolute_url property.images.first.image.url %}">
+  {% else %}
+  <meta name="twitter:image" content="{% static 'img/real/page-hero.jpg' %}">
+  {% endif %}
+{% endblock %}
+
+{% block styles %}
+  <link rel="stylesheet" href="{% staticv 'vendor/maplibre-gl/maplibre-gl.css' %}">
+  <link rel="stylesheet" href="{% staticv 'css/search.css' %}">
+  <link rel="stylesheet" href="{% staticv 'css/detail.css' %}">
+{% endblock %}
+
+{% block head_extra %}
+  {# JSON-LD: Residence/Place (Phase 4) #}
+  <script type="application/ld+json">{{ json_ld|json_ld_script }}</script>
+  {# JSON-LD: BreadcrumbList (Phase 6) #}
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {% for crumb in breadcrumbs %}
+      {
+        "@type": "ListItem",
+        "position": {{ forloop.counter }},
+        "name": "{{ crumb.name|escapejs }}",
+        {% if crumb.url %}"item": "{% absolute_url crumb.url %}"{% else %}"item": "{% absolute_url %}"{% endif %}
+      }{% if not forloop.last %},{% endif %}
+      {% endfor %}
+    ]
+  }
+  </script>
+{% endblock %}
+
+{% block content %}
+
+{# Breadcrumbs #}
+<nav class="breadcrumbs" aria-label="Breadcrumb">
+  <div class="container">
+    <ol>
+      {% for crumb in breadcrumbs %}
+        <li>
+          {% if crumb.url %}<a href="{{ crumb.url }}">{{ crumb.name }}</a>{% else %}{{ crumb.name }}{% endif %}
+        </li>
+      {% endfor %}
+    </ol>
+  </div>
+</nav>
+
+<div class="container">
+  <div class="detail-page-v2">
+    <header class="detail-intro">
+      <div class="detail-intro__eyebrow">
+        <span>{{ property.get_listing_type_display }}{% if property.is_short_stay %} · SHORT STAY{% endif %}</span>
+        {% if property.is_verified %}<span class="detail-intro__checked">✓ Checked listing</span>{% endif %}
+      </div>
+      <h1 class="detail-intro__title">{{ property.title }}</h1>
+      <div class="detail-intro__bottom">
+        <p class="detail-intro__location">{{ property.location.full_path }}</p>
+        <div class="detail-intro__price">
+          <strong>{{ property.price|kes }}</strong>
+          {% if property.price_period == "monthly" %}<span>/ month</span>{% elif property.price_period == "nightly" %}<span>/ night</span>{% endif %}
+          {% if property.price_negotiable %}<span>· negotiable</span>{% endif %}
+        </div>
+        <div class="detail-intro__actions">
+          {% if request.user.is_authenticated %}<span id="save-btn-{{ property.pk }}">{% include "accounts/_save_button.html" with property=property variant="detail" %}</span>{% endif %}
+          <button class="detail-header__action" type="button" data-share-url="{{ request.build_absolute_uri }}" aria-label="Share this property">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg> Share
+          </button>
+        </div>
+      </div>
+    </header>
+    <div class="gallery gallery--revamp" data-gallery>
+      <div class="gallery__main" data-gallery-main
+           {% if property.images.all.0.image %}style="background-image:url('{{ property.images.all.0.image.url }}')"{% else %}style="background-image:url('{% static 'img/real/page-hero.jpg' %}')"{% endif %}
+           role="img" aria-label="{{ property.title }}">
+        <span class="gallery__main-tag">{{ property.property_type.name }}</span>
+        {% if property.images.count > 1 %}
+          <button class="gallery__nav gallery__nav--prev" type="button" data-gallery-prev aria-label="Previous image"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="15 18 9 12 15 6"></polyline></svg></button>
+          <button class="gallery__nav gallery__nav--next" type="button" data-gallery-next aria-label="Next image"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"></polyline></svg></button>
+          <span class="gallery__count"><span data-gallery-current>1</span> / {{ property.images.count }}</span>
+        {% endif %}
+      </div>
+      {% if property.images.count > 1 %}<div class="gallery__thumbs" aria-label="Property photos">
+        {% for img in property.images.all %}<button class="gallery__thumb {% if forloop.first %}is-active{% endif %}" type="button" data-gallery-thumb="{{ forloop.counter0 }}" style="background-image:url('{{ img.image.url }}')" aria-label="View photo {{ forloop.counter }}"></button>{% endfor %}
+      </div>{% endif %}
+    </div>
+    <div class="facts-bar facts-bar--revamp">
+      <div class="facts-bar__fact"><span class="facts-bar__label">Bedrooms</span><span class="facts-bar__value">{{ property.bedrooms|default:"—" }}</span></div>
+      <div class="facts-bar__fact"><span class="facts-bar__label">Bathrooms</span><span class="facts-bar__value">{{ property.bathrooms|default:"—" }}</span></div>
+      <div class="facts-bar__fact"><span class="facts-bar__label">Floor / land area</span><span class="facts-bar__value">{% if property.size_sqm %}{{ property.size_sqm }} m²{% elif property.land_size_acres %}{{ property.land_size_acres }} acres{% else %}—{% endif %}</span></div>
+      <div class="facts-bar__fact"><span class="facts-bar__label">Furnishing</span><span class="facts-bar__value">{{ property.get_furnishing_display }}</span></div>
+    </div>
+  </div>
+
+  <div class="detail-layout detail-layout--revamp">
+
+    {# ---------- Main column ---------- #}
+    <div>
+
+      {# Walkthrough video (owner-supplied) #}
+      {% if property.video %}
+      <div class="detail-video">
+        <p class="detail-video__tag">[ VIDEO TOUR ]</p>
+        <video class="detail-video__player" controls preload="metadata" playsinline
+               src="{{ property.video.url }}"></video>
+      </div>
+      {% endif %}
+
+      {# Description #}
+      <div class="detail-description">
+        <p class="detail-description__title">[ DESCRIPTION ]</p>
+        <div class="detail-description__body">{{ property.description }}</div>
+      </div>
+
+      {# Amenities #}
+      {% if property.amenities.all %}
+      <div class="amenities">
+        <p class="amenities__title">[ AMENITIES ]</p>
+        <div class="amenities__grid">
+          {% for amenity in property.amenities.all %}
+            <div class="amenities__item">
+              <span class="amenities__item-icon" aria-hidden="true">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+              </span>
+              {{ amenity.name }}
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+      {% endif %}
+
+      {% if nearby_amenities or property.is_demo %}
+      <section class="nearby-amenities" aria-labelledby="nearby-title">
+        <div class="nearby-amenities__heading">
+          <div><p class="nearby-amenities__eyebrow">THE NEIGHBOURHOOD</p><h2 id="nearby-title">Nearby amenities</h2></div>
+          <span>Malls · resorts · conference venues</span>
+        </div>
+        {% if property.is_demo %}<p class="nearby-amenities__note">Example places and drive times for this presentation listing; confirm details before publishing.</p>{% endif %}
+        <div class="nearby-amenities__grid">
+          {% for place in nearby_amenities %}
+          <article class="nearby-amenity">
+            <span class="nearby-amenity__icon" aria-hidden="true">{{ place.symbol }}</span>
+            <div><span class="nearby-amenity__type">{{ place.category }}</span><h3>{{ place.name }}</h3><p>{{ place.distance }}</p></div>
+          </article>
+          {% empty %}
+          <article class="nearby-amenity"><span class="nearby-amenity__icon" aria-hidden="true">▦</span><div><span class="nearby-amenity__type">Mall</span><h3>City Mall Nyali</h3><p>Sample · about 5 min by car</p></div></article>
+          <article class="nearby-amenity"><span class="nearby-amenity__icon" aria-hidden="true">≈</span><div><span class="nearby-amenity__type">Resort</span><h3>Voyager Beach Resort</h3><p>Sample · about 6 min by car</p></div></article>
+          <article class="nearby-amenity"><span class="nearby-amenity__icon" aria-hidden="true">▤</span><div><span class="nearby-amenity__type">Conference &amp; events</span><h3>EnglishPoint Marina</h3><p>Sample · about 9 min by car</p></div></article>
+          <article class="nearby-amenity"><span class="nearby-amenity__icon" aria-hidden="true">◎</span><div><span class="nearby-amenity__type">Leisure</span><h3>Wild Waters</h3><p>Sample · about 8 min by car</p></div></article>
+          {% endfor %}
+        </div>
+      </section>
+      {% endif %}
+
+      {# Map #}
+      {% if property.lat and property.lng %}
+      <div class="detail-map">
+        <div class="detail-map__heading"><div><p class="detail-map__title">LOCATION</p><h2>Find it in {{ property.location.name }}</h2></div><span>Approximate location</span></div>
+        <div class="detail-map__frame">
+          <div id="detail-map" data-lat="{{ property.lat }}" data-lng="{{ property.lng }}" data-label="{{ property.location.name }} — approximate location" data-maplibre-src="{% staticv 'vendor/maplibre-gl/maplibre-gl.mjs' %}" role="application" aria-label="OpenStreetMap-based map showing the approximate property location"><p>Loading the location map…</p></div>
+        </div>
+        {% if not property.address_text %}
+          <p class="detail-map__note">Approximate location only — exact address shared on enquiry.</p>
+        {% else %}
+          <p class="detail-map__note">{{ property.address_text }}</p>
+        {% endif %}
+        <a class="detail-map__google" href="https://www.openstreetmap.org/?mlat={{ property.lat }}&mlon={{ property.lng }}#map=15/{{ property.lat }}/{{ property.lng }}" target="_blank" rel="noopener">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+          Open in OpenStreetMap
+        </a>
+      </div>
+      {% endif %}
+
+    </div>
+
+    {# ---------- Sidebar: sticky brand contact card + enquiry ---------- #}
+    <aside>
+      <div class="agent-card-sticky">
+        <div class="agent-card-sticky__header">
+          <div class="agent-card-sticky__logo"
+               style="background: linear-gradient(135deg, var(--clay), var(--brown));"
+               aria-hidden="true"><span class="logo-monogram">{{ SITE_NAME|initials }}</span></div>
+          <div>
+            <div class="agent-card-sticky__name">{{ SITE_NAME }}</div>
+            <div class="agent-card-sticky__role">Owner-direct</div>
+          </div>
+        </div>
+
+        <div class="agent-card-sticky__contact">
+          {% if brand.phone %}
+          <a class="agent-card-sticky__btn agent-card-sticky__btn--call" href="tel:{{ brand.phone }}">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+            Call {{ brand.phone }}
+          </a>
+          {% endif %}
+
+          {% if whatsapp_url %}
+          <a class="agent-card-sticky__btn agent-card-sticky__btn--whatsapp" href="{{ whatsapp_url }}" target="_blank" rel="noopener">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413Z"/></svg>
+            WhatsApp
+          </a>
+          {% endif %}
+
+          {% if brand.email %}
+          <a class="agent-card-sticky__btn agent-card-sticky__btn--email" href="mailto:{{ brand.email }}?subject=Enquiry for {{ property.title|urlencode }}">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+            Email
+          </a>
+          {% endif %}
+        </div>
+
+        {# Enquiry form (HTMX target) — the partial reads `form`, so bind it explicitly #}
+        <div id="enquiry-form-container">
+          {% include "inquiries/_enquiry_form.html" with form=enquiry_form %}
+        </div>
+      </div>
+    </aside>
+
+  </div>
+</div>
+
+{# Similar listings #}
+{% if similar_listings %}
+<section class="similar">
+  <div class="container">
+    <h2 class="similar__title">Similar properties</h2>
+    <div class="similar__grid">
+      {% for property in similar_listings %}
+        <div>{% include "includes/_listing_card.html" with index=forloop.counter %}</div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
+
+{# Mobile Call/WhatsApp sticky bar (per §10.8: contact actions stay thumb-reachable). Renders only when the brand row offers a channel — no empty strip. #}
+{% if brand.phone or whatsapp_url %}
+<div class="mobile-contact-bar">
+  <div class="mobile-contact-bar__inner">
+    {% if brand.phone %}
+    <a class="mobile-contact-bar__btn mobile-contact-bar__btn--call" href="tel:{{ brand.phone }}">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+      Call
+    </a>
+    {% endif %}
+    {% if whatsapp_url %}
+    <a class="mobile-contact-bar__btn mobile-contact-bar__btn--whatsapp" href="{{ whatsapp_url }}" target="_blank" rel="noopener">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413Z"/></svg>
+      WhatsApp
+    </a>
+    {% endif %}
+  </div>
+</div>
+{% endif %}
+
+{% endblock %}
+
+{% block scripts %}
+  {{ block.super }}
+  {# Location map (MapLibre GL, self-hosted; OpenFreeMap tiles — see DECISIONS.md) #}
+  {% if property.lat and property.lng %}
+  <script src="{% staticv 'js/detail-map.js' %}" defer></script>
+  {% endif %}
+
+  {# Gallery slider + share button (vanilla JS — no library) #}
+  <script src="{% staticv 'js/detail-gallery.js' %}" defer></script>
+{% endblock %}

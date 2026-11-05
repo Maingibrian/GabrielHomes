@@ -1,0 +1,54 @@
+{% load core_tags static %}
+<footer class="site-footer" id="contact" role="contentinfo">
+  <div class="container site-footer__inner">
+
+    <div class="site-footer__top">
+      <div>
+        <p class="section-tag section-tag--light">[ FOOTER ]</p>
+        <p class="site-footer__lead">{{ brand.footer_lead }}</p>
+      </div>
+
+      <nav class="footer-cols" aria-label="Footer">
+        <div class="footer-cols__col">
+          <h4>Explore</h4>
+          <a href="/">Home</a>
+          <a href="/properties/">Listings</a>
+          <a href="/checks/">How we check</a>
+          <a href="/about/">About</a>
+        </div>
+        <div class="footer-cols__col">
+          <h4>Legal</h4>
+          <a href="/privacy/">Privacy</a>
+          <a href="/terms/">Terms</a>
+        </div>
+        <div class="footer-cols__col">
+          <h4>Company</h4>
+          <a href="/about/">About us</a>
+          <a href="/contact/">Contact</a>
+
+        </div>
+        <div class="footer-cols__col">
+          <h4>Talk to us</h4>
+          {# r12: social links the owner asked for — hidden until the brand row carries each channel. #}
+          {% if brand.whatsapp %}<a href="https://wa.me/{{ brand.whatsapp_digits }}" rel="noopener">WhatsApp</a>{% endif %}
+          {% if brand.phone %}<a href="tel:{{ brand.phone }}">Call {{ brand.phone }}</a>{% endif %}
+          {% if brand.email %}<a href="mailto:{{ brand.email }}">{{ brand.email }}</a>{% endif %}
+          <a href="/contact/">Contact page</a>
+        </div>
+
+      </nav>
+    </div>
+
+    <div class="site-footer__wordmark-row">
+      <p class="wordmark wordmark--footer" aria-label="Homes">
+        {# Per-letter spans so motion.js can stagger-colour them on hover #}
+        <span class="wordmark__letter">H</span><span class="wordmark__letter">o</span><span class="wordmark__letter">m</span><span class="wordmark__letter">e</span><span class="wordmark__letter">s</span>
+      </p>
+      <div style="display: flex; justify-content: space-between; align-items: center; gap: 1rem; flex-wrap: wrap;">
+        <span class="site-footer__meta">Kenya</span>
+        <span class="site-footer__copyright">&copy; {% now "Y" %} Gabriel Homes. All rights reserved.</span>
+      </div>
+    </div>
+
+  </div>
+</footer>

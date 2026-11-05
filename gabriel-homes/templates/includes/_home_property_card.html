@@ -1,0 +1,23 @@
+{% load core_tags %}
+<article class="home-property" data-reveal>
+  <a class="home-property__media" href="{{ property.get_absolute_url }}">
+    {% if property.images.all.0.image %}
+      <img src="{{ property.images.all.0.image.url }}" alt="{{ property.title }}" loading="lazy" width="760" height="520">
+    {% endif %}
+    {% if property.is_demo %}<span class="demo-chip">Demo listing</span>{% endif %}
+  </a>
+  <div class="home-property__body">
+    <p class="home-property__eyebrow">{{ property.get_listing_type_display }} · {{ property.location.name }}</p>
+    <h3><a href="{{ property.get_absolute_url }}">{{ property.title }}</a></h3>
+    <p class="home-property__price">{{ property.price|kes }}{% if property.price_period == "monthly" %} <small>/ month</small>{% elif property.price_period == "nightly" %} <small>/ night</small>{% endif %}</p>
+    <p class="home-property__copy">{{ property.description|truncatewords:24 }}</p>
+    {% if property.address_text %}<p class="home-property__near">⌖ {{ property.address_text }}</p>{% endif %}
+    <p class="home-property__facts">{% if property.bedrooms %}{{ property.bedrooms }} beds · {% endif %}{% if property.bathrooms %}{{ property.bathrooms }} baths · {% endif %}{% if property.size_sqm %}{{ property.size_sqm }}m²{% endif %}</p>
+    <div class="home-property__actions">
+      <a href="{{ property.get_absolute_url }}">View details</a>
+      {% if brand.whatsapp %}<a href="https://wa.me/{{ brand.whatsapp_digits }}" rel="noopener">WhatsApp</a>{% elif property.agent.display_whatsapp %}<a href="https://wa.me/{{ property.agent.display_whatsapp }}" rel="noopener">WhatsApp</a>{% endif %}
+      {% if brand.phone %}<a href="tel:{{ brand.phone }}">Call</a>{% elif property.agent.display_phone %}<a href="tel:{{ property.agent.display_phone }}">Call</a>{% endif %}
+      {% if brand.email %}<a href="mailto:{{ brand.email }}?subject={{ property.title|urlencode }}">Email</a>{% elif property.agent.display_email %}<a href="mailto:{{ property.agent.display_email }}?subject={{ property.title|urlencode }}">Email</a>{% endif %}
+    </div>
+  </div>
+</article>

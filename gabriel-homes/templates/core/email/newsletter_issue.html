@@ -1,0 +1,10 @@
+<!doctype html><html><body style="font-family:Arial,sans-serif;color:#1c1511;background:#faf8f4;padding:24px">
+<h1 style="font-family:Georgia,serif;font-weight:500">{{ total_new }} new listings</h1>
+<p style="color:#6b5e53">Every listing is checked by Gabriel and the team before it goes live.</p>
+<ul style="padding-left:18px">
+{% for p in listings %}<li style="margin-bottom:12px"><a href="{{ SITE_DOMAIN }}{{ p.get_absolute_url }}" style="color:#a0522d">{{ p.title }}</a> · {{ p.price }} · {{ p.location.full_path }}</li>
+{% endfor %}</ul>
+<p style="font-size:12px;color:#6b5e53">You are receiving this because you asked to hear from Gabriel Homes and confirmed your sign-up.
+<a href="{{ unsubscribe_link }}" style="color:#6b5e53">Unsubscribe</a>.</p>
+<p style="font-size:12px;color:#6b5e53">Gabriel Homes, Kenya</p>
+</body></html>

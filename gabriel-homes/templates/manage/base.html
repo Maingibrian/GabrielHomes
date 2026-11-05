@@ -1,0 +1,44 @@
+{% load core_tags static %}<!doctype html>
+<html lang="en-GB">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Owner portal — {{ SITE_NAME }}{% endblock %}</title>
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="theme-color" content="#2a211c">
+  <link rel="icon" type="image/svg+xml" href="{% static 'img/favicon.svg' %}">
+  <link rel="stylesheet" href="{% staticv 'css/base.css' %}">
+  <link rel="stylesheet" href="{% staticv 'css/manage.css' %}">
+</head>
+<body class="{% block body_class %}page-manage{% endblock %}">
+
+  <header class="manage-topbar">
+    <a class="manage-topbar__brand" href="{% url 'manage:home' %}">
+      <span class="manage-topbar__mark" aria-hidden="true">{{ SITE_NAME|initials }}</span>
+      <span class="manage-topbar__name">
+        {{ SITE_NAME }}
+        <small>Owner portal</small>
+      </span>
+    </a>
+    <div class="manage-topbar__actions">
+      <a class="manage-topbar__link" href="{% url 'manage:site_content' %}">Site content</a>
+      <form method="post" action="{% url 'account_logout' %}" class="manage-topbar__signout">
+        {% csrf_token %}
+        <button type="submit" class="btn btn--light-outline manage-topbar__signout-btn">Sign out</button>
+      </form>
+    </div>
+  </header>
+
+  <main class="manage-main">
+    {% if messages %}
+      <ul class="manage-messages">
+        {% for message in messages %}
+          <li class="manage-messages__item">{{ message }}</li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+    {% block manage_content %}{% endblock %}
+  </main>
+
+</body>
+</html>

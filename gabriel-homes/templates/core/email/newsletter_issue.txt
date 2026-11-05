@@ -1,0 +1,11 @@
+Gabriel Homes: {{ total_new }} new listings
+
+{% for p in listings %}- {{ p.title }} · {{ p.price }} · {{ p.location.full_path }}
+  {{ SITE_DOMAIN }}{{ p.get_absolute_url }}
+{% endfor %}
+Every listing is checked by Gabriel and the team before it goes live.
+
+You are receiving this because you asked to hear from Gabriel Homes and confirmed your sign-up.
+Unsubscribe: {{ unsubscribe_link }}
+
+Gabriel Homes, Kenya

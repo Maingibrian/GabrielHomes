@@ -1,0 +1,67 @@
+{% extends "manage/base.html" %}
+
+{% block title %}Site content — {{ SITE_NAME }}{% endblock %}
+
+{% block manage_content %}
+  <div class="manage-page-head">
+    <a class="manage-back" href="{% url 'manage:home' %}">&larr; Owner portal</a>
+    <p class="manage-card__tag">[ SITE CONTENT ]</p>
+    <h1 class="manage-card__title">Edit the public website.</h1>
+    <p class="manage-card__body">Changes appear immediately. Use plain text only; formatting and accessibility are handled by the site design.</p>
+  </div>
+
+  <form method="post" class="manage-content-form" novalidate>
+    {% csrf_token %}
+
+    {% if form.non_field_errors %}
+      <div class="manage-form-errors" role="alert">{{ form.non_field_errors }}</div>
+    {% endif %}
+
+    <section class="manage-card manage-form-section">
+      <h2>Contact details</h2>
+      <p>Buttons stay hidden when a contact channel is empty.</p>
+      {% for field in form %}
+        {% if field.name == 'phone' or field.name == 'whatsapp' or field.name == 'email' %}
+          <div class="manage-field{% if field.errors %} has-error{% endif %}">
+            <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+            {{ field }}
+            {% if field.help_text %}<p class="manage-field__help">{{ field.help_text }}</p>{% endif %}
+            {{ field.errors }}
+          </div>
+        {% endif %}
+      {% endfor %}
+    </section>
+
+    <section class="manage-card manage-form-section">
+      <h2>Homepage hero</h2>
+      <p>The headline is split into three fields so the highlighted word keeps its design.</p>
+      {% for field in form %}
+        {% if field.name == 'hero_tag' or field.name == 'hero_heading_lead' or field.name == 'hero_heading_accent' or field.name == 'hero_heading_tail' or field.name == 'hero_subtitle' %}
+          <div class="manage-field{% if field.errors %} has-error{% endif %}">
+            <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+            {{ field }}
+            {{ field.errors }}
+          </div>
+        {% endif %}
+      {% endfor %}
+    </section>
+
+    <section class="manage-card manage-form-section">
+      <h2>Homepage sections</h2>
+      {% for field in form %}
+        {% if field.name == 'about_heading' or field.name == 'about_intro' or field.name == 'services_heading' or field.name == 'services_intro' or field.name == 'cta_heading' or field.name == 'cta_intro' or field.name == 'footer_lead' %}
+          <div class="manage-field{% if field.errors %} has-error{% endif %}">
+            <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+            {{ field }}
+            {{ field.errors }}
+          </div>
+        {% endif %}
+      {% endfor %}
+    </section>
+
+    <div class="manage-savebar">
+      <button class="btn btn--primary" type="submit">Save site content</button>
+      <a class="btn btn--outline" href="/" target="_blank" rel="noopener">View public site</a>
+    </div>
+  </form>
+{% endblock %}

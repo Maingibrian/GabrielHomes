@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" role="img" aria-labelledby="title desc">
+  <title id="title">Stylised map of Mombasa and the north coast</title>
+  <desc id="desc">An illustrated map showing Mtwapa, Shanzu, Bamburi, Nyali, Mombasa Island and Likoni.</desc>
+  <defs>
+    <pattern id="blocks" width="86" height="70" patternUnits="userSpaceOnUse" patternTransform="rotate(-12)">
+      <path d="M0 14H86M0 52H86M18 0V70M62 0V70" fill="none" stroke="#d7d3ca" stroke-width="1" opacity=".48"/>
+    </pattern>
+    <filter id="shadow" x="-30%" y="-30%" width="160%" height="160%"><feDropShadow dx="0" dy="10" stdDeviation="13" flood-color="#405052" flood-opacity=".12"/></filter>
+    <linearGradient id="sea" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#dcebed"/><stop offset="1" stop-color="#bcd6da"/></linearGradient>
+  </defs>
+  <rect width="1600" height="900" fill="url(#sea)"/>
+  <g fill="#f1efe9" stroke="#b7c9c8" stroke-width="3">
+    <path d="M0 0H1082C1067 60 1088 116 1054 174C1011 246 1036 310 997 368C960 424 988 475 944 530C910 574 871 591 829 616C784 644 775 705 718 743C657 783 617 826 592 900H0Z"/>
+    <path d="M758 675C810 631 882 616 936 640C985 661 1003 711 974 752C939 801 870 816 802 799C741 783 717 722 758 675Z" filter="url(#shadow)"/>
+    <path d="M0 812C147 776 306 779 440 821C516 845 560 870 592 900H0Z"/>
+  </g>
+  <path d="M0 0H1082C1067 60 1088 116 1054 174C1011 246 1036 310 997 368C960 424 988 475 944 530C910 574 871 591 829 616C784 644 775 705 718 743C657 783 617 826 592 900H0Z" fill="url(#blocks)" opacity=".78"/>
+  <g fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M870 -35C850 75 866 159 836 246C806 336 827 423 789 520C766 580 730 623 687 661" stroke="#fff" stroke-width="14"/>
+    <path d="M870 -35C850 75 866 159 836 246C806 336 827 423 789 520C766 580 730 623 687 661" stroke="#d1a981" stroke-width="3"/>
+    <path d="M789 520C679 492 585 481 458 499C342 516 221 558 82 548" stroke="#fff" stroke-width="11"/>
+    <path d="M789 520C679 492 585 481 458 499C342 516 221 558 82 548" stroke="#d6b99a" stroke-width="2"/>
+    <path d="M689 658C749 673 792 688 817 705" stroke="#fff" stroke-width="13"/>
+    <path d="M807 706C852 720 888 719 933 694" stroke="#fff" stroke-width="8" stroke-dasharray="12 10"/>
+    <path d="M940 750C856 786 752 824 650 876" stroke="#fff" stroke-width="10"/>
+    <g stroke="#fff" stroke-width="5" opacity=".9">
+      <path d="M767 95L969 142M742 188L973 232M694 287L944 319M639 377L921 411M582 456L852 498"/>
+      <path d="M184 133L692 302M92 279L655 389M130 692L537 563M295 811L605 591"/>
+      <path d="M796 682L890 780M762 716L926 699M817 648L942 748"/>
+    </g>
+  </g>
+  <g font-family="Arial, sans-serif" fill="#687476">
+    <g font-size="25" font-weight="700">
+      <text x="880" y="76">Mtwapa</text><text x="875" y="184">Shanzu</text><text x="835" y="317">Bamburi</text><text x="785" y="488">Nyali</text><text x="790" y="735">Mombasa Island</text><text x="535" y="842">Likoni</text>
+    </g>
+    <g font-size="16" opacity=".82">
+      <text x="645" y="225">Bamburi Mwisho</text><text x="574" y="432">Kongowea</text><text x="730" y="565">Mkomani</text><text x="819" y="773">Old Town</text><text x="943" y="664">Indian Ocean</text>
+    </g>
+  </g>
+  <g fill="#fff" stroke="#b9c6c5" stroke-width="2">
+    <circle cx="855" cy="175" r="7"/><circle cx="815" cy="315" r="7"/><circle cx="776" cy="487" r="7"/><circle cx="867" cy="721" r="7"/><circle cx="596" cy="837" r="7"/>
+  </g>
+</svg>

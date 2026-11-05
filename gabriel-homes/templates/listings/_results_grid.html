@@ -1,0 +1,107 @@
+{% load core_tags %}
+{% comment %}
+  Results grid + pagination — returned alone for HTMX requests, or
+  embedded in the full search.html for the initial page load.
+  The wrapping <div id="results-grid"> is the HTMX target.
+{% endcomment %}
+<div id="results-grid">
+  {% if page_obj.object_list %}
+    <div class="results-grid">
+      {% for property in page_obj %}
+        <article class="listing-row listing-card-row{% if forloop.counter|divisibleby:2 %} listing-row--reverse{% endif %}">
+          <a class="listing-row__media" href="{{ property.get_absolute_url }}">
+            {% if property.images.all.0.image %}<img src="{{ property.images.all.0.image.url }}" alt="{{ property.title }}" loading="lazy" width="760" height="520">{% endif %}
+            <span class="listing-row__index">[ {{ forloop.counter|stringformat:"03d" }} ]</span>
+            {% if property.is_demo %}<span class="listing-row__demo">Demo listing</span>{% endif %}
+          </a>
+          <div class="listing-row__content">
+            <p class="listing-row__type">{% if property.is_short_stay %}Short stay / BnB{% else %}{{ property.get_listing_type_display }}{% endif %}</p>
+            <h2><a href="{{ property.get_absolute_url }}">{{ property.title }}</a></h2>
+            <p class="listing-row__price">{{ property.price|kes }}{% if property.price_period == "monthly" %}<small>/ month</small>{% elif property.price_period == "nightly" %}<small>/ night</small>{% endif %}</p>
+            <p class="listing-row__location">⌖ {{ property.location.full_path }}{% if property.address_text %} · {{ property.address_text }}{% endif %}</p>
+            <p class="listing-row__description">{{ property.description|truncatewords:34 }}</p>
+            <div class="listing-row__facts">
+              {% if property.bedrooms %}<span>{{ property.bedrooms }} beds</span>{% endif %}
+              {% if property.bathrooms %}<span>{{ property.bathrooms }} baths</span>{% endif %}
+              {% if property.size_sqm %}<span>{{ property.size_sqm }}m²</span>{% endif %}
+              <span>{{ property.get_furnishing_display }}</span>
+            </div>
+            {% if property.is_verified %}<div class="listing-card__verified" title="This listing has been checked">Checked</div>{% endif %}
+            <div class="listing-row__actions">
+              <a class="listing-row__primary" href="{{ property.get_absolute_url }}">View property →</a>
+              {% if brand.whatsapp %}<a href="https://wa.me/{{ brand.whatsapp_digits }}" rel="noopener">WhatsApp</a>{% elif property.agent.display_whatsapp %}<a href="https://wa.me/{{ property.agent.display_whatsapp }}" rel="noopener">WhatsApp</a>{% endif %}
+              {% if brand.phone %}<a href="tel:{{ brand.phone }}">Call</a>{% elif property.agent.display_phone %}<a href="tel:{{ property.agent.display_phone }}">Call</a>{% endif %}
+              {% if brand.email %}<a href="mailto:{{ brand.email }}?subject={{ property.title|urlencode }}">Email</a>{% elif property.agent.display_email %}<a href="mailto:{{ property.agent.display_email }}?subject={{ property.title|urlencode }}">Email</a>{% endif %}
+            </div>
+          </div>
+        </article>
+      {% endfor %}
+    </div>
+
+    {# Pagination #}
+    {% if page_obj.has_other_pages %}
+    <nav class="pagination" aria-label="Pagination">
+      {% if page_obj.has_previous %}
+        <a class="pagination__link"
+           href="?page={{ page_obj.previous_page_number }}"
+           {% if is_htmx %}hx-get="?page={{ page_obj.previous_page_number }}&sort={{ current_sort }}" hx-target="#results-grid" hx-push-url="true"{% endif %}>
+          <span aria-hidden="true">‹</span> <span class="visually-hidden">Previous</span>
+        </a>
+      {% else %}
+        <span class="pagination__link pagination__disabled" aria-disabled="true">‹</span>
+      {% endif %}
+
+      {% for num in page_obj.paginator.page_range %}
+        {% if page_obj.number == num %}
+          <span class="pagination__current" aria-current="page">{{ num }}</span>
+        {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+          <a class="pagination__link"
+             href="?page={{ num }}"
+             {% if is_htmx %}hx-get="?page={{ num }}&sort={{ current_sort }}" hx-target="#results-grid" hx-push-url="true"{% endif %}>
+            {{ num }}
+          </a>
+        {% elif num == 1 or num == page_obj.paginator.num_pages %}
+          <a class="pagination__link"
+             href="?page={{ num }}"
+             {% if is_htmx %}hx-get="?page={{ num }}&sort={{ current_sort }}" hx-target="#results-grid" hx-push-url="true"{% endif %}>
+            {{ num }}
+          </a>
+        {% elif num == 2 or num == page_obj.paginator.num_pages|add:'-1' %}
+          <span class="pagination__ellipsis">…</span>
+        {% endif %}
+      {% endfor %}
+
+      {% if page_obj.has_next %}
+        <a class="pagination__link"
+           href="?page={{ page_obj.next_page_number }}"
+           {% if is_htmx %}hx-get="?page={{ page_obj.next_page_number }}&sort={{ current_sort }}" hx-target="#results-grid" hx-push-url="true"{% endif %}>
+          <span class="visually-hidden">Next</span> <span aria-hidden="true">›</span>
+        </a>
+      {% else %}
+        <span class="pagination__link pagination__disabled" aria-disabled="true">›</span>
+      {% endif %}
+    </nav>
+    {% endif %}
+
+  {% else %}
+    {# Empty state #}
+    <div class="empty-state">
+      <p class="empty-state__tag">[ NO RESULTS ]</p>
+      <h2 class="empty-state__title">No properties match your filters.</h2>
+      <p class="empty-state__body">
+        Try widening your price range, removing the bedroom count, or
+        clearing all filters to see everything in this area.
+      </p>
+      <div class="empty-state__suggestions">
+        {% if active_filters %}
+          <a class="empty-state__suggestion" href="{{ canonical_url }}">Clear all filters</a>
+        {% endif %}
+        {% if related_searches %}
+          {% for rs in related_searches|slice:":3" %}
+            <a class="empty-state__suggestion" href="{{ rs.url }}">{{ rs.name }}</a>
+          {% endfor %}
+        {% endif %}
+      </div>
+    </div>
+  {% endif %}
+</div>
