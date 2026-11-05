@@ -715,6 +715,9 @@
 @media (min-width: 810px) {
   .footer-cols { grid-template-columns: repeat(4, 1fr); gap: 3rem; }
 }
+@media (min-width: 1200px) {
+  .footer-cols { grid-template-columns: repeat(5, 1fr); gap: 2.5rem; }
+}
 .footer-cols__col h4 {
   font-family: var(--font-mono);
   font-size: var(--text-xs);
@@ -1362,3 +1365,109 @@ html.motion-ready .bento-grid .bento-card[data-reveal]:nth-child(3n) { transitio
 /* Demo / real content badges (r11) */
 .status-badge--demo { background: color-mix(in srgb, var(--burnt) 18%, transparent); color: var(--brown); }
 .status-badge--real { background: color-mix(in srgb, #25D366 18%, transparent); color: var(--green-deep); }
+
+/* ============================================================
+   12b. Footer rows added by H1 (r18) — CTA, browse, newsletter, FAQ
+   ============================================================ */
+.site-footer__cta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem 3rem;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 2.5rem;
+  border-bottom: 1px solid color-mix(in srgb, var(--sand) 18%, transparent);
+}
+.site-footer__cta-title {
+  font-size: var(--text-3xl);
+  font-weight: 500;
+  color: var(--cream);
+  letter-spacing: var(--track-tighter);
+  line-height: var(--leading-tight);
+  margin: 0.5rem 0 0.75rem;
+}
+.site-footer__cta-sub {
+  color: color-mix(in srgb, var(--cream) 75%, transparent);
+  max-width: 52ch;
+  margin: 0;
+}
+.site-footer__row {
+  border-top: 1px solid color-mix(in srgb, var(--sand) 18%, transparent);
+  padding-top: 2.5rem;
+}
+.site-footer__newsletter {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.75rem;
+}
+@media (min-width: 1000px) {
+  .site-footer__newsletter { grid-template-columns: 1.1fr 1fr; gap: 4rem; align-items: start; }
+}
+.site-footer__newsletter-note {
+  color: color-mix(in srgb, var(--cream) 75%, transparent);
+  max-width: 48ch;
+  margin-top: 0.75rem;
+}
+.footer-cols__subhead {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: color-mix(in srgb, var(--cream) 55%, transparent);
+  margin: 0.9rem 0 0.15rem;
+}
+.footer-cols__subhead:first-of-type { margin-top: 0; }
+.footer-cols__count {
+  color: color-mix(in srgb, var(--cream) 45%, transparent);
+  font-size: var(--text-xs);
+  margin-left: 0.35rem;
+}
+.footer-faq__title {
+  font-size: var(--text-xl);
+  font-weight: 500;
+  color: var(--cream);
+  letter-spacing: var(--track-tighter);
+  margin-bottom: 1.25rem;
+}
+.footer-faq__list {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0;
+  max-width: 60rem;
+}
+@media (min-width: 810px) {
+  .footer-faq__list { grid-template-columns: 1fr 1fr; gap: 0 3rem; }
+}
+.footer-faq__list details {
+  border-bottom: 1px solid color-mix(in srgb, var(--sand) 14%, transparent);
+}
+.footer-faq__list summary {
+  cursor: pointer;
+  padding: 0.85rem 0;
+  color: var(--cream);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  list-style-position: outside;
+}
+.footer-faq__list summary::marker { color: var(--burnt); }
+.footer-faq__list details p {
+  color: color-mix(in srgb, var(--cream) 70%, transparent);
+  font-size: var(--text-sm);
+  padding: 0 0 0.9rem;
+  max-width: 52ch;
+}
+
+/* ---- newsletter sign-up (site-wide footer since H1/r18) ------ */
+/* ---- newsletter sign-up (site-wide footer since H1/r18) ------ */
+.newsletter-form { display: grid; gap: 10px; margin-top: 18px; }
+.newsletter-form__label { font-family: var(--font-mono, monospace); font-size: 12px; text-transform: uppercase; letter-spacing: .08em; color: rgba(250,248,244,.8); }
+.newsletter-form__input {
+  font: inherit; padding: 12px 14px; border-radius: 10px; border: 1px solid rgba(250,248,244,.3);
+  background: rgba(250,248,244,.08); color: var(--cream, #faf8f4);
+}
+.newsletter-form__input::placeholder { color: rgba(250,248,244,.5); }
+.newsletter-form__consent { display: flex; gap: 10px; font-size: 14px; color: rgba(250,248,244,.85); align-items: flex-start; }
+.newsletter-form__consent input { margin-top: 4px; }
+.newsletter-form .btn { justify-self: start; }
+  background: var(--white, #fff); color: var(--ink, #1c1511); border-color: var(--sand, #d8c9b8);
+}

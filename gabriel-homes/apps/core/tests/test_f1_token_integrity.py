@@ -48,6 +48,8 @@ SUB13_BASELINE = 44  # px font sizes below 13px; may only go DOWN
 FONT_FLOOR_ALLOWLIST = {
     ("dashboard.css", 10): "admin/staff dashboard micro labels — staff-only "
                            "tool surface, not visitor-facing",
+    ("components.css", 12): "footer newsletter form label (moved from the "
+                            "home band with the form, r18)",
     ("detail.css", 9): "maplibre attribution overlay + nearby-amenity mono "
                        "type tag",
     ("detail.css", 10): "amenities/nearby eyebrow micro labels "
@@ -70,13 +72,14 @@ FONT_FLOOR_ALLOWLIST = {
 # per-(file, px) counts at r17 — listed pairs must not grow either
 FONT_FLOOR_PAIR_BASELINE = {
     ("dashboard.css", 10): 2,
+    ("components.css", 12): 1,
     ("detail.css", 9): 2,
     ("detail.css", 10): 5,
     ("detail.css", 11): 1,
     ("detail.css", 12): 1,
     ("home.css", 10): 7,
     ("home.css", 11): 6,
-    ("home.css", 12): 7,
+    ("home.css", 12): 6,
     ("search.css", 9): 2,
     ("search.css", 10): 5,
     ("search.css", 11): 2,

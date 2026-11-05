@@ -543,3 +543,22 @@
    white cards sit on the warm sand band (same language as the home page). */
 .hv2-process { background: #f4eee6; }
 .contact-paths { background: #f4eee6; }
+
+/* H1 r18: commitments list on /checks/ (moved from the home band) */
+.commit-list {
+  list-style: none;
+  margin: 2rem 0 0;
+  padding: 0;
+  display: grid;
+  gap: 1.25rem;
+  max-width: 62rem;
+}
+.commit-list li {
+  background: var(--white, #fff);
+  border: 1px solid var(--sand);
+  border-radius: var(--radius-md, 14px);
+  padding: 1.25rem 1.5rem;
+  color: var(--brown);
+  line-height: 1.55;
+}
+.commit-list strong { display: block; color: var(--ink); margin-bottom: 0.3rem; }

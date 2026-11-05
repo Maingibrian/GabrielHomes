@@ -8,12 +8,12 @@ proving test exists and is green.
 
 | ID | Item | W | needs | target | status | self D1-D8 | aud D1-D8 | evid | att | last | next step |
 |----|------|---|-------|--------|--------|------------|-----------|------|-----|------|-----------|
-| F1 | Token integrity | 5 | — | T1 | READY-FOR-AUDIT | 3,n/a,n/a,n/a,3,n/a,3,3 | – | E2 | 0 | r17 | AUDIT it: re-run gates; recompute ratchets (sub-floor 44, hex 238 — scripts/r17_f1_survey.py); check allowlist reasons |
+| F1 | Token integrity | 5 | — | T1 | MET-T1 | 3,n/a,n/a,n/a,3,n/a,3,3 | 3,n/a,n/a,n/a,3,n/a,3,4 | E2 | 0 | r18 | MET — frozen; WATCH re-runs ratchets via scripts/f1_token_survey.py (expect 44/238) |
 | F2 | Capability gate | 5 | — | T1 | MET-T1 | 3,n/a,n/a,3,3,n/a,3,3 | 3,n/a,n/a,3,3,3,4,4 | E2+E3 | 1 | r17 | MET — frozen; WATCH spot-checks; E3 artifacts LOOP/audit-screens/r17-e3-*.png |
 | F3 | Image & video diet | 4 | — | T1 | TODO | – | – | – | 0 | r15 | Measure current static/ sizes (baseline table), then Pillow WebP pass + hero video gating |
 | F4 | Motion vocabulary | 4 | — | T1 | TODO | – | – | – | 0 | r15 | Write docs/DESIGN-ADDENDUM.md (≤6 effects + archetypes), then map shipped effects |
 | F5 | Smooth scroll (Lenis) | 3 | F2 | T1 | TODO | – | – | – | 0 | r15 | Vendor Lenis under hygiene rules after F2 lands |
-| H1 | Home order & diet | 5 | — | T1 | TODO | – | – | – | 0 | r15 | Write test_h1_home_order.py (id order) then move sections; destination check for moved content |
+| H1 | Home order & diet | 5 | — | T1 | READY-FOR-AUDIT | 3,3,n/a,3,3,3,3,3 | – | E2+E3 | 0 | r18 | AUDIT it: id order + ≤7 sections + trust ≤2 (test_h1_home_order.py); destinations render moved content; E3 shots r18-home-desktop.jpg |
 | H2 | Hero | 5 | F2,F3 | T1 | TODO | – | – | – | 0 | r15 | After F2+F3: one gesture, split-text mask headline, frosted pill, LCP preload |
 | H3 | Mobile bento | 5 | F2 | T1 | TODO | – | – | – | 0 | r15 | CSS scroll-snap carousel <1021px; desktop bento-shift tests untouched |
 | H4 | Section rhythm | 3 | H1 | T1 | TODO | – | – | – | 0 | r15 | After H1: archetype tags on sections + rhythm test |

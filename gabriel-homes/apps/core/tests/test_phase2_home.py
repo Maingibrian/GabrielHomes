@@ -23,26 +23,30 @@ def test_home_page_returns_200():
 
 
 def test_home_page_has_all_sections():
-    """Home section map (r12 Mombasa redesign) — verify they all render.
-    The how-buying-works process section moved to /services/ and is
-    asserted separately (test_process_section_lives_on_services_not_home)."""
+    """Home section map — r18 H1 diet: exactly the owner's order
+    (hero, bento, recommended, nearby). The about/services/commitments/
+    faq/browse/newsletter/cta sections moved to their pages and the footer
+    (asserted by test_h1_home_order.py)."""
     c = Client()
     r = c.get("/")
     body = r.content.decode()
     required_markers = [
-        "hero",            # 1. hero (real-homes slideshow)
-        "showcase",        # 2. homes bento showcase (replaces featured grid)
-        "home-market",     # 3. recommended Mombasa homes — sale / rent / BnB (r12)
-        "hv2-about",       # 4. who we are (founder, real photos)
-        "hv2-services",    # 5. services
-        "hv2-commit",      # 6. commitments band
-        "hv2-faq",         # 7. questions
-        "cta",             # 8. cta band
-        "site-footer",     # footer
-        "site-header",     # nav (separate but required)
+        "hero",         # 1. hero (real-homes slideshow)
+        "bento",        # 2. homes bento showcase (was id=showcase)
+        "recommended",  # 3. recommended Mombasa homes — sale / rent / BnB
+        "nearby",       # 4. homes close to what matters (closing band)
+        "site-footer",  # footer (now also carries newsletter/faq/browse/cta)
+        "site-header",  # nav (separate but required)
     ]
     for marker in required_markers:
         assert marker in body, f"Home page missing section marker: {marker!r}"
+    # The diet is real: the moved sections must NOT render on home anymore.
+    # (The footer newsletter row legitimately renders on home — it lives
+    # in the footer now; check the old home section signature instead.)
+    for gone in ("hv2-about", "hv2-services", "hv2-commit", "hv2-faq",
+                 'section band-soft" id="newsletter"',
+                 'class="section hv2-cta" id="cta"'):
+        assert gone not in body, f"moved section still on home: {gone!r}"
 
 
 def test_home_page_renders_real_showcase_listings():
@@ -182,13 +186,23 @@ def test_home_page_has_footer_with_wordmark():
 
 
 def test_home_page_has_design_language_markers():
-    """The home page must use the bracket tags and eyebrow words from §10.2."""
+    """The home page must use the bracket tags and eyebrow words from §10.2.
+    r18 H1: the about/services/commitments/faq tags moved OFF home with
+    their sections — they render on their destination pages now."""
     c = Client()
     r = c.get("/")
     body = r.content.decode()
     assert "[ HOW WE CHECK ]" in body or "[ HOMES ]" in body
-    for tag in ["[ WHO WE ARE ]", "[ SERVICES ]", "[ OUR COMMITMENTS ]", "[ QUESTIONS ]"]:
-        assert tag in body, f"Missing bracket tag {tag!r}"
+    assert "[ RECOMMENDED IN MOMBASA ]" in body
+    for tag in ("[ WHO WE ARE ]", "[ SERVICES ]", "[ OUR COMMITMENTS ]",
+                "[ QUESTIONS ]"):
+        assert tag not in body, f"moved tag still on home: {tag!r}"
+    # …and the moved tags live at their destinations (nothing renamed away).
+    # /about/ keeps its own "[ ABOUT ]" hero tag — the philosophy lines are
+    # asserted on /about/ by test_h1_home_order.py.
+    assert "[ SERVICES ]" in Client().get("/services/").content.decode()
+    assert ("[ OUR COMMITMENTS ]"
+            in Client().get("/checks/").content.decode())
 
 
 def test_no_template_comment_leaks_into_html():

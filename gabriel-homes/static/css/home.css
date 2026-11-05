@@ -734,7 +734,6 @@ html.motion-ready .bento-grid--shift .bento-card[data-reveal] {
 /* ---- commitments: full-bleed photo band ------------------------ */
 .hv2-commit {
   position: relative; padding: 120px 0; color: var(--cream, #faf8f4);
-  background: var(--bg) center / cover no-repeat;
   isolation: isolate;
 }
 .hv2-commit::before {
@@ -768,7 +767,6 @@ html.motion-ready .bento-grid--shift .bento-card[data-reveal] {
 /* ---- closing CTA on a photo ------------------------------------ */
 .hv2-cta {
   position: relative; isolation: isolate; text-align: left; padding: 130px 0;
-  background: var(--bg) center / cover no-repeat;
 }
 .hv2-cta::before {
   content: ""; position: absolute; inset: 0; z-index: -1;
@@ -834,23 +832,8 @@ html.motion-ready .bento-grid--shift .bento-card[data-reveal] {
 .checks-list p { margin: 0; color: var(--taupe, #6b5e53); }
 .band-soft { background: var(--paper); }
 
-/* ---- newsletter sign-up (index) ------------------------------- */
-.newsletter-form { display: grid; gap: 10px; margin-top: 18px; }
-.newsletter-form__label { font-family: var(--font-mono, monospace); font-size: 12px; text-transform: uppercase; letter-spacing: .08em; color: rgba(250,248,244,.8); }
-.newsletter-form__input {
-  font: inherit; padding: 12px 14px; border-radius: 10px; border: 1px solid rgba(250,248,244,.3);
-  background: rgba(250,248,244,.08); color: var(--cream, #faf8f4);
-}
-.newsletter-form__input::placeholder { color: rgba(250,248,244,.5); }
-.newsletter-form__consent { display: flex; gap: 10px; font-size: 14px; color: rgba(250,248,244,.85); align-items: flex-start; }
-.newsletter-form__consent input { margin-top: 4px; }
-.newsletter-form .btn { justify-self: start; }
-.newsletter-form--light .newsletter-form__label { color: var(--clay, #b06a3b); }
-.newsletter-form--light .newsletter-form__input {
-  background: var(--white, #fff); color: var(--ink, #1c1511); border-color: var(--sand, #d8c9b8);
-}
-.newsletter-form--light .newsletter-form__input::placeholder { color: var(--taupe, #6b5e53); }
-.newsletter-form--light .newsletter-form__consent { color: var(--brown, #5a4032); }
+/* H1 r18: talk-to-us strip lives inside the recommended section */
+.home-market__talk { margin-top: clamp(3rem, 5vw, 4.5rem); padding-top: 2.5rem; border-top: 1px solid var(--sand-60, rgba(216,201,184,.6)); }
 
 /* ---- curated Mombasa listing sections ------------------------ */
 .home-market { background: #f4eee6; }

@@ -22,3 +22,4 @@ def brand_contact(request):
     from apps.core.models import BrandSettings
 
     return {"brand": BrandSettings.load()}
+

@@ -60,3 +60,4 @@ Tick items `[x]` when done, with run number. Never start a slice you cannot fini
 - Runs 4 / 8 / 12 …: QA run (full gates + smoke + one page type at 360/810/1280). Run 4 also re-verifies the three states.
 - Runs 8 / 16 …: security + accessibility pass (fold in P5-3, P6-1 items).
 - If backlog empties: re-audit weakest area, append new slices at the correct priority.
+- [ ] HYG-1 Dead home.css purge (r18): .hv2-commit / .hv2-faq / .hv2-cta / .hv2-cards / .hv2-collage rules + their media-query references are orphaned since H1 moved the sections; delete with the F3/F4 pass and re-run the F1 ratchet (hex will drop).
