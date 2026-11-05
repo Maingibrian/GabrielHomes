@@ -4,7 +4,7 @@
 <article class="market-stay" data-reveal>
   <a class="market-stay__media" href="{{ property.get_absolute_url }}">
     {% if property.images.all.0.image %}
-      <img src="{{ property.images.all.0.image.url }}" alt="{{ property.title }}" loading="lazy" width="760" height="950">
+      <img src="{{ property.images.all.0.image.url }}" alt="{{ property.title }}" loading="lazy" width="760" height="950" style="view-transition-name: prop-{{ property.pk }};">
     {% endif %}
     {% if property.is_demo %}<span class="market-stay__chip market-stay__chip--demo">Demo listing</span>{% endif %}
     {% if property.furnishing == "furnished" %}<span class="market-stay__chip market-stay__chip--furnished">Furnished</span>{% endif %}

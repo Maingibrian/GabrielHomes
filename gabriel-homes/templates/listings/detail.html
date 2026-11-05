@@ -102,7 +102,7 @@
     </header>
     <div class="gallery gallery--revamp" data-gallery>
       <div class="gallery__main" data-gallery-main
-           {% if property.images.all.0.image %}style="background-image:url('{{ property.images.all.0.image.url }}')"{% else %}style="background-image:url('{% static 'img/real/page-hero.jpg' %}')"{% endif %}
+           {% if property.images.all.0.image %}style="background-image:url('{{ property.images.all.0.image.url }}'); view-transition-name: prop-{{ property.pk }}"{% else %}style="background-image:url('{% static 'img/real/page-hero.jpg' %}'); view-transition-name: prop-{{ property.pk }}"{% endif %}
            role="img" aria-label="{{ property.title }}">
         <span class="gallery__main-tag">{{ property.property_type.name }}</span>
         {% if property.images.count > 1 %}

@@ -8,9 +8,9 @@ proving test exists and is green.
 
 | ID | Item | W | needs | target | status | self D1-D8 | aud D1-D8 | evid | att | last | next step |
 |----|------|---|-------|--------|--------|------------|-----------|------|-----|------|-----------|
-| F1 | Token integrity | 5 | — | T1 | MET-T1 | 3,n/a,n/a,n/a,3,n/a,3,3 | 3,n/a,n/a,n/a,3,n/a,3,4 | E2 | 0 | r18 | MET — frozen; WATCH re-runs ratchets via scripts/f1_token_survey.py (expect 44/217 — tightened at r21) |
+| F1 | Token integrity | 5 | — | T1 | MET-T1 | 3,n/a,n/a,n/a,3,n/a,3,3 | 3,n/a,n/a,n/a,3,n/a,3,4 | E2 | 0 | r18 | MET — frozen; WATCH re-runs ratchets via scripts/f1_token_survey.py (expect **43**/217 — corrected r22, D-LOOP-22a) |
 | F2 | Capability gate | 5 | — | T1 | MET-T1 | 3,n/a,n/a,3,3,n/a,3,3 | 3,n/a,n/a,3,3,3,4,4 | E2+E3 | 1 | r17 | MET — frozen; WATCH spot-checks; E3 artifacts LOOP/audit-screens/r17-e3-*.png |
-| F3 | Image & video diet | 4 | — | T1 | READY-FOR-AUDIT | 3,3,n/a,3,3,3,3,4 | – | E2+E3 | 0 | r21 | AUDIT it: 6/6 test_f3_media_diet.py; zero >250KB; bytes 6,161,625→4,185,045 (−32%); hero slides + market cards WebP w/ width+height; hero-loop.mp4 deferred to H2 (D-LOOP-21a); HYG-1 purge done (home.css 1461→1342, hex 236→217); E3 smoke 13/13 (r21-{home,search}-after-diet.png) |
+| F3 | Image & video diet | 4 | — | T1 | MET-T1 | 3,3,n/a,3,3,3,3,4 | 3,3,n/a,4,3,3,3,4 | E2+E3 | 0 | r22 | MET — frozen; WATCH re-runs 6 F3 tests + exact bytes ratchet 4,185,045 + f1 survey expect **43**/217 (D-LOOP-22a) + smoke expect PASS; D6 mobile E3 batched OWNER_NEEDS L2 |
 | F4 | Motion vocabulary | 4 | — | T1 | TODO | – | – | – | 0 | r15 | Write docs/DESIGN-ADDENDUM.md (≤6 effects + archetypes), then map shipped effects |
 | F5 | Smooth scroll (Lenis) | 3 | F2 | T1 | TODO | – | – | – | 0 | r15 | Vendor Lenis under hygiene rules after F2 lands |
 | H1 | Home order & diet | 5 | — | T1 | MET-T1 | 3,3,n/a,3,3,3,3,3 | 3,3,n/a,3,3,3,3,3 | E2+E3 | 0 | r19 | MET — frozen; WATCH spot-checks; D6 desktop-only E3 — batched OWNER_NEEDS mobile eyeball |
@@ -18,7 +18,7 @@ proving test exists and is green.
 | H3 | Mobile bento | 5 | F2 | T1 | MET-T1 | 3,3,3,3,3,3,3,3 | 3,3,3,3,3,3,3,3 | E2+E3 | 0 | r20 | MET — frozen; WATCH spot-checks; E3: scripts/r20_e3_h3_audit.py 21/21 (snap rail, keyboard walk 0→1470, JS-blocked D-MOTION-SAFE, desktop untouched), LOOP/audit-screens/r20-e3-h3-*.png |
 | H4 | Section rhythm | 3 | H1 | T1 | TODO | – | – | – | 0 | r15 | After H1: archetype tags on sections + rhythm test |
 | G1 | Floating pill nav | 4 | F2 | T1 | TODO | – | – | – | 0 | r15 | Hide/return on scroll under fx lite+rich; move mobile-menu inline styles to CSS |
-| G2 | Shared-element transitions | 5 | F2 | T1 | TODO | – | – | – | 0 | r15 | r22 candidate (D-LOOP-20a): @view-transition behind @supports + per-listing names; uniqueness test; unblocks L4 |
+| G2 | Shared-element transitions | 5 | F2 | T1 | READY-FOR-AUDIT | 3,3,3,3,3,3,4,4 | – | E2+E3 | 0 | r22 | AUDIT it: 7/7 test_g2_view_transitions.py; @view-transition in @supports CSSOM-verified (r22 E3: scripts/r22_e3_g2_audit.py 14/14 — lite names on, reduced-motion + JS-blocked fail-closed, Q3 visible); names on search rows, 4 home cards, detail hero; HTMX partial carries names |
 | G3 | Scroll-linked effects | 3 | F2,F4 | T1 | TODO | – | – | – | 0 | r15 | animation-timeline: view() behind @supports; IO fallback kept |
 | G4 | Pointer polish | 2 | F2,F4 | T1 | TODO | – | – | – | 0 | r15 | Cursor View bubble + magnetic CTAs, fx=rich + fine pointer only |
 | L1 | Map & list sync | 5 | — | T1 | TODO | – | – | – | 0 | r15 | Two-way highlight (row↔pin), keyboard operable, aria-live count, Map pill |
@@ -33,7 +33,7 @@ proving test exists and is green.
 Priorities recomputed at the r20 retrospective (D-LOOP-20a; untouched bonus +1 live from r20):
 **L1 16 · G2 16 · F3 13 · F4 13 · G1 13 · L2 13 · L3 13 · F5 10 · H4 10 · G4 7\***
 (* blocked: H2→F3 would be 16, G3→F4 would be 10, L4→G2 would be 10).
-Build order: r22 AUDIT F3 → then BUILDER G2 (16) → L1. MET share 4/18 incl. F3-pending (24%).
+Build order: r22 = AUDIT F3 (done → MET-T1) then BUILDER G2 (done → READY-FOR-AUDIT) → r23 AUDIT G2 then BUILDER L1. MET share **5/18 (28%)**.
 
 ---
 

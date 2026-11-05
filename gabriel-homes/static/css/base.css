@@ -83,3 +83,25 @@ ul, ol { margin: 0; padding: 0; list-style: none; }
   outline: 2px solid var(--white);
   outline-offset: 2px;
 }
+
+/* G2 — shared-element page transitions (D-LOOP-22b).
+   Opt-in is feature-guarded; everything fails closed: with JS blocked (no
+   data-fx attribute yet) or under data-fx="none" the root snapshot is
+   suppressed and inline per-listing names are neutralised, so no transition
+   runs. prefers-reduced-motion resolves to fx=none via the F2 gate. */
+@supports (view-transition-name: none) {
+  @view-transition {
+    navigation: auto;
+  }
+  html {
+    view-transition-name: none;
+  }
+  html[data-fx="rich"],
+  html[data-fx="lite"] {
+    view-transition-name: root;
+  }
+  html:not([data-fx]) [style*="view-transition-name"],
+  html[data-fx="none"] [style*="view-transition-name"] {
+    view-transition-name: none !important;
+  }
+}

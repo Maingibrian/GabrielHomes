@@ -61,3 +61,6 @@ Tick items `[x]` when done, with run number. Never start a slice you cannot fini
 - Runs 8 / 16 …: security + accessibility pass (fold in P5-3, P6-1 items).
 - If backlog empties: re-audit weakest area, append new slices at the correct priority.
 - [ ] HYG-1 Dead home.css purge (r18): .hv2-commit / .hv2-faq / .hv2-cta / .hv2-cards / .hv2-collage rules + their media-query references are orphaned since H1 moved the sections; delete with the F3/F4 pass and re-run the F1 ratchet (hex will drop). **(r20: FOLDED into design-loop item F3 as the planned r21 build — same diet pass, same files; see LOOP/SCORECARD F3 + D-LOOP-20c.)**
+
+## HYGIENE (found r22, fold into any convenient slice)
+- [ ] HYG-2 **Delete the orphaned include `templates/includes/_home_property_card.html`.** No template includes it since the r18 market redesign (grep: zero includers); it still carries width/height + a view-transition name from r22. Deleting it also removes it from the F3 template scan surface. One-line check: `rg -l "_home_property_card" templates/ | grep -v _home_property_card` must be empty after deletion.

@@ -3,7 +3,7 @@
 <article class="market-feature" data-reveal>
   <a class="market-feature__media" href="{{ property.get_absolute_url }}">
     {% if property.images.all.0.image %}
-      <img src="{{ property.images.all.0.image.url }}" alt="{{ property.title }}" loading="lazy" width="1200" height="900">
+      <img src="{{ property.images.all.0.image.url }}" alt="{{ property.title }}" loading="lazy" width="1200" height="900" style="view-transition-name: prop-{{ property.pk }};">
     {% endif %}
     {% if property.is_demo %}<span class="demo-chip demo-chip--on-media">Demo listing</span>{% endif %}
     <span class="market-feature__price">{{ property.price|kes }}{% if property.price_period == "monthly" %} <small>/ month</small>{% elif property.price_period == "nightly" %} <small>/ night</small>{% endif %}</span>
