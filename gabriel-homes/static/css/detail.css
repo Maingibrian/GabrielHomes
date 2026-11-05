@@ -447,7 +447,7 @@
 }
 .detail-map .maplibregl-popup-content {
   border-radius: var(--radius-sm);
-  font-family: var(--font-body, inherit);
+  font-family: var(--font-sans);
   box-shadow: var(--shadow-card);
 }
 

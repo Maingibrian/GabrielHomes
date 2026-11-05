@@ -44,6 +44,9 @@
 :root {
   /* --- Colour (WORK.md §10.1) --- */
   --cream:    #faf8f4;  /* page background, light sections */
+  --paper:    #f3eee6;  /* soft paper band / chip fill (F1 r17: was an
+                           undefined token — usages carried inline fallbacks
+                           #f3eee6, now single-sourced here) */
   --white:    #ffffff;
   --sand:     #d8c9b8;  /* soft borders, chips, subtle fills */
   --taupe:    #6b5e53;  /* muted text, divider lines (r12: was #8a7d70,
@@ -80,6 +83,13 @@
 
   /* Size scale seen in the reference */
   --text-xs:   0.8125rem; /* 13px — floor for UI text; was 12px (too small) */
+
+  /* F1 font-floor allowlist (r17, DECISIONS D-LOOP-17c): px sizes below the
+     13px floor are allowed ONLY for the pairs listed in
+     apps/core/tests/test_f1_token_integrity.py::FONT_FLOOR_ALLOWLIST
+     (map/attribution overlays, uppercase-mono eyebrow micro type, staff
+     dashboard labels). The sub-floor total is a ratchet: 44 at r17 and it
+     may only go DOWN. New sub-floor sizes fail pytest. */
   --text-sm:   0.875rem;  /* 14px */
   --text-base: 1rem;      /* 16px */
   --text-md:   1.125rem;  /* 18px */

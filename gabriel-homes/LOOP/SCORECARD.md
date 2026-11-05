@@ -8,8 +8,8 @@ proving test exists and is green.
 
 | ID | Item | W | needs | target | status | self D1-D8 | aud D1-D8 | evid | att | last | next step |
 |----|------|---|-------|--------|--------|------------|-----------|------|-----|------|-----------|
-| F1 | Token integrity | 5 | — | T1 | TODO | – | – | – | 0 | r15 | Write test_f1_token_integrity.py first (defines the ratchet), then fix --font-body→--font-sans, define --paper |
-| F2 | Capability gate | 5 | — | T1 | READY-FOR-AUDIT | 3,n/a,n/a,3,3,n/a,3,3 | – | E2 | 1 | r16 | AUDIT it: re-run gates, grade from scratch; open E3 step = forced data-fx browser check (NOTES/F2.md) |
+| F1 | Token integrity | 5 | — | T1 | READY-FOR-AUDIT | 3,n/a,n/a,n/a,3,n/a,3,3 | – | E2 | 0 | r17 | AUDIT it: re-run gates; recompute ratchets (sub-floor 44, hex 238 — scripts/r17_f1_survey.py); check allowlist reasons |
+| F2 | Capability gate | 5 | — | T1 | MET-T1 | 3,n/a,n/a,3,3,n/a,3,3 | 3,n/a,n/a,3,3,3,4,4 | E2+E3 | 1 | r17 | MET — frozen; WATCH spot-checks; E3 artifacts LOOP/audit-screens/r17-e3-*.png |
 | F3 | Image & video diet | 4 | — | T1 | TODO | – | – | – | 0 | r15 | Measure current static/ sizes (baseline table), then Pillow WebP pass + hero video gating |
 | F4 | Motion vocabulary | 4 | — | T1 | TODO | – | – | – | 0 | r15 | Write docs/DESIGN-ADDENDUM.md (≤6 effects + archetypes), then map shipped effects |
 | F5 | Smooth scroll (Lenis) | 3 | F2 | T1 | TODO | – | – | – | 0 | r15 | Vendor Lenis under hygiene rules after F2 lands |
