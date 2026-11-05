@@ -557,6 +557,50 @@
   }
 }
 
+/* ============================================================
+   H3 r19 — mobile bento carousel. Under 1021px the shift grid
+   becomes a horizontal scroll-snap rail: native swipe, keyboard
+   focus walks card-by-card (browsers scroll the focused card into
+   view), JS neither required nor added. The centre-card scale-up
+   runs on scroll-driven animations where the browser supports them
+   (@supports guard; D-LOOP-19a) — everywhere else all cards rest
+   at the same scale and the rail still works.
+   ============================================================ */
+@media (max-width: 1020px) {
+  .bento-grid--shift {
+    display: flex;
+    gap: 12px;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    /* edge padding lets the first/last card reach the snap centre */
+    scroll-padding-inline: 9%;
+    padding-inline: 9%;
+    margin-top: 2rem;
+    scrollbar-width: none;
+  }
+  .bento-grid--shift::-webkit-scrollbar { display: none; }
+  .bento-grid--shift .bento-card {
+    flex: 0 0 82%;
+    height: clamp(300px, 58vw, 430px);
+    scroll-snap-align: center;
+  }
+  .bento-grid--shift .bento-card--spotlight { flex-basis: 88%; }
+}
+
+@supports (animation-timeline: view()) {
+  @media (max-width: 1020px) {
+    .bento-grid--shift .bento-card {
+      animation: h3-card-grow linear both;
+      animation-timeline: view(inline);
+      animation-range: entry 40% cover 50%;
+    }
+  }
+  @keyframes h3-card-grow {
+    from { transform: scale(0.92); }
+    to   { transform: scale(1); }
+  }
+}
+
 /* Reveal transition restated for the shift cards so the corner radius
    animates too. Matches components.css's reveal timing. */
 html.motion-ready .bento-grid--shift .bento-card[data-reveal] {
@@ -581,7 +625,7 @@ html.motion-ready .bento-grid--shift .bento-card[data-reveal] {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .bento-grid--shift .bento-card { transition: none; }
+  .bento-grid--shift .bento-card { transition: none; animation: none; /* stops h3-card-grow too */ }
   .bento-grid--shift.is-live .bento-card .bento-card__bg { transition: none; }
   html.motion-ready .bento-grid--shift .bento-card[data-reveal] {
     transition: none;

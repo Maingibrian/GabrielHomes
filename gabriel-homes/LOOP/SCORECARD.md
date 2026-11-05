@@ -13,9 +13,9 @@ proving test exists and is green.
 | F3 | Image & video diet | 4 | — | T1 | TODO | – | – | – | 0 | r15 | Measure current static/ sizes (baseline table), then Pillow WebP pass + hero video gating |
 | F4 | Motion vocabulary | 4 | — | T1 | TODO | – | – | – | 0 | r15 | Write docs/DESIGN-ADDENDUM.md (≤6 effects + archetypes), then map shipped effects |
 | F5 | Smooth scroll (Lenis) | 3 | F2 | T1 | TODO | – | – | – | 0 | r15 | Vendor Lenis under hygiene rules after F2 lands |
-| H1 | Home order & diet | 5 | — | T1 | READY-FOR-AUDIT | 3,3,n/a,3,3,3,3,3 | – | E2+E3 | 0 | r18 | AUDIT it: id order + ≤7 sections + trust ≤2 (test_h1_home_order.py); destinations render moved content; E3 shots r18-home-desktop.jpg |
+| H1 | Home order & diet | 5 | — | T1 | MET-T1 | 3,3,n/a,3,3,3,3,3 | 3,3,n/a,3,3,3,3,3 | E2+E3 | 0 | r19 | MET — frozen; WATCH spot-checks; D6 desktop-only E3 — batched OWNER_NEEDS mobile eyeball |
 | H2 | Hero | 5 | F2,F3 | T1 | TODO | – | – | – | 0 | r15 | After F2+F3: one gesture, split-text mask headline, frosted pill, LCP preload |
-| H3 | Mobile bento | 5 | F2 | T1 | TODO | – | – | – | 0 | r15 | CSS scroll-snap carousel <1021px; desktop bento-shift tests untouched |
+| H3 | Mobile bento | 5 | F2 | T1 | READY-FOR-AUDIT | 3,3,3,3,3,3,3,3 | – | E2+E3 | 0 | r19 | AUDIT it: test_h3_mobile_bento.py + E3 mobile render (r19-mobile-bento-carousel.jpg, keyboard walk proven) |
 | H4 | Section rhythm | 3 | H1 | T1 | TODO | – | – | – | 0 | r15 | After H1: archetype tags on sections + rhythm test |
 | G1 | Floating pill nav | 4 | F2 | T1 | TODO | – | – | – | 0 | r15 | Hide/return on scroll under fx lite+rich; move mobile-menu inline styles to CSS |
 | G2 | Shared-element transitions | 5 | F2 | T1 | TODO | – | – | – | 0 | r15 | @view-transition behind @supports + per-listing names; uniqueness test |

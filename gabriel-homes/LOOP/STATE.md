@@ -1,54 +1,44 @@
 # LOOP/STATE.md — Gabriel Homes agent loop state
 
-- **Run number:** 18
-- **Run type:** AUDITOR→BUILDER — F1 audited MET-T1; H1 (home order & diet)
-  built and left READY-FOR-AUDIT. Two mid-run failed attempts, both fixed
-  in-run (multi-line template comments — the r16 bug class again; and the
-  live footer browse column breaking the page query budget).
-- **Timestamp:** 2026-11-05 ~13:05 +03:00 (session tz Africa/Nairobi)
+- **Run number:** 19
+- **Run type:** AUDITOR→BUILDER — H1 audited MET-T1 (9/9 destination
+  visibility E3); H3 (mobile bento carousel) built, READY-FOR-AUDIT.
+- **Timestamp:** 2026-11-05 ~13:50 +03:00 (session tz Africa/Nairobi)
 - **Workspace:** /home/z/my-project/gabriel-homes/
 - **Protocol:** LOOP/SCHEDULED-TASK.md; condensed rules LOOP/PROTOCOL.md;
   rubric LOOP/RUBRIC.md; per-item contract LOOP/SCORECARD.md.
 
 ## Gates (real results)
-| Gate | Start | Mid-run | End |
-|---|---|---|---|
-| `manage.py check` | OK — 0 issues | — | OK — 0 issues |
-| `makemigrations --check --dry-run` | OK — no changes | — | OK — no changes |
-| `pytest -q` | **540 passed** | **17 failed** (leaks + query budget) | **551 passed** |
+| Gate | Start | End |
+|---|---|---|
+| `manage.py check` | OK — 0 issues | OK — 0 issues |
+| `makemigrations --check --dry-run` | OK — no changes | OK — no changes |
+| `pytest -q` | **551 passed** | **556 passed** |
 
-Ratchets (F1): hex outside tokens.css 238 → **236**; sub-13px **44**
-(pairs re-attributed: the newsletter form moved home.css → components.css).
-Survey tool: scripts/f1_token_survey.py.
+Ratchets (F1): hex 236, sub-13px 44 — held.
 
 ## Shipped this run
-- **F1 → MET-T1** (audit): gates + survey recompute exact; test engineering
-  graded 4 on D8; frozen; WATCH re-runs the survey.
-- **H1 → READY-FOR-AUDIT**: home.html 569 → ~347 lines; top-level sections
-  12 → 4 — exactly `hero, bento, recommended, nearby` (showcase id→bento).
-  Moves: about lines → /about/; services dedup'd (page already had them);
-  commitments → /checks/; FAQ + newsletter + closing CTA → footer
-  (site-wide, details/summary, same form action); browse → curated footer
-  hubs; talk-to-us → channels strip inside recommended (honest-blank kept).
-  Proving tests: test_h1_home_order.py (11). E3: r18-home-desktop.jpg +
-  r18-checks-commitments.jpg (download/preview-screenshots/).
-
-## Failed attempts (both fixed in-run; no NOTES file — single cause each)
-1. Five multi-line `{# … #}` template comments leaked onto pages (17 test
-   failures) — the EXACT r16 bug class (NOTES/F2.md rule). All single-lined;
-   grep for a `{#` without a same-line `#}` BEFORE finishing template edits.
-2. Footer browse built LIVE first (context processor, 7 queries/request; one
-   bad `location__path` FieldError on the way) → results-page query budget
-   broke (21 > 15; baseline 14, ceiling 15). Replaced with curated
-   query-free hubs; processor deleted; budget test green again.
+- **H1 → MET-T1** (audit): 11/11 tests; E3 destination audit — every moved
+  block renders VISIBLE at its destination (9/9 Playwright visibility
+  checks). One batched OWNER_NEEDS line: mobile eyeball of the restructured
+  home + footer (D6 was desktop-E3 only at build time).
+- **H3 → READY-FOR-AUDIT**: <1021px the shift bento is a pure-CSS flex
+  scroll-snap rail (82%/88% cards, centre snap, clamp height, hidden
+  scrollbar); centre-card scale-up via animation-timeline: view(inline)
+  behind @supports (0.92→1); reduced-motion kills the grow animation;
+  ZERO JS added (bento-shift.js + desktop >1020px rules untouched,
+  grep-guarded by tests). E3 at 390px: computed flex/auto/x-mandatory/
+  centre, rail scrolls, keyboard focus walk 0→493, bento-shift correctly
+  not live. Screenshot r19-mobile-bento-carousel.jpg.
 
 ## Item states (SCORECARD)
-MET-T1: F1, F2. READY-FOR-AUDIT: H1. TODO: 14 items. Unblocked leaders:
-H3 (15, needs F2 ✓), F3 (12), F4 (12), G1 (12, needs F2 ✓), L1 (15).
+MET-T1: F1, F2, H1. READY-FOR-AUDIT: H3. TODO: 13 items. Unblocked
+leaders: L1 (15), F3 (12), F4 (12), G1 (12), G2 (15, needs F2 ✓).
 
 ## Next slice
-**Run 19 = AUDITOR first (H1: gates + test_h1_home_order.py + E3 on
-destinations), then BUILDER: H3 (mobile bento carousel, priority 15,
-unblocked by F2)** — keep the desktop bento-shift tests untouched. Suite
-must stay ≥ 551. Dead home.css purge is queued (BACKLOG HYG-1) for the
-F3/F4 pass, not this one.
+**Run 20 = retrospective (multiple of 5)** per §3b: read the last 5
+journal entries, re-weight, split stuck items, then — per §5 — the MET
+share is 3/17 (18%), so BUILDER continues: F3 (image & video diet) with
+the HYG-1 dead-CSS purge folded in, or L1. Also audit H3 if no auditor
+ran after this build (AUDITOR first if H3 still READY-FOR-AUDIT).
+Suite must stay ≥ 556.
