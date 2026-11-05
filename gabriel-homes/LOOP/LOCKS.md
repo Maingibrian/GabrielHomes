@@ -14,3 +14,5 @@ same item or the same file ⇒ pick a different item.
 | H1 (home order & diet: test_h1_home_order.py + home.html section moves + destinations) | r18-builder | 2026-11-05 12:52 +03:00 | 2026-11-05 13:37 +03:00 | yes — 13:05 +03:00 (READY-FOR-AUDIT) |
 | AUDIT H1 (gates + test_h1_home_order.py + E3 destination renders) | r19-auditor | 2026-11-05 13:20 +03:00 | 2026-11-05 14:05 +03:00 | yes — 13:32 +03:00 (verdict MET-T1) |
 | H3 (mobile bento: test_h3_mobile_bento.py + home.css carousel) | r19-builder | 2026-11-05 13:33 +03:00 | 2026-11-05 14:18 +03:00 | yes — 13:50 +03:00 (READY-FOR-AUDIT) |
+| RETRO r20 (re-weight/split/add/prune per §3b; docs only, no code) | r20-planner | 2026-11-05 13:50 +03:00 | 2026-11-05 14:35 +03:00 | yes — 13:58 +03:00 (retro logged: D-LOOP-20a..e) |
+| AUDIT H3 (gates + test_h3_mobile_bento.py + E3 rail @390px: snap, keyboard walk, bento-shift off) | r20-auditor | 2026-11-05 13:58 +03:00 | 2026-11-05 14:43 +03:00 | yes — 14:12 +03:00 (verdict MET-T1, 21/21 E3) |

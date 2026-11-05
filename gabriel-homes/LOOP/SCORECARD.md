@@ -8,32 +8,32 @@ proving test exists and is green.
 
 | ID | Item | W | needs | target | status | self D1-D8 | aud D1-D8 | evid | att | last | next step |
 |----|------|---|-------|--------|--------|------------|-----------|------|-----|------|-----------|
-| F1 | Token integrity | 5 | — | T1 | MET-T1 | 3,n/a,n/a,n/a,3,n/a,3,3 | 3,n/a,n/a,n/a,3,n/a,3,4 | E2 | 0 | r18 | MET — frozen; WATCH re-runs ratchets via scripts/f1_token_survey.py (expect 44/238) |
+| F1 | Token integrity | 5 | — | T1 | MET-T1 | 3,n/a,n/a,n/a,3,n/a,3,3 | 3,n/a,n/a,n/a,3,n/a,3,4 | E2 | 0 | r18 | MET — frozen; WATCH re-runs ratchets via scripts/f1_token_survey.py (expect 44/236) |
 | F2 | Capability gate | 5 | — | T1 | MET-T1 | 3,n/a,n/a,3,3,n/a,3,3 | 3,n/a,n/a,3,3,3,4,4 | E2+E3 | 1 | r17 | MET — frozen; WATCH spot-checks; E3 artifacts LOOP/audit-screens/r17-e3-*.png |
-| F3 | Image & video diet | 4 | — | T1 | TODO | – | – | – | 0 | r15 | Measure current static/ sizes (baseline table), then Pillow WebP pass + hero video gating |
+| F3 | Image & video diet | 4 | — | T1 | TODO | – | – | – | 0 | r15 | NEXT BUILD (r21): measure static/ baseline table, Pillow WebP pass, hero video gating; FOLDS HYG-1 dead home.css purge (D-LOOP-20c) |
 | F4 | Motion vocabulary | 4 | — | T1 | TODO | – | – | – | 0 | r15 | Write docs/DESIGN-ADDENDUM.md (≤6 effects + archetypes), then map shipped effects |
 | F5 | Smooth scroll (Lenis) | 3 | F2 | T1 | TODO | – | – | – | 0 | r15 | Vendor Lenis under hygiene rules after F2 lands |
 | H1 | Home order & diet | 5 | — | T1 | MET-T1 | 3,3,n/a,3,3,3,3,3 | 3,3,n/a,3,3,3,3,3 | E2+E3 | 0 | r19 | MET — frozen; WATCH spot-checks; D6 desktop-only E3 — batched OWNER_NEEDS mobile eyeball |
-| H2 | Hero | 5 | F2,F3 | T1 | TODO | – | – | – | 0 | r15 | After F2+F3: one gesture, split-text mask headline, frosted pill, LCP preload |
-| H3 | Mobile bento | 5 | F2 | T1 | READY-FOR-AUDIT | 3,3,3,3,3,3,3,3 | – | E2+E3 | 0 | r19 | AUDIT it: test_h3_mobile_bento.py + E3 mobile render (r19-mobile-bento-carousel.jpg, keyboard walk proven) |
+| H2 | Hero | 5 | F2,F3 | T1 | TODO | – | – | – | 0 | r15 | After F3 — two ordered slices in one row (D-LOOP-20b): H2.a structure (one gesture, frosted pill + segment, stats from BrandSettings, LCP preload) then H2.b motion (split-text mask headline, video under fx=rich; folds BACKLOG P4-1) |
+| H3 | Mobile bento | 5 | F2 | T1 | MET-T1 | 3,3,3,3,3,3,3,3 | 3,3,3,3,3,3,3,3 | E2+E3 | 0 | r20 | MET — frozen; WATCH spot-checks; E3: scripts/r20_e3_h3_audit.py 21/21 (snap rail, keyboard walk 0→1470, JS-blocked D-MOTION-SAFE, desktop untouched), LOOP/audit-screens/r20-e3-h3-*.png |
 | H4 | Section rhythm | 3 | H1 | T1 | TODO | – | – | – | 0 | r15 | After H1: archetype tags on sections + rhythm test |
 | G1 | Floating pill nav | 4 | F2 | T1 | TODO | – | – | – | 0 | r15 | Hide/return on scroll under fx lite+rich; move mobile-menu inline styles to CSS |
-| G2 | Shared-element transitions | 5 | F2 | T1 | TODO | – | – | – | 0 | r15 | @view-transition behind @supports + per-listing names; uniqueness test |
+| G2 | Shared-element transitions | 5 | F2 | T1 | TODO | – | – | – | 0 | r15 | r22 candidate (D-LOOP-20a): @view-transition behind @supports + per-listing names; uniqueness test; unblocks L4 |
 | G3 | Scroll-linked effects | 3 | F2,F4 | T1 | TODO | – | – | – | 0 | r15 | animation-timeline: view() behind @supports; IO fallback kept |
 | G4 | Pointer polish | 2 | F2,F4 | T1 | TODO | – | – | – | 0 | r15 | Cursor View bubble + magnetic CTAs, fx=rich + fine pointer only |
 | L1 | Map & list sync | 5 | — | T1 | TODO | – | – | – | 0 | r15 | Two-way highlight (row↔pin), keyboard operable, aria-live count, Map pill |
 | L2 | Basemap palette | 4 | — | T1 | TODO | – | – | – | 0 | r15 | setPaintProperty token recolour with guarded layer list; pin font fix |
 | L3 | Row conversion & density | 4 | — | T1 | TODO | – | – | – | 0 | r15 | WhatsApp primary icon action; row ≤320px; desc ≤28 words |
 | L4 | Detail gallery | 3 | G2 | T1 | TODO | – | – | – | 0 | r15 | Read detail-gallery.js first; swipe + lightbox focus trap + shared-element |
-| Q1 | Perf budget (WATCH) | — | all | T1 | TODO | – | – | – | 0 | r15 | Record measurement method; home first-view ≤400KB, JS deferred, CLS 0 |
+| Q1 | Perf budget (WATCH) | — | all | T1 | TODO | – | – | – | 0 | r15 | Record measurement method; home first-view ≤400KB, JS deferred, CLS 0; r18 constraint: results-page query budget baseline 14 / ceiling 15 — page chrome stays query-free |
 | Q2 | Accessibility (WATCH) | — | all | T1 | TODO | – | – | – | 0 | r15 | Reduced-motion parity test per effect; 4.5:1; visible focus; keyboard |
 | Q3 | Resilience (WATCH) | — | all | T1 | TODO | – | – | – | 0 | r15 | All content visible with JS blocked and under fx=none |
 | Q4 | Docs (WATCH) | — | all | T1 | TODO | – | – | – | 0 | r15 | PROTOCOL matches practice; addendum current; DECISIONS entries made |
 
-Initial priorities (weight × (3−0), all untouched at r15): F1 15 · F2 15 · H1 15 ·
-H2 15* · H3 15* · G2 15* · L1 15 · F3 12 · F4 12 · G1 12* · L2 12 · L3 12 · F5 9* ·
-H4 9† · G3 9* · L4 9* · G4 6*  (* blocked by needs, † blocked by H1).
-Unblocked leaders: **F1, F2, H1, L1**.
+Priorities recomputed at the r20 retrospective (D-LOOP-20a; untouched bonus +1 live from r20):
+**L1 16 · G2 16 · F3 13 · F4 13 · G1 13 · L2 13 · L3 13 · F5 10 · H4 10 · G4 7\***
+(* blocked: H2→F3 would be 16, G3→F4 would be 10, L4→G2 would be 10).
+Build order: r21 WATCH overlay + F3 (folds HYG-1) → r22 G2 → L1. MET share 4/17 (24%) after H3's r20 audit.
 
 ---
 

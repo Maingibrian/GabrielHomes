@@ -39,10 +39,10 @@ Tick items `[x]` when done, with run number. Never start a slice you cannot fini
 - [ ] P3-14 Backup & export: one-click DB + media export, activity log, short in-portal help guide. Tests.
 
 ## P4 — Page-by-page design polish
-- [ ] P4-1 Home hero: contrast pass on photo overlays; stats row at 810; verify reveals don't leave gaps in static captures.
+- [ ] P4-1 Home hero: contrast pass on photo overlays; stats row at 810; verify reveals don't leave gaps in static captures. **(r20: FOLDED into design-loop item H2 — same surface, one build; see LOOP/SCORECARD H2 + D-LOOP-20b/c. Portal-track readers: do H2's checks instead.)**
 - [ ] P4-2 About middle: currently one intro paragraph + long reveal gap → rebuild as story/values blocks from SiteContent.
 - [ ] P4-3 Detail: multi-photo gallery + lightbox a11y + mobile sticky Call/WhatsApp bar verification.
-- [ ] P4-4 Home: add DB-driven "Latest checked listings" + "Areas we serve" sections (BRIEF §8 items 3 & 8; hide cleanly at zero listings).
+- [ ] P4-4 Home: add DB-driven "Latest checked listings" + "Areas we serve" sections (BRIEF §8 items 3 & 8; hide cleanly at zero listings). **(r20 RULE, D-LOOP-20d: this changes home's frozen 4-section order — update test_h1_home_order.py + DECISIONS entry FIRST, then the template; a planned section change must never surface as a red H1 test.)**
 - [ ] P4-5 Checks / Services / Contact polish; real contact channels block once P3-8 fields exist (contact page currently shows no phone/email/WhatsApp). Note (run 6): search.html sets `body_class` in the view but never defines the template block — `.page-search` CSS rules never apply; same latent bug class fixed on detail.html in P1-2.
 - [ ] P4-6 Footer: contact block + newsletter inline validation + wordmark tracking detail.
 
@@ -60,4 +60,4 @@ Tick items `[x]` when done, with run number. Never start a slice you cannot fini
 - Runs 4 / 8 / 12 …: QA run (full gates + smoke + one page type at 360/810/1280). Run 4 also re-verifies the three states.
 - Runs 8 / 16 …: security + accessibility pass (fold in P5-3, P6-1 items).
 - If backlog empties: re-audit weakest area, append new slices at the correct priority.
-- [ ] HYG-1 Dead home.css purge (r18): .hv2-commit / .hv2-faq / .hv2-cta / .hv2-cards / .hv2-collage rules + their media-query references are orphaned since H1 moved the sections; delete with the F3/F4 pass and re-run the F1 ratchet (hex will drop).
+- [ ] HYG-1 Dead home.css purge (r18): .hv2-commit / .hv2-faq / .hv2-cta / .hv2-cards / .hv2-collage rules + their media-query references are orphaned since H1 moved the sections; delete with the F3/F4 pass and re-run the F1 ratchet (hex will drop). **(r20: FOLDED into design-loop item F3 as the planned r21 build — same diet pass, same files; see LOOP/SCORECARD F3 + D-LOOP-20c.)**
