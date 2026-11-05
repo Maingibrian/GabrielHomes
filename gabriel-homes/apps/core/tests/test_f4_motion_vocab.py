@@ -31,6 +31,8 @@ SHIPPED_TOKENS = [
     "is-flashed",      # L1 pin->row flash (M5)
     "data-map-return", # L1 Map pill return (M5)
     "hv2-scroll",      # wheel cue pulse (M6)
+    "gallery-count-bump",  # detail gallery counter bump (M5, r26 audit find)
+    "manage-card-in",      # portal /manage/ entrance (declared out-of-scope)
 ]
 
 

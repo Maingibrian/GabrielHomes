@@ -64,6 +64,52 @@
     });
   }
 
+  // L2 — recolour the basemap to house tokens once the style is ready.
+  // The palette is an ordered rule list applied to the loaded style:
+  // first matching rule wins per paint property, layers that are absent
+  // (ids vary between style versions) are skipped, and a layer without a
+  // given paint property is skipped — never fatal.
+  /* L2-PALETTE-BEGIN */
+  var basemapRules = [
+    // [id pattern, paint property, tokens.css variable]
+    [/^background$/, 'background-color', '--paper'],            // land
+    [/landcover|landuse|park|wood|glacier|ice_shelf/, 'fill-color', '--paper'],
+    [/water|waterway/, 'fill-color', '--sand'],                 // water
+    [/casing/, 'line-color', '--sand'],                         // road casings
+    [/railway/, 'line-color', '--sand'],
+    [/boundary/, 'line-color', '--taupe'],
+    [/building/, 'fill-color', '--sand'],
+    [/highway|road|street|path|pier/, 'line-color', '--cream'], // roads
+    [/(^|_)label|_label$|poi|place/, 'text-color', '--taupe'],  // labels
+    [/(^|_)label|_label$|poi|place/, 'text-halo-color', '--paper'],
+  ];
+
+  function recolourBasemap(map) {
+    var cache = Object.create(null);
+    function tokenValue(name) {
+      if (!(name in cache)) {
+        cache[name] = getComputedStyle(document.documentElement)
+          .getPropertyValue(name).trim();
+      }
+      return cache[name];
+    }
+    var layers;
+    try { layers = map.getStyle().layers || []; } catch (error) { return; }
+    layers.forEach(function (layer) {
+      if (!layer || !map.getLayer(layer.id)) return;  // skip missing ids
+      var applied = Object.create(null);
+      basemapRules.forEach(function (rule) {
+        var property = rule[1];
+        if (applied[property] || !rule[0].test(layer.id)) return;
+        applied[property] = true;                     // first match wins
+        try {
+          map.setPaintProperty(layer.id, property, tokenValue(rule[2]));
+        } catch (error) { /* layer lacks that paint property — skip */ }
+      });
+    });
+  }
+  /* L2-PALETTE-END */
+
   function escapeHtml(value) {
     return String(value || '').replace(/[&<>\'\"]/g, function (character) {
       return {'&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '\"': '&quot;'}[character];
@@ -104,6 +150,7 @@
     mapEl.parentElement.appendChild(resetBtn);
 
     map.on('load', function () {
+      recolourBasemap(map);  // L2: house palette before pins draw
       listings.forEach(function (listing) {
         var lat = Number(listing.lat);
         var lng = Number(listing.lng);
