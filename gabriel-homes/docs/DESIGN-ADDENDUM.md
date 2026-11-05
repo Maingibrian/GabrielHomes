@@ -40,12 +40,19 @@ At most two entries animate in the same viewport at the same time:
 
 ## Section archetypes (for H4 rhythm)
 
-1. **full-bleed** — edge-to-edge media band that owns the viewport: the hero,
-   the marquee strip. One per screenful; never two neighbours.
+1. **full-bleed** — an edge-to-edge media band where imagery owns the stage:
+   the hero (owns the viewport), the showcase bento (media fills every tile
+   and the text rides on the image). One per screenful; never two neighbours.
 2. **type-led** — a text-led block where the heading carries the section
    (recommended/nearby headers, the philosophy lines on /about/).
 3. **edge strip** — a narrow full-width band stitching sections together
-   (marquee, channels strip inside recommended).
+   (the five-checks marquee, the channels strip inside recommended).
+
+Home mapping (top-level flow order — r30 H4; each band carries its
+archetype as `data-archetype`, asserted by test_h4_section_rhythm.py):
+`#hero` full-bleed → `#checks` edge strip → `#bento` full-bleed →
+`#recommended` type-led → `#nearby` type-led. The marquee is an edge strip,
+not a second full-bleed (r30 resolves the r25 double-listing).
 
 Rule: at least 3 archetypes in use site-wide; never more than 2 neighbouring
 sections share one archetype.

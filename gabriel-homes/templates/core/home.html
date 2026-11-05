@@ -23,7 +23,7 @@
 {# ============================================================ #}
 {# 1. HERO — slideshow of real photos, confirmed facts only      #}
 {# ============================================================ #}
-<section class="hero" id="hero">
+<section class="hero" id="hero" data-archetype="full-bleed">
   <div class="hero__bg" aria-hidden="true">
     <div class="hero__slide" style="--slide-img: url('{% staticv 'img/real/hero-slide-1.webp' %}')"></div>
     <div class="hero__slide" style="--slide-img: url('{% staticv 'img/real/hero-slide-2.webp' %}')"></div>
@@ -72,7 +72,7 @@
 {# ============================================================ #}
 {# 2. MARQUEE — the five checks, running                          #}
 {# ============================================================ #}
-<div class="hv2-marquee" id="checks" aria-label="The five checks every listing goes through">
+<div class="hv2-marquee" id="checks" data-archetype="edge-strip" aria-label="The five checks every listing goes through">
   <div class="hv2-marquee__track">
     {% for i in "x"|ljust:"2" %}
     <span>Ownership</span><i aria-hidden="true">✦</i>
@@ -88,7 +88,7 @@
 {# 3. SHOWCASE — real published listings, or the five checks     #}
 {#    while there are none. Same bento component + shape shift. #}
 {# ============================================================ #}
-<section class="section showcase" id="bento">
+<section class="section showcase" id="bento" data-archetype="full-bleed">
   <span class="visually-hidden">{% if showcase_listings %}HOMES · Published homes, each one checked before it went live.{% else %}HOW WE CHECK · Five checks before anything goes live. We check who has the right to let or sell.{% endif %}</span>
   <div class="container">
     <div class="featured__header" data-reveal>
@@ -191,7 +191,7 @@
 
 {% comment %} Curated Mombasa presentation listings. Owner-replaceable demo data. r13: each market gets its own editorial layout — sale = feature + rail, rent = wide banners, short stays = staggered portraits — instead of twin side-by-side cards. {% endcomment %}
 {% if sale_listings or rent_listings or short_stay_listings %}
-<section class="section home-market" id="recommended">
+<section class="section home-market" id="recommended" data-archetype="type-led">
   <div class="container">
     <div class="home-market__head">
       <div class="home-market__head-main">
@@ -291,7 +291,7 @@
 {# 3b. NEARBY — homes around amenities (mall, beach, schools). The   #}
 {# owner asked for this as the closing listings section of the page. #}
 {% if amenity_listings %}
-<section class="section home-nearby" id="nearby">
+<section class="section home-nearby" id="nearby" data-archetype="type-led">
   <div class="container">
     <div class="home-market__heading" data-reveal>
       <div><span>04</span><h2>Homes close to what matters.</h2><p>Malls, beaches, schools, parks and daily connections around Mombasa.</p></div>

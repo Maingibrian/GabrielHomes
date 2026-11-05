@@ -75,7 +75,7 @@ total = 0
 for name in sorted(all_css):
     if name == "tokens.css":
         continue
-    n = len(re.findall(r"#[0-9a-fA-F]{3,8}\b", all_css[name]))
+    n = len(re.findall(r"#[0-9a-fA-F]{3,8}", all_css[name]))
     total += n
     print(f"   {name}: {n}")
 print(f"   HEX BASELINE (outside tokens.css): {total}")
