@@ -66,15 +66,15 @@
     {{ map_listings|json_script:"search-map-data" }}
     <div class="market-filters" aria-label="Quick property filters">
       <a class="market-filter market-filter--sale{% if current_market == 'sale' %} is-active{% endif %}" href="/properties/?market=sale">
-        <img src="{% staticv 'img/stock/mombasa-villa.jpg' %}" alt="" loading="lazy"><span class="market-filter__shade"></span>
+        <img src="{% staticv 'img/stock/mombasa-villa.webp' %}" alt="" width="900" height="600" loading="lazy"><span class="market-filter__shade"></span>
         <span class="market-filter__number">01 · BUY</span><span class="market-filter__copy"><strong>Find a place to own.</strong><small>Villas, apartments and family homes for sale.</small></span><span class="market-filter__arrow" aria-hidden="true">↗</span>
       </a>
       <a class="market-filter market-filter--rent{% if current_market == 'rent' %} is-active{% endif %}" href="/properties/?market=rent">
-        <img src="{% staticv 'img/stock/green-apartments.jpg' %}" alt="" loading="lazy"><span class="market-filter__shade"></span>
+        <img src="{% staticv 'img/stock/green-apartments.webp' %}" alt="" width="900" height="900" loading="lazy"><span class="market-filter__shade"></span>
         <span class="market-filter__number">02 · RENT</span><span class="market-filter__copy"><strong>Settle in for longer.</strong><small>Comfortable monthly rentals across Mombasa.</small></span><span class="market-filter__arrow" aria-hidden="true">↗</span>
       </a>
       <a class="market-filter market-filter--bnb{% if current_market == 'bnb' %} is-active{% endif %}" href="/properties/?market=bnb">
-        <img src="{% staticv 'img/stock/pool-villa-night.jpg' %}" alt="" loading="lazy"><span class="market-filter__shade"></span>
+        <img src="{% staticv 'img/stock/pool-villa-night.webp' %}" alt="" width="900" height="600" loading="lazy"><span class="market-filter__shade"></span>
         <span class="market-filter__number">03 · STAY</span><span class="market-filter__copy"><strong>Stay for a few nights.</strong><small>Furnished BnBs and coastal short stays.</small></span><span class="market-filter__arrow" aria-hidden="true">↗</span>
       </a>
     </div>

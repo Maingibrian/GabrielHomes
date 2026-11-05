@@ -688,26 +688,12 @@ html.motion-ready .bento-grid--shift .bento-card[data-reveal] {
   letter-spacing: var(--track-tight, -0.02em); color: var(--ink, #1c1511); margin: 12px 0 18px;
   max-width: 22ch;
 }
-.hv2-h2--light { color: var(--cream, #faf8f4); }
 .hv2-lede { font-size: 1.15rem; color: var(--brown, #5a4032); max-width: 58ch; }
 .hv2-sub { color: var(--taupe, #6b5e53); max-width: 58ch; margin: 0; }
 .hv2-head { margin-bottom: 52px; }
 
-/* ---- about: collage + founder ---------------------------------- */
+/* ---- founder card ---------------------------------------------- */
 .hv2-split { display: grid; grid-template-columns: 1.05fr .95fr; gap: 72px; align-items: center; }
-.hv2-collage {
-  display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; gap: 14px;
-  height: 620px;
-}
-.hv2-collage figure { margin: 0; overflow: hidden; border-radius: var(--radius-card, 18px); position: relative; }
-.hv2-collage__tall { grid-row: span 2; }
-.hv2-collage__wide { grid-column: span 1; }
-.hv2-collage img {
-  width: 100%; height: 100%; object-fit: cover; display: block;
-  transition: transform 1.6s var(--ease-out, ease);
-}
-.hv2-collage figure:hover img { transform: scale(1.06); }
-.hv2-about__copy p { color: var(--brown, #5a4032); margin: 0 0 16px; }
 .hv2-founder {
   display: flex; align-items: center; gap: 18px; margin-top: 30px; padding: 22px;
   background: var(--white, #fff); border: 1px solid var(--sand, #d8c9b8); border-radius: var(--radius-card, 18px);
@@ -720,30 +706,6 @@ html.motion-ready .bento-grid--shift .bento-card[data-reveal] {
 .hv2-founder__role { font-family: var(--font-mono, monospace); font-size: 12px; text-transform: uppercase; letter-spacing: .08em; color: var(--clay, #b06a3b); margin: 0 0 2px !important; }
 .hv2-founder__name { font-family: var(--font-display, Georgia, serif); font-size: 1.25rem; color: var(--ink, #1c1511) !important; margin: 0 0 2px !important; }
 .hv2-founder__note { font-size: 15px; color: var(--taupe, #6b5e53) !important; margin: 0 !important; }
-
-/* ---- services: image cards ------------------------------------- */
-.hv2-cards { display: grid; grid-template-columns: repeat(2, 1fr); gap: 26px; }
-.hv2-card {
-  background: var(--white, #fff); border-radius: var(--radius-card, 18px); overflow: hidden;
-  border: 1px solid rgba(90,64,50,.1);
-  transition: transform .6s var(--ease-out, ease), box-shadow .6s var(--ease-out, ease);
-}
-.hv2-card:hover { transform: translateY(-5px); box-shadow: 0 26px 50px -28px rgba(28,21,17,.45); }
-.hv2-card__img { aspect-ratio: 16 / 10; overflow: hidden; }
-.hv2-card__img img {
-  width: 100%; height: 100%; object-fit: cover; display: block;
-  transition: transform 1.2s var(--ease-out, ease);
-}
-.hv2-card:hover .hv2-card__img img { transform: scale(1.08); }
-.hv2-card__body { padding: 28px 30px 30px; }
-.hv2-card__tag { font-family: var(--font-mono, monospace); font-size: 12px; text-transform: uppercase; letter-spacing: .08em; color: var(--clay, #b06a3b); margin: 0 0 8px; }
-.hv2-card h3 { font-family: var(--font-display, Georgia, serif); font-size: 1.5rem; font-weight: 500; margin: 0 0 10px; color: var(--ink, #1c1511); }
-.hv2-card p { color: var(--taupe, #6b5e53); margin: 0 0 20px; }
-.hv2-link {
-  color: var(--burnt, #a0522d); text-decoration: none; font-weight: 600; display: inline-flex; gap: 8px; align-items: center;
-}
-.hv2-link span { transition: transform .4s var(--ease-out, ease); }
-.hv2-link:hover span { transform: translateX(5px); }
 
 /* ---- process timeline ------------------------------------------ */
 .hv2-steps {
@@ -775,84 +737,20 @@ html.motion-ready .bento-grid--shift .bento-card[data-reveal] {
 .hv2-fee__label { font-family: var(--font-mono, monospace); font-size: 12px; text-transform: uppercase; letter-spacing: .08em; color: var(--clay, #b06a3b); margin: 0 0 6px !important; }
 .hv2-fee p { color: var(--brown, #5a4032); margin: 0; }
 
-/* ---- commitments: full-bleed photo band ------------------------ */
-.hv2-commit {
-  position: relative; padding: 120px 0; color: var(--cream, #faf8f4);
-  isolation: isolate;
-}
-.hv2-commit::before {
-  content: ""; position: absolute; inset: 0; z-index: -1;
-  /* r13 fix: .72 let bright skies wash out the cream heading at the top
-     of the band — start darker so the whole band stays readable. */
-  background: linear-gradient(180deg, rgba(28,21,17,.84), rgba(28,21,17,.93));
-}
-.hv2-commit__grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 40px; margin-top: 56px; }
-.hv2-commit__item { border-top: 1px solid rgba(250,248,244,.35); padding-top: 26px; }
-.hv2-commit__num { font-family: var(--font-mono, monospace); color: #d9a27e; font-size: 14px; }
-.hv2-commit__item h3 { font-family: var(--font-display, Georgia, serif); font-size: 1.5rem; font-weight: 500; margin: 14px 0 12px; line-height: 1.25; }
-.hv2-commit__item p { color: rgba(250,248,244,.8); margin: 0; }
-
-/* ---- faq --------------------------------------------------------- */
-.hv2-faq__inner { display: grid; grid-template-columns: .8fr 1.2fr; gap: 72px; align-items: start; }
-.hv2-faq details { border-bottom: 1px solid rgba(90,64,50,.16); padding: 22px 0; }
-.hv2-faq details:first-child { border-top: 1px solid rgba(90,64,50,.16); }
-.hv2-faq summary {
-  cursor: pointer; list-style: none; display: flex; justify-content: space-between; align-items: center; gap: 20px;
-  font-family: var(--font-display, Georgia, serif); font-size: 1.3rem; color: var(--ink, #1c1511);
-}
-.hv2-faq summary::-webkit-details-marker { display: none; }
-.hv2-faq summary::after {
-  content: "+"; font-family: var(--font-mono, monospace); color: var(--burnt, #a0522d); font-size: 24px; line-height: 1;
-  transition: transform .4s var(--ease-out, ease);
-}
-.hv2-faq details[open] summary::after { transform: rotate(45deg); }
-.hv2-faq details p { color: var(--taupe, #6b5e53); margin: 14px 0 0; max-width: 60ch; }
-
-/* ---- closing CTA on a photo ------------------------------------ */
-.hv2-cta {
-  position: relative; isolation: isolate; text-align: left; padding: 130px 0;
-}
-.hv2-cta::before {
-  content: ""; position: absolute; inset: 0; z-index: -1;
-  background: linear-gradient(90deg, rgba(28,21,17,.88), rgba(28,21,17,.45));
-}
-.hv2-cta__inner { max-width: 760px; }
-.hv2-cta__sub { color: rgba(250,248,244,.85); font-size: 1.1rem; margin: 18px 0 32px; }
-.hv2-cta__actions { display: flex; gap: 14px; flex-wrap: wrap; }
-.hv2-btn-light { color: var(--cream, #faf8f4) !important; border-color: rgba(250,248,244,.7) !important; }
-.hv2-btn-light:hover { background: var(--cream, #faf8f4) !important; color: var(--ink, #1c1511) !important; }
-
-/* ---- reveal polish: slight stagger inside grids ---------------- */
-.hv2-cards [data-reveal]:nth-child(2) { transition-delay: .12s; }
-.hv2-commit__grid [data-reveal]:nth-child(2) { transition-delay: .12s; }
-.hv2-commit__grid [data-reveal]:nth-child(3) { transition-delay: .24s; }
-
 /* ---- responsive -------------------------------------------------- */
 @media (max-width: 960px) {
-  .hv2-split, .hv2-faq__inner { grid-template-columns: 1fr; gap: 48px; }
-  .hv2-collage { height: 480px; }
+  .hv2-split { grid-template-columns: 1fr; gap: 48px; }
   .hv2-steps { grid-template-columns: repeat(2, 1fr); row-gap: 40px; }
-  .hv2-commit__grid { grid-template-columns: 1fr; gap: 36px; }
 }
 @media (max-width: 640px) {
-  .hv2-cards { grid-template-columns: 1fr; }
-  .hv2-collage { height: 380px; }
   .hv2-steps { grid-template-columns: 1fr; }
-  .hv2-commit, .hv2-cta { padding: 84px 0; }
 }
 
 /* ---- reduced motion: keep layout, drop movement ---------------- */
 @media (prefers-reduced-motion: reduce) {
   .hv2-rise, .hv2-marquee__track, .hv2-scroll span { animation: none !important; }
   .hv2-steps::before, .hv2-steps__dot { transition: none !important; transform: none !important; }
-  .hv2-card, .hv2-collage img, .hv2-card__img img { transition: none !important; }
-  .hv2-card:hover, .hv2-collage figure:hover img, .hv2-card:hover .hv2-card__img img { transform: none !important; }
 }
-
-/* CTA on photo: the shared .cta__title is dark ink; this band needs light text */
-.hv2-cta .cta__title,
-.hv2-cta .section-tag { color: var(--cream, #faf8f4); }
-.hv2-cta .section-tag { color: #d9a27e; }
 
 /* ---- checklist used on the services and checks pages ---------- */
 .hv2-checklist { list-style: none; padding: 0; margin: 28px 0 0; display: grid; gap: 14px; max-width: 760px; }
@@ -1016,22 +914,6 @@ html.motion-ready .bento-grid--shift .bento-card[data-reveal] {
 .home-social__link strong { font: 500 clamp(1.3rem,2vw,1.8rem)/1 var(--font-display,Georgia,serif); letter-spacing: -.02em; }
 .home-social__link span { color: var(--taupe,#6b5e53); font-size: 14px; line-height: 1.45; overflow-wrap: anywhere; }
 @media (max-width: 760px) { .home-social__links { grid-template-columns: 1fr; } }
-
-/* ---- r13 completion — section wrappers the pass left unstyled -----
-   About keeps the cream page band (a quiet beat after the dark nearby
-   strip); services takes the warm sand band so the white image cards
-   pop, echoing the market section. */
-.hv2-about { background: var(--cream, #faf8f4); }
-.hv2-services { background: #f4eee6; }
-
-/* Collage: pin each figure to its cell instead of relying on
-   auto-placement order (tall = left column, short + wide stack right). */
-.hv2-collage__short { grid-column: 2; grid-row: 1; }
-.hv2-collage__wide { grid-column: 2; grid-row: 2; }
-
-/* FAQ list: a little air under the heading once the grid stacks. */
-.hv2-faq__list { margin-top: 10px; }
-@media (max-width: 960px) { .hv2-faq__list { margin-top: 24px; } }
 
 /* Demo chip over bright photography: darker glass than the default. */
 .demo-chip--on-media { background: rgba(28, 21, 17, .58); border-color: rgba(250, 248, 244, .32); }

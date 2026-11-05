@@ -8,9 +8,9 @@ proving test exists and is green.
 
 | ID | Item | W | needs | target | status | self D1-D8 | aud D1-D8 | evid | att | last | next step |
 |----|------|---|-------|--------|--------|------------|-----------|------|-----|------|-----------|
-| F1 | Token integrity | 5 | — | T1 | MET-T1 | 3,n/a,n/a,n/a,3,n/a,3,3 | 3,n/a,n/a,n/a,3,n/a,3,4 | E2 | 0 | r18 | MET — frozen; WATCH re-runs ratchets via scripts/f1_token_survey.py (expect 44/236) |
+| F1 | Token integrity | 5 | — | T1 | MET-T1 | 3,n/a,n/a,n/a,3,n/a,3,3 | 3,n/a,n/a,n/a,3,n/a,3,4 | E2 | 0 | r18 | MET — frozen; WATCH re-runs ratchets via scripts/f1_token_survey.py (expect 44/217 — tightened at r21) |
 | F2 | Capability gate | 5 | — | T1 | MET-T1 | 3,n/a,n/a,3,3,n/a,3,3 | 3,n/a,n/a,3,3,3,4,4 | E2+E3 | 1 | r17 | MET — frozen; WATCH spot-checks; E3 artifacts LOOP/audit-screens/r17-e3-*.png |
-| F3 | Image & video diet | 4 | — | T1 | TODO | – | – | – | 0 | r15 | NEXT BUILD (r21): measure static/ baseline table, Pillow WebP pass, hero video gating; FOLDS HYG-1 dead home.css purge (D-LOOP-20c) |
+| F3 | Image & video diet | 4 | — | T1 | READY-FOR-AUDIT | 3,3,n/a,3,3,3,3,4 | – | E2+E3 | 0 | r21 | AUDIT it: 6/6 test_f3_media_diet.py; zero >250KB; bytes 6,161,625→4,185,045 (−32%); hero slides + market cards WebP w/ width+height; hero-loop.mp4 deferred to H2 (D-LOOP-21a); HYG-1 purge done (home.css 1461→1342, hex 236→217); E3 smoke 13/13 (r21-{home,search}-after-diet.png) |
 | F4 | Motion vocabulary | 4 | — | T1 | TODO | – | – | – | 0 | r15 | Write docs/DESIGN-ADDENDUM.md (≤6 effects + archetypes), then map shipped effects |
 | F5 | Smooth scroll (Lenis) | 3 | F2 | T1 | TODO | – | – | – | 0 | r15 | Vendor Lenis under hygiene rules after F2 lands |
 | H1 | Home order & diet | 5 | — | T1 | MET-T1 | 3,3,n/a,3,3,3,3,3 | 3,3,n/a,3,3,3,3,3 | E2+E3 | 0 | r19 | MET — frozen; WATCH spot-checks; D6 desktop-only E3 — batched OWNER_NEEDS mobile eyeball |
@@ -33,7 +33,7 @@ proving test exists and is green.
 Priorities recomputed at the r20 retrospective (D-LOOP-20a; untouched bonus +1 live from r20):
 **L1 16 · G2 16 · F3 13 · F4 13 · G1 13 · L2 13 · L3 13 · F5 10 · H4 10 · G4 7\***
 (* blocked: H2→F3 would be 16, G3→F4 would be 10, L4→G2 would be 10).
-Build order: r21 WATCH overlay + F3 (folds HYG-1) → r22 G2 → L1. MET share 4/17 (24%) after H3's r20 audit.
+Build order: r22 AUDIT F3 → then BUILDER G2 (16) → L1. MET share 4/18 incl. F3-pending (24%).
 
 ---
 
