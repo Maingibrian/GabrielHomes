@@ -114,22 +114,8 @@
   color: color-mix(in srgb, var(--cream) 95%, transparent); /* r12: was 85% */
   margin: 0 0 2.5rem;
 }
-.hero__stats {
-  display: grid;
-  /* Compact 3-across even on phones — pushes the search bar toward the fold */
-  grid-template-columns: repeat(3, 1fr);
-  gap: 1rem;
-  margin-bottom: 1.75rem;
-}
-.hero__stats .stat { gap: 0.4rem; }
-.hero__stats .stat__number { font-size: clamp(1.5rem, 6vw, 2rem); }
-.hero__stats .stat__line { display: none; }
-@media (min-width: 810px) {
-  .hero__stats { gap: 2.5rem; margin-bottom: 2.5rem; }
-  .hero__stats .stat { gap: 0.75rem; }
-  .hero__stats .stat__number { font-size: var(--text-display-2); }
-  .hero__stats .stat__line { display: block; }
-}
+/* r24 H2.a: .hero__stats rules removed with the template block — one
+   gesture per hero; "Kenya" was filler (see D-LOOP-24a). */
 .hero__search {
   margin-top: 1.5rem;
 }
@@ -661,11 +647,21 @@ html.motion-ready .bento-grid--shift .bento-card[data-reveal] {
   30% { opacity: 1; }
   100% { opacity: 0; transform: translateY(14px); }
 }
+/* r24: the mouse-wheel cue is meaningless on touch / small screens —
+   hide it there (owner mobile screenshot read it as a stray "0" pill). */
+@media (max-width: 809px), (hover: none) {
+  .hv2-scroll { display: none; }
+}
 
 /* ---- marquee of the five checks ------------------------------- */
 .hv2-marquee {
   background: var(--burnt, #a0522d); color: var(--white, #fff);
   overflow: hidden; padding: 18px 0; white-space: nowrap;
+  /* r24: edge fade so the running text dissolves instead of being cut
+     mid-word at the viewport edges (owner mobile screenshot). Colour
+     keywords, not hex, to respect the F1 hex ratchet. */
+  -webkit-mask-image: linear-gradient(90deg, transparent, black 36px, black calc(100% - 36px), transparent);
+  mask-image: linear-gradient(90deg, transparent, black 36px, black calc(100% - 36px), transparent);
 }
 .hv2-marquee__track {
   display: inline-flex; gap: 28px; align-items: center;
@@ -698,10 +694,9 @@ html.motion-ready .bento-grid--shift .bento-card[data-reveal] {
   display: flex; align-items: center; gap: 18px; margin-top: 30px; padding: 22px;
   background: var(--white, #fff); border: 1px solid var(--sand, #d8c9b8); border-radius: var(--radius-card, 18px);
 }
-.hv2-founder__mark {
-  width: 60px; height: 60px; border-radius: 50%; flex: none; display: grid; place-items: center;
-  background: var(--burnt, #a0522d); color: var(--white, #fff);
-  font-family: var(--font-display, Georgia, serif); font-size: 1.4rem;
+.hv2-founder__photo {
+  width: 60px; height: 60px; border-radius: 50%; flex: none;
+  object-fit: cover; display: block;
 }
 .hv2-founder__role { font-family: var(--font-mono, monospace); font-size: 12px; text-transform: uppercase; letter-spacing: .08em; color: var(--clay, #b06a3b); margin: 0 0 2px !important; }
 .hv2-founder__name { font-family: var(--font-display, Georgia, serif); font-size: 1.25rem; color: var(--ink, #1c1511) !important; margin: 0 0 2px !important; }

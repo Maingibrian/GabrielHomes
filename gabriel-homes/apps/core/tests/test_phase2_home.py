@@ -114,12 +114,19 @@ def test_home_page_has_no_agents_section():
 
 
 def test_home_page_has_three_hero_stats():
+    """r24 H2.a (D-LOOP-24a) supersedes the original three-stat contract:
+    the hero carries ONE gesture (the search pill) and BrandSettings has
+    no stat fields, so the stats row (2026 / 5 checks / Kenya) is removed
+    rather than fed filler. The five-checks message still runs in the
+    marquee strip. Kept as one test so the count never drops."""
     c = Client()
     r = c.get("/")
     body = r.content.decode()
-    assert body.count("stat__number") >= 3  # three confirmed hero facts
-    assert "stat__number" in body
-    assert "stat__label" in body
+    assert "hero__stats" not in body
+    assert "stat__number" not in body
+    assert "stat__label" not in body
+    # the confirmed facts still live on the page they belong to
+    assert "checks" in body  # marquee strip id (five checks band)
 
 
 def test_home_page_has_search_bar_with_buy_rent_segment():

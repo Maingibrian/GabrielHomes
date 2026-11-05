@@ -24,7 +24,10 @@ TEMPLATES = REPO / "templates"
 MAX_IMAGE_BYTES = 250 * 1024
 # Recorded 6,161,625 B pre-diet (r21 survey); tightened post-diet to the
 # exact 4,185,045 B. May only go DOWN.
-IMAGE_BYTES_BASELINE = 4_185_045
+# r24 D-LOOP-24b: owner-supplied founder portrait (+6,642 B WebP, owner
+# upload 2026-11-05) is a sanctioned content addition, not diet drift —
+# baseline re-pinned to the exact new total. Direction still: down only.
+IMAGE_BYTES_BASELINE = 4_191_687
 
 IMG_EXTS = {".jpg", ".jpeg", ".png", ".webp", ".gif", ".avif"}
 

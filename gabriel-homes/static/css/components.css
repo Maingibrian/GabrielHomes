@@ -150,13 +150,13 @@
   text-transform: uppercase;
   color: var(--taupe);
 }
-.stat--light .stat__label { color: var(--sand); }
+/* r24 H2.a: the .stat--light variants left with the hero stats row
+   (D-LOOP-24a) — the dashboards use the base .stat family only. */
 .stat__line {
   height: 1px;
   background: var(--taupe);
   opacity: 0.5;
 }
-.stat--light .stat__line { background: var(--sand); opacity: 0.4; }
 
 
 /* ============================================================
@@ -630,6 +630,16 @@
     grid-template-columns: auto 1.4fr 1fr auto;
     align-items: center;
   }
+}
+/* r24 H2.a mobile fixes (owner 390px screenshots):
+   - the stacked card is ~340px tall, and the 100px pill radius clamps
+     into a blob — use the card radius below 810px;
+   - inline-flex blockifies inside a grid cell, so the Buy/Rent segment
+     stretched into a full-width cream band — shrink it to its buttons. */
+@media (max-width: 809px) {
+  .search-bar { border-radius: var(--radius-card); }
+  .search-bar__segment { justify-self: start; }
+  .search-bar__submit { justify-self: stretch; }
 }
 .search-bar__group {
   display: flex;

@@ -35,25 +35,11 @@
     <h1 class="hero__title hv2-rise" style="--d:1">{{ brand.hero_heading_lead }} <em class="hero__accent">{{ brand.hero_heading_accent }}</em> {{ brand.hero_heading_tail }}</h1>
     <p class="hero__subtitle hv2-rise" style="--d:2">{{ brand.hero_subtitle }}</p>
 
-    <div class="hero__stats hv2-rise" style="--d:3">
-      <div class="stat stat--light">
-        <span class="stat__number">2026</span>
-        <span class="stat__label">Year founded</span>
-        <div class="stat__line"></div>
-      </div>
-      <div class="stat stat--light">
-        <span class="stat__number">5</span>
-        <span class="stat__label">Checks on every listing</span>
-        <div class="stat__line"></div>
-      </div>
-      <div class="stat stat--light">
-        <span class="stat__number">Kenya</span>
-        <span class="stat__label">Where we are based</span>
-        <div class="stat__line"></div>
-      </div>
-    </div>
+    {# r24 H2.a: the stats row (2026 / 5 checks / Kenya) is gone — one #}
+    {# gesture per hero (the search pill below), "Kenya" was filler, and #}
+    {# the five-checks message already runs in the marquee strip.        #}
 
-    <form class="search-bar hero__search hv2-rise" style="--d:4" action="/property-for-sale/" method="get" data-search-bar role="search" id="hero-search-form">
+    <form class="search-bar hero__search hv2-rise" style="--d:3" action="/property-for-sale/" method="get" data-search-bar role="search" id="hero-search-form">
       <input type="hidden" name="listing_type" value="sale">
       <div class="search-bar__segment" role="group" aria-label="Buy or Rent">
         <button type="button" class="search-bar__segment-btn is-active" data-segment="sale">Buy</button>
