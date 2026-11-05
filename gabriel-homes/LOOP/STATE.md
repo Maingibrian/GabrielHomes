@@ -1,40 +1,39 @@
 # LOOP/STATE.md — Gabriel Homes agent loop state
 
-- **Run number:** 31 (next) — r30 completed
-- **Run type r30:** AUDITOR→BUILDER — F5 audited MET-T1 (from scratch, zero gaps, aud=self); H4 built → READY-FOR-AUDIT (section rhythm).
-- **Timestamp:** 2026-11-06 ~01:25 +03:00 (session tz Africa/Nairobi)
+- **Run number:** 32 (next) — r31 completed
+- **Run type r31:** AUDITOR→BUILDER — H4 audited MET-T1 (from scratch, zero
+  gaps, aud=self); G3 built → READY-FOR-AUDIT (scroll-linked reveals).
+- **Timestamp:** 2026-11-06 ~03:20 +03:00 (session tz Africa/Nairobi)
 - **Workspace:** /home/z/my-project/gabriel-homes/
 - **Protocol:** LOOP/SCHEDULED-TASK.md (+ PROTOCOL/RUBRIC/SCORECARD).
 
 ## Gates (real results)
 `manage.py check` OK · `makemigrations --check --dry-run` OK · pytest
-**621 → 627 passed** (+6 H4). Ratchets: sub-13px **43**, hex **214**
-(re-pinned r30 D-LOOP-30c — bisected to the r29 L3 commit), image bytes
-**4,191,687** — all held.
+**627 → 636 passed** (+9 G3; re-verified after the addendum M1 edit).
+Ratchets: sub-13px **43**, hex **214**, image bytes **4,191,687** — held.
 
 ## Shipped this run
-- **AUDIT F5 → MET-T1**: 6/6 tests; E3 r29_e3_f5.py re-run **19/19**
-  (smoothing curve, G1/L1 neighbours intact under Lenis, native paths on
-  none/touch/lite); SRI recomputed from bytes == tag; D-LOOP-29a verified
-  line-by-line; M5 covers smooth scroll — zero gaps.
-- **BUILDER H4 → READY-FOR-AUDIT**: 6/6 test_h4_section_rhythm.py; five
-  attribute-only `data-archetype` tags on home bands: #hero full-bleed →
-  #checks edge-strip → #bento full-bleed → #recommended type-led → #nearby
-  type-led (D-LOOP-30a: marquee double-listing resolved, F4 M-table
-  untouched); addendum home mapping pinned; E3 r30_e3_h4.py **6/6**
-  (1280px + 390px, marquee intact, zero errors) — hero pixel-identical.
-- **OPS**: stale r29 --noreload server held port 8765 serving cached
-  templates → E3 failed oddly until killed. Future runs: pkill the old
-  runserver BEFORE starting a fresh detached one.
+- **AUDIT H4 → MET-T1**: 6/6 tests; E3 r30_e3_h4.py re-run 6/6 (fresh
+  server, pkill-first); D-LOOP-30a verified against code; 390px eyeball —
+  zero gaps. D-LOOP-30c doc wart fixed in passing.
+- **BUILDER G3 → READY-FOR-AUDIT**: 9/9 test_g3_scroll_linked.py; ONE
+  @supports (animation-timeline: view()) block — reversible g3-rise on
+  nearby cards + services rows, g3-clip on services media, rise on the
+  about collage figure; IO fallback untouched; transition:none sole-
+  ownership rule (D-LOOP-31a); bento untouched; parallax deferred
+  honestly. E3 r31_e3_g3.py **12/12** natural-scroll: nearby 0→0.57→1,
+  svc-row 0→1, clip inset 10%→0%, fx=none kills, JS-blocked visible,
+  zero errors; services screenshot eyeballed (mid-clip visible).
+- **E3 methodology**: scroll timelines read stale same-task — rAF-tick
+  + behavior:"instant" steps (global scroll-behavior:smooth trap).
 
 ## Item states (SCORECARD)
-MET-T1: F1, F2, F3, F4, F5, H1, H3, G1, G2, L1, L2, L3 (**12/18 = 67%**)
-+ H2 (a-slice). READY-FOR-AUDIT: H4. TODO: 5 (G3/L4 10; G4 7).
+MET-T1: F1, F2, F3, F4, F5, H1, H3, H4, G1, G2, L1, L2, L3 (**13/18 =
+72%**) + H2 (a-slice). READY-FOR-AUDIT: G3. TODO: 4 (L4 10; G4 7).
 
 ## Next slice
-**Run 31 = AUDITOR**: audit H4 (6/6 test_h4_section_rhythm.py, re-run
-scripts/r30_e3_h4.py expect ALL PASS, re-read D-LOOP-30a, eyeball
-r30-h4-home-1280.png). Then **BUILDER ONE item deeply**: G3
-(animation-timeline behind @supports — collage/services/nearby, IO
-fallback kept, transform/clip/opacity only) or L4 (read detail-gallery.js
-first; swipe + lightbox focus trap + shared-element). Suite ≥ 627.
+**Run 32 = AUDITOR**: audit G3 (9/9 test_g3_scroll_linked.py, re-run
+scripts/r31_e3_g3.py expect ALL PASS, re-read D-LOOP-31a, eyeball
+r31-g3-services.png). Then **BUILDER ONE item deeply**: L4 (detail
+gallery, 10 — read detail-gallery.js FIRST; swipe + lightbox focus trap
++ keyboard + shared-element) or G4 (pointer polish, 7). Suite ≥ 636.

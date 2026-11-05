@@ -1113,6 +1113,83 @@ html.motion-ready [data-reveal].is-visible {
   }
 }
 
+/* ============================================================
+   12b. G3 — scroll-linked reveals (D-LOOP-31a)
+   Progressive enhancement of the M1 reveal family: capable browsers
+   drive the same rise/clip reveals off the scroll timeline instead of
+   the one-shot IntersectionObserver (which stays as the fallback and
+   still owns every element NOT listed here). Reveals are reversible —
+   scrolling back re-runs them, exactly like a Framer scroll section.
+   Rules of the block:
+   * everything lives behind @supports (animation-timeline: view()) —
+     non-supporting browsers never download a hidden from-state;
+   * every selector is scoped under html.motion-ready — with JS blocked
+     nothing is hidden and nothing animates (D-MOTION-SAFE);
+   * fx=none and prefers-reduced-motion kill it (animation: none);
+   * keyframes animate transform / clip-path / opacity ONLY — no layout
+     shift; the bento grid is deliberately NOT targeted (H3/M4 own it).
+   ============================================================ */
+@supports (animation-timeline: view()) {
+  @keyframes g3-rise {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes g3-clip {
+    from { clip-path: inset(10% 7% 10% 7% round var(--radius-card, 18px)); opacity: .4; }
+    to   { clip-path: inset(0 0 0 0 round var(--radius-card, 18px)); opacity: 1; }
+  }
+  html.motion-ready .nearby-card[data-reveal] {
+    /* transition: none — the scroll timeline is the sole motion owner of a
+       g3 element; the IO one-shot transition must never fight it (a running
+       transition sits ABOVE animations in the cascade and would snap the
+       reveal while the timeline is mid-range). */
+    transition: none;
+    animation: g3-rise linear both;
+    animation-timeline: view();
+    animation-range: entry 5% entry 55%;
+  }
+  html.motion-ready .svc-row[data-reveal] {
+    transition: none;
+    animation: g3-rise linear both;
+    animation-timeline: view();
+    animation-range: entry 0% entry 60%;
+  }
+  html.motion-ready .svc-row__media {
+    transition: none;
+    animation: g3-clip linear both;
+    animation-timeline: view();
+    animation-range: entry 10% entry 70%;
+  }
+  html.motion-ready .about-story__figure[data-reveal] {
+    transition: none;
+    animation: g3-rise linear both;
+    animation-timeline: view();
+    animation-range: entry 0% entry 55%;
+  }
+  html.motion-ready[data-fx="none"] .nearby-card[data-reveal],
+  html.motion-ready[data-fx="none"] .svc-row[data-reveal],
+  html.motion-ready[data-fx="none"] .svc-row__media,
+  html.motion-ready[data-fx="none"] .about-story__figure[data-reveal] {
+    animation: none;
+  }
+  /* fail-closed: if fx-gate.js never set data-fx, nothing scroll-linked runs */
+  html.motion-ready:not([data-fx]) .nearby-card[data-reveal],
+  html.motion-ready:not([data-fx]) .svc-row[data-reveal],
+  html.motion-ready:not([data-fx]) .svc-row__media,
+  html.motion-ready:not([data-fx]) .about-story__figure[data-reveal] {
+    animation: none;
+  }
+  /* OS-level reduced motion before/at fx-gate time */
+  @media (prefers-reduced-motion: reduce) {
+    html.motion-ready .nearby-card[data-reveal],
+    html.motion-ready .svc-row[data-reveal],
+    html.motion-ready .svc-row__media,
+    html.motion-ready .about-story__figure[data-reveal] {
+      animation: none;
+    }
+  }
+}
+
 
 /* ============================================================
    13. Site footer frame (moved from home.css — renders on ALL pages)
