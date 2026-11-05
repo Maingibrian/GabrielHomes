@@ -5,8 +5,7 @@
   gaps, aud=self); F5 built → READY-FOR-AUDIT (Lenis smooth scroll).
 - **Timestamp:** 2026-11-06 ~00:45 +03:00 (session tz Africa/Nairobi)
 - **Workspace:** /home/z/my-project/gabriel-homes/
-- **Protocol:** LOOP/SCHEDULED-TASK.md; LOOP/PROTOCOL.md; LOOP/RUBRIC.md;
-  per-item contract LOOP/SCORECARD.md.
+- **Protocol:** LOOP/SCHEDULED-TASK.md (+ PROTOCOL/RUBRIC/SCORECARD).
 
 ## Gates (real results)
 `manage.py check` OK · `makemigrations --check --dry-run` OK · pytest
@@ -26,9 +25,8 @@ image bytes **4,191,687** — all held (no new px/hex/images; F1 pins).
   under fx=rich + fine pointer + hover, anchors stay motion.js's, no
   reduced-motion re-check (D-LOOP-16a); motion.js + search-map.js call
   sites routed (justified, D-LOOP-29a); base.css Lenis classes. E3
-  r29_e3_f5.py **19/19** (rich smoothing curve, G1 hide/return under
-  Lenis, L1 pin 5→886 + flash, fx=none/touch/lite native); r27 G1 E3
-  re-run PASS.
+  r29_e3_f5.py **19/19** (rich smoothing curve, G1/L1 neighbours intact,
+  fx=none/touch/lite native); r27 G1 E3 re-run PASS.
 
 ## Item states (SCORECARD)
 MET-T1: F1, F2, F3, F4, H1, H3, G1, G2, L1, L2, L3 (**11/18 = 61%**) +
