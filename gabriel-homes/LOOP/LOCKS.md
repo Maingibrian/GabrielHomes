@@ -20,3 +20,5 @@ same item or the same file ⇒ pick a different item.
 | F3 (image & video diet: test_f3_media_diet.py + WebP pass + video contract + HYG-1 purge) | r21-builder | 2026-11-05 14:18 +03:00 | 2026-11-05 15:03 +03:00 | yes — 14:46 +03:00 (READY-FOR-AUDIT, 562 passed) |
 | AUDIT F3 (gates + 6 F3 tests + survey re-run + E3 smoke re-run + D-LOOP-21 rationale) | r22-auditor | 2026-11-05 15:27 +03:00 | 2026-11-05 16:12 +03:00 | yes — 15:30 +03:00 (verdict MET-T1; sub-13px corrected 44→43, D-LOOP-22a) |
 | G2 (shared-element transitions: test_g2_view_transitions.py + base.css @view-transition/@supports + per-listing names + fx opt-out) | r22-builder | 2026-11-05 15:30 +03:00 | 2026-11-05 16:15 +03:00 | yes — 15:55 +03:00 (READY-FOR-AUDIT, 569 passed) |
+| AUDIT G2 (gates + 7 G2 tests + E3 re-run + D-LOOP-22b re-read) | r23-auditor | 2026-11-05 16:15 +03:00 | 2026-11-05 17:00 +03:00 | yes — 16:20 +03:00 (verdict MET-T1, E3 14/14) |
+| L1 (map & list sync: test_l1_map_list_sync.py + search-map.js wiring + row identity + oob count + Map pill) | r23-builder | 2026-11-05 16:22 +03:00 | 2026-11-05 17:07 +03:00 | yes — 16:45 +03:00 (READY-FOR-AUDIT, 581 passed) |

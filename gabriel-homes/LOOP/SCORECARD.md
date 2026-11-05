@@ -18,10 +18,10 @@ proving test exists and is green.
 | H3 | Mobile bento | 5 | F2 | T1 | MET-T1 | 3,3,3,3,3,3,3,3 | 3,3,3,3,3,3,3,3 | E2+E3 | 0 | r20 | MET — frozen; WATCH spot-checks; E3: scripts/r20_e3_h3_audit.py 21/21 (snap rail, keyboard walk 0→1470, JS-blocked D-MOTION-SAFE, desktop untouched), LOOP/audit-screens/r20-e3-h3-*.png |
 | H4 | Section rhythm | 3 | H1 | T1 | TODO | – | – | – | 0 | r15 | After H1: archetype tags on sections + rhythm test |
 | G1 | Floating pill nav | 4 | F2 | T1 | TODO | – | – | – | 0 | r15 | Hide/return on scroll under fx lite+rich; move mobile-menu inline styles to CSS |
-| G2 | Shared-element transitions | 5 | F2 | T1 | READY-FOR-AUDIT | 3,3,3,3,3,3,4,4 | – | E2+E3 | 0 | r22 | AUDIT it: 7/7 test_g2_view_transitions.py; @view-transition in @supports CSSOM-verified (r22 E3: scripts/r22_e3_g2_audit.py 14/14 — lite names on, reduced-motion + JS-blocked fail-closed, Q3 visible); names on search rows, 4 home cards, detail hero; HTMX partial carries names |
+| G2 | Shared-element transitions | 5 | F2 | T1 | MET-T1 | 3,3,3,3,3,3,4,4 | 3,3,3,3,3,3,4,4 | E2+E3 | 0 | r23 | MET — frozen; WATCH re-runs 7 G2 tests + scripts/r22_e3_g2_audit.py expect PASS; F4 must map the cross-fade + shared-element pair as addendum entries (D-LOOP-22b) |
 | G3 | Scroll-linked effects | 3 | F2,F4 | T1 | TODO | – | – | – | 0 | r15 | animation-timeline: view() behind @supports; IO fallback kept |
 | G4 | Pointer polish | 2 | F2,F4 | T1 | TODO | – | – | – | 0 | r15 | Cursor View bubble + magnetic CTAs, fx=rich + fine pointer only |
-| L1 | Map & list sync | 5 | — | T1 | TODO | – | – | – | 0 | r15 | Two-way highlight (row↔pin), keyboard operable, aria-live count, Map pill |
+| L1 | Map & list sync | 5 | — | T1 | READY-FOR-AUDIT | 3,3,3,3,3,3,4,4 | – | E2+E3 | 0 | r23 | AUDIT it: 12/12 test_l1_map_list_sync.py; two-way highlight + oob aria-live count + Map pill; E3 15/15 with live tiles (scripts/r23_e3_l1_audit.py, r23-e3-l1-*.png); popup owns focus after pin click (D-LOOP-23a); D6 mobile E3 batched OWNER_NEEDS L3 |
 | L2 | Basemap palette | 4 | — | T1 | TODO | – | – | – | 0 | r15 | setPaintProperty token recolour with guarded layer list; pin font fix |
 | L3 | Row conversion & density | 4 | — | T1 | TODO | – | – | – | 0 | r15 | WhatsApp primary icon action; row ≤320px; desc ≤28 words |
 | L4 | Detail gallery | 3 | G2 | T1 | TODO | – | – | – | 0 | r15 | Read detail-gallery.js first; swipe + lightbox focus trap + shared-element |
@@ -33,7 +33,7 @@ proving test exists and is green.
 Priorities recomputed at the r20 retrospective (D-LOOP-20a; untouched bonus +1 live from r20):
 **L1 16 · G2 16 · F3 13 · F4 13 · G1 13 · L2 13 · L3 13 · F5 10 · H4 10 · G4 7\***
 (* blocked: H2→F3 would be 16, G3→F4 would be 10, L4→G2 would be 10).
-Build order: r22 = AUDIT F3 (done → MET-T1) then BUILDER G2 (done → READY-FOR-AUDIT) → r23 AUDIT G2 then BUILDER L1. MET share **5/18 (28%)**.
+Build order: r23 = AUDIT G2 (done → MET-T1) then BUILDER L1 (done → READY-FOR-AUDIT) → r24 AUDIT L1 then BUILDER F4 (13, unblocks G3+G4) or the H2.a structure slice (D-LOOP-20b, 16). MET share **6/18 (33%)**.
 
 ---
 

@@ -257,6 +257,7 @@ def search(request, type_slug: str | None = None, location_slug: str | None = No
             item.get("location__name"),
         ]
         map_listings.append({
+            "id": item["pk"],  # L1: pairs each pin with its result row
             "lat": float(item["lat"]), "lng": float(item["lng"]),
             "title": item["title"],
             "url": f"/listing/{item['slug']}-{item['pk']}/",

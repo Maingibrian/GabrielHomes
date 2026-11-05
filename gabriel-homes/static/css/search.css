@@ -481,3 +481,44 @@
 .htmx-settling .htmx-indicator {
   display: block;
 }
+
+/* L1 — map & list sync (D-LOOP-23a) ----------------------------------- */
+.listing-row.is-flashed {
+  outline: 2px solid var(--burnt);
+  outline-offset: -2px;
+  animation: l1-row-flash 1.6s var(--ease-out) both;
+}
+@keyframes l1-row-flash {
+  0% { box-shadow: 0 0 0 0 rgba(160, 82, 45, .30); }
+  100% { box-shadow: 0 0 0 14px rgba(160, 82, 45, 0); }
+}
+.map-price-pin.is-hot {
+  transform: scale(1.08);
+  background: var(--ink);
+  color: var(--white);
+  outline: 2px solid var(--white);
+}
+.map-return-pill {
+  position: fixed;
+  left: 50%;
+  bottom: max(18px, env(safe-area-inset-bottom));
+  transform: translateX(-50%);
+  z-index: var(--z-modal);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6rem 1.15rem;
+  border: 1px solid var(--sand-60);
+  border-radius: var(--radius-pill);
+  background: var(--white);
+  color: var(--ink);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  box-shadow: var(--shadow-card);
+  cursor: pointer;
+}
+.map-return-pill:hover { box-shadow: var(--shadow-card-hover); }
+@media (prefers-reduced-motion: reduce) {
+  .listing-row.is-flashed { animation: none; }
+}
+html[data-fx="none"] .listing-row.is-flashed { animation: none; }

@@ -61,7 +61,7 @@
       <span>Explore homes by location.</span>
     </div>
     <div class="search-map-stage">
-      <div id="search-map" class="search-map" data-maplibre-src="{% staticv 'vendor/maplibre-gl/maplibre-gl.mjs' %}" role="application" aria-label="OpenStreetMap showing Mombasa property locations"><p>Loading the Mombasa property map…</p></div>
+      <div id="search-map" class="search-map" data-maplibre-src="{% staticv 'vendor/maplibre-gl/maplibre-gl.mjs' %}" role="application" tabindex="-1" aria-label="OpenStreetMap showing Mombasa property locations"><p>Loading the Mombasa property map…</p></div>
     </div>
     {{ map_listings|json_script:"search-map-data" }}
     <div class="market-filters" aria-label="Quick property filters">
@@ -79,13 +79,19 @@
       </a>
     </div>
   </div>
+  {# L1: floating "Map" pill — hidden until JS sees the map leave the viewport #}
+  <button class="map-return-pill" type="button" data-map-return hidden
+          aria-label="Scroll back to the property map">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"></polygon><line x1="9" y1="3" x2="9" y2="18"></line><line x1="15" y1="6" x2="15" y2="21"></line></svg>
+    Map
+  </button>
 </section>
 
 {# Results header #}
 <div class="container">
   <div class="results-header">
     <div class="results-header__meta">
-      <span class="results-header__count">
+      <span class="results-header__count" id="results-count" aria-live="polite">
         <strong>{{ total_count }}</strong> propert{{ total_count|pluralize:"y,ies" }} found
       </span>
 

@@ -6,6 +6,64 @@
   var listings = [];
   try { listings = JSON.parse(dataEl.textContent); } catch (error) { return; }
 
+  // L1 — smooth scrolling only when the capability gate allows it
+  // (D-LOOP-16a: motion-preference media queries live in fx-gate.js and
+  // CSS only — never in this file).
+  function smoothOk() {
+    return document.documentElement.getAttribute('data-fx') !== 'none';
+  }
+
+  // L1 — two-way highlight, pin → row: scroll to + flash the row.
+  // Focus is NOT moved: activating a pin opens its maplibre popup, which
+  // takes focus itself (focusAfterOpen) — that is the keyboard path; the
+  // flash orients everyone else.
+  var flashTimer = null;
+  function flashRow(id) {
+    var row = document.getElementById('listing-row-' + id);
+    if (!row) return;
+    row.scrollIntoView({behavior: smoothOk() ? 'smooth' : 'auto', block: 'center'});
+    row.classList.remove('is-flashed');
+    void row.offsetWidth; /* restart the animation on re-trigger */
+    row.classList.add('is-flashed');
+    if (flashTimer) clearTimeout(flashTimer);
+    flashTimer = setTimeout(function () {
+      row.classList.remove('is-flashed');
+    }, 1600);
+  }
+
+  // L1 — two-way highlight, row → pin: hovering a result row highlights
+  // its pin (delegated, so HTMX row swaps keep working).
+  var grid = document.getElementById('results-grid');
+  if (grid) {
+    var hotPin = null;
+    grid.addEventListener('mouseover', function (event) {
+      var row = event.target.closest('.listing-row');
+      var pin = row && row.dataset.listingPk
+        ? mapEl.querySelector('[data-listing-pin="' + row.dataset.listingPk + '"]')
+        : null;
+      if (hotPin && hotPin !== pin) hotPin.classList.remove('is-hot');
+      if (pin) { pin.classList.add('is-hot'); hotPin = pin; }
+    });
+    grid.addEventListener('mouseleave', function () {
+      if (hotPin) { hotPin.classList.remove('is-hot'); hotPin = null; }
+    });
+  }
+
+  // L1 — floating "Map" pill: hidden until the map leaves the viewport;
+  // with JS blocked it never appears (no dead control, Q3-safe).
+  var pill = document.querySelector('[data-map-return]');
+  if (pill && 'IntersectionObserver' in window) {
+    new IntersectionObserver(function (entries) {
+      pill.hidden = entries[0].isIntersecting;
+    }, {threshold: 0.15}).observe(mapEl);
+    pill.addEventListener('click', function () {
+      mapEl.scrollIntoView({behavior: smoothOk() ? 'smooth' : 'auto', block: 'start'});
+      mapEl.focus({preventScroll: true});
+      pill.hidden = true;
+      pill.blur();
+    });
+  }
+
   function escapeHtml(value) {
     return String(value || '').replace(/[&<>\'\"]/g, function (character) {
       return {'&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '\"': '&quot;'}[character];
@@ -67,6 +125,8 @@
         pin.className = 'map-price-pin map-price-pin--' + market;
         pin.textContent = listing.price_short || listing.price || 'View';
         pin.setAttribute('aria-label', (listing.title || 'Property') + ', ' + pin.textContent);
+        pin.dataset.listingPin = listing.id;  // L1: pairs with #listing-row-<id>
+        pin.addEventListener('click', function () { flashRow(listing.id); });
 
         var popup = '<article class="map-property-popup">' +
           '<small>' + (market === 'bnb' ? 'SHORT STAY' : (market === 'rent' ? 'FOR RENT' : 'FOR SALE')) + '</small>' +

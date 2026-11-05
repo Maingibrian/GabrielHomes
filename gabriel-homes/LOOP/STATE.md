@@ -1,9 +1,9 @@
 # LOOP/STATE.md — Gabriel Homes agent loop state
 
-- **Run number:** 23 (next) — r22 completed
-- **Run type r22:** AUDITOR→BUILDER — F3 audited → MET-T1 (sub-13px
-  expectation corrected 44→43, D-LOOP-22a); G2 built → READY-FOR-AUDIT.
-- **Timestamp:** 2026-11-05 ~15:55 +03:00 (session tz Africa/Nairobi)
+- **Run number:** 24 (next) — r23 completed
+- **Run type r23:** AUDITOR→BUILDER — G2 audited → MET-T1; L1 built →
+  READY-FOR-AUDIT (two-way highlight, oob aria-live count, Map pill).
+- **Timestamp:** 2026-11-05 ~16:45 +03:00 (session tz Africa/Nairobi)
 - **Workspace:** /home/z/my-project/gabriel-homes/
 - **Protocol:** LOOP/SCHEDULED-TASK.md; condensed rules LOOP/PROTOCOL.md;
   rubric LOOP/RUBRIC.md; per-item contract LOOP/SCORECARD.md.
@@ -13,33 +13,32 @@
 |---|---|---|
 | `manage.py check` | OK — 0 issues | OK — 0 issues |
 | `makemigrations --check --dry-run` | OK — no changes | OK — no changes |
-| `pytest -q` | **562 passed** | **569 passed** |
+| `pytest -q` | **569 passed** | **581 passed** |
 
-Ratchets: sub-13px **43** (corrected expectation — HYG-1 carried one
-sub-13px line out after the r21 WATCH count; ceiling constant stays 44),
-hex **217 held**, image bytes **4,185,045 exact held**.
+Ratchets: sub-13px **43**, hex **217**, image bytes **4,185,045** — all
+held (no hex added; rgba pulses are F1-exempt per existing precedent).
 
 ## Shipped this run
-- **F3 → MET-T1** (audited r22): 6/6 tests, independent byte walk exact,
-  width/height 12/12 incl. multi-line tag, E3 smoke re-run 13/13.
-- **G2 → READY-FOR-AUDIT**: CSS-only shared-element transitions —
-  @view-transition inside @supports (CSSOM-verified in Chromium),
-  fail-closed `html { view-transition-name: none }` re-enabled only under
-  fx=rich|lite, inline-name override for no-gate/fx=none; prop-<pk> names
-  on search rows, 4 home market cards, detail hero (both branches);
-  _listing_card unnamed (detail duplicates trap); HTMX partial carries
-  names. E3 14/14 (scripts/r22_e3_g2_audit.py; r22-e3-g2-{lite,none}.png).
-- Queue note: HYG-2 = delete orphaned _home_property_card.html (BACKLOG).
+- **G2 → MET-T1** (audited r23): 7/7 tests, E3 14/14 re-run, D-LOOP-22b.
+- **L1 → READY-FOR-AUDIT**: rows `id=listing-row-<pk>` + `data-listing-pk`;
+  map JSON gains `id`; search-map.js delegated row→pin `.is-hot`, pin→row
+  scroll + `.is-flashed` (behaviour reads html[data-fx]); Map pill via
+  IntersectionObserver (hidden in markup, focus returns to tabindex=-1
+  map); `#results-count` aria-live=polite + HTMX partial re-sends it
+  `hx-swap-oob` (count was stale on filter swaps — fixed). E3 15/15 with
+  live tiles (scripts/r23_e3_l1_audit.py; r23-e3-l1-{map,flash}.png).
+  Focus rule: the maplibre popup owns focus after pin click (D-LOOP-23a).
 
 ## Item states (SCORECARD)
-MET-T1: F1, F2, F3, H1, H3 (5/18 = 28%). READY-FOR-AUDIT: G2. TODO: 12.
-Unblocked leaders: L1 (16), H2 (16 — slice H2.a structure per D-LOOP-20b),
-F4 (13), G1/L2/L3 (13). L4 unblocked once G2 audits clean.
+MET-T1: F1, F2, F3, G2, H1, H3 (6/18 = 33%). READY-FOR-AUDIT: L1.
+TODO: 11. Unblocked leaders: F4 (13, unblocks G3+G4), H2.a slice (16,
+D-LOOP-20b), G1/L2/L3 (13). L4 unblocked (G2 MET).
 
 ## Next slice
-**Run 23 = AUDITOR first**: audit G2 (mechanical — re-run gates,
-7/7 test_g2_view_transitions.py, re-run scripts/r22_e3_g2_audit.py expect
-PASS, re-read D-LOOP-22b). **Then BUILDER L1** (map & list sync, 16 —
-two-way highlight, keyboard, aria-live count, Map pill; owner layout kept)
-— or the H2.a structure slice (D-LOOP-20b) if L1 looks too big for one box.
-Suite must stay ≥ 569.
+**Run 24 = AUDITOR first**: audit L1 (mechanical — re-run gates,
+12/12 test_l1_map_list_sync.py, re-run scripts/r23_e3_l1_audit.py expect
+PASS — live tiles ARE reachable from this sandbox, re-read D-LOOP-23a).
+**Then BUILDER F4** (motion vocabulary, 13 — docs/DESIGN-ADDENDUM.md ≤6
+effects + archetypes; map shipped effects incl. the G2 pair + L1
+flash/scroll; unblocks G3+G4) — or the H2.a structure slice (D-LOOP-20b)
+if the addendum looks too small for one box. Suite must stay ≥ 581.
