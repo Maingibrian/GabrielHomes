@@ -16,3 +16,5 @@ same item or the same file ⇒ pick a different item.
 | H3 (mobile bento: test_h3_mobile_bento.py + home.css carousel) | r19-builder | 2026-11-05 13:33 +03:00 | 2026-11-05 14:18 +03:00 | yes — 13:50 +03:00 (READY-FOR-AUDIT) |
 | RETRO r20 (re-weight/split/add/prune per §3b; docs only, no code) | r20-planner | 2026-11-05 13:50 +03:00 | 2026-11-05 14:35 +03:00 | yes — 13:58 +03:00 (retro logged: D-LOOP-20a..e) |
 | AUDIT H3 (gates + test_h3_mobile_bento.py + E3 rail @390px: snap, keyboard walk, bento-shift off) | r20-auditor | 2026-11-05 13:58 +03:00 | 2026-11-05 14:43 +03:00 | yes — 14:12 +03:00 (verdict MET-T1, 21/21 E3) |
+| WATCH r20-overlay (gates + deterministic MET spot-check F2 [21 mod 4 = 1 of F1,F2,H1,H3] + F1 drift) | r21-watch | 2026-11-05 11:17 +0000 | 2026-11-05 12:02 +0000 | no |
+| F3 (image & video diet: test_f3_media_diet.py + WebP pass + video contract + HYG-1 purge) | r21-builder | 2026-11-05 14:18 +03:00 | 2026-11-05 15:03 +03:00 | no |
