@@ -69,6 +69,9 @@
   <script src="{% staticv 'js/fx-gate.js' %}" defer></script>
   {% block scripts %}
     <script src="{% staticv 'js/motion.js' %}" defer></script>
+    {# F5 — vendored Lenis (HYG: self-hosted, SRI pinned, no sourceMappingURL; D-LOOP-29a) #}
+    <script src="{% staticv 'vendor/lenis/lenis.min.js' %}" integrity="sha384-v5v9TZe0Qv8TraZzfqnGlZgHEUpkRhdqVkaWUkI6+BIsJOU0WxUuNx4/f6KcSCUK" crossorigin="anonymous" defer></script>
+    <script src="{% staticv 'js/smooth-scroll.js' %}" defer></script>
   {% endblock %}
 </body>
 </html>

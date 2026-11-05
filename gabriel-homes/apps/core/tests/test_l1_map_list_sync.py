@@ -28,6 +28,8 @@ pytestmark = pytest.mark.django_db
 
 REPO = Path(__file__).resolve().parents[3]
 JS = (REPO / "static" / "js" / "search-map.js").read_text(encoding="utf-8")
+# F5 (D-LOOP-29a): the fx-aware scroll helper that search-map.js routes through
+INIT = (REPO / "static" / "js" / "smooth-scroll.js").read_text(encoding="utf-8")
 SEARCH_CSS = (REPO / "static" / "css" / "search.css").read_text(encoding="utf-8")
 
 SEARCH_URL = "/property-for-sale/mombasa/"
@@ -100,8 +102,11 @@ def test_map_data_ids_unique_and_paired():
 # 3. the JS wiring (static, per F2/F4 grep-test convention)
 # ---------------------------------------------------------------------------
 def test_pin_to_row_scroll_and_flash_wired():
-    for needle in ("dataset.listingPin", "listing-row-", "scrollIntoView",
-                   "is-flashed", "block"):
+    # F5 (D-LOOP-29a): programmatic scroll routes through the fx-aware
+    # ghScrollTo helper (lenis under fx=rich, native otherwise) — the
+    # behaviour contract (pin→row scroll + flash) is unchanged.
+    for needle in ("dataset.listingPin", "listing-row-", "ghScrollTo",
+                   "is-flashed", "'center'"):
         assert needle in JS, f"search-map.js missing pin→row wiring: {needle}"
 
 
@@ -118,10 +123,14 @@ def test_pins_stay_keyboard_buttons():
 
 
 def test_scroll_respects_fx_gate():
-    assert "data-fx" in JS, (
-        "scroll behaviour must read html[data-fx] (smooth only when the "
-        "gate allows it)")
-    assert "prefers-reduced-motion" not in JS, (
+    # F5 (D-LOOP-29a): fx awareness for programmatic scroll is centralised
+    # in the ghScrollTo helper (static/js/smooth-scroll.js) — search-map.js
+    # routes through it instead of reading html[data-fx] locally.
+    assert "ghScrollTo" in JS, (
+        "scroll behaviour must go through the fx-aware ghScrollTo helper")
+    assert "data-fx" in INIT, (
+        "the helper must read html[data-fx] (smooth only when the gate allows it)")
+    assert "prefers-reduced-motion" not in JS and "prefers-reduced-motion" not in INIT, (
         "D-LOOP-16a: fx-gate.js is the only script allowed to mention "
         "prefers-reduced-motion")
 

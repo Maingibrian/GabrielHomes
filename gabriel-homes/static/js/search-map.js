@@ -6,13 +6,6 @@
   var listings = [];
   try { listings = JSON.parse(dataEl.textContent); } catch (error) { return; }
 
-  // L1 — smooth scrolling only when the capability gate allows it
-  // (D-LOOP-16a: motion-preference media queries live in fx-gate.js and
-  // CSS only — never in this file).
-  function smoothOk() {
-    return document.documentElement.getAttribute('data-fx') !== 'none';
-  }
-
   // L1 — two-way highlight, pin → row: scroll to + flash the row.
   // Focus is NOT moved: activating a pin opens its maplibre popup, which
   // takes focus itself (focusAfterOpen) — that is the keyboard path; the
@@ -21,7 +14,7 @@
   function flashRow(id) {
     var row = document.getElementById('listing-row-' + id);
     if (!row) return;
-    row.scrollIntoView({behavior: smoothOk() ? 'smooth' : 'auto', block: 'center'});
+    ghScrollTo(row, 'center'); /* F5 D-LOOP-29a: helper keeps the native path for lite/none */
     row.classList.remove('is-flashed');
     void row.offsetWidth; /* restart the animation on re-trigger */
     row.classList.add('is-flashed');
@@ -57,7 +50,7 @@
       pill.hidden = entries[0].isIntersecting;
     }, {threshold: 0.15}).observe(mapEl);
     pill.addEventListener('click', function () {
-      mapEl.scrollIntoView({behavior: smoothOk() ? 'smooth' : 'auto', block: 'start'});
+      ghScrollTo(mapEl, 'start'); /* F5 D-LOOP-29a: helper keeps the native path for lite/none */
       mapEl.focus({preventScroll: true});
       pill.hidden = true;
       pill.blur();

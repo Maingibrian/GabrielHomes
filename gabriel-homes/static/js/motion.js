@@ -44,7 +44,9 @@
       var target = document.querySelector(hash);
       if (!target) return;
       e.preventDefault();
-      target.scrollIntoView({ behavior: "smooth", block: "start" });
+      /* F5 (D-LOOP-29a): Lenis under fx=rich; native fallback keeps lite/none intact. */
+      if (window.ghScrollTo) { window.ghScrollTo(target, "start"); }
+      else { target.scrollIntoView({ behavior: "smooth", block: "start" }); }
     });
   }
 
