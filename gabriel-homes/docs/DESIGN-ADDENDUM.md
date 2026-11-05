@@ -1,0 +1,48 @@
+# DESIGN-ADDENDUM — motion vocabulary & section archetypes
+
+F4 contract: this document names **at most 6 motion effects**. Every shipped
+effect in the codebase maps to one entry below. The keep-alive rule: if an
+effect does not orient, confirm, or earn its keep, it gets cut — not added to
+this list.
+
+## The stacking rule (max 2 at once per viewport)
+
+At most two entries animate in the same viewport at the same time:
+
+- The hero pairs M2's ambient slide rotation (background slot) with M1's
+  entry rise (gesture slot) — that is the only place an ambient effect runs.
+- Everywhere else, entries are one-shot (M1 reveals finish before the next
+  section enters) or interaction-scoped (M4/M5 animate only while the
+  visitor is engaged with the element), so they never stack with each other.
+- The capability gate (`html[data-fx]` = rich / lite / none, F2) tiers every
+  entry; `none` behaves like `prefers-reduced-motion: reduce` everywhere.
+
+## Vocabulary (6 effects)
+
+| ID | Effect (hooks) | Purpose | Where used | Tier | Reduced-motion / fx=none behaviour |
+|---|---|---|---|---|---|
+| M1 | **rise** — `hv2-rise` stagger, `data-reveal` IntersectionObserver fade-ups | Orient: content arrives in reading order, once | Hero tag/title/subtitle/search; section headers, cards, rows (motion.js) | lite + rich | Content fully visible instantly; `animation: none` kills rise/marquee/cue; reveals fire visible with no transition |
+| M2 | **crossfade** — `view-transition` shared-element pair (G2); `hero-fade` + `hero-drift` slide rotation | Continuity: the listing image carries from grid to detail; the hero stays alive without competing | Listing card/row img → detail hero; `.hero__bg` slide stack (24s) | lite + rich (view-transition off under none via the CSS `html { view-transition-name: none }` fail-closed rule) | Navigation is an instant swap; hero shows slide 1 static (no rotation, no drift) |
+| M3 | **marquee** — `hv2-marquee` track + edge fade mask + hover pause | Confirm: the five checks stay present without a trust-badges wall | `#checks` strip on home | lite + rich | Track static (`animation: none`); edge mask survives (it is a fade, not motion); full text still readable |
+| M4 | **spotlight** — `bento-shift` desktop hover morph; `h3-card-grow` scroll-driven centre scale | Orient: the engaged card is unmistakable | Bento grid (desktop, rich + fine pointer); mobile bento rail (scroll-driven CSS, @supports-guarded) | bento: rich + fine · rail: lite + rich | Shape-shift off (`is-live` never set); rail cards render at base scale; all cards reachable |
+| M5 | **confirm** — L1 sync: `is-flashed` pin→row flash, fx-aware smooth scroll, `data-map-return` pill glide | Confirm: the map↔list link answers "which row is this pin?" | Search page map + results grid + pill | lite + rich (scroll reads `data-fx`; flash killed under both reduced-motion CSS and `data-fx="none"`) | Scroll jumps (`auto`); row still scrolls into view and the popup takes focus — the keyboard path never depends on motion |
+| M6 | **invite** — `hv2-scroll` wheel pulse cue | Invite: signals more content below the fold | Hero, fine-pointer screens wider than 809px only | lite + rich, fine pointer | Cue hidden on touch/small viewports by media query; pulse `animation: none` under reduced-motion |
+
+## Cut / dormant
+
+- `data-count` (motion.js counter): **dormant** — no template uses it; it is
+  not a shipped effect and must not be re-activated without an entry here.
+- Anything not in the table above is outside the vocabulary; adding an effect
+  means editing this table (still ≤6) or cutting one first.
+
+## Section archetypes (for H4 rhythm)
+
+1. **full-bleed** — edge-to-edge media band that owns the viewport: the hero,
+   the marquee strip. One per screenful; never two neighbours.
+2. **type-led** — a text-led block where the heading carries the section
+   (recommended/nearby headers, the philosophy lines on /about/).
+3. **edge strip** — a narrow full-width band stitching sections together
+   (marquee, channels strip inside recommended).
+
+Rule: at least 3 archetypes in use site-wide; never more than 2 neighbouring
+sections share one archetype.

@@ -11,17 +11,17 @@ proving test exists and is green.
 | F1 | Token integrity | 5 | — | T1 | MET-T1 | 3,n/a,n/a,n/a,3,n/a,3,3 | 3,n/a,n/a,n/a,3,n/a,3,4 | E2 | 0 | r24 | MET — frozen; WATCH re-runs ratchets via scripts/f1_token_survey.py (expect **43**/**215** — 43 corrected r22 D-LOOP-22a; hex tightened 217→215 r24 D-LOOP-24b) |
 | F2 | Capability gate | 5 | — | T1 | MET-T1 | 3,n/a,n/a,3,3,n/a,3,3 | 3,n/a,n/a,3,3,3,4,4 | E2+E3 | 1 | r17 | MET — frozen; WATCH spot-checks; E3 artifacts LOOP/audit-screens/r17-e3-*.png |
 | F3 | Image & video diet | 4 | — | T1 | MET-T1 | 3,3,n/a,3,3,3,3,4 | 3,3,n/a,4,3,3,3,4 | E2+E3 | 0 | r24 | MET — frozen; WATCH re-runs 6 F3 tests + exact bytes ratchet **4,191,687** (re-pinned r24 D-LOOP-24b: +6,642 B owner portrait, sanctioned) + f1 survey expect **43**/215 + smoke expect PASS |
-| F4 | Motion vocabulary | 4 | — | T1 | TODO | – | – | – | 0 | r15 | Write docs/DESIGN-ADDENDUM.md (≤6 effects + archetypes), then map shipped effects |
+| F4 | Motion vocabulary | 4 | — | T1 | READY-FOR-AUDIT | 3,n/a,3,3,n/a,3,4,4 | – | E2 | 0 | r25 | AUDIT it: 7/7 test_f4_motion_vocab.py; read docs/DESIGN-ADDENDUM.md against the code — every shipped hook (M1-M6 table) maps, ≤6 rows, stacking rule + 3 archetypes + dormant data-count; D-LOOP-25a |
 | F5 | Smooth scroll (Lenis) | 3 | F2 | T1 | TODO | – | – | – | 0 | r15 | Vendor Lenis under hygiene rules after F2 lands |
 | H1 | Home order & diet | 5 | — | T1 | MET-T1 | 3,3,n/a,3,3,3,3,3 | 3,3,n/a,3,3,3,3,3 | E2+E3 | 0 | r19 | MET — frozen; WATCH spot-checks; D6 desktop-only E3 — batched OWNER_NEEDS mobile eyeball |
-| H2 | Hero | 5 | F2,F3 | T1 | READY-FOR-AUDIT (a-slice) | 3,3,n/a,3,3,3,4,4 | – | E2+E3 | 0 | r24 | AUDIT H2.a: 7/7 test_h2_hero.py + E3 re-run (scripts/r24_e3_h2a_audit.py expect 18/18 PASS — supersedes first-pass r24_e3_visual.py 15/15; both shipped) + D-LOOP-24a/b; H2.b motion slice (split-text mask headline, video under fx=rich && !Save-Data + poster per D-LOOP-21a) still TODO — extends the same test file |
+| H2 | Hero | 5 | F2,F3 | T1 | MET-T1 (a-slice) | 3,3,n/a,3,3,3,4,4 | 3,3,n/a,3,3,3,4,4 | E2+E3 | 0 | r25 | MET a-slice — frozen; WATCH re-runs 7/7 test_h2_hero.py + scripts/r24_e3_h2a_audit.py expect 18/18; H2.b motion slice (split-text mask headline → addendum M1, video under fx=rich && !Save-Data + poster per D-LOOP-21a) still TODO — extends the same test file |
 | H3 | Mobile bento | 5 | F2 | T1 | MET-T1 | 3,3,3,3,3,3,3,3 | 3,3,3,3,3,3,3,3 | E2+E3 | 0 | r20 | MET — frozen; WATCH spot-checks; E3: scripts/r20_e3_h3_audit.py 21/21 (snap rail, keyboard walk 0→1470, JS-blocked D-MOTION-SAFE, desktop untouched), LOOP/audit-screens/r20-e3-h3-*.png |
 | H4 | Section rhythm | 3 | H1 | T1 | TODO | – | – | – | 0 | r15 | After H1: archetype tags on sections + rhythm test |
 | G1 | Floating pill nav | 4 | F2 | T1 | TODO | – | – | – | 0 | r15 | Hide/return on scroll under fx lite+rich; move mobile-menu inline styles to CSS |
 | G2 | Shared-element transitions | 5 | F2 | T1 | MET-T1 | 3,3,3,3,3,3,4,4 | 3,3,3,3,3,3,4,4 | E2+E3 | 0 | r23 | MET — frozen; WATCH re-runs 7 G2 tests + scripts/r22_e3_g2_audit.py expect PASS; F4 must map the cross-fade + shared-element pair as addendum entries (D-LOOP-22b) |
 | G3 | Scroll-linked effects | 3 | F2,F4 | T1 | TODO | – | – | – | 0 | r15 | animation-timeline: view() behind @supports; IO fallback kept |
 | G4 | Pointer polish | 2 | F2,F4 | T1 | TODO | – | – | – | 0 | r15 | Cursor View bubble + magnetic CTAs, fx=rich + fine pointer only |
-| L1 | Map & list sync | 5 | — | T1 | READY-FOR-AUDIT | 3,3,3,3,3,3,4,4 | – | E2+E3 | 0 | r23 | AUDIT it: 12/12 test_l1_map_list_sync.py; two-way highlight + oob aria-live count + Map pill; E3 15/15 with live tiles (scripts/r23_e3_l1_audit.py, r23-e3-l1-*.png); popup owns focus after pin click (D-LOOP-23a); D6 mobile E3 batched OWNER_NEEDS L3 |
+| L1 | Map & list sync | 5 | — | T1 | MET-T1 | 3,3,3,3,3,3,4,4 | 3,3,3,3,3,3,4,4 | E2+E3 | 0 | r25 | MET — frozen; WATCH re-runs 12/12 test_l1_map_list_sync.py + scripts/r23_e3_l1_audit.py expect 15/15 live tiles; addendum entry M5 confirm (D-LOOP-25a); D6 mobile E3 batched OWNER_NEEDS L3 |
 | L2 | Basemap palette | 4 | — | T1 | TODO | – | – | – | 0 | r15 | setPaintProperty token recolour with guarded layer list; pin font fix |
 | L3 | Row conversion & density | 4 | — | T1 | TODO | – | – | – | 0 | r15 | WhatsApp primary icon action; row ≤320px; desc ≤28 words |
 | L4 | Detail gallery | 3 | G2 | T1 | TODO | – | – | – | 0 | r15 | Read detail-gallery.js first; swipe + lightbox focus trap + shared-element |
@@ -33,7 +33,7 @@ proving test exists and is green.
 Priorities recomputed at the r20 retrospective (D-LOOP-20a; untouched bonus +1 live from r20):
 **L1 16 · G2 16 · F3 13 · F4 13 · G1 13 · L2 13 · L3 13 · F5 10 · H4 10 · G4 7\***
 (* blocked: H2→F3 would be 16, G3→F4 would be 10, L4→G2 would be 10).
-Build order: r24 = owner-directed H2.a + founder portrait (done → READY-FOR-AUDIT a-slice) → r25 AUDIT L1 then AUDIT H2.a (both mechanical) then BUILDER F4 (13, unblocks G3+G4). MET share **6/18 (33%)**.
+Build order: r25 = AUDIT L1 + AUDIT H2.a (done → both MET-T1) + BUILDER F4 (done → READY-FOR-AUDIT, unblocks G3+G4) → r26 AUDIT F4 then BUILDER L2 (13) or G1 (13). MET share **7/18 (39%)** + H2.a slice; H2.b/L2/L3/G1/G3/G4/F5/H4/L4/H4 remain.
 
 ---
 
