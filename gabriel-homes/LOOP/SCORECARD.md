@@ -17,12 +17,12 @@ proving test exists and is green.
 | H2 | Hero | 5 | F2,F3 | T1 | MET-T1 (a-slice) | 3,3,n/a,3,3,3,4,4 | 3,3,n/a,3,3,3,4,4 | E2+E3 | 0 | r25 | MET a-slice — frozen; WATCH re-runs 7/7 test_h2_hero.py + scripts/r24_e3_h2a_audit.py expect 18/18; H2.b motion slice (split-text mask headline → addendum M1, video under fx=rich && !Save-Data + poster per D-LOOP-21a) still TODO — extends the same test file |
 | H3 | Mobile bento | 5 | F2 | T1 | MET-T1 | 3,3,3,3,3,3,3,3 | 3,3,3,3,3,3,3,3 | E2+E3 | 0 | r20 | MET — frozen; WATCH spot-checks; E3: scripts/r20_e3_h3_audit.py 21/21 (snap rail, keyboard walk 0→1470, JS-blocked D-MOTION-SAFE, desktop untouched), LOOP/audit-screens/r20-e3-h3-*.png |
 | H4 | Section rhythm | 3 | H1 | T1 | TODO | – | – | – | 0 | r15 | After H1: archetype tags on sections + rhythm test |
-| G1 | Floating pill nav | 4 | F2 | T1 | TODO | – | – | – | 0 | r15 | Hide/return on scroll under fx lite+rich; move mobile-menu inline styles to CSS |
+| G1 | Floating pill nav | 4 | F2 | T1 | READY-FOR-AUDIT | 3,3,3,4,4,3,4,4 | – | E2+E3 | 0 | r27 | AUDIT it: 6/6 test_g1_pill_nav.py + E3 scripts/r27_e3_g1.py expect PASS (hide-on-down/return-on-up incl. focusin return, fx=none never hides, JS-blocked visible); setupNavAutoHide fx-gated lite/rich, rAF-throttled, transform-only (D-LOOP-27a: functional nav UI, not a vocabulary family); breakpoints 1200→1024 (nav + hamburger); 6 inline styles → mobile-menu__index/__signout classes; Escape + skip link pre-existing, now test-pinned |
 | G2 | Shared-element transitions | 5 | F2 | T1 | MET-T1 | 3,3,3,3,3,3,4,4 | 3,3,3,3,3,3,4,4 | E2+E3 | 0 | r23 | MET — frozen; WATCH re-runs 7 G2 tests + scripts/r22_e3_g2_audit.py expect PASS; F4 must map the cross-fade + shared-element pair as addendum entries (D-LOOP-22b) |
 | G3 | Scroll-linked effects | 3 | F2,F4 | T1 | TODO | – | – | – | 0 | r15 | animation-timeline: view() behind @supports; IO fallback kept |
 | G4 | Pointer polish | 2 | F2,F4 | T1 | TODO | – | – | – | 0 | r15 | Cursor View bubble + magnetic CTAs, fx=rich + fine pointer only |
 | L1 | Map & list sync | 5 | — | T1 | MET-T1 | 3,3,3,3,3,3,4,4 | 3,3,3,3,3,3,4,4 | E2+E3 | 0 | r25 | MET — frozen; WATCH re-runs 12/12 test_l1_map_list_sync.py + scripts/r23_e3_l1_audit.py expect 15/15 live tiles; addendum entry M5 confirm (D-LOOP-25a); D6 mobile E3 batched OWNER_NEEDS L3 |
-| L2 | Basemap palette | 4 | — | T1 | READY-FOR-AUDIT | 3,3,n/a,4,3,3,4,4 | – | E2+E3 | 0 | r26 | AUDIT it: 6/6 test_l2_basemap_palette.py + E3 scripts/r26_e3_l2.py expect PASS (live tiles, zero console errors, sync intact); rule-list recolour sand-water/paper-land/cream-roads/taupe-labels at runtime tokens, first-match-wins per property (D-LOOP-26b); r13 map tests stay green (603) |
+| L2 | Basemap palette | 4 | — | T1 | MET-T1 | 3,3,n/a,4,3,3,4,4 | 3,3,n/a,4,3,3,4,4 | E2+E3 | 0 | r27 | MET — frozen; WATCH re-runs 6/6 test_l2_basemap_palette.py + scripts/r26_e3_l2.py expect PASS; r27 audit from scratch: 6/6 + E3 7/7 live tiles re-run + D-LOOP-26b verified line-by-line against the code + screenshot eyeballed (vintage-atlas; taupe-on-paper label contrast computed 5.4:1) — zero gaps found; D6 desktop-E3 only (batched OWNER_NEEDS L3 row) |
 | L3 | Row conversion & density | 4 | — | T1 | TODO | – | – | – | 0 | r15 | WhatsApp primary icon action; row ≤320px; desc ≤28 words |
 | L4 | Detail gallery | 3 | G2 | T1 | TODO | – | – | – | 0 | r15 | Read detail-gallery.js first; swipe + lightbox focus trap + shared-element |
 | Q1 | Perf budget (WATCH) | — | all | T1 | TODO | – | – | – | 0 | r15 | Record measurement method; home first-view ≤400KB, JS deferred, CLS 0; r18 constraint: results-page query budget baseline 14 / ceiling 15 — page chrome stays query-free |
@@ -33,7 +33,7 @@ proving test exists and is green.
 Priorities recomputed at the r20 retrospective (D-LOOP-20a; untouched bonus +1 live from r20):
 **L1 16 · G2 16 · F3 13 · F4 13 · G1 13 · L2 13 · L3 13 · F5 10 · H4 10 · G4 7\***
 (* blocked: H2→F3 would be 16, G3→F4 would be 10, L4→G2 would be 10).
-Build order: r26 = AUDIT F4 (done → MET-T1, D-LOOP-26a) + BUILDER L2 (done → READY-FOR-AUDIT, D-LOOP-26b) → r27 AUDIT L2 then BUILDER G1 (13) or L3 (13). MET share **8/18 (44%)**; remaining: L3, G1, F5, H4, G3, G4, L4, H2.b.
+Build order: r26 = AUDIT F4 (done → MET-T1, D-LOOP-26a) + BUILDER L2 (done → READY-FOR-AUDIT, D-LOOP-26b) → r27 = AUDIT L2 (done → MET-T1) + BUILDER G1 (done → READY-FOR-AUDIT, D-LOOP-27a) → r28 AUDIT G1 then ONE item deeply (MET share hit 50%: L3 13, F5 10, H4 10 — take the highest unblocked). MET share **9/18 (50%)** + H2.a slice; remaining: L3, F5, H4, G3, G4, L4, H2.b.
 
 ---
 

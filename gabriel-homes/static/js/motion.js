@@ -153,6 +153,36 @@
     window.addEventListener("scroll", onScroll, { passive: true });
   }
 
+  // ---------- 5b. G1: floating pill nav — hides on scroll-down, returns
+  // on scroll-up. Called ONLY under fx lite or rich (see init); with JS
+  // blocked or fx=none the class is never added, so the header stays
+  // visible (D-MOTION-SAFE: CSS never hides it on its own).
+  function setupNavAutoHide() {
+    var header = document.querySelector(".site-header");
+    if (!header) return;
+    var lastY = window.scrollY;
+    var ticking = false;
+    var onScroll = function () {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(function () {
+        var y = window.scrollY;
+        if (y > lastY + 4 && y > 160) {
+          header.classList.add("nav--hidden");
+        } else if (y < lastY - 4 || y <= 160) {
+          header.classList.remove("nav--hidden");
+        }
+        lastY = y;
+        ticking = false;
+      });
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    // Keyboard safety: focus entering the header always returns it.
+    header.addEventListener("focusin", function () {
+      header.classList.remove("nav--hidden");
+    });
+  }
+
   // ---------- 6. Mobile menu ----------
   function setupMobileMenu() {
     var openBtn = document.querySelector("[data-mobile-menu-open]");
@@ -319,6 +349,7 @@
     setupQuoteReveal();
     setupReveal();
     setupHeaderScroll();
+    if (!fxNone) setupNavAutoHide();  // G1: hide/return is lite/rich only
     setupMobileMenu();
     setupSearchSegment();
   }

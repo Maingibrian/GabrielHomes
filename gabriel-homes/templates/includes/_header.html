@@ -54,7 +54,7 @@
 <div class="mobile-menu" id="mobile-menu" data-mobile-menu aria-hidden="true">
   <div class="mobile-menu__header">
     <a class="site-header__brand" href="/">
-      Gabriel&nbsp;<span style="color: var(--burnt);">Homes</span>
+      Gabriel&nbsp;<span>Homes</span>
     </a>
     <button class="mobile-menu__close" type="button"
             aria-label="Close menu" data-mobile-menu-close>
@@ -62,10 +62,10 @@
     </button>
   </div>
   <nav class="mobile-menu__nav" aria-label="Mobile primary">
-    <a class="mobile-menu__link" href="/about/"><span style="font-family: var(--font-mono); font-size: 0.4em; color: var(--burnt); margin-right: 0.5em;">01</span>About</a>
-    <a class="mobile-menu__link" href="/properties/"><span style="font-family: var(--font-mono); font-size: 0.4em; color: var(--burnt); margin-right: 0.5em;">02</span>Listings</a>
-    <a class="mobile-menu__link" href="/services/"><span style="font-family: var(--font-mono); font-size: 0.4em; color: var(--burnt); margin-right: 0.5em;">03</span>Services</a>
-    <a class="mobile-menu__link" href="/contact/"><span style="font-family: var(--font-mono); font-size: 0.4em; color: var(--burnt); margin-right: 0.5em;">04</span>Contact</a>
+    <a class="mobile-menu__link" href="/about/"><span class="mobile-menu__index">01</span>About</a>
+    <a class="mobile-menu__link" href="/properties/"><span class="mobile-menu__index">02</span>Listings</a>
+    <a class="mobile-menu__link" href="/services/"><span class="mobile-menu__index">03</span>Services</a>
+    <a class="mobile-menu__link" href="/contact/"><span class="mobile-menu__index">04</span>Contact</a>
     {# r13: "How we check" lives under Contact — indented sub-page link #}
     <a class="mobile-menu__link mobile-menu__link--sub" href="/checks/">How we check listings <span aria-hidden="true">→</span></a>
     {% if request.user.is_authenticated %}
@@ -74,8 +74,7 @@
         <a class="mobile-menu__link" href="/dashboard/">Dashboard</a>
       {% endif %}
       <form method="post" action="/account/logout/">{% csrf_token %}
-        <button type="submit" class="mobile-menu__link nav-link--button"
-                style="width: 100%; text-align: left;">Sign out</button>
+        <button type="submit" class="mobile-menu__link nav-link--button mobile-menu__signout">Sign out</button>
       </form>
     {% endif %}
   </nav>

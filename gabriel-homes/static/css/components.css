@@ -873,10 +873,18 @@
   -webkit-backdrop-filter: blur(10px);
   color: var(--cream);
   border-bottom: 1px solid color-mix(in srgb, var(--sand) 18%, transparent);
-  transition: background var(--t-med) var(--ease);
+  transition: background var(--t-med) var(--ease),
+              transform var(--t-med) var(--ease);
 }
 .site-header--scrolled {
   background: var(--espresso);
+}
+/* G1: floating pill nav — JS adds this on scroll-down under fx lite/rich
+   only; without JS (or under fx=none) the class never appears and the
+   header stays visible (D-MOTION-SAFE). Focus entering the header also
+   returns it (motion.js focusin). */
+.site-header.nav--hidden {
+  transform: translateY(-100%);
 }
 .site-header__inner {
   display: flex;
@@ -900,7 +908,7 @@
   display: none;
   gap: 1.75rem;
 }
-@media (min-width: 1200px) {
+@media (min-width: 1024px) {
   .site-header__nav { display: flex; }
 }
 
@@ -959,6 +967,20 @@
   padding-left: 2.1em;
 }
 .mobile-menu__link--sub span { color: var(--burnt); }
+
+/* G1: mobile-menu pieces moved out of the header include's inline
+   styles — index numbers, brand accent, full-width sign-out button. */
+.mobile-menu__index {
+  font-family: var(--font-mono);
+  font-size: 0.4em;
+  color: var(--burnt);
+  margin-right: 0.5em;
+}
+.mobile-menu .site-header__brand span { color: var(--burnt); }
+.mobile-menu__signout {
+  width: 100%;
+  text-align: left;
+}
 
 .site-header__contact {
   display: none;
@@ -1044,7 +1066,7 @@
   cursor: pointer;
   padding: 0.5rem;
 }
-@media (min-width: 1200px) {
+@media (min-width: 1024px) {
   .site-header__hamburger { display: none; }
 }
 .site-header__hamburger-icon {
