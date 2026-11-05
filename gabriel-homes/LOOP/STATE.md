@@ -5,38 +5,30 @@
   gaps, aud=self); F5 built → READY-FOR-AUDIT (Lenis smooth scroll).
 - **Timestamp:** 2026-11-06 ~00:45 +03:00 (session tz Africa/Nairobi)
 - **Workspace:** /home/z/my-project/gabriel-homes/
-- **Protocol:** LOOP/SCHEDULED-TASK.md; condensed LOOP/PROTOCOL.md; rubric
-  LOOP/RUBRIC.md; per-item contract LOOP/SCORECARD.md.
+- **Protocol:** LOOP/SCHEDULED-TASK.md; LOOP/PROTOCOL.md; LOOP/RUBRIC.md;
+  per-item contract LOOP/SCORECARD.md.
 
 ## Gates (real results)
-| Gate | Start | End |
-|---|---|---|
-| `manage.py check` | OK — 0 issues | OK — 0 issues |
-| `makemigrations --check --dry-run` | OK — no changes | OK — no changes |
-| `pytest -q` | **615 passed** | **621 passed** (+6 F5) |
-
-Ratchets: sub-13px **43**, hex **215**, image bytes **4,191,687** — all
-held (no new px font-sizes, no new hex, no images; F1 test pins exact
-counts).
+`manage.py check` OK · `makemigrations --check --dry-run` OK · pytest
+**615 → 621 passed** (+6 F5). Ratchets: sub-13px **43**, hex **215**,
+image bytes **4,191,687** — all held (no new px/hex/images; F1 pins).
 
 ## Shipped this run
 - **AUDIT L3 → MET-T1**: 6/6 tests; git-diff proves brand→agent channel
-  conditions byte-identical; E3 r29_e3_l3_audit.py **16/16** on the live
-  page (24 rows, agent-fallback branch — brand channels unfilled in demo
-  data): WhatsApp>Call>Email>View in every row, wa.me+?text=+svg+aria,
-  heights 410–448px content-driven, ≤28 content words (truncatewords
-  " …" suffix is punctuation — audit script fixed), mobile stack, zero
+  conditions byte-identical; E3 r29_e3_l3_audit.py **16/16** live (24
+  rows, agent-fallback branch): WhatsApp>Call>Email>View everywhere,
+  heights 410–448 content-driven, ≤28 content words (truncatewords " …"
+  suffix is punctuation — audit script fixed), mobile stack, zero
   errors; r28-l3-row.png eyeballed — zero gaps.
-- **BUILDER F5 → READY-FOR-AUDIT**: lenis@1.3.11 vendored (HYG:
-  sourceMappingURL stripped, LICENSE kept, sha384 SRI recomputed by the
-  test); `ghScrollTo` helper defined UNCONDITIONALLY (native fallback on
-  lite/none/touch), Lenis only under fx=rich + fine pointer + hover,
-  anchors stay motion.js's, no reduced-motion re-check (D-LOOP-16a);
-  motion.js + search-map.js call sites routed (justified, D-LOOP-29a);
-  base.css Lenis classes stand native smooth down only while driving.
-  E3 r29_e3_f5.py **19/19** (rich smoothing curve, G1 hide/return under
-  Lenis, L1 pin 5→886 + flash, fx=none/touch/lite all native); r27
-  G1 E3 re-run PASS.
+- **BUILDER F5 → READY-FOR-AUDIT**: lenis@1.3.11 vendored (HYG: sourceMappingURL
+  stripped, LICENSE kept, sha384 SRI recomputed by the test); `ghScrollTo`
+  helper UNCONDITIONAL (native fallback on lite/none/touch), Lenis only
+  under fx=rich + fine pointer + hover, anchors stay motion.js's, no
+  reduced-motion re-check (D-LOOP-16a); motion.js + search-map.js call
+  sites routed (justified, D-LOOP-29a); base.css Lenis classes. E3
+  r29_e3_f5.py **19/19** (rich smoothing curve, G1 hide/return under
+  Lenis, L1 pin 5→886 + flash, fx=none/touch/lite native); r27 G1 E3
+  re-run PASS.
 
 ## Item states (SCORECARD)
 MET-T1: F1, F2, F3, F4, H1, H3, G1, G2, L1, L2, L3 (**11/18 = 61%**) +
