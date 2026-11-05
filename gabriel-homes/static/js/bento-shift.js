@@ -21,10 +21,10 @@
      - Colour/zoom follow the .is-spot class, not CSS :hover, so a card
        sliding under a still cursor doesn't flash.
 
-   Only on devices whose primary pointer can hover (same query the CSS
-   uses). Touch screens keep plain tap-through cards. Under
-   prefers-reduced-motion the layout changes instantly. Below 1021px
-   nothing applies.
+   Only on devices the capability gate marks rich + fine pointer (same
+   pointer query the CSS uses, centralised in fx-gate.js). Touch screens
+   keep plain tap-through cards; reduced-motion and lite devices never
+   enter the effect at all. Below 1021px nothing applies.
    ============================================================= */
 (function () {
   "use strict";
@@ -32,12 +32,21 @@
   var grid = document.querySelector(".bento-grid--shift");
   if (!grid || !window.matchMedia) return;
 
-  var canHover = window.matchMedia("(hover: hover) and (pointer: fine)");
-  if (!canHover.matches) return;
+  // F2: pointer-driven DECORATIVE effects are rich-tier and fine-pointer
+  // only, decided once by fx-gate.js. [data-fine] exists only on
+  // (hover: hover) and (pointer: fine); data-fx="none" (reduced motion)
+  // and "lite" (Save-Data / <=4 cores / <=4 GB) skip this effect
+  // entirely — the runbook's "no effect runs under none". A missing
+  // attribute (fx-gate blocked) fails CLOSED to no-effect.
+  // The viewport half of the old check (min-width 1021px) stays local:
+  // it is layout, not capability (H3 builds the mobile alternative).
+  var FX = document.documentElement.getAttribute("data-fx") || "none";
+  if (!document.documentElement.hasAttribute("data-fine") || FX !== "rich") {
+    return;
+  }
 
   var canAnimate = typeof Element.prototype.animate === "function";
-  var reduce = !canAnimate ||
-    window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var reduce = !canAnimate; // rich tier already excludes reduced-motion
   var wide = window.matchMedia("(min-width: 1021px)");
 
   grid.classList.add("is-live");          // CSS gates the shape-shift/zoom states on this

@@ -9,7 +9,7 @@ proving test exists and is green.
 | ID | Item | W | needs | target | status | self D1-D8 | aud D1-D8 | evid | att | last | next step |
 |----|------|---|-------|--------|--------|------------|-----------|------|-----|------|-----------|
 | F1 | Token integrity | 5 | — | T1 | TODO | – | – | – | 0 | r15 | Write test_f1_token_integrity.py first (defines the ratchet), then fix --font-body→--font-sans, define --paper |
-| F2 | Capability gate | 5 | — | T1 | TODO | – | – | – | 0 | r15 | Build static/js/fx-gate.js + decision-table test; unblocks 7 items |
+| F2 | Capability gate | 5 | — | T1 | READY-FOR-AUDIT | 3,n/a,n/a,3,3,n/a,3,3 | – | E2 | 1 | r16 | AUDIT it: re-run gates, grade from scratch; open E3 step = forced data-fx browser check (NOTES/F2.md) |
 | F3 | Image & video diet | 4 | — | T1 | TODO | – | – | – | 0 | r15 | Measure current static/ sizes (baseline table), then Pillow WebP pass + hero video gating |
 | F4 | Motion vocabulary | 4 | — | T1 | TODO | – | – | – | 0 | r15 | Write docs/DESIGN-ADDENDUM.md (≤6 effects + archetypes), then map shipped effects |
 | F5 | Smooth scroll (Lenis) | 3 | F2 | T1 | TODO | – | – | – | 0 | r15 | Vendor Lenis under hygiene rules after F2 lands |

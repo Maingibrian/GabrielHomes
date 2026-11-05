@@ -1,6 +1,8 @@
 /* =============================================================
    Gabriel Homes — motion layer (progressive enhancement)
-   All effects disabled under prefers-reduced-motion.
+   All effects disabled when the capability gate (fx-gate.js) sets
+   html[data-fx="none"] — reduced-motion devices, and fail-closed when
+   the gate script itself is missing.
 
    Implements (per WORK.md §10.6):
      1. Smooth scrolling (lightweight, no Lenis dependency)
@@ -23,11 +25,17 @@
   // (D-MOTION-SAFE: content can never be permanently blank.)
   document.documentElement.classList.add("motion-ready");
 
-  var prefersReduced = window.matchMedia &&
-    window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  // F2: the capability gate (static/js/fx-gate.js, always loaded first)
+  // decides the tier ONCE for the whole site. data-fx="none" (reduced
+  // motion) behaves exactly like the old in-file reduced-motion check;
+  // a MISSING attribute fails CLOSED to "none" too — if fx-gate.js is
+  // ever blocked or stale, every effect simply stays off (D-MOTION-SAFE:
+  // content is rendered instantly, never blank).
+  var fxNone =
+    (document.documentElement.getAttribute("data-fx") || "none") === "none";
 
   // ---------- 1. Smooth scrolling (very small Lenis-style ease) ----------
-  if (!prefersReduced && "addEventListener" in window) {
+  if (!fxNone && "addEventListener" in window) {
     document.addEventListener("click", function (e) {
       var a = e.target.closest('a[href^="#"]');
       if (!a) return;
@@ -46,7 +54,7 @@
     var suffix = el.dataset.suffix || "";
     var prefix = el.dataset.prefix || "";
     var decimals = parseInt(el.dataset.decimals || "0", 10);
-    var duration = prefersReduced ? 0 : 1500;
+    var duration = fxNone ? 0 : 1500;
     var start = performance.now();
     function fmt(v) {
       return prefix + v.toFixed(decimals).replace(/\B(?=(\d{3})+(?!\d))/g, ",") + suffix;
@@ -65,7 +73,7 @@
   function setupCounters() {
     var counters = document.querySelectorAll("[data-count]");
     if (!counters.length) return;
-    if (!("IntersectionObserver" in window) || prefersReduced) {
+    if (!("IntersectionObserver" in window) || fxNone) {
       counters.forEach(animateCounter);
       return;
     }
@@ -97,7 +105,7 @@
       quote.appendChild(span);
       return span;
     });
-    if (prefersReduced || !("IntersectionObserver" in window)) {
+    if (fxNone || !("IntersectionObserver" in window)) {
       wordEls.forEach(function (w) { w.classList.add("is-lit"); });
       return;
     }
@@ -118,7 +126,7 @@
   function setupReveal() {
     var els = document.querySelectorAll("[data-reveal]");
     if (!els.length) return;
-    if (prefersReduced || !("IntersectionObserver" in window)) {
+    if (fxNone || !("IntersectionObserver" in window)) {
       els.forEach(function (el) { el.classList.add("is-visible"); });
       return;
     }

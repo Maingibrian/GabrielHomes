@@ -65,6 +65,8 @@
     {% include "includes/_footer.html" %}
   {% endblock %}
 
+  {# F2 capability gate — outside the scripts block so child overrides can never drop it #}
+  <script src="{% staticv 'js/fx-gate.js' %}" defer></script>
   {% block scripts %}
     <script src="{% staticv 'js/motion.js' %}" defer></script>
   {% endblock %}
