@@ -49,6 +49,9 @@
                            #f3eee6, now single-sourced here) */
   --white:    #ffffff;
   --sand:     #d8c9b8;  /* soft borders, chips, subtle fills */
+  --map-stage: #e7e4df; /* r38 (D-LOOP-38a): map stage / tile backdrop behind
+                           the maplibre canvas — tokenised from the last two
+                           raw hexes in search.css (F1 T2 lift) */
   --taupe:    #6b5e53;  /* muted text, divider lines (r12: was #8a7d70,
                            3.77:1 on cream — darkened to 5.91:1, WCAG AA) */
   --clay:     #965634;  /* secondary accent (r12: was #a66a4d, 4.13:1 on

@@ -1,5 +1,45 @@
 # JOURNAL.md — append-only, newest first
 
+Run 38 | AUDITOR→BUILDER | 2026-11-06 07:15-08:05 +03:00 | items:
+(1) **AUDIT H2 T2 claim from scratch — verdict MET-T2 (the project's second
+Tier-2 item).** Baseline gates green (check 0, makemigrations 0, 655);
+fresh server (pkill-first); 10/10 test_h2_hero.py; scripts/r37_e3_h2_t2.py
+re-run **24/24 ALL PASS** (R7+L8+M5+MR2+RM2; lite-leg wire accounting
+reproduced byte-for-byte: css 173,559 + js 52,033 + fonts 290,180 + LCP
+119,000; video 0 B on every off-rich leg); D-LOOP-37a verified against
+code (preload fetchpriority=high in home.html head, video hidden-by-default
+with the rich && !Save-Data contract at the reference site, zero
+[data-count] in hero) + git tree proves r37 evidence-only (LOCKS + 2
+regenerated screenshots only); 3 screenshots eyeballed (rich-1280 settled
+mask headline + ONE gesture; mobile-390 stacked pill; mobile-rich-390
+shows a DIFFERENT video frame = touch handover fired). aud=self all-4s,
+lower wins → H2 MET-T2. (2) **BUILDER F1 T2 lift** — the tokenisation pass:
+search.css carried exactly 10 hex (`#fff` ×8 + `#e7e4df` ×2, test regex);
+8× #fff → var(--white) (pre-existing token, identical value) + 2× #e7e4df
+→ NEW token **--map-stage** (tokens.css, D-LOOP-38a sanction, used nowhere
+else); hex ratchet **211 → 201** re-pinned; NEW test
+test_search_css_is_fully_tokenised (suite 655 → **656**); **computed-style
+A/B proof** scripts/r38_e3_f1_ab.py: 13 probes on /properties/ captured
+BEFORE and AFTER the edit → **13/13 identical** (render-invisible by
+construction); WCAG D5: all five text pairs ≥ 4.5:1 (16.59 / 5.62 / 16.59
+/ 16.59 / 13.48); search-page screenshot eyeballed clean. F3's WATCH
+needle updated 211 → 201.
+| score: H2 READY-FOR-AUDIT → **MET-T2** (aud=self 4s) · F1 MET-T1 →
+**READY-FOR-AUDIT (T2 claim; T1 intact)** self 4,n/a,n/a,n/a,4,n/a,4,4
+(was 3,n/a,n/a,n/a,3,n/a,3,4) | evidence: E2+E3 | gates: start — check 0
+issues, makemigrations no changes, **655 passed**; end — check 0,
+makemigrations 0, **656 passed** | ratchets: sub-13px **43**, hex **211 →
+201** (legitimate drop: 10 search.css hex tokenised), image bytes
+4,191,687 — untouched | decisions: **D-LOOP-38a** | FOR THE NEXT RUN:
+r39 = AUDITOR — audit the F1 T2 claim (9/9 test_f1_token_integrity.py
+incl. the new search-css pin, re-run scripts/r38_e3_f1_ab.py before/after
+on a FRESH server expect 13/13 identical, verify --map-stage in
+tokens.css, re-read D-LOOP-38a, eyeball r38-f1-search-after.png; verdict
+MET-T2 or demote naming the checks); then BUILDER the next T2 lift deeply
+(G2 real-browser transition capture, or L1/H1 evidence pack); suite ≥ 656
+| blockers: none |
+
+
 Run 37 | AUDITOR→BUILDER | 2026-11-06 05:45-06:35 +03:00 | items:
 (1) **AUDIT F2 T2 claim from scratch — verdict MET-T2 (the project's first
 Tier-2 item).** Baseline gates green (check 0, makemigrations 0, 655);

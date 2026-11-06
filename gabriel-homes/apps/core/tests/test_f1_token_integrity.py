@@ -39,7 +39,7 @@ TOKENS = CSS / "tokens.css"
 FONT_FLOOR_PX = 13
 
 # --- ratchet baselines, recorded at r17 (first green F1 run) --------------
-HEX_BASELINE = 211   # hard-coded hex outside tokens.css; may only go DOWN (240 @r17, 236 @r18, 217 @r21 after the HYG-1 dead-rule purge, 215 @r24 after the .stat--light removal, 214 @r30 audit re-pin, 211 @r34 — the r34 G4 build removed a pre-existing dead rule fragment at the components.css tail which carried 3 hex literals; survey regex aligned with the test counter r30)
+HEX_BASELINE = 201   # hard-coded hex outside tokens.css; may only go DOWN (240 @r17, 236 @r18, 217 @r21 after the HYG-1 dead-rule purge, 215 @r24 after the .stat--light removal, 214 @r30 audit re-pin, 211 @r34 — the r34 G4 build removed a pre-existing dead rule fragment at the components.css tail which carried 3 hex literals; survey regex aligned with the test counter r30; 201 @r38 — the F1 T2 lift tokenised search.css to zero hex: 8x #fff -> var(--white), 2x #e7e4df -> new token --map-stage, D-LOOP-38a; computed-style A/B proof: 13/13 probes identical)
 SUB13_BASELINE = 43  # px font sizes below 13px; may only go DOWN (44 pre-r22, true count corrected to 43 at r22 D-LOOP-22a; constant re-pinned to the recorded ratchet at r34)
 
 # (file, px) -> reason. A sub-floor size whose (file, px) pair is not listed
@@ -153,6 +153,10 @@ def test_font_body_token_is_gone():
     assert "--font-sans:" in TOKENS.read_text(encoding="utf-8"), (
         "--font-sans must stay defined in tokens.css"
     )
+    assert "--map-stage:" in TOKENS.read_text(encoding="utf-8"), (
+        "--map-stage (r38) must stay defined in tokens.css — search.css "
+        "references it"
+    )
 
 
 def test_paper_token_is_defined_and_single_sourced():
@@ -220,6 +224,21 @@ def test_hex_count_outside_tokens_ratchets_down():
     assert count <= HEX_BASELINE, (
         f"hard-coded hex outside tokens.css grew: {count} > baseline "
         f"{HEX_BASELINE}. Add a token instead of another hex."
+    )
+
+
+def test_search_css_is_fully_tokenised():
+    """r38 T2 slice (D-LOOP-38a): search.css carries ZERO hex literals —
+    every colour is a var() reference into tokens.css. The map price pin,
+    the r13 a11y bug origin, is provably token-sourced."""
+    text = (CSS / "search.css").read_text(encoding="utf-8")
+    residual = re.findall(r"#[0-9a-fA-F]{3,8}", text)
+    assert residual == [], (
+        "search.css must stay fully tokenised (F1 T2 lift, r38): "
+        f"{residual}. Add a token to tokens.css instead."
+    )
+    assert "var(--map-stage)" in text and "var(--white)" in text, (
+        "the tokenised references must survive edits"
     )
 
 
