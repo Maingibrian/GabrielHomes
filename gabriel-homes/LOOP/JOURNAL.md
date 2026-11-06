@@ -1,5 +1,51 @@
 # JOURNAL.md — append-only, newest first
 
+Run 34 | AUDITOR→BUILDER | 2026-11-06 03:46-04:55 +03:00 | items: (1) AUDIT H2.b
+from scratch — gates 648, 10/10 test_h2_hero.py; E3 scripts/r33_e3_h2b.py re-run
+**18/18 ALL PASS** on a FRESH server (pkill-first); D-LOOP-33a verified
+line-by-line against motion.js/home.css/home.html (fxNone skips the split,
+splitText(parent, textNode) keeps whitespace verbatim, em accent survives,
+sole-owner hv2-rise removal, rich && !Save-Data video gate with
+hidden+preload=none+poster, .is-video crossfade); r33-h2b-hero-rich-1280.png
+eyeballed (loop playing, headline settled, descenders intact) → **H2 full
+MET-T1** (a r25 + b r34), aud 3,3,4,3,3,3,4,4, zero gaps. (2) BUILDER G4
+(pointer polish — the last remaining item) — test_g4_pointer_polish.py FIRST
+(7 tests, red 7), then motion.js setupPointerPolish: cursor "View" bubble
+JS-built (aria-hidden, textContent, pointer-events none, fixed +
+transform-positioned) following the pointer over .listing-row +
+.nearby-card via --cx/--cy; magnetic primary CTAs (hero search submit,
+header Enquire, detail WhatsApp primary) via clamped ±8px --mx/--my;
+gate = data-fx=rich AND (pointer: fine) AND (hover: hover); keyboard users
+never trigger it (pointer events only); bento cards deliberately excluded
+(M4 bento-shift owns the pointer there — test-pinned); cursor-view → M5
+confirm, magnetic → M6 invite (variant mapping, cap stays 6),
+SHIPPED_TOKENS extended. E3 scripts/r34_e3_g4.py **18/18 ALL PASS**;
+screenshots r34-g4-row-cursor.png + r34-g4-magnet.png eyeballed.
+**Defect found + repaired (D-LOOP-34a)**: components.css ended (pre-existing,
+in HEAD) in a dead rule fragment (orphan declarations + stray `}`) — after
+the G4 append the browser's error recovery dropped the FOLLOWING rule
+(.cursor-view never applied: computed opacity 1, position static);
+diagnosed by brace-balancing the served CSS in-browser (276 opens / 277
+closes); dead text removed — it carried 3 hex literals, so hex ratchet
+legitimately fell **214→211** (HEX_BASELINE re-pinned; SUB13 44→43 aligned
+with the r22-recorded count). E3 lessons: scroll_into_view before hovering
+below-fold rows (map pushes rows under the fold); text-transform uppercase
+→ assert inner_text .lower(); adjacent rows re-trigger pointerenter — leave
+to a no-target area; 1.2s settle before evidence screenshots.
+| score: H2.b audit (no move — MET-T1 confirmed, H2 full) · G4 n/a→READY-FOR-AUDIT
+self 3,3,3,3,3,3,4,4 | evidence: E2+E3 | gates: start — check 0 issues,
+makemigrations no changes, **648 passed**; end — check 0 issues, makemigrations
+no changes, **655 passed** (+7 G4) | ratchets: sub-13px **43** (constant
+re-pinned), hex **211** (re-pinned, legitimate drop), image bytes
+**4,191,687** — held | decisions: **D-LOOP-34a** | FOR THE NEXT RUN: AUDITOR —
+audit G4 (mechanical: 7/7 test_g4_pointer_polish.py, re-run
+scripts/r34_e3_g4.py expect ALL PASS, re-read D-LOOP-34a, eyeball
+r34-g4-row-cursor.png + r34-g4-magnet.png); then PLANNER retrospective (r35
+is a multiple of 5 — re-weight/split/add/prune; if G4 passes, every work
+item is MET-T1 → raise targets per §5); suite must stay ≥ 655 | blockers:
+none |
+
+
 Run 33 | AUDITOR→BUILDER | 2026-11-06 05:15-06:05 +03:00 | items: (1) AUDIT L4
 from scratch — gates 645, 9/9 test_l4_gallery.py; E3 scripts/r32_e3_l4.py
 re-run **ALL PASS** on a FRESH server (pkill-first); D-LOOP-32a verified

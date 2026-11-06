@@ -1578,5 +1578,37 @@ html.motion-ready .bento-grid .bento-card[data-reveal]:nth-child(3n) { transitio
 .newsletter-form__consent { display: flex; gap: 10px; font-size: 14px; color: rgba(250,248,244,.85); align-items: flex-start; }
 .newsletter-form__consent input { margin-top: 4px; }
 .newsletter-form .btn { justify-self: start; }
-  background: var(--white, #fff); color: var(--ink, #1c1511); border-color: var(--sand, #d8c9b8);
+
+/* ============================================================
+   12c. G4 pointer polish (r34) — cursor-view bubble (M5 confirm)
+   + magnetic primary CTAs (M6 invite). The bubble element is
+   JS-BUILT by motion.js under fx=rich + (pointer: fine) +
+   (hover: hover) only — with JS blocked it never exists
+   (D-MOTION-SAFE); keyboard users never trigger it (pointer
+   events only, aria-hidden decoration over an existing link).
+   Bento cards deliberately excluded: M4 bento-shift owns the
+   pointer there. Fixed + transform-positioned = no layout shift.
+   ============================================================ */
+.cursor-view {
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 80;
+  pointer-events: none;
+  transform: translate(calc(var(--cx, -200px) + 14px), calc(var(--cy, -200px) + 14px));
+  background: var(--ink);
+  color: var(--paper);
+  font-family: var(--font-sans);
+  font-size: 13px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 10px 14px;
+  border-radius: 999px;
+  opacity: 0;
+  transition: opacity var(--t-fast) var(--ease);
+}
+body.cursor-view-on .cursor-view { opacity: 1; }
+html.motion-ready [data-magnetic] {
+  transform: translate(var(--mx, 0px), var(--my, 0px));
+  transition: transform 0.25s var(--ease);
 }

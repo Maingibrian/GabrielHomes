@@ -33,6 +33,8 @@ SHIPPED_TOKENS = [
     "hv2-scroll",      # wheel cue pulse (M6)
     "gallery-count-bump",  # detail gallery counter bump (M5, r26 audit find)
     "manage-card-in",      # portal /manage/ entrance (declared out-of-scope)
+    "data-cursor-view",    # G4 cursor "View" bubble (M5 confirm, r34)
+    "data-magnetic",       # G4 magnetic primary CTAs (M6 invite, r34)
 ]
 
 

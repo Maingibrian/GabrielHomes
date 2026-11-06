@@ -39,8 +39,8 @@ TOKENS = CSS / "tokens.css"
 FONT_FLOOR_PX = 13
 
 # --- ratchet baselines, recorded at r17 (first green F1 run) --------------
-HEX_BASELINE = 214   # hard-coded hex outside tokens.css; may only go DOWN (240 @r17, 236 @r18, 217 @r21 after the HYG-1 dead-rule purge, 215 @r24 after the .stat--light removal, 214 @r30 audit re-pin — one hex was tokenised by the r25-r29 CSS work; survey regex aligned with the test counter r30)
-SUB13_BASELINE = 44  # px font sizes below 13px; may only go DOWN
+HEX_BASELINE = 211   # hard-coded hex outside tokens.css; may only go DOWN (240 @r17, 236 @r18, 217 @r21 after the HYG-1 dead-rule purge, 215 @r24 after the .stat--light removal, 214 @r30 audit re-pin, 211 @r34 — the r34 G4 build removed a pre-existing dead rule fragment at the components.css tail which carried 3 hex literals; survey regex aligned with the test counter r30)
+SUB13_BASELINE = 43  # px font sizes below 13px; may only go DOWN (44 pre-r22, true count corrected to 43 at r22 D-LOOP-22a; constant re-pinned to the recorded ratchet at r34)
 
 # (file, px) -> reason. A sub-floor size whose (file, px) pair is not listed
 # here is a failure. Listed pairs also have per-pair baselines (below) so

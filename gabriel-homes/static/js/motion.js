@@ -421,11 +421,65 @@
     if (playPromise && playPromise.catch) playPromise.catch(function () {});
   }
 
+  // ---------- G4: pointer polish (cursor-view bubble + magnetic CTAs) ----------
+  // Rich devices with a fine, hover-capable pointer only (the fx gate alone
+  // is not enough — a rich touch device must not grow a cursor bubble).
+  // The bubble is JS-BUILT, aria-hidden decoration that duplicates an
+  // existing link affordance ("View" — rows/cards are links), so keyboard
+  // users lose nothing: only real pointer events drive it, and the bento
+  // cards are excluded because M4 bento-shift owns the pointer there
+  // (never two pointer effects on one element). Magnets are transform-only,
+  // clamped to ±8px, and pointermove never fires on keyboard focus.
+  function setupPointerPolish() {
+    if (fxNone) return;
+    if (document.documentElement.getAttribute("data-fx") !== "rich") return;
+    if (!window.matchMedia("(pointer: fine)").matches) return;
+    if (!window.matchMedia("(hover: hover)").matches) return;
+    var PULL = 8;
+    var bubbleTargets = document.querySelectorAll("[data-cursor-view]");
+    if (bubbleTargets.length) {
+      var bubble = document.createElement("div");
+      bubble.className = "cursor-view";
+      bubble.setAttribute("aria-hidden", "true");
+      bubble.textContent = "View";
+      document.body.appendChild(bubble);
+      document.addEventListener("pointermove", function (e) {
+        bubble.style.setProperty("--cx", e.clientX + "px");
+        bubble.style.setProperty("--cy", e.clientY + "px");
+      }, { passive: true });
+      Array.prototype.forEach.call(bubbleTargets, function (t) {
+        t.addEventListener("pointerenter", function () {
+          document.body.classList.add("cursor-view-on");
+        });
+        t.addEventListener("pointerleave", function () {
+          document.body.classList.remove("cursor-view-on");
+        });
+      });
+    }
+    Array.prototype.forEach.call(
+      document.querySelectorAll("[data-magnetic]"), function (el) {
+        el.addEventListener("pointermove", function (e) {
+          var r = el.getBoundingClientRect();
+          var dx = (e.clientX - (r.left + r.width / 2)) * 0.18;
+          var dy = (e.clientY - (r.top + r.height / 2)) * 0.18;
+          el.style.setProperty("--mx",
+            Math.max(-PULL, Math.min(PULL, dx)).toFixed(1) + "px");
+          el.style.setProperty("--my",
+            Math.max(-PULL, Math.min(PULL, dy)).toFixed(1) + "px");
+        });
+        el.addEventListener("pointerleave", function () {
+          el.style.setProperty("--mx", "0px");
+          el.style.setProperty("--my", "0px");
+        });
+      });
+  }
+
   function init() {
     setupCounters();
     setupQuoteReveal();
     setupHeroHeadline();
     setupHeroVideo();
+    setupPointerPolish();
     setupReveal();
     setupHeaderScroll();
     if (!fxNone) setupNavAutoHide();  // G1: hide/return is lite/rich only

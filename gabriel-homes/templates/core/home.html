@@ -71,7 +71,7 @@
           {% endfor %}
         </select>
       </label>
-      <button class="search-bar__submit" type="submit">
+      <button class="search-bar__submit" type="submit" data-magnetic>
         Search
         <span aria-hidden="true">&rarr;</span>
       </button>
@@ -310,7 +310,7 @@
     </div>
     <div class="home-nearby__grid">
       {% for property in amenity_listings %}
-      <a class="nearby-card" href="{{ property.get_absolute_url }}" data-reveal>
+      <a class="nearby-card" href="{{ property.get_absolute_url }}" data-reveal data-cursor-view>
         {% if property.images.all.0.image %}<img src="{{ property.images.all.0.image.url }}" alt="{{ property.title }}" loading="lazy" width="600" height="460">{% endif %}
         <span>{% if property.is_demo %}Demo · {% endif %}{{ property.address_text }}</span>
         <h3>{{ property.title }}</h3>
