@@ -1335,3 +1335,44 @@ html.motion-ready .bento-grid--shift .bento-card[data-reveal] {
 /* r18.2 — final optical nudges (vision pass 2) */
 .market-rail__card { grid-template-columns: 124px minmax(0, 1fr); gap: 17px; }
 .market-stay__more-inner { padding-bottom: 18px; }
+
+/* ============================================================
+   H2.b — split-text mask headline + rich-gated hero video
+   (r33, D-LOOP-33a; M1 mask variant + M2 video handover).
+   The word spans are built by motion.js ONLY when fx is live
+   (fxNone skips the split): with JS blocked or fx=none the h1
+   stays plain and fully visible — D-MOTION-SAFE by construction.
+   ============================================================ */
+html.motion-ready .hero__w {
+  display: inline-block;
+  overflow: hidden;
+  vertical-align: bottom;
+  /* room for descenders inside the mask (Framer split-text fix) */
+  padding-bottom: 0.12em;
+  margin-bottom: -0.12em;
+}
+html.motion-ready .hero__w-in {
+  display: inline-block;
+  animation: hero-mask-rise 0.7s var(--ease-out) both;
+  animation-delay: calc(140ms + var(--d, 0) * 45ms);
+}
+@keyframes hero-mask-rise {
+  from { transform: translateY(112%); }
+  to   { transform: translateY(0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  html.motion-ready .hero__w-in { animation: none; }
+}
+/* The loop crossfades over the slide stack only when motion.js has
+   verified fx=rich && !Save-Data and flipped the class. */
+.hero__video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  transition: opacity var(--t-slow) var(--ease);
+}
+.hero__bg.is-video .hero__video { opacity: 1; }
+.hero__bg.is-video .hero__slide { animation: none; opacity: 0; }

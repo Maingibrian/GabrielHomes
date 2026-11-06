@@ -346,9 +346,86 @@
     }
   }
 
+  // ---------- H2.b: split-text mask headline ----------
+  // Word-splits the hero headline in place (DOM APIs only — no innerHTML,
+  // same rule as the quote reveal) so each word can rise out of its own
+  // overflow-hidden mask. Ownership hand-over: once the words own the
+  // entrance, the h1's own hv2-rise fade is removed (a one-shot transition
+  // must never share the animated properties with the mask animation —
+  // same sole-owner rule as G3/D-LOOP-31a). fxNone skips the split entirely:
+  // the h1 stays plain and fully visible (D-MOTION-SAFE).
+  function setupHeroHeadline() {
+    var headline = document.querySelector("[data-hero-headline]");
+    if (!headline) return;
+    if (fxNone) return;
+    var index = 0;
+    // Split ONE text node inside its parent element: every run of
+    // non-whitespace becomes a mask span, every whitespace run is kept
+    // VERBATIM as plain text (leading/trailing/between — so the inter-part
+    // spaces of the template survive and innerText matches the plain h1).
+    function splitText(parent, textNode) {
+      var raw = textNode.textContent;
+      var frag = document.createDocumentFragment();
+      var re = /\S+/g;
+      var m;
+      var last = 0;
+      while ((m = re.exec(raw))) {
+        if (m.index > last) {
+          frag.appendChild(document.createTextNode(raw.slice(last, m.index)));
+        }
+        var mask = document.createElement("span");
+        mask.className = "hero__w";
+        var inner = document.createElement("span");
+        inner.className = "hero__w-in";
+        inner.style.setProperty("--d", index++);
+        inner.textContent = m[0];
+        mask.appendChild(inner);
+        frag.appendChild(mask);
+        last = m.index + m[0].length;
+      }
+      if (last < raw.length) {
+        frag.appendChild(document.createTextNode(raw.slice(last)));
+      }
+      parent.replaceChild(frag, textNode);
+    }
+    Array.prototype.slice.call(headline.childNodes).forEach(function (n) {
+      if (n.nodeType === 3 && n.textContent.trim()) {
+        splitText(headline, n);
+      } else if (n.nodeType === 1) {
+        Array.prototype.slice.call(n.childNodes).forEach(function (m) {
+          if (m.nodeType === 3 && m.textContent.trim()) splitText(n, m);
+        });
+      }
+    });
+    headline.classList.remove("hv2-rise");
+    headline.style.removeProperty("--d");
+  }
+
+  // ---------- H2.b: hero video under fx=rich && !Save-Data (D-LOOP-21a) ----------
+  // The 1.5MB loop is a rich-device upgrade of the slide stack: it loads
+  // ONLY when the gate says rich and Save-Data is off; otherwise the
+  // template's hidden attribute keeps it from loading at all (preload=
+  // "none" as a second belt) and the slides stay the visual.
+  function setupHeroVideo() {
+    var video = document.querySelector("[data-hero-video]");
+    if (!video) return;
+    var rich = document.documentElement.getAttribute("data-fx") === "rich";
+    var conn = navigator.connection || {};
+    var saveData = !!(conn.saveData ||
+        (conn.effectiveType && /(^2g$)/.test(conn.effectiveType)));
+    if (!rich || saveData) return;
+    video.hidden = false;
+    var bg = video.closest(".hero__bg");
+    if (bg) bg.classList.add("is-video");
+    var playPromise = video.play();
+    if (playPromise && playPromise.catch) playPromise.catch(function () {});
+  }
+
   function init() {
     setupCounters();
     setupQuoteReveal();
+    setupHeroHeadline();
+    setupHeroVideo();
     setupReveal();
     setupHeaderScroll();
     if (!fxNone) setupNavAutoHide();  // G1: hide/return is lite/rich only

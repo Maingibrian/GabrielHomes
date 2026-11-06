@@ -29,10 +29,21 @@
     <div class="hero__slide" style="--slide-img: url('{% staticv 'img/real/hero-slide-2.webp' %}')"></div>
     <div class="hero__slide" style="--slide-img: url('{% staticv 'img/real/hero-slide-3.webp' %}')"></div>
     <div class="hero__slide" style="--slide-img: url('{% staticv 'img/real/hero-slide-4.webp' %}')"></div>
+    {% comment %}
+      H2.b (D-LOOP-21a): the loop is a rich-device upgrade. The gate lives in
+      motion.js setupHeroVideo and is test-pinned by test_h2_hero.py: this
+      video loads ONLY when html[data-fx]="rich" AND Save-Data is off;
+      anything else (lite, none, Save-Data, JS blocked) keeps the hidden
+      attribute — it never loads and the slides stay the visual.
+    {% endcomment %}
+    <video class="hero__video" data-hero-video hidden muted loop playsinline
+           preload="none" tabindex="-1" aria-hidden="true"
+           poster="{% staticv 'img/real/hero-poster.jpg' %}"
+           src="{% staticv 'video/hero-loop.mp4' %}"></video>
   </div>
   <div class="container hv2-hero">
     <p class="hero__tag hv2-rise" style="--d:0">[ {{ brand.hero_tag }} ]</p>
-    <h1 class="hero__title hv2-rise" style="--d:1">{{ brand.hero_heading_lead }} <em class="hero__accent">{{ brand.hero_heading_accent }}</em> {{ brand.hero_heading_tail }}</h1>
+    <h1 class="hero__title hv2-rise" style="--d:1" data-hero-headline>{{ brand.hero_heading_lead }} <em class="hero__accent">{{ brand.hero_heading_accent }}</em> {{ brand.hero_heading_tail }}</h1>
     <p class="hero__subtitle hv2-rise" style="--d:2">{{ brand.hero_subtitle }}</p>
 
     {# r24 H2.a: the stats row (2026 / 5 checks / Kenya) is gone — one #}

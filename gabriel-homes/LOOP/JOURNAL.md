@@ -1,5 +1,39 @@
 # JOURNAL.md — append-only, newest first
 
+Run 33 | AUDITOR→BUILDER | 2026-11-06 05:15-06:05 +03:00 | items: (1) AUDIT L4
+from scratch — gates 645, 9/9 test_l4_gallery.py; E3 scripts/r32_e3_l4.py
+re-run **ALL PASS** on a FRESH server (pkill-first); D-LOOP-32a verified
+against code (JS-built overlay, G2 name unique on the gallery main,
+.lightbox__main view-transition-name:none, Lenis stop/start via the F5
+public API, M2 extension with no new family); both screenshots re-verified
+→ **L4 MET-T1**, aud=self 3,3,3,3,4,3,4,4, zero gaps. (2) BUILDER H2.b
+(hero motion slice, weight-5 item) — split-text mask headline: motion.js
+word-splits the h1 client-side (DOM APIs only, whitespace runs preserved
+verbatim, em accent kept, h1's own hv2-rise handed over — sole-owner rule
+per D-LOOP-31a; fxNone skips the split entirely = plain visible h1),
+CSS mask rise transform-only with 45ms stagger + descender allowance,
+reduced-motion kill; hero-loop.mp4 now referenced: hidden + preload="none"
++ poster, motion.js flips it live ONLY under html[data-fx=rich] &&
+!Save-Data (D-LOOP-21a), crossfades over the slides via .hero__bg.is-video
+— lite/none/SaveData/JS-blocked never load a byte; gate contract documented
+at the reference site (multiline {% comment %}) and pinned by tests;
+addendum M1 (mask headline) + M2 (video handover) extended, cap stays 6.
+test_h2_hero.py 7→**10/10**; E3 scripts/r33_e3_h2b.py **18/18 ALL PASS**
+(mask split/stagger/text-intact-vs-JS-blocked-baseline, rich hand-over
+playing t>0.9s, lite/none/JS-blocked h1 plain + video hidden, zero errors);
+r33-h2b-hero-rich-1280.png eyeballed (loop playing, headline settled).
+Failures fixed en route: splitText appendChild on a text node (take
+parent+textNode), whitespace verbatim preservation, headless-fx spoof via
+add_init_script, and the **multiline {# #} Django comment leak** (r24
+D-LOOP-24c lesson hit again — 4 test_p0/phase2 failures → {% comment %}
+block, suite re-run green). | score: L4 audit (no move, MET-T1 confirmed)
+· H2.b n/a→READY-FOR-AUDIT self 3,3,n/a,3,3,3,4,4 (+D3 4 with E3) |
+evidence: E2+E3 | gates: check OK · makemigrations OK · **645 → 648
+passed** (+3 H2.b) · hex **214** held | decisions: D-LOOP-33a | FOR THE
+NEXT RUN: audit H2.b (10/10 + r33_e3_h2b.py ALL PASS + D-LOOP-33a re-read
++ rich-hero screenshot), then BUILDER G4 (pointer polish — the last
+remaining item) | blockers: none
+
 Run 32 | AUDITOR→BUILDER | 2026-11-06 04:45-05:25 +03:00 | items: (1) AUDIT G3
 from scratch — gates 636, 9/9 test_g3_scroll_linked.py; E3 scripts/r31_e3_g3.py
 re-run **ALL PASS** on a FRESH server (pkill-first OPS lesson applied);
