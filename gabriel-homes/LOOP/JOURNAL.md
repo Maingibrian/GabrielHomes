@@ -1,5 +1,33 @@
 # JOURNAL.md — append-only, newest first
 
+Run 35 | AUDITOR→PLANNER (+WATCH overlay) | 2026-11-06 04:19-05:05 +03:00 | items:
+(1) AUDIT G4 from scratch — gates 655, 7/7 test_g4_pointer_polish.py; E3
+scripts/r34_e3_g4.py re-run **18/18 ALL PASS** on a FRESH server (pkill-first);
+D-LOOP-34a verified against the code (brace balance 279/279 + dead fragment
+gone, 7/7 gate needles in setupPointerPolish, M5 data-cursor-view / M6
+data-magnetic rows correct, cap 6 intact, bento exclusion documented); both
+fresh screenshots eyeballed → **G4 MET-T1**, aud=self 3,3,4,3,3,3,4,4, zero
+gaps — **all 17 work items now MET-T1**. (2) WATCH overlay (r20 precedent):
+35 mod 16 = 3 → **F5 spot-check** 6/6 test_f5_smooth_scroll.py + r29_e3_f5.py
+ALL PASS; F1 drift re-surveyed **211/43 held**; nothing REGRESSED.
+(3) RETRO (r35 = multiple of 5, docs-only): read r30-r34 — five builders, five
+first-attempt audit passes, 0 failed attempts, no stuck items to split, no
+duplicates, no new item earned its keep (F4 rule); per §5 raised the six
+weight-5 items (F1, F2, H1, H2, G2, L1) to **Tier 2**; fixed the ledger's
+off-by-one denominator — canonical count is **17** (SCORECARD work rows), so
+MET share is **17/17 (100%) at T1**; bookkeeping rationale + T2 plan logged as
+D-LOOP-35a. | score: G4 READY-FOR-AUDIT→MET-T1 (aud=self); targets raised for
+F1/F2/H1/H2/G2/L1 | evidence: E2+E3 (G4 7/7 + 18/18; F5 6/6 + ALL PASS; survey
+211/43) | gates: start — check 0 issues, makemigrations no changes, **655
+passed**; end — unchanged, docs-only after the audits (no code touched this
+run) | ratchets: sub-13px 43, hex 211, image bytes 4,191,687 — all held |
+decisions: **D-LOOP-35a** | FOR THE NEXT RUN: r36 = BUILDER — take ONE T2 lift
+deeply (suggested H2: five 3s → 4s with evidence, richest existing E3 harness
+r33_e3_h2b.py + r24_e3_h2a_audit.py; or F2 the keystone gate); every T2 claim
+then needs a different-run audit to become MET-T2; suite must stay ≥ 655 |
+blockers: none |
+
+
 Run 34 | AUDITOR→BUILDER | 2026-11-06 03:46-04:55 +03:00 | items: (1) AUDIT H2.b
 from scratch — gates 648, 10/10 test_h2_hero.py; E3 scripts/r33_e3_h2b.py re-run
 **18/18 ALL PASS** on a FRESH server (pkill-first); D-LOOP-33a verified
