@@ -1,5 +1,45 @@
 # JOURNAL.md — append-only, newest first
 
+Run 37 | AUDITOR→BUILDER | 2026-11-06 05:45-06:35 +03:00 | items:
+(1) **AUDIT F2 T2 claim from scratch — verdict MET-T2 (the project's first
+Tier-2 item).** Baseline gates green (check 0, makemigrations 0, 655);
+fresh server (pkill-first); 14/14 test_f2_capability_gate.py; scripts/
+r36_e3_f2_matrix.py re-run **ALL PASS** (three times total this run, once
+for the count audit); D-LOOP-36a verified against code (five legs, byte
+fact 1,507,333 B, M-table aligned row-for-row, screenshots hash-verified
++ eyeballed). **Bookkeeping correction: the matrix is 53/53, not 52/52**
+(NOJS 8 + NONE 10 + LITE 13 + RICH 15 + TOUCH 7, counted via rg -c;
+r36's prose undercounted by one; all green either way; D-LOOP-22a
+precedent). From-scratch grading: D1/D4/D5/D6/D7/D8 all 4 with E2+E3 →
+aud=self all-4s, lower wins → **F2 MET-T2**. (2) **BUILDER H2 T2 lift**
+(evidence-only, zero shipped-code changes): scripts/r37_e3_h2_t2.py —
+**24/24 ALL PASS** across 5 legs. D1: ONE gesture live (1 submit CTA,
+0 competing anchors, stats gone) + LCP preload fetchpriority=high
+honoured (119,000 B); D2: settled screenshots eyeballed (rich-1280,
+mobile-390, mobile-rich-390); D4: video 0 B lite/none/no-JS + LCP
+119 KB; D5: keyboard walk — skip link first, Enter flips Rent + hidden
+input + action URL → /property-for-rent/; D6: zero horizontal overflow
+at 390px, hamburger + stacked pill, video handover pointer-independent
+on touch. Script fixes en route: ?v= query on the preload href (assert
+the path), keyboard walk lands on Buy first (Rent = one more Tab),
+1.2s settle before mobile screenshots (r34 lesson). **Q1 datapoint**
+(first real wire accounting, recorded on the Q1 WATCH row): css
+173,559 + js 52,033 + fonts 290,180 + LCP 119,000 = **634,772 B** >
+400KB aspiration — fonts are the lever; NOT an H2 defect (site-wide).
+| score: F2 READY-FOR-AUDIT → **MET-T2** (aud=self 4s) · H2 MET-T1 →
+**READY-FOR-AUDIT (T2 claim; T1 intact)** self 4,4,n/a,4,4,4,4,4 (was
+3,3,n/a,3,3,3,4,4) | evidence: E2+E3 | gates: start — check 0 issues,
+makemigrations no changes, **655 passed**; end — re-run below (docs +
+E3 scripts only) | ratchets: sub-13px 43, hex 211, image bytes
+4,191,687 — untouched (no CSS/static changes) | decisions:
+**D-LOOP-37a** | FOR THE NEXT RUN: r38 = AUDITOR — audit the H2 T2
+claim (10/10 test_h2_hero.py, re-run scripts/r37_e3_h2_t2.py expect
+ALL PASS on a FRESH server, re-read D-LOOP-37a, eyeball r37-h2-*.png;
+verdict MET-T2 or demote naming the checks); then BUILDER the next T2
+lift deeply (G2 real-browser transition capture, or F1 tokenisation
+pass over the 10 search.css hexes); suite ≥ 655 | blockers: none |
+
+
 Run 36 | BUILDER (T2 lift) | 2026-11-06 05:15-06:05 +03:00 | items:
 **F2 capability gate — the keystone T2 lift (evidence-only; no shipped code
 touched)**. Chose F2 over H2 per r35's fork: a gate lift is read-only on the
