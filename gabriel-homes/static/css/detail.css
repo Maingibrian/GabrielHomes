@@ -802,3 +802,126 @@
   .facts-bar--revamp { grid-template-columns:repeat(2,minmax(0,1fr)); gap:0; margin-bottom:30px; padding:12px 0; }.facts-bar--revamp .facts-bar__fact { padding:12px 10px; border-bottom:1px solid var(--sand-60); }.facts-bar--revamp .facts-bar__fact:nth-child(2) { border-right:0; }.facts-bar--revamp .facts-bar__fact:nth-child(n+3) { border-bottom:0; }
   .detail-layout--revamp .amenities__grid,.nearby-amenities__grid { grid-template-columns:1fr; }.nearby-amenities { padding:20px 16px; border-radius:16px; }.nearby-amenities__heading { align-items:start; flex-direction:column; gap:8px; }.detail-map__heading { align-items:start; flex-direction:column; gap:8px; }#detail-map { height:270px; border-radius:15px; }
 }
+
+/* ============================================================
+   L4 — gallery lightbox (r32, D-LOOP-32a). Tokens only; the
+   open/close fade extends the M2 crossfade family in the addendum.
+   The overlay is JS-built (detail-gallery.js): with JS blocked no
+   lightbox and no expand control exist, and the gallery itself
+   remains the full content surface (Q3/D-MOTION-SAFE).
+   ============================================================ */
+.gallery__expand {
+  position: absolute;
+  right: 1rem;
+  bottom: 1rem;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border: 1px solid var(--cream-75);
+  border-radius: var(--radius-pill);
+  background: var(--espresso-88);
+  color: var(--cream);
+  cursor: zoom-in;
+  backdrop-filter: blur(6px);
+  transition: background var(--t-fast) var(--ease), transform var(--t-fast) var(--ease);
+}
+.gallery__expand:hover {
+  background: var(--espresso);
+  transform: translateY(-1px);
+}
+.gallery__expand:focus-visible {
+  outline: 2px solid var(--burnt);
+  outline-offset: 2px;
+}
+.lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-modal);
+  display: grid;
+  place-items: center;
+  padding: 2rem;
+  background: var(--espresso-88);
+  backdrop-filter: blur(10px);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity var(--t-med) var(--ease), visibility 0s var(--t-med);
+}
+.lightbox.is-open {
+  opacity: 1;
+  visibility: visible;
+  transition: opacity var(--t-med) var(--ease);
+}
+.lightbox__main {
+  width: min(100%, 68rem);
+  height: min(76vh, 50rem);
+  border-radius: var(--radius-card);
+  background-color: var(--espresso-70);
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+  /* D-LOOP-32a: the overlay never carries a shared-element name — the G2
+     name stays on the gallery main, so the page-wide name stays unique. */
+  view-transition-name: none;
+}
+.lightbox__close,
+.lightbox__nav {
+  display: grid;
+  place-items: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  border: 1px solid var(--cream-75);
+  border-radius: var(--radius-pill);
+  background: var(--espresso-88);
+  color: var(--cream);
+  cursor: pointer;
+  transition: background var(--t-fast) var(--ease), transform var(--t-fast) var(--ease);
+}
+.lightbox__close:hover,
+.lightbox__nav:hover {
+  background: var(--espresso);
+  transform: translateY(-1px);
+}
+.lightbox__close:focus-visible,
+.lightbox__nav:focus-visible,
+.lightbox__count:focus-visible {
+  outline: 2px solid var(--burnt);
+  outline-offset: 2px;
+}
+.lightbox__close { position: absolute; top: 1.25rem; right: 1.25rem; }
+.lightbox__nav { position: absolute; top: 50%; transform: translateY(-50%); }
+.lightbox__nav:hover { transform: translateY(calc(-50% - 1px)); }
+.lightbox__nav--prev { left: 1.25rem; }
+.lightbox__nav--next { right: 1.25rem; }
+.lightbox__count {
+  position: absolute;
+  bottom: 1.25rem;
+  left: 50%;
+  transform: translateX(-50%);
+  color: var(--cream);
+  font-size: var(--text-sm);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.08em;
+}
+/* Scroll lock while the viewer is open (Lenis is stopped via the F5
+   public API window.__lenis.stop()/start() — smooth-scroll.js untouched). */
+html.lb-open { overflow: hidden; }
+@media (max-width: 650px) {
+  .lightbox { padding: 1rem; }
+  .lightbox__main { height: min(64vh, 40rem); }
+  .lightbox__nav--prev { left: 0.6rem; }
+  .lightbox__nav--next { right: 0.6rem; }
+}
+/* F2 parity: fx=none and OS reduced-motion open the viewer instantly
+   (same behaviour, no fade). With JS blocked the lightbox never exists,
+   so no :not([data-fx]) rule is needed — D-MOTION-SAFE by construction. */
+html[data-fx="none"] .lightbox,
+html[data-fx="none"] .lightbox.is-open,
+html[data-fx="none"] .gallery__expand,
+html[data-fx="none"] .lightbox__close,
+html[data-fx="none"] .lightbox__nav { transition: none; }
+@media (prefers-reduced-motion: reduce) {
+  .lightbox, .lightbox.is-open,
+  .gallery__expand, .lightbox__close, .lightbox__nav { transition: none; }
+}
