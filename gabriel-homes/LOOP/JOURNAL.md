@@ -1,5 +1,43 @@
 # JOURNAL.md — append-only, newest first
 
+Run 36 | BUILDER (T2 lift) | 2026-11-06 05:15-06:05 +03:00 | items:
+**F2 capability gate — the keystone T2 lift (evidence-only; no shipped code
+touched)**. Chose F2 over H2 per r35's fork: a gate lift is read-only on the
+17 frozen MET items, so zero regression risk. Read PROTOCOL/STATE/SCORECARD/
+LOCKS/last-5-journal first; baseline gates green (check 0, makemigrations 0,
+655); claimed F2 T2 lift in LOCKS; read test_f2_capability_gate.py (14 tests),
+fx-gate.js, motion.js, smooth-scroll.js, bento-shift.js, the G3 @supports
+block and the addendum M-table, then built scripts/r36_e3_f2_matrix.py — the
+five-leg live decision-table matrix on home: RICH (spoofed hc=8/dm=8) · LITE
+(hc=2) · NONE (reduced-motion) · TOUCH (390×844, is_mobile+has_touch, spoofed
+rich, coarse pointer) · NOJS (java_script_enabled=False). **52/52 ALL PASS,
+zero console/page errors**: tier half (split lite+rich never none/no-JS; video
+rich && !Save-Data; Lenis rich+fine; nav auto-hide lite+rich; g3 scroll-linked
+lite+rich and animation:none under none/no-JS; reveals instant under none,
+visible no-JS) AND pointer half (TOUCH: data-fx=rich but no data-fine → no
+bubble, bento never is-live, native scroll). Byte fact (D4): hero loop =
+1,507,333 B under rich/touch, exactly **0 B** under lite/none/no-JS.
+Reduced-motion parity (D5) + D-MOTION-SAFE (D7) proven live. Addendum M-table
+matches the observed table row-for-row — no doc drift, F4 freeze untouched.
+Screenshots r36-f2-{rich,nojs,none,lite,touch}-*.png eyeballed (video frame +
+settled mask headline; static marquee with header never hidden; mobile stacked
+pill, no pointer decorations). E3 lesson: under Lenis autoRaf, native
+window.scrollTo(0,0) is overridden next frame — use window.__lenis.scrollTo(0).
+| score: F2 MET-T1 → **READY-FOR-AUDIT (T2 claim; T1 baseline intact)**, self
+4,n/a,n/a,4,4,4,4,4 (was 3,n/a,n/a,3,3,3,4,4) | evidence: E2+E3 (52/52 matrix
++ 14 F2 tests within the 655 + 5 screenshots + printed decision table) |
+gates: start — check 0 issues, makemigrations no changes, **655 passed**; end —
+re-run below (docs+script only after the matrix) | ratchets: sub-13px 43, hex
+211, image bytes 4,191,687 — untouched (no CSS/static changes this run) |
+decisions: **D-LOOP-36a** | FOR THE NEXT RUN: r37 = AUDITOR — audit the F2 T2
+claim from scratch (14/14 test_f2_capability_gate.py, re-run
+scripts/r36_e3_f2_matrix.py expect ALL PASS on a fresh server (pkill-first),
+re-read D-LOOP-36a, eyeball r36-f2-rich/none/touch pngs; verdict MET-T2 or
+demote naming the checks); then BUILDER the next T2 lift deeply (H2 five
+3s→4s with the r33/r24 harness, or G2 real-browser transition capture); suite
+≥ 655 | blockers: none |
+
+
 Run 35 | AUDITOR→PLANNER (+WATCH overlay) | 2026-11-06 04:19-05:05 +03:00 | items:
 (1) AUDIT G4 from scratch — gates 655, 7/7 test_g4_pointer_polish.py; E3
 scripts/r34_e3_g4.py re-run **18/18 ALL PASS** on a FRESH server (pkill-first);
