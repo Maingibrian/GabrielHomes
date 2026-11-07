@@ -26,6 +26,45 @@ def published_property_q() -> Q:
     return q
 
 
+def _hero_popular_areas(mombasa_ids: list[int]) -> list[dict]:
+    """r49: the hero's "Popular" chips — the four Mombasa areas with the
+    most published listings right now (live data, never hardcoded names),
+    each linking to its sale search page. Listings hang off NEIGHBOURHOOD
+    leaves, so each area counts its descendants too (same per-area loop
+    pattern as the counties browse block above). Thumbs are decorative
+    stock shots (aria-hidden in the template), mapped by slug with a
+    fallback so an unexpected area still renders."""
+    from django.templatetags.static import static as static_url
+
+    thumbs = {
+        "nyali": "img/stock/nyali-apartment.jpg",
+        "bamburi": "img/stock/mombasa-villa.webp",
+        "town": "img/stock/coastal-living.jpg",
+        "mtwapa": "img/stock/pool-villa-day.jpg",
+        "shanzu": "img/stock/pool-villa-night.webp",
+        "likoni": "img/stock/modern-living.jpg",
+    }
+    areas = []
+    for area in Location.objects.filter(
+        level=Location.Level.AREA, pk__in=mombasa_ids,
+    ).order_by("name"):
+        area_ids = [area.pk, *area.get_descendants().values_list("pk", flat=True)]
+        count = Property.objects.published().filter(
+            location_id__in=area_ids).count()
+        if count:
+            areas.append((area, count))
+    areas.sort(key=lambda pair: (-pair[1], pair[0].name))
+    return [
+        {
+            "name": area.name,
+            "url": f"/property-for-sale/{area.slug}/",
+            "count": count,
+            "thumb": static_url(thumbs.get(area.slug, "img/stock/modern-living.jpg")),
+        }
+        for area, count in areas[:4]
+    ]
+
+
 def home(request):
     """Home page — hero slideshow, homes bento showcase, story, numbers,
     philosophy, browse, CTA (docs/HOME-REDESIGN.md).
@@ -108,6 +147,10 @@ def home(request):
     context = {
         "body_class": "page-home",
         "showcase_listings": showcase_listings,
+        # r49: the floating hero card promotes the same featured listing the
+        # bento spotlights (first showcase entry; None hides the card).
+        "hero_card_listing": showcase_listings[0] if showcase_listings else None,
+        "popular_areas": _hero_popular_areas(list(mombasa_ids)),
         "sale_listings": sale_listings,
         "rent_listings": rent_listings,
         "short_stay_listings": short_stay_listings,

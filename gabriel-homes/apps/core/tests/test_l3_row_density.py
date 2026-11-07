@@ -6,7 +6,13 @@ Binary checks (SCORECARD L3):
    Call/Email in the actions block.
 2. Call and Email stay secondary via the existing brand-channel logic
    (brand first, agent fallback, hidden when unfilled).
-3. Row min-height <= 320px on desktop (CSS).
+3. Desktop rows are a UNIFORM fixed height (r49 owner request: "ensure
+   all listing cards are the same size"). With height:auto the grid track
+   sized each row to its photo's natural aspect ratio (a portrait 942x1280
+   image made one card 883px tall against 397px neighbours). 460px is the
+   measured worst-case content stack + slack; the definite track also makes
+   .listing-row__media's height:100% resolve, so every media cell is
+   identical. Mobile keeps its own fixed 680px stack.
 4. Description truncated to 28 words.
 5. Alternating sides kept (reverse row on every 2nd card).
 6. Rows stack on mobile (single-column media query).
@@ -46,14 +52,20 @@ def test_call_email_secondary_brand_channel_logic():
     assert 'listing-row__whatsapp' not in ACTIONS.split('tel:')[1].split('{% endif %}')[0]
 
 
-def test_row_min_height_320_desktop():
+def test_row_uniform_height_desktop():
+    """r49: all listing cards the same size — a definite desktop height so
+    the grid track (and the media cell's height:100%) no longer follows each
+    photo's natural aspect ratio. 460px = measured worst-case content (456)
+    + slack, overflow-verified on every seeded row."""
     rule = re.search(r"\.listing-row \{[^}]*\}", CSS)
     assert rule, ".listing-row rule must exist"
     body = rule.group(0)
-    assert "min-height" in body, "desktop row must declare a min-height"
-    m = re.search(r"min-height:\s*(\d+)px", body)
-    assert int(m.group(1)) <= 320, (
-        f"row min-height must be <= 320px on desktop, got {m.group(1)}px")
+    m = re.search(r"height:\s*(\d+)px", body)
+    assert m, "desktop row must declare a definite height (uniform cards)"
+    assert "height: auto" not in body, "auto height lets photo aspect drive the row"
+    # the height must be definite but never clip the worst content stack
+    assert 440 <= int(m.group(1)) <= 500, (
+        f"uniform row height must stay in the measured 440-500px band, got {m.group(1)}px")
 
 
 def test_description_truncated_28_words():
@@ -69,3 +81,4 @@ def test_alternating_sides_kept():
 def test_rows_stack_on_mobile():
     stack = re.search(r"\.listing-row,\.listing-row--reverse \{[^}]*grid-template-columns:\s*1fr", CSS)
     assert stack, "mobile media query must stack rows to one column"
+    assert "height:680px" in CSS, "mobile rows keep their own uniform fixed height"

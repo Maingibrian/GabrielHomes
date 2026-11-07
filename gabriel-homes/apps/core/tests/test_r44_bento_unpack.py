@@ -50,11 +50,15 @@ def _home_body() -> str:
 
 
 def _card_slice(body: str, marker: str) -> str:
-    """The bento card <a> that contains `marker` (title text)."""
-    i = body.index(marker)
-    start = body.rindex('<a class="bento-card', 0, i)
-    end = body.index("</a>", i)
-    return body[start:end]
+    """The bento card <a> that contains `marker` (title text).
+    r49: the hero card legitimately repeats the spotlight listing's
+    title above the bento, so scope the lookup to the grid — the
+    first title match may now live in the hero, not the bento."""
+    grid = body.split('class="bento-grid bento-grid--shift"', 1)[1]
+    i = grid.index(marker)
+    start = grid.rindex('<a class="bento-card', 0, i)
+    end = grid.index("</a>", i)
+    return grid[start:end]
 
 
 def test_showcase_cards_carry_the_unpack_drawer():

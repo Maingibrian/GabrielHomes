@@ -310,7 +310,13 @@
   .results-grid { grid-template-columns: 1fr; }
 }
 
-.listing-row { display: grid; grid-template-columns: minmax(0,1.08fr) minmax(340px,.92fr); height: auto; min-height: 320px; background: var(--white); border: 1px solid rgba(90,64,50,.13); border-radius: 24px; overflow: hidden; box-shadow: 0 12px 42px rgba(45,31,23,.07); }
+/* r49: uniform card size (owner request). The track must be DEFINITE so
+   .listing-row__media's height:100% resolves — with height:auto the grid
+   row sized itself to each photo's natural aspect ratio, and one portrait
+   942x1280 image inflated its card to 883px while landscape cards sat at
+   397px. 460px is the measured worst-case content stack (456px) + slack;
+   verified against all rows: zero content overflow (scrollHeight check). */
+.listing-row { display: grid; grid-template-columns: minmax(0,1.08fr) minmax(340px,.92fr); height: 460px; background: var(--white); border: 1px solid rgba(90,64,50,.13); border-radius: 24px; overflow: hidden; box-shadow: 0 12px 42px rgba(45,31,23,.07); }
 .listing-row--reverse { grid-template-columns: minmax(340px,.92fr) minmax(0,1.08fr); }.listing-row--reverse .listing-row__media { order: 2; }.listing-row--reverse .listing-row__content { order: 1; }
 .listing-row__media { position: relative; min-height: 0; height: 100%; overflow: hidden; background: var(--sand); }.listing-row__media img { width: 100%; height: 100%; object-fit: cover; transition: transform .65s cubic-bezier(.2,.7,.2,1); }.listing-row:hover .listing-row__media img { transform: scale(1.04); }
 .listing-row__index,.listing-row__demo { position: absolute; top: 18px; padding: 8px 11px; border-radius: 999px; background: rgba(255,255,255,.84); backdrop-filter: blur(10px); font: 700 10px var(--font-mono); text-transform: uppercase; letter-spacing: .08em; }.listing-row__index { left: 18px; }.listing-row__demo { right: 18px; color: var(--burnt); }

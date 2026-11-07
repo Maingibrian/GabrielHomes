@@ -75,10 +75,16 @@
   position: absolute;
   inset: 0;
   background:
-    /* r12: left/bottom bands deepened so title-zone text clears AA over
-       the brightest photo regions (worst case was ~2:1 for the accent). */
-    linear-gradient(90deg, rgba(28,21,17,0.72) 0%, rgba(28,21,17,0.48) 48%, rgba(28,21,17,0.10) 100%),
-    linear-gradient(180deg, rgba(28,21,17,0.52) 0%, rgba(42,33,28,0.34) 45%, rgba(42,33,28,0.78) 100%);
+    /* r49: rebalanced so the room reads WARM (owner: the old near-black
+       left-to-right band made the hero a "dark void"). Three layers: a
+       soft vignette pool behind the text block (the reference's "dark
+       left-side vignette" — slide 2's sun-lit window measured 1.13:1
+       without it; re-verified >=4.5:1 by pixel probe, r49), the left
+       band, and the vertical top/bottom bands that carry the nav, the
+       market stat and the marquee hand-off. */
+    radial-gradient(ellipse 62% 55% at 30% 42%, rgba(28,21,17,.58), rgba(28,21,17,0) 72%),
+    linear-gradient(90deg, rgba(28,21,17,.66) 0%, rgba(28,21,17,.42) 44%, rgba(28,21,17,.06) 82%),
+    linear-gradient(180deg, rgba(28,21,17,.52) 0%, rgba(42,33,28,.20) 42%, rgba(42,33,28,.18) 60%, rgba(42,33,28,.74) 100%);
 }
 .hero .container { position: relative; z-index: 1; width: 100%; }
 .hero__tag {
@@ -118,6 +124,183 @@
    gesture per hero; "Kenya" was filler (see D-LOOP-24a). */
 .hero__search {
   margin-top: 1.5rem;
+}
+
+/* ============================================================
+   r49 — HERO REMODEL (owner request, after the reference image)
+   Two columns (text stack + floating listing card), an accent bar
+   on the headline, a frosted assurance strip, popular-area chips
+   under the search pill and a bottom-left market stat. Zero new
+   hex (F1 ratchet): tokens, color-mix and rgba() only.
+   ============================================================ */
+.hero__grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 2.5rem; }
+.hero__title {
+  /* the reference's orange accent bar beside the headline */
+  border-left: 4px solid var(--burnt);
+  padding-left: 22px;
+}
+.hero__subtitle { margin: 0 0 1.6rem; }
+
+/* frosted service-tags strip */
+.hero__assurances {
+  display: flex; flex-wrap: wrap; align-items: stretch;
+  margin: 0 0 1.6rem; padding: 9px 6px;
+  border-radius: 999px;
+  background: rgba(28,21,17,.38);
+  border: 1px solid rgba(245,239,227,.14);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+}
+.hero__assurances li {
+  display: inline-flex; align-items: center; gap: 10px;
+  padding: 6px 18px;
+  font-size: var(--text-sm);
+  font-weight: 500;
+  color: color-mix(in srgb, var(--cream) 94%, transparent);
+}
+.hero__assurances li + li { border-left: 1px solid rgba(245,239,227,.14); }
+.hero__assurances svg {
+  width: 17px; height: 17px; flex: none;
+  color: color-mix(in srgb, var(--clay) 78%, var(--cream));
+}
+
+/* popular-area chips (live top-4 from the view) */
+.hero__locations {
+  display: flex; align-items: center; flex-wrap: wrap; gap: 10px;
+  margin-top: 1.4rem;
+}
+.hero__locations-label {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  text-transform: uppercase;
+  letter-spacing: var(--track-mono);
+  color: color-mix(in srgb, var(--cream) 82%, transparent);
+  margin-right: 2px;
+}
+.hero__loc {
+  display: inline-flex; align-items: center; gap: 9px;
+  padding: 5px 14px 5px 6px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--white) 92%, transparent);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  color: var(--ink);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  transition: transform var(--t-med) var(--ease-out), box-shadow var(--t-med) var(--ease-out);
+}
+.hero__loc:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 24px rgba(45,31,23,.28);
+}
+.hero__loc img { width: 30px; height: 30px; border-radius: 50%; object-fit: cover; }
+.hero__loc-count {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--taupe);
+}
+
+/* the floating listing card */
+.hero-card {
+  background: var(--white);
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 24px 60px rgba(45,31,23,.35);
+  width: 100%; max-width: 400px;
+  justify-self: end;
+}
+.hero-card__media { position: relative; display: block; aspect-ratio: 5 / 3; overflow: hidden; background: var(--sand); }
+.hero-card__media img { width: 100%; height: 100%; object-fit: cover; }
+.hero-card__badge {
+  position: absolute; left: 14px; bottom: 14px;
+  padding: 6px 12px; border-radius: 999px;
+  background: var(--burnt); color: var(--white);
+  font-family: var(--font-mono); font-size: var(--text-xs);
+  font-weight: 600; text-transform: uppercase; letter-spacing: var(--track-mono);
+}
+.hero-card__body { padding: 18px 20px 20px; }
+.hero-card__title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 1.3rem;
+  font-weight: 500;
+  line-height: 1.18;
+  letter-spacing: var(--track-tight);
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+.hero-card__title a { color: inherit; text-decoration: none; }
+.hero-card__title a:hover { text-decoration: underline; text-underline-offset: 3px; }
+.hero-card__loc {
+  display: flex; align-items: center; gap: 6px;
+  margin: 9px 0 10px;
+  color: var(--taupe);
+  font-size: var(--text-sm);
+  font-weight: 500;
+}
+.hero-card__loc svg { flex: none; color: var(--burnt); }
+.hero-card__price { margin: 0; font-size: 1.35rem; font-weight: 700; color: var(--ink); }
+.hero-card__link {
+  display: inline-flex; align-items: center; gap: 6px;
+  margin-top: 12px;
+  color: var(--burnt);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  text-decoration: none;
+}
+.hero-card__link:hover { text-decoration: underline; text-underline-offset: 3px; }
+.hero-card__link:hover span { transform: translateX(3px); }
+.hero-card__link span { transition: transform var(--t-med) var(--ease-out); }
+
+/* bottom-left market stat */
+.hero__market {
+  position: absolute;
+  left: clamp(20px, 4.5vw, 64px);
+  bottom: 26px;
+  z-index: 2;
+  display: flex; align-items: center; gap: 13px;
+}
+.hero__market > svg {
+  width: 44px; height: 44px; padding: 10px;
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--burnt) 90%, transparent);
+  color: var(--white);
+  box-sizing: content-box;
+  box-shadow: 0 10px 26px rgba(45,31,23,.30);
+}
+.hero__market-text strong {
+  display: block;
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--cream);
+}
+.hero__market-text span {
+  font-size: var(--text-sm);
+  color: color-mix(in srgb, var(--cream) 86%, transparent);
+}
+.hero__market-text b {
+  /* green-deep lifted toward cream so it clears the dark scrim */
+  color: color-mix(in srgb, var(--green-deep) 38%, var(--cream));
+  font-weight: 700;
+}
+
+@media (min-width: 1200px) {
+  .hero__grid { grid-template-columns: minmax(0, 1fr) 400px; gap: 4rem; align-items: start; }
+  .hero-card { margin-top: clamp(0px, 4vw, 56px); }
+}
+@media (max-width: 1199px) {
+  /* single column: the bento below already carries the listings */
+  .hero-card { display: none; }
+}
+@media (max-width: 1020px) {
+  .hero__market { display: none; }
+}
+@media (max-width: 640px) {
+  .hero__assurances { gap: 4px; padding: 8px 4px; }
+  .hero__assurances li { padding: 5px 10px; }
+  .hero__assurances li + li { border-left: none; }
 }
 
 
