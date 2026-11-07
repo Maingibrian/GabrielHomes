@@ -31,9 +31,12 @@ def test_about_founder_card_shows_the_portrait():
     assert "founder-portrait.webp" in attrs
     # r52: the founder band is an editorial portrait now — 160px display
     # inside the offset frame (was a 120px chip). Source is 240px, so the
-    # 1.5x density still carries it; F3 attrs unchanged.
-    assert re.search(r'width="160"', attrs), "width attribute required (F3)"
-    assert re.search(r'height="160"', attrs), "height attribute required (F3)"
+    # 1.5x density still carried it; F3 attrs unchanged.
+    # r53: the portrait leads the three-column lockup — display grown to
+    # 200px (density 240/200 = 1.2x; acceptable at 1x viewing, noted in
+    # pages.css). F3 attrs still width/height/loading/alt.
+    assert re.search(r'width="200"', attrs), "width attribute required (F3)"
+    assert re.search(r'height="200"', attrs), "height attribute required (F3)"
     assert 'alt="Gabriel Omulu, founder of Gabriel Homes"' in attrs
     assert 'loading="lazy"' in attrs
     # the initials mark is gone

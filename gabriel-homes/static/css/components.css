@@ -1363,8 +1363,12 @@ html.motion-ready [data-reveal].is-visible {
    ============================================================ */
 .cta {
   position: relative;
+  /* r53: scrim rebalanced (vision pass called the old one muddy) — the
+     middle thins so the photo reads warm instead of grey sludge, while
+     the top/bottom edges deepen to carry the tag and the proof strip.
+     Large display text sits in the ~0.56 zone: cream on that ≈ 7:1. */
   background:
-    linear-gradient(180deg, rgba(28,21,17,0.82) 0%, rgba(42,33,28,0.68) 50%, rgba(28,21,17,0.88) 100%),
+    linear-gradient(180deg, rgba(28,21,17,0.88) 0%, rgba(42,33,28,0.56) 50%, rgba(28,21,17,0.93) 100%),
     url("../img/real/hero-poster.jpg") center/cover no-repeat,
     var(--espresso);
   color: var(--cream);
@@ -1378,7 +1382,9 @@ html.motion-ready [data-reveal].is-visible {
   letter-spacing: -0.015em;
   line-height: var(--leading-tight);
   max-width: 18ch;
-  margin: 0 auto 2rem;
+  /* r53: 2rem→2.4rem — the vision pass caught the title and button
+     nearly colliding once the proof strip joined the band. */
+  margin: 0 auto 2.4rem;
   text-wrap: balance;
 }
 .cta__sub {
@@ -1763,4 +1769,40 @@ body.cursor-view-on .cursor-view { opacity: 1; }
 html.motion-ready [data-magnetic] {
   transform: translate(var(--mx, 0px), var(--my, 0px));
   transition: transform 0.25s var(--ease);
+}
+
+
+/* ============================================================
+   r53 — phone header diet (owner: "the nav bar in the phone is
+   too long"). At 390px the actions box (Enquire 76px + "Menu"
+   84px + gap) overflowed its grid track and flex-wrapped into a
+   SECOND row — a 98px bar eating 12% of the screen. Phones now
+   get: icon-only hamburger (the word drops, aria-label keeps the
+   name), a 40×40 tap target on both controls, a tighter wordmark
+   and half the bar padding. One row, ~58px total. The r12 wrap
+   rule (≤809px) stays as the signed-in safety net — it only
+   bites when the account links genuinely need the space.
+   ============================================================ */
+@media (max-width: 480px) {
+  .site-header__inner {
+    padding-block: 0.55rem;
+    gap: 0.9rem;
+  }
+  .site-header__brand {
+    font-size: 1.02rem;
+    gap: 0.5rem;
+  }
+  .site-header__brand .brand-mark { width: 23px; height: 23px; }
+  .site-header__actions { gap: 0.5rem; }
+  .site-header__cta {
+    padding-inline: 0.8rem;
+    min-height: 40px;
+  }
+  .site-header__hamburger {
+    padding: 0.5rem 0.4rem;
+    min-width: 40px;
+    min-height: 40px;
+    justify-content: center;
+  }
+  .site-header__hamburger-label { display: none; }
 }

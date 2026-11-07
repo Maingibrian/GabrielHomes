@@ -42,14 +42,14 @@
         Enquire
         <span class="btn__arrow" aria-hidden="true">&rarr;</span>
       </a>
-      {# Hamburger (<1200px) opens the full-screen menu #}
+      {# Hamburger (<1200px) opens the menu. r53: the "Menu" word lives in its own span so phones (≤480px) can drop it for an icon-only button; the aria-label keeps the name. #}
       <button class="site-header__hamburger" type="button"
               aria-label="Open menu" aria-expanded="false" aria-controls="mobile-menu"
               data-mobile-menu-open>
         <span class="site-header__hamburger-icon" aria-hidden="true">
           <span></span><span></span><span></span>
         </span>
-        Menu
+        <span class="site-header__hamburger-label">Menu</span>
       </button>
     </div>
   </div>

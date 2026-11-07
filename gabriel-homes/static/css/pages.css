@@ -504,12 +504,21 @@
   border-top: 1px solid var(--sand-60);
 }
 .about-story__copy p {
-  color: color-mix(in srgb, var(--ink) 82%, var(--cream));
+  /* r53: near-espresso on cream (was 82% ink — the vision pass read the
+     story body as muddy grey); measure stays the same. */
+  color: var(--ink);
   font-size: var(--text-base);
   line-height: var(--leading-body);
   letter-spacing: var(--track-tight);
 }
 .about-story__copy p + p { margin-top: 0.6rem; }
+/* r53 pass-2 (vision verification): the first paragraph becomes the lede —
+   one step up the scale so the column opens with hierarchy instead of
+   three same-weight blocks. */
+.about-story__copy p:first-of-type {
+  font-size: 1.12rem;
+  line-height: 1.62;
+}
 .about-story__figure {
   position: sticky;
   top: 96px;
@@ -523,7 +532,9 @@
      grade (saturate .92 / sepia .08) pulls the sea-blue bedding toward
      the sand palette without touching the honest subject. */
   aspect-ratio: 4 / 5;
-  max-height: clamp(420px, 62vh, 640px);
+  /* r53: cap tightened 62vh→52vh — with the pull-quote gone to its own
+     band the story section no longer needs a wallpaper-height photo. */
+  max-height: clamp(380px, 52vh, 520px);
   object-fit: cover;
   border-radius: var(--radius-card, 18px);
   box-shadow: 0 20px 55px rgba(45, 31, 23, 0.16);
@@ -648,9 +659,11 @@ html.motion-ready:not([data-fx="none"]) .story__values .value-card:nth-child(3) 
    the photo keeps its class + F3 attrs (test_founder_portrait). */
 .about-founder {
   display: grid;
-  grid-template-columns: auto minmax(0, 1fr);
+  /* r53: third column — the mono fact rail fills the dead right half
+     (vision pass). Align START so the quote tops out with the portrait. */
+  grid-template-columns: auto minmax(0, 1fr) minmax(170px, 210px);
   gap: clamp(2.5rem, 5vw, 4.5rem);
-  align-items: center;
+  align-items: start;
 }
 .about-founder__portrait {
   position: relative;
@@ -665,8 +678,10 @@ html.motion-ready:not([data-fx="none"]) .story__values .value-card:nth-child(3) 
 }
 .about-founder__portrait .hv2-founder__photo {
   position: relative;
-  width: 160px;
-  height: 160px;
+  /* r53: 160→200px display (240px source, 1.2x density — noted in
+     test_founder_portrait). The portrait leads the band now. */
+  width: 200px;
+  height: 200px;
   border-radius: var(--radius-card, 18px);
   object-fit: cover;
   display: block;
@@ -715,4 +730,182 @@ html.motion-ready:not([data-fx="none"]) .story__values .value-card:nth-child(3) 
   .about-founder__sig { margin-top: 1.2rem; padding-top: 1rem; }
   .about-story__figure figcaption { display: block; }
   .about-story__figure figcaption span { display: inline; }
+}
+
+
+/* ============================================================
+   r53 — About styling round two (owner: "still deserves more
+   styling"; vision critique pass two). Every rule here is new
+   or page-scoped (.about-*); the r52-pinned blocks above are
+   untouched.
+   ============================================================ */
+
+/* 1. The philosophy line becomes the page's mid-point espresso band —
+   the one dark breath between two cream halves. The blockquote keeps
+   its r52 class (pinned by test_r52_about_polish); the band owns the
+   restyle: display-scale Fraunces italic in cream, a short burnt rule
+   above (the accent reads on espresso; burnt text itself would not
+   clear contrast at this size), generous block padding. */
+.about-quote {
+  background: var(--espresso);
+  color: var(--cream);
+  padding-block: clamp(4.5rem, 3.5rem + 4vw, 7.5rem);
+}
+.about-quote .about-story__pull {
+  margin: 0;
+  padding-left: 0;
+  border-left: 0;
+  max-width: 30ch;
+  font-size: clamp(2rem, 1.5rem + 2.4vw, 3.4rem);
+  line-height: 1.22;
+  color: var(--cream);
+}
+.about-quote .about-story__pull::before {
+  content: "";
+  display: block;
+  width: 56px;
+  height: 3px;
+  background: var(--burnt);
+  margin-bottom: 1.6rem;
+}
+.about-quote .section-tag--light { margin-bottom: 2.1rem; }
+
+/* 2. Values cards, de-SaaS'd (vision pass: "white rounded rectangles
+   with soft shadows … imported from a different brand"). The 40px app
+   radius comes down to the house 20px card radius, a 3px burnt rule
+   replaces the neutral top edge, the shadow flattens, and the body
+   ink deepens off taupe. Scoped to the about values band only — the
+   shared .value-card base (home) keeps its r52 look. */
+.about-values .value-card {
+  border-radius: var(--radius-card);
+  border-top: 3px solid var(--burnt);
+  padding: 1.9rem 1.75rem;
+  box-shadow: 0 14px 34px -22px rgba(45, 31, 23, 0.28);
+}
+.about-values .value-card__icon {
+  /* circular medallion — the rounded-14 chip read app-tile (vision pass). */
+  border-radius: 50%;
+}
+.about-values .value-card:hover {
+  box-shadow: 0 20px 44px -24px rgba(45, 31, 23, 0.34);
+  border-color: color-mix(in srgb, var(--clay) 45%, var(--sand-60));
+  border-top-color: var(--burnt);
+}
+.about-values .value-card__body {
+  color: color-mix(in srgb, var(--ink) 85%, var(--taupe));
+}
+
+/* 3. Founder band — caption under the photo, larger quote (the page's
+   strongest moment per the pass), and the mono fact rail that fills
+   the dead right half. Rail values set in Fraunces so the facts read
+   editorial, not dashboard. */
+.about-founder__caption {
+  margin-top: 0.85rem;
+  font-family: var(--font-mono);
+  font-weight: 600;
+  font-size: var(--text-xs);
+  letter-spacing: var(--track-mono);
+  text-transform: uppercase;
+  color: var(--taupe);
+}
+.about-founder__quote {
+  font-size: clamp(1.5rem, 1.15rem + 1.5vw, 2.2rem);
+  line-height: 1.34;
+  max-width: 34ch;
+}
+.about-founder__lede { max-width: 52ch; }
+.about-founder__rail {
+  list-style: none;
+  margin: 0.5rem 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  align-self: start;
+}
+.about-founder__rail li {
+  display: flex;
+  flex-direction: column;
+  gap: 0.22rem;
+  padding-block: 0.95rem;
+  border-top: 1px solid var(--sand-60);
+}
+.about-founder__rail li:first-child {
+  border-top: 0;
+  padding-top: 0.55rem;
+}
+.about-founder__rail-k {
+  font-family: var(--font-mono);
+  font-weight: 600;
+  font-size: var(--text-xs);
+  letter-spacing: var(--track-mono);
+  text-transform: uppercase;
+  color: var(--taupe);
+}
+.about-founder__rail-v {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: 1.08rem;
+  line-height: 1.3;
+  letter-spacing: var(--track-tight);
+  color: var(--ink);
+}
+
+/* 4. Closing band proof strip (about-only markup; the shared .cta
+   geometry/scrim lives in components.css so home and contact render
+   the identical band). A triptych of real listing-check photos —
+   "see the homes" now shows the homes. */
+.cta__proof {
+  margin-top: 2.6rem;
+}
+.cta__proof-strip {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  max-width: 520px;
+  margin: 0 auto;
+}
+.cta__proof-strip img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 3 / 2;
+  object-fit: cover;
+  border-radius: 12px;
+  box-shadow: 0 12px 28px -14px rgba(10, 6, 4, 0.5);
+}
+.cta__proof-note {
+  margin: 1rem auto 0;
+  font-family: var(--font-mono);
+  font-weight: 600;
+  font-size: var(--text-xs);
+  letter-spacing: var(--track-mono);
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--cream) 72%, transparent);
+}
+
+/* 5. Mobile refinements (vision pass item 8): the fixed header overlays
+   this hero, so the H1 needs real clearance below it; the quote band
+   and cards breathe at phone widths; the founder rail drops under the
+   copy as a horizontal row (portrait + quote stay side by side at
+   ≤560 per r52 pass-2). */
+@media (max-width: 900px) {
+  .about-founder { grid-template-columns: auto minmax(0, 1fr); }
+  .about-founder__rail {
+    grid-column: 1 / -1;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 0 2.2rem;
+    margin-top: 1.6rem;
+  }
+  .about-founder__rail li {
+    border-top: 0;
+    padding: 0;
+  }
+}
+@media (max-width: 560px) {
+  .page-hero { padding-top: calc(var(--section-pad-y) + 3rem); }
+  .about-quote { padding-block: clamp(3.6rem, 3rem + 5vw, 4.6rem); }
+  .about-quote .about-story__pull { font-size: 1.85rem; line-height: 1.28; }
+  .about-quote .about-story__pull::before { margin-bottom: 1.25rem; }
+  .about-values .value-card { padding: 1.4rem 1.3rem; }
+  .cta__proof-strip { gap: 10px; }
 }
