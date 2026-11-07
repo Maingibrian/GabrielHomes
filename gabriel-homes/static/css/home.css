@@ -1003,7 +1003,47 @@ html.motion-ready .bento-grid--shift .bento-card[data-reveal] {
 .home-market__talk { margin-top: clamp(3rem, 5vw, 4.5rem); padding-top: 2.5rem; border-top: 1px solid var(--sand-60, rgba(216,201,184,.6)); }
 
 /* ---- curated Mombasa listing sections ------------------------ */
-.home-market { background: #f4eee6; }
+/* r46: the palm field. A seamless tile of arching palm fronds
+   (static/img/palm-field.svg, drawn by scripts/r46_palm_field.py)
+   covers the section background — owner request: "from RECOMMENDED
+   IN MOMBASA down to the Short stays & BnB". The ::before sits at
+   z-index:-1 inside the section's own stacking context (isolation:
+   isolate), so it paints above the sand background but below every
+   card and heading. The mask holds the field solid through the head
+   and the three market groups and fades it out only across the last
+   stretch (84%→100% — live-measured: the Short stays & BnB group
+   ends at ~97% of the section height at 1600px), so coverage runs
+   exactly from RECOMMENDED IN MOMBASA down to Short stays & BnB and
+   the TALK TO US strip at the very bottom sits on clean sand.
+   Token-only colours (hex ratchet holds); no font sizes touched;
+   decorative, so nothing for screen readers or pointers to find. */
+.home-market { background: #f4eee6; position: relative; isolation: isolate; }
+.home-market::before {
+  content: ""; position: absolute; inset: 0; z-index: -1;
+  background-image: url("../img/palm-field.svg");
+  background-repeat: repeat;
+  background-size: 1400px 1600px;
+  -webkit-mask-image: linear-gradient(to bottom, black 0%, black 84%, transparent 100%);
+  mask-image: linear-gradient(to bottom, black 0%, black 84%, transparent 100%);
+  pointer-events: none;
+}
+/* the soft veil that keeps the head's mid-grey body copy off the
+   densest fronds (design-sheet review): a translucent cream radial
+   behind the head block, painted above the field, below the text. */
+.home-market__head { position: relative; }
+.home-market__head::before {
+  content: ""; position: absolute; z-index: -1;
+  inset: -4rem -8rem -2.5rem;
+  background: radial-gradient(closest-side,
+    color-mix(in srgb, var(--cream) 78%, transparent), transparent);
+  pointer-events: none;
+}
+/* finer grain on small screens — the 1400px tile would show only
+   slivers of two fronds at phone widths */
+@media (max-width: 1020px) {
+  .home-market::before { background-size: 860px 985px; }
+  .home-market__head::before { inset: -2rem -2.5rem -1.5rem; }
+}
 .home-market__title { max-width: 780px; margin: 0 0 64px; font: 500 clamp(2.5rem,6vw,5.5rem)/.96 var(--font-display,Georgia,serif); letter-spacing: -.045em; }
 .home-market__group { padding: 42px 0 70px; border-top: 1px solid rgba(90,64,50,.18); }
 .home-market__heading { display: flex; align-items: end; justify-content: space-between; gap: 24px; margin-bottom: 28px; }

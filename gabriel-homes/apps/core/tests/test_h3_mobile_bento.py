@@ -72,6 +72,13 @@ def test_base_bento_grid_not_hijacked():
     keep their tile layouts."""
     css = HOME_CSS.read_text(encoding="utf-8")
     for m in re.finditer(r"@media \(max-width: 1020px\) \{[^}]*\}", css, re.S):
+        # r46: home.css now carries a ≤1020px block that has nothing to
+        # do with the bento (the palm-field tile resize for
+        # .home-market). Blocks that never mention the bento cannot
+        # hijack it — skip them; anything bento-related keeps the full
+        # original assertion.
+        if "bento" not in m.group(0):
+            continue
         assert ".bento-grid--shift" in m.group(0), (
             "H3 rules must target only .bento-grid--shift"
         )
