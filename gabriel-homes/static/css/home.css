@@ -788,7 +788,14 @@ html.motion-ready .bento-grid--shift .bento-card[data-reveal] {
    3e. r44 — brand wordmarks flanking the bento: "gabriel" runs
    down the left gutter from the top, "homes" down the right
    gutter to the bottom (owner request). Book-spine vertical
-   Fraunces italic — display size that still fits the gutters.
+   Fraunces italic. r45: sized to the GUTTER, not the viewport —
+   the owner found the r44 proof too timid. The usable column is
+   50vw − 38.5rem − 16px stand-off (wrapper edge to viewport
+   edge), so the type scales at 40vw − 30rem of it: ~96px at the
+   1440px floor (fills the 120px gutter), ~288px at 1920 (fills
+   80% of the 360px gutter), capped at 20rem on 2k+ displays.
+   Never overflows the viewport edge: 40vw−30rem ≤ 50vw−38.5rem
+   for every vw ≥ 1360px, i.e. everywhere the words are shown.
    js/bento-flank.js lags them behind the scroll at ~0.14x with
    heavy damping — the mosaic streams past while the words barely
    travel ("stagnant parallax"). Purely decorative: aria-hidden,
@@ -815,7 +822,8 @@ html.motion-ready .bento-grid--shift .bento-card[data-reveal] {
     font-family: var(--font-display);
     font-style: italic;
     font-weight: 400;
-    font-size: clamp(3.2rem, 4vw, 6rem);
+    /* Gutter-scaled (see block comment): 96px @1440 → 288px @1920, cap 320px. */
+    font-size: clamp(3.75rem, 40vw - 30rem, 20rem);
     line-height: 1;
     letter-spacing: var(--track-wordmark);
     color: color-mix(in srgb, var(--clay) 55%, var(--white));

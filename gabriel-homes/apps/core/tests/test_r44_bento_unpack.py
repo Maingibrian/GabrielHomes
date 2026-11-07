@@ -229,6 +229,12 @@ def test_brand_wordmarks_flank_the_bento():
     assert "pointer-events: none" in flank_block
     # token-only colour (the hex ratchet holds in this block too)
     assert "#" not in flank_block
+    # r45: the words are scaled to the GUTTER (owner: "much bigger") —
+    # 40vw − 30rem tracks the wrapper-edge-to-viewport budget
+    # (50vw − 38.5rem) so the type fills ~80% of the gutter at every
+    # width it is shown at (96px @1440 → 288px @1920, capped at 20rem)
+    # and can never run off the viewport edge.
+    assert "font-size: clamp(3.75rem, 40vw - 30rem, 20rem)" in flank_block
 
 
 def test_flank_parallax_script_fails_closed():
