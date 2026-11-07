@@ -545,6 +545,43 @@
     });
   }
 
+  // ---------- r48: alternating listing-row slide-in (data-slide-row) ----------
+  // Search-page rows glide into place from alternating sides — odd rows
+  // (media left) enter from the LEFT, reverse rows (media right) from
+  // the RIGHT (search.css owns the direction via --slide-dist). Same
+  // hysteresis as the r47 bubble titles: slide at >=20% visible, re-arm
+  // only once FULLY out (ratio 0), so the glide replays scrolling down
+  // and back up. D-MOTION-SAFE: fxNone / no-JS / no-IO -> rows never
+  // arm and stay visible; the .row-armed class (the ONLY thing that
+  // hides a row) is added per element AFTER io.observe succeeds.
+  // HTMX pagination/filter/sort swaps replace the grid wholesale, so
+  // htmx:afterSwap re-arms whatever rows the swap brought in (rows the
+  // swap removed simply never fire again).
+  function setupRowSlides() {
+    var rows = document.querySelectorAll("[data-slide-row]");
+    if (!rows.length) return;
+    if (fxNone || !("IntersectionObserver" in window)) return;
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (entry.intersectionRatio >= 0.2) {
+          entry.target.classList.add("is-slid");
+        } else if (entry.intersectionRatio === 0) {
+          // fully out of view: re-arm so the next entry glides again
+          entry.target.classList.remove("is-slid");
+        }
+      });
+    }, { threshold: [0, 0.2] });
+    function arm(scope) {
+      scope.querySelectorAll("[data-slide-row]:not(.row-armed)").forEach(
+        function (el) {
+          io.observe(el);
+          el.classList.add("row-armed");   // after observe: crash = visible
+        });
+    }
+    arm(document);
+    document.addEventListener("htmx:afterSwap", function () { arm(document); });
+  }
+
   function init() {
     setupCounters();
     setupQuoteReveal();
@@ -553,6 +590,7 @@
     setupPointerPolish();
     setupReveal();
     setupBubbleTitles();
+    setupRowSlides();
     setupHeaderScroll();
     if (!fxNone) setupNavAutoHide();  // G1: hide/return is lite/rich only
     setupMobileMenu();

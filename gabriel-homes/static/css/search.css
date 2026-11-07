@@ -517,3 +517,51 @@
   .listing-row.is-flashed { animation: none; }
 }
 html[data-fx="none"] .listing-row.is-flashed { animation: none; }
+
+/* r48 — alternating row slide-in (owner request) -----------------------
+   On scroll, listing rows glide in from alternating sides: odd rows
+   (media left) enter from the LEFT, reverse rows (media right) from
+   the RIGHT. motion.js setupRowSlides arms each row (data-slide-row)
+   and flips .is-slid at >=20% visibility; fully leaving the viewport
+   re-arms it, so the glide replays in both scroll directions.
+
+   SAFETY (same doctrine as [data-reveal] / r47 bt-armed):
+   * the hidden from-state requires BOTH html.motion-ready (motion.js
+     sets it as its first statement) AND .row-armed (added per row only
+     AFTER io.observe succeeds) — with JS stale, blocked or crashed the
+     rows simply render. CSS alone never hides a row.
+   * body overflow-x guard: armed rows rest translated ±--slide-dist
+     while off-screen; without the guard they would open a horizontal
+     scrollbar. search.css loads only on this page, so the guard is
+     scoped here (hidden fallback for browsers without overflow:clip).
+   * fx=none / missing gate / OS reduced motion kill the effect.
+   ------------------------------------------------------------------- */
+body { overflow-x: hidden; overflow-x: clip; }
+.results-grid { --slide-dist: clamp(80px, 24vw, 300px); }
+html.motion-ready .listing-row.row-armed {
+  opacity: 0;
+  transform: translateX(calc(var(--slide-dist) * -1));
+  transition: transform .8s var(--ease-out), opacity .5s var(--ease-out);
+}
+html.motion-ready .listing-row--reverse.row-armed {
+  transform: translateX(var(--slide-dist));
+}
+html.motion-ready .listing-row.is-slid {
+  opacity: 1;
+  transform: translateX(0);
+}
+@media (prefers-reduced-motion: reduce) {
+  html.motion-ready .listing-row.row-armed,
+  html.motion-ready .listing-row.is-slid {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+}
+html[data-fx="none"] .listing-row.row-armed,
+html:not([data-fx]) .listing-row.row-armed {
+  opacity: 1 !important;
+  transform: none !important;
+  transition: none !important;
+}
+

@@ -8,7 +8,7 @@
   {% if page_obj.object_list %}
     <div class="results-grid">
       {% for property in page_obj %}
-        <article class="listing-row listing-card-row{% if forloop.counter|divisibleby:2 %} listing-row--reverse{% endif %}" id="listing-row-{{ property.pk }}" data-listing-pk="{{ property.pk }}" data-cursor-view>
+        <article class="listing-row listing-card-row{% if forloop.counter|divisibleby:2 %} listing-row--reverse{% endif %}" id="listing-row-{{ property.pk }}" data-listing-pk="{{ property.pk }}" data-cursor-view data-slide-row>
           <a class="listing-row__media" href="{{ property.get_absolute_url }}">
             {% if property.images.all.0.image %}<img src="{{ property.images.all.0.image.url }}" alt="{{ property.title }}" loading="lazy" width="760" height="520" style="view-transition-name: prop-{{ property.pk }};">{% endif %}
             <span class="listing-row__index">[ {{ forloop.counter|stringformat:"03d" }} ]</span>
