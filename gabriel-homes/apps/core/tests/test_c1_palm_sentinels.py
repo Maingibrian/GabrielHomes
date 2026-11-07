@@ -162,6 +162,40 @@ def test_sentinels_keep_clear_of_the_content_column():
         assert "calc(50% + (var(--container-max) / 2) + 18px)" in rule, side
 
 
+def test_sentinels_suspend_mid_page():
+    """r61 (owner: "too small... suspended in the middle of the page"):
+    the sticker is HEIGHT-driven — min(64vh, 660px), no width cap —
+    and the sticky top centres exactly that box on the viewport
+    midline: 50vh - min(32vh, 330px), where 32vh == 64vh/2 and
+    330px == 660px/2 (both arms stay in step, so the palm hangs
+    mid-screen at every viewport height). The svg fills the box
+    height, keeps its viewBox aspect (width: auto) and is capped to
+    the gutter column (max-width: 100%)."""
+    stick = re.search(r"\.palm-sentinel__stick\s*\{[^}]*\}", SEARCH_CSS)
+    assert stick, "stick rule missing"
+    body = stick.group(0)
+    assert "position: sticky" in body
+    assert "top: calc(50vh - min(32vh, 330px))" in body
+    assert "height: min(64vh, 660px)" in body
+    # half-of-height arithmetic must stay in step with the height rule
+    # (32vh == 64vh/2, 330px == 660px/2) — pins both numbers as a pair
+    assert "justify-content: center" in body
+    assert "margin-left" not in body and "margin-right" not in body
+    assert "width" not in body          # no width cap on the sticker
+    tree = re.search(r"\.palm-tree\s*\{[^}]*\}", SEARCH_CSS).group(0)
+    assert "height: 100%" in tree
+    assert "width: auto" in tree
+    assert "max-width: 100%" in tree
+
+
+def test_suspension_shadow_is_token_only():
+    """The floating drop-shadow (what sells "suspended") must come from
+    the token palette, keeping search.css at zero hex."""
+    tree = re.search(r"\.palm-tree\s*\{[^}]*\}", SEARCH_CSS).group(0)
+    assert "drop-shadow" in tree
+    assert "var(--taupe-35)" in tree
+
+
 # --------------------------------------------------------------- tokens
 def test_every_palm_class_is_styled_from_tokens():
     """Every .palm-* hook in the markup resolves to a rule in
