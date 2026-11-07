@@ -112,10 +112,13 @@
   <div class="bento-flank bento-flank--gabriel" aria-hidden="true"><span class="bento-flank__word">gabriel</span></div>
   <span class="visually-hidden">{% if showcase_listings %}HOMES · Published homes, each one checked before it went live.{% else %}HOW WE CHECK · Five checks before anything goes live. We check who has the right to let or sell.{% endif %}</span>
   <div class="container">
-    <div class="featured__header" data-reveal>
+    <div class="featured__header">
       <div>
         <p class="section-tag">[ {% if showcase_listings %}HOMES{% else %}HOW WE CHECK{% endif %} ]</p>
-        <h2 class="featured__title">
+        {# r47: bubbly title reveal — replays whenever the title re-enters #}
+        {# view (scroll down or back up). Container reveals removed so #}
+        {# the letter pop is never masked by a parent fade. #}
+        <h2 class="featured__title" data-bubble-title>
           {% if showcase_listings %}Featured homes, ready to view.{% else %}Five checks before anything goes live.{% endif %}
         </h2>
       </div>
@@ -242,7 +245,7 @@
     <div class="home-market__head">
       <div class="home-market__head-main">
         <p class="section-tag section-tag--rule" data-reveal>[ RECOMMENDED IN MOMBASA ]</p>
-        <h2 class="home-market__title" data-reveal>Homes for the way you want to move.</h2>
+        <h2 class="home-market__title" data-bubble-title>Homes for the way you want to move.</h2>
       </div>
       <div class="home-market__aside" data-reveal>
         <p>A small, hand-picked set of homes for sale, long-term rent and short stays across Mombasa. Every one is visited and checked by the Gabriel Homes team before it appears here.</p>
@@ -252,8 +255,8 @@
 
     {% if sale_listings %}
     <div class="home-market__group home-market__group--sale">
-      <div class="home-market__heading" data-reveal>
-        <div><span>01</span><h3>Homes for sale</h3></div>
+      <div class="home-market__heading">
+        <div><span>01</span><h3 data-bubble-title>Homes for sale</h3></div>
         <a class="home-market__more" href="/properties/?market=sale">See all for sale →</a>
       </div>
       {% comment %} r18: feature card left, the compact cards + closing tile in a real rail wrapper right — before this the cards auto-placed into a 2x2 grid and left the right column mostly empty. {% endcomment %}
@@ -277,8 +280,8 @@
 
     {% if rent_listings %}
     <div class="home-market__group home-market__group--rent">
-      <div class="home-market__heading" data-reveal>
-        <div><span>02</span><h3>Long-term rentals</h3></div>
+      <div class="home-market__heading">
+        <div><span>02</span><h3 data-bubble-title>Long-term rentals</h3></div>
         <a class="home-market__more" href="/properties/?market=rent">See all rentals →</a>
       </div>
       <div class="market-rent">
@@ -289,8 +292,8 @@
 
     {% if short_stay_listings %}
     <div class="home-market__group home-market__group--stay">
-      <div class="home-market__heading" data-reveal>
-        <div><span>03</span><h3>Short stays &amp; BnB</h3></div>
+      <div class="home-market__heading">
+        <div><span>03</span><h3 data-bubble-title>Short stays &amp; BnB</h3></div>
         <a class="home-market__more" href="/properties/?market=bnb">See all short stays →</a>
       </div>
       <div class="market-stagger">
@@ -307,9 +310,9 @@
     {% endif %}
 
     {% if brand.whatsapp or brand.phone or brand.email %}
-    <div class="home-market__talk" data-reveal>
+    <div class="home-market__talk">
       <p class="section-tag section-tag--rule">[ TALK TO US ]</p>
-      <h2 class="home-social__title">One message, three ways to send it.</h2>
+      <h2 class="home-social__title" data-bubble-title>One message, three ways to send it.</h2>
       <p class="home-social__sub">Ask about any home above — a person replies, whatever the channel.</p>
       <div class="home-social__links">
         {% if brand.whatsapp %}
@@ -339,8 +342,8 @@
 {% if amenity_listings %}
 <section class="section home-nearby" id="nearby" data-archetype="type-led">
   <div class="container">
-    <div class="home-market__heading" data-reveal>
-      <div><span>04</span><h2>Homes close to what matters.</h2><p>Malls, beaches, schools, parks and daily connections around Mombasa.</p></div>
+    <div class="home-market__heading">
+      <div><span>04</span><h2 data-bubble-title>Homes close to what matters.</h2><p>Malls, beaches, schools, parks and daily connections around Mombasa.</p></div>
       <a href="/properties/">Explore the map →</a>
     </div>
     <div class="home-nearby__grid">

@@ -474,6 +474,77 @@
       });
   }
 
+  // ---------- r47: bubbly section-title reveal (data-bubble-title) ----------
+  // Every topic title pops in letter-by-letter (the bt-pop bubble in
+  // home.css: rise -> overshoot -> wobble -> settle) and REPLAYS when
+  // it re-enters view, scrolling down or back up (owner request).
+  // Hysteresis: pop at >=30% visible, re-arm only once the title has
+  // FULLY left (ratio 0) — a title drifting past the edge never
+  // flickers. Words wrap as units (.bt-w), letters animate (.bt-l);
+  // per-letter delay = word stagger (capped) + letter stagger, both
+  // set as CSS vars by the split.
+  // D-MOTION-SAFE: fxNone / no-JS / no-IO -> the title never splits
+  // and stays plain text. The .bt-armed class (the ONLY thing that
+  // hides letters) is added per element AFTER io.observe succeeds —
+  // a crash anywhere earlier leaves fully visible text behind.
+  // Split is DOM-APIs-only (S11): template text is never re-parsed.
+  function setupBubbleTitles() {
+    var els = document.querySelectorAll("[data-bubble-title]");
+    if (!els.length) return;
+    if (fxNone || !("IntersectionObserver" in window)) return;
+
+    function splitTitle(el) {
+      var wordIndex = 0;
+      Array.prototype.slice.call(el.childNodes).forEach(function (n) {
+        if (n.nodeType !== 3 || !n.textContent.trim()) return;
+        var raw = n.textContent;
+        var frag = document.createDocumentFragment();
+        var re = /\S+/g, m, last = 0;
+        while ((m = re.exec(raw))) {
+          if (m.index > last) {
+            frag.appendChild(document.createTextNode(raw.slice(last, m.index)));
+          }
+          var word = document.createElement("span");
+          word.className = "bt-w";
+          // cap the word stagger so long titles still pop as one gesture
+          var wd = Math.min(wordIndex * 70, 420);
+          for (var li = 0; li < m[0].length; li++) {
+            var letter = document.createElement("span");
+            letter.className = "bt-l";
+            letter.style.setProperty("--wd", wd + "ms");
+            letter.style.setProperty("--ld", (li * 26) + "ms");
+            letter.textContent = m[0].charAt(li);
+            word.appendChild(letter);
+          }
+          frag.appendChild(word);
+          last = m.index + m[0].length;
+          wordIndex++;
+        }
+        if (last < raw.length) {
+          frag.appendChild(document.createTextNode(raw.slice(last)));
+        }
+        el.replaceChild(frag, n);
+      });
+    }
+
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (entry.intersectionRatio >= 0.3) {
+          entry.target.classList.add("is-bubbled");
+        } else if (entry.intersectionRatio === 0) {
+          // fully out of view: re-arm so the next entry pops again
+          entry.target.classList.remove("is-bubbled");
+        }
+      });
+    }, { threshold: [0, 0.3] });
+
+    els.forEach(function (el) {
+      splitTitle(el);
+      io.observe(el);
+      el.classList.add("bt-armed");   // after observe: hide letters
+    });
+  }
+
   function init() {
     setupCounters();
     setupQuoteReveal();
@@ -481,6 +552,7 @@
     setupHeroVideo();
     setupPointerPolish();
     setupReveal();
+    setupBubbleTitles();
     setupHeaderScroll();
     if (!fxNone) setupNavAutoHide();  // G1: hide/return is lite/rich only
     setupMobileMenu();

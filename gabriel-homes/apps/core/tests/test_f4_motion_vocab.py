@@ -35,6 +35,7 @@ SHIPPED_TOKENS = [
     "manage-card-in",      # portal /manage/ entrance (declared out-of-scope)
     "data-cursor-view",    # G4 cursor "View" bubble (M5 confirm, r34)
     "data-magnetic",       # G4 magnetic primary CTAs (M6 invite, r34)
+    "data-bubble-title",   # r47 bubbly topic-title reveal (M1 rise variant)
 ]
 
 

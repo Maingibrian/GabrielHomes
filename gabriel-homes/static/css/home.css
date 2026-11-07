@@ -1056,7 +1056,11 @@ html.motion-ready .bento-grid--shift .bento-card[data-reveal] {
 .home-property__media { display: block; position: relative; aspect-ratio: 16/10; overflow: hidden; }
 .home-property__media img { width: 100%; height: 100%; object-fit: cover; transition: transform .65s cubic-bezier(.2,.7,.2,1); }
 .home-property:hover .home-property__media img { transform: scale(1.045); }
-.demo-chip { position: absolute; top: 16px; left: 16px; padding: 7px 10px; background: #fff6; color: #fff; border: 1px solid #fff9; border-radius: 999px; backdrop-filter: blur(12px); font: 700 10px var(--font-mono,monospace); letter-spacing: .08em; text-transform: uppercase; }
+/* r47: the on-media bubble now indicates the listing's LOCATION (pin
+   glyph + area name); demo rows keep their disclosure as the chip's
+   demo flag. Same glass pill grammar as before, now flex so the pin,
+   the name and the flag sit on one line. */
+.loc-chip { position: absolute; top: 16px; left: 16px; display: inline-flex; align-items: center; gap: 6px; padding: 7px 10px; background: #fff6; color: #fff; border: 1px solid #fff9; border-radius: 999px; backdrop-filter: blur(12px); font: 700 10px var(--font-mono,monospace); letter-spacing: .08em; text-transform: uppercase; }
 .home-property__body { padding: 25px; }
 .home-property__eyebrow {margin: 0 0 8px; color: var(--burnt,#a0522d); font: 600  11px var(--font-mono,monospace); text-transform: uppercase; letter-spacing: .08em;}
 .home-property h3 { margin: 0; font: 500 clamp(1.35rem,2vw,2rem)/1.1 var(--font-display,Georgia,serif); }
@@ -1181,7 +1185,7 @@ html.motion-ready .bento-grid--shift .bento-card[data-reveal] {
 @media (max-width: 760px) { .home-social__links { grid-template-columns: 1fr; } }
 
 /* Demo chip over bright photography: darker glass than the default. */
-.demo-chip--on-media { background: rgba(28, 21, 17, .58); border-color: rgba(250, 248, 244, .32); }
+.loc-chip--on-media { background: rgba(28, 21, 17, .58); border-color: rgba(250, 248, 244, .32); }
 
 /* Market groups: one accent family, a shade per market so the 01/02/03
    indexes are told apart at a glance. */
@@ -1254,7 +1258,7 @@ html.motion-ready .bento-grid--shift .bento-card[data-reveal] {
   color: #faf8f4;
   font: 600 10px var(--font-mono, monospace); text-transform: uppercase; letter-spacing: .1em;
 }
-.market-stay__chip--demo { right: auto; left: 16px; background: rgba(250, 248, 244, .85); color: var(--brown, #5a4032); border-color: rgba(90, 64, 50, .25); }
+.market-stay__chip--loc { right: auto; left: 16px; background: rgba(250, 248, 244, .85); color: var(--brown, #5a4032); border-color: rgba(90, 64, 50, .25); }
 .market-stay__body { padding: 22px 24px 26px; gap: 9px; }
 .market-stay__body h3 { font-size: 1.32rem; }
 .market-stay__link { display: inline-flex; align-items: center; gap: 8px; margin-top: 2px; }
@@ -1285,8 +1289,8 @@ html.motion-ready .bento-grid--shift .bento-card[data-reveal] {
 .market-stay--more:hover .market-stay__more-link span { transform: translateX(4px); }
 .market-stay__more-link span { transition: transform .25s; }
 
-/* --- Subtler demo chips across the section (less placeholder noise) */
-.home-market .demo-chip--on-media, .demo-chip--on-media {
+/* --- Subtler location chips across the section (less placeholder noise) */
+.home-market .loc-chip--on-media, .loc-chip--on-media {
   padding: .5em .8em;
   background: rgba(28, 21, 17, .48);
   border: 1px solid rgba(250, 248, 244, .24);
@@ -1385,9 +1389,10 @@ html.motion-ready .bento-grid--shift .bento-card[data-reveal] {
 .home-market__heading > a:hover, .home-market__more:hover { text-decoration: underline; }
 
 /* --- One chip grammar: dark glass pills, 12px inset, mono caps */
-.home-market .demo-chip, .home-market .demo-chip--on-media,
-.market-stay__chip, .market-stay__chip--demo, .market-stay__chip--furnished {
+.home-market .loc-chip, .home-market .loc-chip--on-media,
+.market-stay__chip, .market-stay__chip--loc, .market-stay__chip--furnished {
   position: absolute; top: 12px; z-index: 2;
+  display: inline-flex; align-items: center; gap: 6px;
   padding: .52em .95em;
   background: rgba(28, 21, 17, .58);
   -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
@@ -1398,8 +1403,8 @@ html.motion-ready .bento-grid--shift .bento-card[data-reveal] {
   border-radius: 999px;
   opacity: 1;
 }
-.home-market .demo-chip { left: 12px; }
-.market-stay__chip--demo { left: 12px; right: auto; }
+.home-market .loc-chip { left: 12px; }
+.market-stay__chip--loc { left: 12px; right: auto; }
 .market-stay__chip--furnished {
   right: 12px; left: auto;
   background: rgba(150, 86, 52, .78);
@@ -1547,10 +1552,10 @@ html.motion-ready .bento-grid--shift .bento-card[data-reveal] {
    bottom-locked banner footers, optically aligned "see all" links.
    ================================================================== */
 
-/* Demo chips carry their own background, so they read on any photo
+/* Location chips carry their own background, so they read on any photo
    (bright day shots and dark night shots alike). */
-.home-market .demo-chip, .home-market .demo-chip--on-media,
-.market-stay__chip--demo {
+.home-market .loc-chip, .home-market .loc-chip--on-media,
+.market-stay__chip--loc {
   background: rgba(250, 248, 244, .92);
   -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
   border: 1px solid rgba(90, 64, 50, .34);
@@ -1646,3 +1651,56 @@ html.motion-ready .hero__w-in {
 }
 .hero__bg.is-video .hero__video { opacity: 1; }
 .hero__bg.is-video .hero__slide { animation: none; opacity: 0; }
+
+/* ============================================================
+   r47 — the location chip's pin glyph + demo flag, and the
+   bubbly title reveal (data-bubble-title).
+
+   THE BUBBLE (owner request): the on-media pill that used to say
+   "Demo listing" now indicates the listing's LOCATION — pin glyph +
+   area name, on every card. Demo rows keep their disclosure as a
+   quieter "demo" flag behind a hairline (the bento index, search
+   rows and the detail page still spell it out in full).
+
+   THE BUBBLY TITLES (owner request): every section topic title pops
+   in letter-by-letter — a bubble rising to the surface, overshooting,
+   wobbling, settling. Reversible: the IntersectionObserver in
+   motion.js (setupBubbleTitles) re-arms a title once it has FULLY
+   left the viewport (ratio 0) and pops it again when ≥30% of it is
+   back — scrolling down or back up, exactly as asked. Hysteresis
+   between 0 and 30% keeps a title at the viewport edge from
+   flickering.
+
+   Safety (D-MOTION-SAFE): letters are only hidden under
+   .bt-armed, a class JS adds per element ONLY after the observer is
+   attached — no JS, no fx gate (data-fx=none), or a crash before
+   arming leaves the title as plain, fully-visible text. The split
+   itself (motion.js) is DOM-APIs-only and never runs under fx=none,
+   so reduced-motion users get plain titles; the reduce block below
+   is the belt-and-braces pin.
+   ============================================================ */
+.loc-chip__pin { display: block; flex: none; }
+.loc-chip__flag {
+  font-style: normal;
+  opacity: .82;
+  padding-left: 7px;
+  border-left: 1px solid rgba(90, 64, 50, .3);
+}
+
+/* --- the bubbly title ----------------------------------------- */
+.bt-w { display: inline-block; white-space: nowrap; }   /* words wrap as units */
+.bt-l { display: inline-block; }                        /* letters transform  */
+.bt-armed .bt-l { opacity: 0; }                         /* hidden until pop  */
+.bt-armed.is-bubbled .bt-l {
+  animation: bt-pop .58s cubic-bezier(.25, 1.25, .4, 1) both;
+  animation-delay: calc(var(--wd, 0ms) + var(--ld, 0ms));
+}
+@keyframes bt-pop {
+  0%   { opacity: 0; transform: translateY(.5em) scale(.3); }   /* deep    */
+  55%  { opacity: 1; transform: translateY(-.09em) scale(1.16); } /* overshoot */
+  78%  { transform: translateY(.025em) scale(.965); }           /* wobble  */
+  100% { opacity: 1; transform: none; }                          /* settle  */
+}
+@media (prefers-reduced-motion: reduce) {
+  .bt-armed .bt-l { opacity: 1; transform: none; animation: none !important; }
+}

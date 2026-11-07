@@ -5,7 +5,7 @@
     {% if property.images.all.0.image %}
       <img src="{{ property.images.all.0.image.url }}" alt="{{ property.title }}" loading="lazy" width="1000" height="750" style="view-transition-name: prop-{{ property.pk }};">
     {% endif %}
-    {% if property.is_demo %}<span class="demo-chip demo-chip--on-media">Demo listing</span>{% endif %}
+    <span class="loc-chip loc-chip--on-media"><svg class="loc-chip__pin" viewBox="0 0 10 12" width="9" height="11" aria-hidden="true" focusable="false"><path d="M5 11C5 11 9 7.2 9 4.4A4 4 0 0 0 1 4.4C1 7.2 5 11 5 11Z" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/><circle cx="5" cy="4.4" r="1.4" fill="currentColor"/></svg>{{ property.location.name }}{% if property.is_demo %}<span class="loc-chip__flag">demo</span>{% endif %}</span>
   </a>
   <div class="market-banner__body">
     <p class="market-banner__eyebrow">{{ property.get_listing_type_display }} · {{ property.location.full_path }}</p>

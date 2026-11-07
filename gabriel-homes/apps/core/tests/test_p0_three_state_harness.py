@@ -102,7 +102,10 @@ class TestDemoVisible:
         html = r.content
         _assert_designed(html, what="home/demo-visible")
         assert b"[ HOMES ]" in html
-        assert b"Demo listing" in html          # presentation rows are labelled
+        # r47: presentation rows are labelled — the on-media bubble now
+        # leads with the location and carries the demo flag with it
+        assert b"loc-chip" in html
+        assert b'loc-chip__flag">demo' in html
         assert b"RECOMMENDED IN MOMBASA" in html
         assert b"Five checks before anything goes live." not in html
 

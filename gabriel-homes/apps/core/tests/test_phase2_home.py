@@ -82,9 +82,12 @@ def test_home_page_renders_real_showcase_listings():
     assert real.title in body                               # real inventory wins the bento
     for title in demo_titles:
         assert title not in body                            # this demo row is outside Mombasa
-    # r12: the Mombasa presentation rows demonstrate the recommended
-    # groups while real inventory is thin — always with the Demo chip.
-    assert "Demo listing" in body
+    # r12→r47: the Mombasa presentation rows demonstrate the recommended
+    # groups while real inventory is thin — always disclosed. The on-media
+    # bubble now leads with the listing's LOCATION (owner request); the
+    # demo disclosure rides along as the chip's flag.
+    assert "loc-chip" in body
+    assert 'loc-chip__flag">demo' in body
 
 
 def test_home_bento_falls_back_to_labelled_demo_homes():
