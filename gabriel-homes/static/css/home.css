@@ -1180,19 +1180,12 @@ html.motion-ready .bento-grid--shift .bento-card[data-reveal] {
 .hv2-sub { color: var(--taupe, #6b5e53); max-width: 58ch; margin: 0; }
 .hv2-head { margin-bottom: 52px; }
 
-/* ---- founder card ---------------------------------------------- */
-.hv2-split { display: grid; grid-template-columns: 1.05fr .95fr; gap: 72px; align-items: center; }
-.hv2-founder {
-  display: flex; align-items: center; gap: 18px; margin-top: 30px; padding: 22px;
-  background: var(--white, #fff); border: 1px solid var(--sand, #d8c9b8); border-radius: var(--radius-card, 18px);
-}
-.hv2-founder__photo {
-  width: 60px; height: 60px; border-radius: 50%; flex: none;
-  object-fit: cover; display: block;
-}
+/* ---- founder signature (r52: the r24 chip + hv2-split wrapper left
+   with the about redesign — the portrait is owned by pages.css
+   .about-founder__portrait now; only the role/name type pair,
+   which the about signature block still renders, lives here) ------ */
 .hv2-founder__role {font-family: var(--font-mono, monospace); font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: .08em; color: var(--clay, #b06a3b); margin: 0 0 2px !important;}
 .hv2-founder__name { font-family: var(--font-display, Georgia, serif); font-size: 1.25rem; color: var(--ink, #1c1511) !important; margin: 0 0 2px !important; }
-.hv2-founder__note { font-size: 15px; color: var(--taupe, #6b5e53) !important; margin: 0 !important; }
 
 /* ---- process timeline ------------------------------------------ */
 .hv2-steps {
@@ -1226,7 +1219,6 @@ html.motion-ready .bento-grid--shift .bento-card[data-reveal] {
 
 /* ---- responsive -------------------------------------------------- */
 @media (max-width: 960px) {
-  .hv2-split { grid-template-columns: 1fr; gap: 48px; }
   .hv2-steps { grid-template-columns: repeat(2, 1fr); row-gap: 40px; }
 }
 @media (max-width: 640px) {

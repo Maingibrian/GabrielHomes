@@ -27,8 +27,11 @@
   content: "";
   position: absolute;
   inset: 0;
+  /* r52: left band deepened (0.85/0.62 -> 0.92/0.72, held to 46%) so the
+     headline + subtitle always sit on a near-dark column — the vision
+     pass flagged the old scrim as the page's weakest contrast. */
   background:
-    linear-gradient(90deg, rgba(28,21,17,0.85) 0%, rgba(28,21,17,0.62) 42%, rgba(28,21,17,0.15) 100%),
+    linear-gradient(90deg, rgba(28,21,17,0.92) 0%, rgba(28,21,17,0.72) 46%, rgba(28,21,17,0.18) 100%),
     url("../img/real/page-hero.jpg") 72% 50% / cover no-repeat,
     var(--espresso);
   z-index: 0;
@@ -75,6 +78,17 @@
   margin-top: 1rem;
   letter-spacing: var(--track-tight);
   text-shadow: 0 1px 16px rgba(28,21,17,0.4);
+}
+/* r52: mono place-and-year line — replaces the retired "Our story"
+   eyebrow (two labels said the same thing). Same facts as the copy. */
+.page-hero__meta {
+  margin: 1.7rem 0 0;
+  font-family: var(--font-mono);
+  font-weight: 600;
+  font-size: var(--text-xs);
+  letter-spacing: var(--track-mono);
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--cream) 68%, var(--sand));
 }
 /* Search pill living INSIDE the page hero (agent directory). Mirrors the
    home search-bar language: white pill, icon slot, dark submit. */
@@ -504,10 +518,16 @@
 .about-story__figure img {
   display: block;
   width: 100%;
-  aspect-ratio: 4 / 4.4;
+  /* r52: 4/5 portrait with a hard height cap — the old 4/4.4 column
+     could run away into wallpaper next to short copy. The quiet warm
+     grade (saturate .92 / sepia .08) pulls the sea-blue bedding toward
+     the sand palette without touching the honest subject. */
+  aspect-ratio: 4 / 5;
+  max-height: clamp(420px, 62vh, 640px);
   object-fit: cover;
   border-radius: var(--radius-card, 18px);
   box-shadow: 0 20px 55px rgba(45, 31, 23, 0.16);
+  filter: saturate(0.92) sepia(0.08);
 }
 .about-story__figure figcaption {
   display: flex;
@@ -563,3 +583,136 @@
   line-height: 1.55;
 }
 .commit-list strong { display: block; color: var(--ink); margin-bottom: 0.3rem; }
+
+/* ============================================================
+   r52 — About page polish (vision-critique pass). Tokens only,
+   motion gated per the M-doctrine: hidden/animated states live
+   under html.motion-ready, fx=none and prefers-reduced-motion
+   both kill the stagger (the longhand transition-delay needs its
+   own explicit kill — the reduced-motion `transition: none`
+   shorthand loses the cascade to a more specific selector).
+   ============================================================ */
+
+/* Story pull-quote — the philosophy line pulled out of the body so the
+   copy column carries weight beside the photo (the old band left a dead
+   zone under three short paragraphs). */
+.about-story__copy .section-tag { margin-bottom: 1.4rem; }
+.about-story__pull {
+  margin: 2.4rem 0 2rem;
+  padding-left: 1.5rem;
+  border-left: 3px solid var(--burnt);
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 400;
+  font-variation-settings: "opsz" 40;
+  font-size: clamp(1.5rem, 1.25rem + 1vw, 2rem);
+  line-height: 1.32;
+  letter-spacing: var(--track-tighter);
+  color: var(--ink);
+  max-width: 26ch;
+}
+
+/* Values band header — "What we stand for" no longer dangles at the
+   bottom of the story copy; the grid follows the head, not 3rem below. */
+.values-head { max-width: 64ch; }
+.values-head__title {
+  font-size: var(--text-2xl);
+  font-weight: 500;
+  letter-spacing: var(--track-tighter);
+  margin: 0.9rem 0 0.7rem;
+}
+.values-head__intro {
+  color: var(--taupe);
+  font-size: var(--text-md);
+  line-height: var(--leading-body);
+}
+.values-head + .story__values { margin-top: 1.75rem; }
+
+/* Value cards reveal in a short stagger (cards 2 and 3 trail card 1).
+   The base [data-reveal] transition (components.css §12) owns the
+   rise; only the delay is added here. The flex column pins every card
+   to the row height (equal baselines even if a future copy edit makes
+   one body longer) with the body soaking the spare space. */
+html.motion-ready:not([data-fx="none"]) .story__values .value-card:nth-child(2) { transition-delay: 110ms; }
+html.motion-ready:not([data-fx="none"]) .story__values .value-card:nth-child(3) { transition-delay: 220ms; }
+@media (prefers-reduced-motion: reduce) {
+  html.motion-ready .story__values .value-card { transition-delay: 0s; }
+}
+.story__values .value-card { display: flex; flex-direction: column; }
+.story__values .value-card .value-card__body { flex: 1; }
+
+/* Founder band — the human moment. Editorial portrait at 160px inside
+   an offset sand frame (the 240px WebP source carries it), first-person
+   quote in the house pull style, signature block on a hairline rule.
+   The old 120px floating chip (.hv2-founder) is retired from this page;
+   the photo keeps its class + F3 attrs (test_founder_portrait). */
+.about-founder {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: clamp(2.5rem, 5vw, 4.5rem);
+  align-items: center;
+}
+.about-founder__portrait {
+  position: relative;
+  margin: 0 16px 16px 0;
+}
+.about-founder__portrait::before {
+  content: "";
+  position: absolute;
+  inset: 16px -16px -16px 16px;
+  border: 1.5px solid var(--sand-60);
+  border-radius: var(--radius-card, 18px);
+}
+.about-founder__portrait .hv2-founder__photo {
+  position: relative;
+  width: 160px;
+  height: 160px;
+  border-radius: var(--radius-card, 18px);
+  object-fit: cover;
+  display: block;
+  box-shadow: 0 18px 45px rgba(45, 31, 23, 0.18);
+}
+.about-founder__quote {
+  margin: 1.5rem 0;
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 380;
+  font-variation-settings: "opsz" 40;
+  font-size: clamp(1.4rem, 1.15rem + 1.1vw, 1.9rem);
+  line-height: 1.38;
+  color: var(--burnt);
+  max-width: 32ch;
+}
+.about-founder__lede {
+  color: color-mix(in srgb, var(--ink) 78%, var(--taupe));
+  font-size: var(--text-base);
+  line-height: var(--leading-body);
+  max-width: 56ch;
+}
+.about-founder__sig {
+  display: flex;
+  align-items: baseline;
+  gap: 0.9rem;
+  margin-top: 1.9rem;
+  padding-top: 1.4rem;
+  border-top: 1px solid var(--sand-60);
+}
+@media (max-width: 900px) {
+  .about-founder { grid-template-columns: 1fr; align-items: start; gap: 2.25rem; }
+}
+/* r52 pass-2: at phone widths the stacked portrait orphaned above the
+   copy left a dead band — the founder goes SIDE BY SIDE instead: 96px
+   portrait + quote/signature in the remaining column, frame offset
+   shrunk to 10px to match. The caption under the story photo also
+   drops its flex row (the [ SITE VISIT ] label wrapped alone with a
+   gap) and flows inline. */
+@media (max-width: 560px) {
+  .about-founder { grid-template-columns: auto minmax(0, 1fr); gap: 1.4rem; }
+  .about-founder__portrait { margin: 0 10px 10px 0; }
+  .about-founder__portrait::before { inset: 10px -10px -10px 10px; }
+  .about-founder__portrait .hv2-founder__photo { width: 96px; height: 96px; }
+  .about-founder__quote { font-size: 1.15rem; margin: 1rem 0 0.9rem; }
+  .about-founder__sig { margin-top: 1.2rem; padding-top: 1rem; }
+  .about-story__figure figcaption { display: block; }
+  .about-story__figure figcaption span { display: inline; }
+}

@@ -10,10 +10,10 @@
       <span class="brand-word">Gabriel&nbsp;<span class="brand-accent">Homes</span></span>
     </a>
 
-    {% comment %} Desktop nav (≥1024px) — numbered links per §8.1, centred pill. r13: Listings is the second link (owner request) and "How we check" is a sub-page under Contact, not a top-level item. aria-current highlights the open page inside the pill. {% endcomment %}
+    {% comment %} Desktop nav (≥1024px) — numbered links per §8.1, centred pill. r52: Listings is the FIRST link and About the second (owner request, supersedes r13) — the shop window leads, the story follows. "How we check" stays a sub-page under Contact, not a top-level item. aria-current highlights the open page inside the pill. {% endcomment %}
     <nav class="site-header__nav" aria-label="Primary">
-      <a class="nav-link" href="/about/" {% if request.path == '/about/' %}aria-current="page"{% endif %}><span class="nav-link__index">01</span> About</a>
-      <a class="nav-link" href="/properties/" {% if request.path == '/properties/' %}aria-current="page"{% endif %}><span class="nav-link__index">02</span> Listings</a>
+      <a class="nav-link" href="/properties/" {% if request.path == '/properties/' %}aria-current="page"{% endif %}><span class="nav-link__index">01</span> Listings</a>
+      <a class="nav-link" href="/about/" {% if request.path == '/about/' %}aria-current="page"{% endif %}><span class="nav-link__index">02</span> About</a>
       <a class="nav-link" href="/services/" {% if request.path == '/services/' %}aria-current="page"{% endif %}><span class="nav-link__index">03</span> Services</a>
       <div class="nav-item nav-item--has-sub">
         <a class="nav-link" href="/contact/" {% if request.path == '/contact/' %}aria-current="page"{% endif %}><span class="nav-link__index">04</span> Contact <span class="nav-link__caret" aria-hidden="true">▾</span></a>
@@ -72,8 +72,8 @@
     </button>
   </div>
   <nav class="mobile-menu__nav" aria-label="Mobile primary">
-    <a class="mobile-menu__link" href="/about/"><span class="mobile-menu__index">01</span>About</a>
-    <a class="mobile-menu__link" href="/properties/"><span class="mobile-menu__index">02</span>Listings</a>
+    <a class="mobile-menu__link" href="/properties/"><span class="mobile-menu__index">01</span>Listings</a>
+    <a class="mobile-menu__link" href="/about/"><span class="mobile-menu__index">02</span>About</a>
     <a class="mobile-menu__link" href="/services/"><span class="mobile-menu__index">03</span>Services</a>
     <a class="mobile-menu__link" href="/contact/"><span class="mobile-menu__index">04</span>Contact</a>
     {# r13: "How we check" lives under Contact — indented sub-page link #}

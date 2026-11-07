@@ -159,15 +159,16 @@ def test_home_page_has_three_header_states():
 def test_mobile_menu_has_one_consistently_numbered_link_per_primary_page():
     """Keep the compact navigation in sync with the desktop primary nav.
 
-    r13: Listings is the second link (owner request) and "How we check"
+    r52: Listings is the FIRST link and About the second (owner request,
+    supersedes r13) — same order as the desktop pill. "How we check"
     is a sub-page under Contact — an indented, unnumbered link.
     """
     body = Client().get("/").content.decode()
     mobile_menu = body.split('<nav class="mobile-menu__nav"', 1)[1].split("</nav>", 1)[0]
 
     for number, label, href in [
-        ("01", "About", "/about/"),
-        ("02", "Listings", "/properties/"),
+        ("01", "Listings", "/properties/"),
+        ("02", "About", "/about/"),
         ("03", "Services", "/services/"),
         ("04", "Contact", "/contact/"),
     ]:

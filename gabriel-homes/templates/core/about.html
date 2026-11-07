@@ -12,23 +12,35 @@
 
 {% block content %}
 
+{% comment %} r52: the hero drops the "Our story" eyebrow — it said the same
+thing as the frosted [ ABOUT ] pill above it. A mono place-and-year line
+grounds the band instead (same facts the story copy already states). {% endcomment %}
 <section class="page-hero">
   <div class="container">
     <p class="section-tag" data-reveal>[ ABOUT ]</p>
-    <span class="eyebrow" data-reveal>Our story</span>
     <h1 class="page-hero__title" data-reveal>Real estate with a human point of view.</h1>
     <p class="page-hero__subtitle" data-reveal>
       Gabriel Homes is a Kenyan property agency built on a simple idea: people
       come first, property second. We help you buy, rent, and short-stay across
       the Kenyan coast and beyond.
     </p>
+    <p class="page-hero__meta" data-reveal>Mombasa · Kenya — founded 2026</p>
   </div>
 </section>
 
-{% comment %} r13: story split — the paragraphs sit left and a real house photo fills the column on the right (owner asked for the white space to be used, not left empty). {% endcomment %}
+{% comment %} r52: story remodel. The old band left a dead zone under the
+copy (three short paragraphs next to a very tall sticky photo) and the
+"What we stand for" heading dangled over nothing — the values now live in
+their own headed band below. Here, the philosophy line is pulled out of
+the body as a display pull-quote so the copy column carries real weight,
+and the figure swaps to the one real photo no other page uses
+(real-04-bedroom-sea), cropped 4/5 and height-capped so it can never run
+away into wallpaper. The fee-disclosure paragraph keeps its pinned
+phrases (test_h1_home_order). {% endcomment %}
 <section class="section">
   <div class="container about-story">
     <div class="about-story__copy">
+      <p class="section-tag" data-reveal>[ OUR STORY ]</p>
       <p data-reveal>
         We started Gabriel Homes because property in Kenya too often feels
         transactional — endless listings, vague details, and agents who disappear
@@ -39,34 +51,47 @@
         of how we work.
       </p>
       <p data-reveal>
-        We are a new company, founded in 2026 and centred in Kenya. We are building our listings one checked property at a time. Every listing we publish has been
-        checked by us first, with honest photography. If something is wrong with a
-        property, we tell you before you ask — because our work doesn't end when the
-        keys change hands.
+        We are a new company, founded in 2026 and centred in Kenya. We are
+        building our listings one checked property at a time, with honest
+        photography. If something is wrong with a property, we tell you before
+        you ask.
       </p>
-
-      {# Moved from the home about section (H1 r18) — lives here now. #}
+      <blockquote class="about-story__pull" data-reveal>
+        We would rather publish fewer homes that we have checked than many
+        that we have not.
+      </blockquote>
       <p data-reveal>
-        We would rather publish fewer homes that we have checked than many that
-        we have not. If we could not check something, we tell you. Buyers pay
-        Gabriel Homes a fee, and we tell you the exact amount before you commit
-        to anything.
+        If we could not check something, we tell you. Buyers pay Gabriel Homes
+        a fee, and we tell you the exact amount before you commit to anything.
       </p>
+    </div>
+    <figure class="about-story__figure" data-reveal>
+      <img src="{% staticv 'img/real/real-04-bedroom-sea.jpg' %}" alt="A bedroom in a Mombasa home from our listing checks" loading="lazy" width="1200" height="800">
+      <figcaption><span>[ SITE VISIT ]</span> A Mombasa home from our listing checks.</figcaption>
+    </figure>
+  </div>
+</section>
 
-      <h2 data-reveal>What we stand for</h2>
-      <p data-reveal>
+{% comment %} r52: the values band gets the header it never had. Each card
+gains an icon from the same 1.7-stroke everyday-object family as the home
+hero assurances (person / eye / key — "beyond the keys" made literal), and
+the cards reveal in a short stagger (pages.css, motion-gated with the usual
+kill switches). Body copy is unchanged. {% endcomment %}
+<section class="section">
+  <div class="container">
+    <div class="values-head">
+      <p class="section-tag" data-reveal>[ PRINCIPLES ]</p>
+      <h2 class="values-head__title" data-reveal>What we stand for.</h2>
+      <p class="values-head__intro" data-reveal>
         Three principles run through everything we do, from the first phone call
         to the final handover.
       </p>
     </div>
-    <figure class="about-story__figure" data-reveal>
-      <img src="{% staticv 'img/real/real-08-aerial.jpg' %}" alt="A Mombasa home photographed from above" loading="lazy" width="1200" height="1320">
-      <figcaption><span>[ SITE VISIT ]</span> A Mombasa home from our listing checks.</figcaption>
-    </figure>
-  </div>
-  <div class="container">
     <div class="story__values">
       <article class="value-card" data-reveal>
+        <span class="value-card__icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" focusable="false"><circle cx="12" cy="7.8" r="3.4"/><path d="M5.4 19.8c.8-3.6 3.4-5.4 6.6-5.4s5.8 1.8 6.6 5.4"/></svg>
+        </span>
         <p class="value-card__tag">[ 001 — People ]</p>
         <h3 class="value-card__title">People first, property second.</h3>
         <p class="value-card__body">
@@ -76,6 +101,9 @@
         </p>
       </article>
       <article class="value-card" data-reveal>
+        <span class="value-card__icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" focusable="false"><path d="M2.8 12s3.4-5.9 9.2-5.9 9.2 5.9 9.2 5.9-3.4 5.9-9.2 5.9S2.8 12 2.8 12Z"/><circle cx="12" cy="12" r="2.7"/></svg>
+        </span>
         <p class="value-card__tag">[ 002 — Transparency ]</p>
         <h3 class="value-card__title">Radical transparency.</h3>
         <p class="value-card__body">
@@ -84,6 +112,9 @@
         </p>
       </article>
       <article class="value-card" data-reveal>
+        <span class="value-card__icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" focusable="false"><circle cx="8" cy="12" r="3.4"/><path d="M11.4 12h9.1"/><path d="M16.6 12v3.2"/><path d="M19.6 12v2.2"/></svg>
+        </span>
         <p class="value-card__tag">[ 003 — Support ]</p>
         <h3 class="value-card__title">Support beyond the keys.</h3>
         <p class="value-card__body">
@@ -96,31 +127,48 @@
   </div>
 </section>
 
+{% comment %} r52: the founder band becomes the human moment the page's
+thesis deserves. A proper editorial portrait (the 240px WebP source shown
+at 160px in an offset sand frame) instead of the old floating 120px chip,
+a first-person quote that only restates established copy (every listing
+walked through by us; we tell you what is wrong before you ask), and a
+signature block. The old .hv2-founder chip is retired; the photo keeps
+its class and F3 attrs (test_founder_portrait, updated to 160px). {% endcomment %}
 <section class="section" id="team">
-  <div class="container hv2-split" style="align-items:center">
-    <div data-reveal>
-      <p class="section-tag">[ TEAM ]</p>
-      <h2 class="featured__title">Founded by Gabriel Omulu.</h2>
-      <p class="hv2-lede">Gabriel Homes was founded in 2026. Gabriel leads the listing checks, and the team carries them out with him.</p>
-    </div>
-    <div class="hv2-founder" data-reveal>
-      {# r24: owner-supplied studio portrait (2026-11-05 upload) replaces the "GO" initials mark — 240px source, 120px display, 6.5KB WebP. #}
+  <div class="container about-founder">
+    <figure class="about-founder__portrait" data-reveal>
       <img class="hv2-founder__photo" src="{% staticv 'img/real/founder-portrait.webp' %}"
-           width="120" height="120" loading="lazy"
+           width="160" height="160" loading="lazy"
            alt="Gabriel Omulu, founder of Gabriel Homes">
-      <div>
+    </figure>
+    <div class="about-founder__copy">
+      <p class="section-tag" data-reveal>[ TEAM ]</p>
+      <h2 class="featured__title" data-reveal>Founded by Gabriel Omulu.</h2>
+      <blockquote class="about-founder__quote" data-reveal>
+        &ldquo;Every home we publish, we have walked through ourselves. If
+        something is wrong with it, we tell you before you ask.&rdquo;
+      </blockquote>
+      <p class="about-founder__lede" data-reveal>
+        Gabriel Homes was founded in 2026. Gabriel leads the listing checks,
+        and the team carries them out with him.
+      </p>
+      <div class="about-founder__sig" data-reveal>
         <p class="hv2-founder__role">Founder</p>
         <p class="hv2-founder__name">Gabriel Omulu</p>
-        <p class="hv2-founder__note">Founded Gabriel Homes in 2026.</p>
       </div>
     </div>
   </div>
 </section>
 
+{% comment %} r52: the closing band no longer repeats the footer's "Tell us
+what you are looking for." (the footer CTA says it ~400px later). The About
+page closes on the brand's actual proof — the checked homes — and hands you
+to the listings. {% endcomment %}
 <section class="section cta">
   <div class="container">
+    <p class="section-tag section-tag--light" data-reveal>[ THE PROOF ]</p>
     <h2 class="cta__title" data-reveal>
-      Tell us what you are looking for.
+      See the homes we have checked.
     </h2>
     <a class="btn btn--primary btn--lg" href="/properties/" data-reveal>
       Explore listings <span class="btn__arrow" aria-hidden="true">&rarr;</span>

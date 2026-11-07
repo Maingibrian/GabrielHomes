@@ -29,8 +29,11 @@ def test_about_founder_card_shows_the_portrait():
     assert m, "founder photo img missing on /about/"
     attrs = m.group(1)
     assert "founder-portrait.webp" in attrs
-    assert re.search(r'width="120"', attrs), "width attribute required (F3)"
-    assert re.search(r'height="120"', attrs), "height attribute required (F3)"
+    # r52: the founder band is an editorial portrait now — 160px display
+    # inside the offset frame (was a 120px chip). Source is 240px, so the
+    # 1.5x density still carries it; F3 attrs unchanged.
+    assert re.search(r'width="160"', attrs), "width attribute required (F3)"
+    assert re.search(r'height="160"', attrs), "height attribute required (F3)"
     assert 'alt="Gabriel Omulu, founder of Gabriel Homes"' in attrs
     assert 'loading="lazy"' in attrs
     # the initials mark is gone
