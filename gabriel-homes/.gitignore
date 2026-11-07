@@ -12,7 +12,13 @@ env/
 # Django
 *.sqlite3
 db.sqlite3-journal
-/media/
+# Media is runtime data EXCEPT the demo-photo pools: those are curated
+# assets the seeder reads (VLM-screened stock photos, r57). They used to
+# live only on disk, so every sandbox recycle wiped them and the auto
+# re-seed fell back to Pillow gradient cards — the "cards are back"
+# regression that bit us three times. Bundling them in git ends that.
+/media/*
+!/media/demo-photos/
 /staticfiles/
 /.static/
 
