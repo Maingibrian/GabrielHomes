@@ -147,9 +147,12 @@ def home(request):
     context = {
         "body_class": "page-home",
         "showcase_listings": showcase_listings,
-        # r49: the floating hero card promotes the same featured listing the
-        # bento spotlights (first showcase entry; None hides the card).
-        "hero_card_listing": showcase_listings[0] if showcase_listings else None,
+        # r50: the floating hero card is a carousel — up to five showcase
+        # entries (featured first, then newest; the same cached list the
+        # bento uses, so no extra queries). hero-card.js rotates the panes;
+        # the template renders pane #1 active server-side, so no-JS shows
+        # the first listing and an empty list hides the card.
+        "hero_card_listings": showcase_listings[:5],
         "popular_areas": _hero_popular_areas(list(mombasa_ids)),
         "sale_listings": sale_listings,
         "rent_listings": rent_listings,

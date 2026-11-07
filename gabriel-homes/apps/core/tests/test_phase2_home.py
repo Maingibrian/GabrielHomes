@@ -381,7 +381,12 @@ def test_home_hero_and_footer_read_the_new_brand_defaults():
     assert brand.about_heading == "We would rather show our working."
     assert "new" not in brand.footer_lead.lower()
     body = Client().get("/").content.decode()
-    assert brand.hero_tag in body
+    # r50: the hero eyebrow is gone (owner: the reference reads cleaner
+    # without it) — hero_tag no longer renders on the home page. The
+    # heading words, the accent em and the footer below still prove the
+    # defaults render live from BrandSettings, never hardcoded.
+    assert brand.hero_heading_lead in body
+    assert brand.hero_heading_accent in body
     assert brand.footer_lead in body
 
 

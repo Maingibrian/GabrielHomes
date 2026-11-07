@@ -16,9 +16,14 @@ Two owner asks in one round:
    floating listing card), orange accent bar on the headline, frosted
    service-assurance strip, popular-area chips under the search pill,
    bottom-left market stat, and a lighter scrim so the room reads warm.
-   The reference's "Verified Agents" label is adapted to "Local
-   agents" — p0 checked language bans "verified" on public pages.
-   The "+12% YoY" figure is the owner's provided reference content.
+
+r50 second pass (owner round two, see test_r50_hero_card_cycle): the
+strip is reworded (no agents on this site, no banned "verified"), the
+card became a dynamic pane carousel pinned top-right, the search pill
+moved to a lower hero__search-zone band, and the eyebrow tag is gone.
+The r49 pins below are updated to the r50 reality; the ones the r50
+pass did not touch (uniform rows, scrim, accent bar, sides hiding,
+market stat, chips) still pin their r49 contracts.
 """
 from __future__ import annotations
 
@@ -84,9 +89,16 @@ class HeroMarkupTests(SimpleTestCase):
         self.assertNotIn("hero__w", self.html)
 
     def test_assurance_strip_three_items(self):
+        """r50: reworded — no agents on this site (owner: none of the team
+        are agents), no banned "verified". The strip states what actually
+        happens; the old r49 labels are gone."""
         self.assertIn('class="hero__assurances', self.html)
-        for label in ("Trusted listings", "Local agents", "Dedicated support"):
+        for label in ("Checked listings", "Prices in writing",
+                      "A person replies"):
             self.assertIn(label, self.html)
+        for banned in ("Local agents", "Dedicated support",
+                       "Trusted listings"):
+            self.assertNotIn(banned, self.html)
 
     def test_search_pill_still_the_single_hero_gesture(self):
         hero = self.html.split("</section>", 1)[0]
@@ -101,13 +113,23 @@ class HeroMarkupTests(SimpleTestCase):
         self.assertIn("{{ area.count }}", self.html)
 
     def test_hero_card_is_conditional_and_content_complete(self):
-        self.assertIn("{% if hero_card_listing %}", self.html)
-        for hook in ("hero-card__media", "hero-card__badge",
+        """r50: the card is a pane carousel (hero_card_listings, plural —
+        the view's r49 singular key is retired)."""
+        self.assertIn("{% if hero_card_listings %}", self.html)
+        for hook in ("hero-card__track", "data-hero-card-pane",
+                     "hero-card__media", "hero-card__badge",
                      "hero-card__title", "hero-card__loc",
-                     "hero-card__price", "hero-card__link"):
+                     "hero-card__price", "hero-card__link",
+                     "hero-card__dots", "data-hero-card-dot"):
             self.assertIn(hook, self.html)
-        self.assertIn("{{ hero_card_listing.price|kes }}", self.html)
-        self.assertIn("{{ hero_card_listing.get_absolute_url }}", self.html)
+        self.assertIn("{{ listing.price|kes }}", self.html)
+        self.assertIn("{{ listing.get_absolute_url }}", self.html)
+        # pane #1 is active in the served HTML — no-JS shows listing #1
+        self.assertIn(
+            'class="hero-card__pane{% if forloop.first %} is-active{% endif %}"',
+            self.html)
+        # the dots only render when there is something to rotate
+        self.assertIn("{% if hero_card_listings|length > 1 %}", self.html)
 
     def test_market_stat_carries_the_owner_figure(self):
         self.assertIn('class="hero__market"', self.html)
@@ -120,7 +142,7 @@ class HeroCSSTests(SimpleTestCase):
 
     def setUp(self):
         css = HOME_CSS.read_text(encoding="utf-8")
-        start = css.index("r49 — HERO REMODEL")
+        start = css.index("r50 — HERO")
         end = css.index("3. Featured properties", start)
         self.block = css[start:end]
 
@@ -158,8 +180,8 @@ class HeroCSSTests(SimpleTestCase):
         self.assertIn("rgba(28,21,17,.06) 82%", scrim)
         self.assertNotIn("0.72) 0%", scrim, "the old dead-dark band is gone")
 
-    def test_r49_block_adds_no_hex(self):
-        """F1 ratchet: home.css hex count may only go down — the r49
+    def test_r50_block_adds_no_hex(self):
+        """F1 ratchet: home.css hex count may only go down — the r50
         block must be hex-free (tokens, color-mix, rgba only)."""
         self.assertEqual(re.findall(r"#[0-9a-fA-F]{3,8}\b", self.block), [])
 
@@ -197,10 +219,11 @@ class TestHeroViewData:
         assert re.search(r'hero__loc-count">\d+<', html)
 
     def test_rendered_hero_copy_is_checked_language(self):
-        """The mockup's 'Verified Agents' must not reach the rendered
-        page (p0) — the strip reads Trusted/Local/Dedicated instead."""
+        """No "verified" on public pages (p0) and no agent wording (the
+        site has none); the strip reads Checked/Prices/A person."""
         html = Client().get("/").content.decode()
-        assert "Trusted listings" in html
-        assert "Local agents" in html
-        assert "Dedicated support" in html
+        assert "Checked listings" in html
+        assert "Prices in writing" in html
+        assert "A person replies" in html
+        assert "Local agents" not in html
         assert "verified" not in html.lower()

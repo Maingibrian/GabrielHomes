@@ -74,9 +74,12 @@ def test_saved_content_appears_on_public_homepage():
 
 
 def test_owner_content_is_escaped_on_public_homepage():
+    # r50: hero_tag no longer renders on the home page (the hero eyebrow
+    # is gone), so the escape tripwire rides hero_heading_lead — a
+    # BrandSettings field the home h1 still renders live.
     _owner_client().post(
         "/manage/site-content/",
-        _valid_payload(hero_tag='<img src=x onerror="alert(1)">'),
+        _valid_payload(hero_heading_lead='<img src=x onerror="alert(1)">'),
     )
     home = Client().get("/").content.decode()
     assert '<img src=x onerror="alert(1)">' not in home
