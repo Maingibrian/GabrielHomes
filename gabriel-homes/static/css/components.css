@@ -884,6 +884,33 @@
   background: var(--espresso);
   box-shadow: 0 16px 38px -16px rgba(15, 9, 6, 0.75);
 }
+/* r41 (owner request): invisible navbar at rest — the bar melts into the
+   hero photo. Two pieces, both scoped so cream text is never stranded:
+     a) position:fixed only on pages whose first section is a dark hero
+        (.hero on home, .page-hero on content pages) — the header overlays
+        the hero instead of sitting above it, so the photo shows through.
+        Search/detail (light tops) keep the in-flow sticky solid bar.
+     b) at rest the bar is fully transparent; scrolling past 24px
+        (motion.js setupHeaderScroll) brings back the solid
+        .site-header--scrolled bar.
+   Gated behind html.motion-ready (set as motion.js's FIRST statement):
+   with JS blocked there is no overlay and no transparency — the header
+   falls back to the solid in-flow bar (D-MOTION-SAFE). :has() is further
+   progressive enhancement; browsers without it keep the solid bar. */
+html.motion-ready:has(.hero) .site-header,
+html.motion-ready:has(.page-hero) .site-header {
+  position: fixed;
+  left: 0;
+  right: 0;
+}
+html.motion-ready:has(.hero) .site-header:not(.site-header--scrolled),
+html.motion-ready:has(.page-hero) .site-header:not(.site-header--scrolled) {
+  background: transparent;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  border-bottom-color: transparent;
+  box-shadow: none;
+}
 /* G1: floating pill nav — JS adds this on scroll-down under fx lite/rich
    only; without JS (or under fx=none) the class never appears and the
    header stays visible (D-MOTION-SAFE). Focus entering the header also
