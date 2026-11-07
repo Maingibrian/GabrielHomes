@@ -34,6 +34,13 @@ Anatomy per tree, bottom-up:
 Byte economy: canonical fronds in <defs> + <use> placements ≈ 4 KiB
 per tree inline in the page (no extra request, cache-free freshness).
 
+r62 (same round, third pass): "they need to constantly be in the
+bottom... no white space under them." The viewBox bottom pad is now
+ZERO — the lowest ink (mound, fallen-nut contact shadows) lands
+exactly on the box floor, so the sand sits flush on the viewport
+floor that search.css pins the sticker to. The placement and the
+wind both live in search.css (r62 block).
+
 Deterministic: random.seed(60) for the left palm, 61 for the right.
 Output: templates/listings/_palms.html
   --preview  also write palms-preview.html beside this script —
@@ -375,12 +382,18 @@ def build_tree(spec, pad_top=0.0):
         pts.append((fx - r * 1.35, mound_surface_y(spec["mound"], fx) + r * 0.32))
         pts.append((fx + r, mound_surface_y(spec["mound"], fx) - r))
 
-    # --- auto-fit viewBox to the union bbox (pad 6) ---
+    # --- auto-fit viewBox to the union bbox (pad 6, NO bottom pad) ---
+    # r62: the palm stands ON the viewport floor — any bottom padding
+    # would render as a white strip under the sand mound ("no white
+    # space under them", owner round ten, third pass). Top and sides
+    # keep pad 6 for breathing room; the lowest ink lands exactly on
+    # the box floor. (The right tree's crown pad still evens the two
+    # viewBox aspects, so the mounds keep one shared ground plane.)
     xs = [p[0] for p in pts]; ys = [p[1] for p in pts]
     pad = 6.0
     tx, ty = -min(xs) + pad, -min(ys) + pad + pad_top
     w = max(xs) - min(xs) + 2 * pad
-    h = max(ys) - min(ys) + 2 * pad + pad_top
+    h = max(ys) - min(ys) + pad + pad_top
     return (svg_text(spec, w, h, tx, ty, trunk, rings, boot, layers,
                      nuts_svg, mound, shade, grass, fallen_svg, arch_d, droop_d),
             w, h)
@@ -422,15 +435,28 @@ TEMPLATE = """{% comment %}
   coconut tree... it will be stagnant parallax up to the start of the
   footer."
 
+  r62 (same round, third pass): "they need to constantly be in the
+  bottom... no white space under them... make them move in the wind."
+  The sticker is pinned to the VIEWPORT FLOOR (search.css r62:
+  top + height = 100vh, align-items: flex-end), the svg is sized
+  width-first so it can never letterbox a gap under the mound, and
+  this generator drops the viewBox bottom pad so the sand sits flush
+  on that floor. A gentle wind sway runs under html[data-fx="rich"]
+  only (search.css) — the palms stand perfectly still under reduced
+  motion, Save-Data and with scripts blocked.
+
   Two coconut palms for the white gutters of the results band. Each
   .palm-sentinel column is absolutely positioned to span .listings-band
   exactly (results header -> end of related searches, i.e. straight
-  down to the footer); the .palm-sentinel__stick inside is position:
-  sticky, so each palm holds STILL while the listings scroll past and
-  departs precisely when the footer arrives — stagnant parallax, pure
-  CSS. No JS, no animation of its own: identical under fx=none,
-  reduced motion, and with scripts blocked. Shown only >= 1620px,
-  where the white sides are real (search.css); pointer-events: none.
+  down to the footer, plus one tree height below it); the
+  .palm-sentinel__stick inside is position: sticky, so each palm
+  holds STILL at the bottom of the screen while the listings scroll
+  past and stays planted until the footer has scrolled up over it —
+  the release happens entirely behind the footer, so the trees never
+  visibly move. Stagnant parallax. The placement is pure CSS and
+  needs no scripts; only the wind consults the capability gate. Shown only
+  >= 1620px, where the white sides are real (search.css);
+  pointer-events: none.
 
   Decorative only: aria-hidden, never focusable, no text — zero
   accessibility surface (owner round nine: "ensure the website is

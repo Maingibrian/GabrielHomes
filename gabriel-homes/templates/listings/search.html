@@ -90,10 +90,13 @@
 {% comment %}
   r60 (owner round ten): the listings band — everything from the results
   header down to the related searches. The coast palm sentinels
-  (listings/_palms.html) anchor to this band and span exactly its
-  height, so their sticky palms hold still beside the listings and
-  depart exactly when the footer arrives. The inner blocks keep
-  their original indentation on purpose — smallest possible diff.
+  (listings/_palms.html) anchor to this band and span its height plus
+  one tree height below it, so their sticky palms hold still at the
+  bottom of the screen beside the listings and stay planted there
+  until the footer has scrolled up over them — the release happens
+  entirely behind the footer, so the trees never visibly move. The
+  inner blocks keep their original indentation on purpose — smallest
+  possible diff.
   ({% comment %} not {# #}: multi-line {# #} comments leak, run-4 bug class.)
 {% endcomment %}
 <div class="listings-band">

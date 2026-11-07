@@ -20,9 +20,11 @@ Binary checks:
    position: sticky with a top offset (the stagnant-parallax engine).
 4. TOKENS — every .palm-* fill class used by the markup resolves to a
    rule in search.css, and search.css still carries ZERO hex colours
-   (D-LOOP-38a). The sentinel block introduces no animation or
-   transition of its own: identical under fx=none / reduced motion /
-   JS-off, which is the whole point of a CSS-only effect.
+   (D-LOOP-38a). The r62 wind is STRICTLY gated to
+   html[data-fx="rich"]: reduced motion (fx=none), Save-Data (lite)
+   and scripts blocked (no attribute — fails closed) all see the same
+   palms, standing still; the stagnant-parallax placement itself is
+   pure CSS and holds with JS off.
 """
 import re
 from pathlib import Path
@@ -162,35 +164,61 @@ def test_sentinels_keep_clear_of_the_content_column():
         assert "calc(50% + (var(--container-max) / 2) + 18px)" in rule, side
 
 
-def test_sentinels_suspend_mid_page():
-    """r61 (owner: "too small... suspended in the middle of the page"):
-    the sticker is HEIGHT-driven — min(64vh, 660px), no width cap —
-    and the sticky top centres exactly that box on the viewport
-    midline: 50vh - min(32vh, 330px), where 32vh == 64vh/2 and
-    330px == 660px/2 (both arms stay in step, so the palm hangs
-    mid-screen at every viewport height). The svg fills the box
-    height, keeps its viewBox aspect (width: auto) and is capped to
-    the gutter column (max-width: 100%)."""
+def test_sentinels_stand_on_the_viewport_floor():
+    """r62 (owner: "they need to constantly be in the bottom... no
+    white space under them"): the sticky top pins the box BOTTOM on
+    the viewport bottom edge — top + height = 100vh exactly (the same
+    min(64vh, 660px) pair in both arms: 36vh + 64vh on shorter
+    screens, (100vh - 660px) + 660px on tall ones) — so the palm
+    stands on the floor of the screen at every scroll depth, never
+    suspended mid-page, and still departs when the footer pushes the
+    band end up. The svg stands on that floor (align-items:
+    flex-end) and is sized WIDTH-first (width 100%, height auto,
+    capped by the box) so it can never letterbox a gap underneath."""
     stick = re.search(r"\.palm-sentinel__stick\s*\{[^}]*\}", SEARCH_CSS)
     assert stick, "stick rule missing"
     body = stick.group(0)
     assert "position: sticky" in body
-    assert "top: calc(50vh - min(32vh, 330px))" in body
+    assert "top: calc(100vh - min(64vh, 660px))" in body
     assert "height: min(64vh, 660px)" in body
-    # half-of-height arithmetic must stay in step with the height rule
-    # (32vh == 64vh/2, 330px == 660px/2) — pins both numbers as a pair
+    # floor arithmetic must stay a matched pair: top + height == 100vh
+    assert body.count("min(64vh, 660px)") == 2
+    assert "align-items: flex-end" in body
     assert "justify-content: center" in body
-    assert "margin-left" not in body and "margin-right" not in body
-    assert "width" not in body          # no width cap on the sticker
     tree = re.search(r"\.palm-tree\s*\{[^}]*\}", SEARCH_CSS).group(0)
-    assert "height: 100%" in tree
-    assert "width: auto" in tree
-    assert "max-width: 100%" in tree
+    assert "width: 100%" in tree          # width-first: fills the gutter
+    assert "height: auto" in tree         # height follows the viewBox
+    assert "max-height: 100%" in tree     # capped by the sticky box
 
 
-def test_suspension_shadow_is_token_only():
-    """The floating drop-shadow (what sells "suspended") must come from
-    the token palette, keeping search.css at zero hex."""
+def test_mound_ink_sits_flush_on_the_floor():
+    """The generator leaves NO bottom pad in the viewBox — the lowest
+    ink (sand mound, fallen-nut contact shadows) lands exactly on the
+    svg box floor, so no white strip can open under the tree on any
+    screen width (the r61 bottom pad is what the owner saw as "white
+    space under them")."""
+    assert "h = max(ys) - min(ys) + pad + pad_top" in GENERATOR
+    assert "h = max(ys) - min(ys) + 2 * pad" not in GENERATOR
+    # and the shipped markup really carries the cropped boxes
+    assert 'viewBox="0 0 317 597"' in PALMS
+    assert 'viewBox="0 0 312 587"' in PALMS
+
+
+def test_palms_hold_still_until_the_footer_covers_them():
+    """r62 (VLM round: without this the trunk is "cut off at the
+    footer's edge" — the palm visibly rides up the page). The sentinel
+    columns extend one sticky-box height BELOW the band (under the
+    footer's top edge), so the sticky release happens only once the
+    footer has covered the trees outright: they never visibly move,
+    the footer simply scrolls up over them, still."""
+    base = re.search(r"\.palm-sentinel\s*\{[^}]*\}", SEARCH_CSS).group(0)
+    assert "bottom: calc(-1 * min(64vh, 660px))" in base
+    assert "bottom: 0" not in base
+
+
+def test_grounding_shadow_is_token_only():
+    """The grounded drop-shadow must come from the token palette,
+    keeping search.css at zero hex."""
     tree = re.search(r"\.palm-tree\s*\{[^}]*\}", SEARCH_CSS).group(0)
     assert "drop-shadow" in tree
     assert "var(--taupe-35)" in tree
@@ -212,12 +240,34 @@ def test_search_css_still_carries_zero_hex():
     assert not re.findall(r"#[0-9a-fA-F]{3,8}", SEARCH_CSS)
 
 
-def test_sentinels_add_no_motion_of_their_own():
-    """The r60 block introduces no animation/transition — stagnant by
-    design, safe under reduced motion and with JS blocked."""
-    r60 = SEARCH_CSS[SEARCH_CSS.index("r60 (owner round ten)"):]
-    assert "animation" not in r60
-    assert "transition" not in r60
+def test_wind_is_gated_to_rich():
+    """r62 ("make them move in the wind"): the palm block carries a
+    two-layer sway — but EVERY animation declaration sits inside a
+    rule gated on html[data-fx="rich"] (D-FX-GATE contract). fx=none
+    (reduced motion), lite (Save-Data) and scripts blocked (no
+    attribute — fails closed) all get the same palms, standing still;
+    the placement itself stays pure CSS."""
+    block = SEARCH_CSS[SEARCH_CSS.index("r60 (owner round ten)"):]
+    assert "@keyframes palm-sway" in block
+    assert "@keyframes palm-flutter" in block
+    for m in re.finditer(r"animation[a-z-]*\s*:", block):
+        opener = block.rindex("{", 0, m.start())
+        head = block[:opener]
+        selector = head[max(head.rfind("}"), head.rfind(";")) + 1:]
+        assert 'data-fx="rich"' in selector, (
+            f"ungated animation in palm block: {selector.strip()!r}")
+
+
+def test_wind_sways_around_the_base_out_of_lockstep():
+    """The wind pivot is the base of the trunk (transform-origin at
+    50% 100%), and the two trees run at different periods with
+    negative delays — wind never moves two trees in lockstep."""
+    tree = re.search(r"\.palm-tree\s*\{[^}]*\}", SEARCH_CSS).group(0)
+    assert "transform-origin: 50% 100%" in tree
+    block = SEARCH_CSS[SEARCH_CSS.index("r60 (owner round ten)"):]
+    assert "animation: palm-sway 8.6s ease-in-out -2.4s infinite" in block
+    assert "animation-duration: 10.2s" in block   # right tree: slower
+    assert "animation-delay: -6.1s" in block       # and out of phase
 
 
 def test_template_is_generator_owned():
