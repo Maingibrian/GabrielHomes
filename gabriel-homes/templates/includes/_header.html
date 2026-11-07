@@ -2,16 +2,17 @@
 <header class="site-header" role="banner" data-site-header>
   <div class="container site-header__inner">
     <a class="site-header__brand" href="/">
-      Gabriel&nbsp;<span>Homes</span>
+      <span class="brand-mark" aria-hidden="true"></span>
+      <span class="brand-word">Gabriel&nbsp;<span class="brand-accent">Homes</span></span>
     </a>
 
-    {% comment %} Desktop nav (≥1200px) — numbered links per §8.1. r13: Listings is the second link (owner request) and "How we check" is a sub-page under Contact, not a top-level item. {% endcomment %}
+    {% comment %} Desktop nav (≥1024px) — numbered links per §8.1, centred pill. r13: Listings is the second link (owner request) and "How we check" is a sub-page under Contact, not a top-level item. aria-current highlights the open page inside the pill. {% endcomment %}
     <nav class="site-header__nav" aria-label="Primary">
-      <a class="nav-link" href="/about/"><span class="nav-link__index">01</span> About</a>
-      <a class="nav-link" href="/properties/"><span class="nav-link__index">02</span> Listings</a>
-      <a class="nav-link" href="/services/"><span class="nav-link__index">03</span> Services</a>
+      <a class="nav-link" href="/about/" {% if request.path == '/about/' %}aria-current="page"{% endif %}><span class="nav-link__index">01</span> About</a>
+      <a class="nav-link" href="/properties/" {% if request.path == '/properties/' %}aria-current="page"{% endif %}><span class="nav-link__index">02</span> Listings</a>
+      <a class="nav-link" href="/services/" {% if request.path == '/services/' %}aria-current="page"{% endif %}><span class="nav-link__index">03</span> Services</a>
       <div class="nav-item nav-item--has-sub">
-        <a class="nav-link" href="/contact/"><span class="nav-link__index">04</span> Contact <span class="nav-link__caret" aria-hidden="true">▾</span></a>
+        <a class="nav-link" href="/contact/" {% if request.path == '/contact/' %}aria-current="page"{% endif %}><span class="nav-link__index">04</span> Contact <span class="nav-link__caret" aria-hidden="true">▾</span></a>
         <div class="nav-sub">
           <a class="nav-sub__link" href="/checks/">How we check listings <span aria-hidden="true">→</span></a>
         </div>
@@ -54,7 +55,8 @@
 <div class="mobile-menu" id="mobile-menu" data-mobile-menu aria-hidden="true">
   <div class="mobile-menu__header">
     <a class="site-header__brand" href="/">
-      Gabriel&nbsp;<span>Homes</span>
+      <span class="brand-mark" aria-hidden="true"></span>
+      <span class="brand-word">Gabriel&nbsp;<span class="brand-accent">Homes</span></span>
     </a>
     <button class="mobile-menu__close" type="button"
             aria-label="Close menu" data-mobile-menu-close>

@@ -256,3 +256,87 @@ def test_env_example_has_long_secret_key_placeholder():
     assert "50" in content or "get_random_secret_key" in content, (
         ".env.example should mention 50+ chars or how to generate a key"
     )
+
+
+# ---------------------------------------------------------------------------
+# S10b — sandbox preview framing gate (CSP frame-ancestors / X-Frame-Options)
+#
+# The workspace live-preview panel renders the site in an iframe. Only the
+# sandbox runserver process may loosen frame-ancestors; pytest, plain dev,
+# and production must all keep the strict anti-clickjacking policy.
+# ---------------------------------------------------------------------------
+class _Resp:
+    """Minimal response stand-in (headers dict + attribute storage)."""
+
+    def __init__(self):
+        self.headers = {}
+        self.xframe_options_exempt = False
+
+
+def _csp_mw():
+    from apps.core.middleware import ContentSecurityPolicyMiddleware
+
+    def view(request):
+        return _Resp()
+
+    return ContentSecurityPolicyMiddleware(view)
+
+
+def _call_and_get_csp(monkeypatch, *, pytest_env, bridge_flag, argv):
+    if pytest_env:
+        monkeypatch.setenv("PYTEST_CURRENT_TEST", "simulated")
+    else:
+        monkeypatch.delenv("PYTEST_CURRENT_TEST", raising=False)
+    if bridge_flag:
+        monkeypatch.setenv("GABRIEL_PREVIEW_BRIDGE", "1")
+    else:
+        monkeypatch.delenv("GABRIEL_PREVIEW_BRIDGE", raising=False)
+    monkeypatch.setattr("sys.argv", argv)
+    response = _csp_mw()(object())
+    return response.headers.get("Content-Security-Policy", ""), response
+
+
+def test_csp_strict_under_pytest_even_with_flag_and_runserver_argv(monkeypatch):
+    """Gate 1: under pytest the policy is ALWAYS strict, no matter what."""
+    csp, resp = _call_and_get_csp(
+        monkeypatch,
+        pytest_env=True, bridge_flag=True, argv=["manage.py", "runserver"],
+    )
+    assert "frame-ancestors 'none'" in csp
+    assert resp.xframe_options_exempt is False
+
+
+def test_csp_strict_without_bridge_flag(monkeypatch):
+    """Gate 2: no GABRIEL_PREVIEW_BRIDGE -> strict, even as runserver."""
+    csp, resp = _call_and_get_csp(
+        monkeypatch,
+        pytest_env=False, bridge_flag=False, argv=["manage.py", "runserver"],
+    )
+    assert "frame-ancestors 'none'" in csp
+    assert resp.xframe_options_exempt is False
+
+
+def test_csp_strict_with_flag_but_not_runserver(monkeypatch):
+    """Gate 3: flag set but argv is not runserver (e.g. gunicorn) -> strict."""
+    csp, resp = _call_and_get_csp(
+        monkeypatch,
+        pytest_env=False, bridge_flag=True,
+        argv=["/usr/local/bin/gunicorn", "config.wsgi"],
+    )
+    assert "frame-ancestors 'none'" in csp
+    assert resp.xframe_options_exempt is False
+
+
+def test_csp_preview_policy_only_for_bridge_runserver(monkeypatch):
+    """All three gates open: the sandbox preview policy is sent and
+    X-Frame-Options is exempted, so the workspace iframe panel renders."""
+    csp, resp = _call_and_get_csp(
+        monkeypatch,
+        pytest_env=False, bridge_flag=True, argv=["manage.py", "runserver"],
+    )
+    assert "frame-ancestors *" in csp
+    assert "frame-ancestors 'none'" not in csp
+    # Everything else in the policy stays identical.
+    assert "script-src 'self'" in csp
+    assert "form-action 'self'" in csp
+    assert resp.xframe_options_exempt is True

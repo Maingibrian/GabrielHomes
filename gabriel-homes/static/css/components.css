@@ -89,6 +89,8 @@
 .nav-link__index {
   color: var(--ember); /* r12: was --burnt — 2.8:1 on espresso; ember 7.4:1 */
   font-variant-numeric: tabular-nums;
+  font-size: 0.72em; /* r40: quieter inside the pill — label leads, index whispers */
+  opacity: 0.85;
 }
 .nav-link:hover { opacity: 1; color: var(--ember); }
 
@@ -872,12 +874,15 @@
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   color: var(--cream);
-  border-bottom: 1px solid color-mix(in srgb, var(--sand) 18%, transparent);
+  border-bottom: 1px solid color-mix(in srgb, var(--sand) 14%, transparent);
+  box-shadow: 0 12px 32px -22px rgba(15, 9, 6, 0.55);
   transition: background var(--t-med) var(--ease),
-              transform var(--t-med) var(--ease);
+              transform var(--t-med) var(--ease),
+              box-shadow var(--t-med) var(--ease);
 }
 .site-header--scrolled {
   background: var(--espresso);
+  box-shadow: 0 16px 38px -18px rgba(15, 9, 6, 0.6);
 }
 /* G1: floating pill nav — JS adds this on scroll-down under fx lite/rich
    only; without JS (or under fx=none) the class never appears and the
@@ -887,37 +892,105 @@
   transform: translateY(-100%);
 }
 .site-header__inner {
-  display: flex;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
   align-items: center;
-  justify-content: space-between;
-  gap: 1.5rem;
-  padding-block: 1rem;
+  gap: 1.25rem;
+  padding-block: 0.8rem;
 }
+.site-header__brand { grid-column: 1; justify-self: start; }
+.site-header__nav   { grid-column: 2; justify-self: center; }
+.site-header__actions { grid-column: 3; justify-self: end; }
+
+/* r40 (owner request): the wordmark — Fraunces serif + ember diamond mark.
+   The mark is decorative (aria-hidden); the accent keeps ember on espresso
+   (7.4:1, WCAG AA). */
 .site-header__brand {
+  font-family: var(--font-display);
   font-weight: 600;
-  font-size: var(--text-md);
+  font-size: 1.22rem;
+  line-height: 1;
   letter-spacing: var(--track-tighter);
   color: var(--cream);
   display: inline-flex;
-  align-items: baseline;
-  gap: 0.5rem;
+  align-items: center;
+  gap: 0.65rem;
 }
-.site-header__brand span { color: var(--ember); } /* r12: burnt failed on espresso */
+.brand-mark {
+  flex: none;
+  width: 15px;
+  height: 15px;
+  border-radius: 4px;
+  background: linear-gradient(135deg, var(--burnt), var(--ember));
+  transform: rotate(45deg);
+  box-shadow: 0 0 0 5px color-mix(in srgb, var(--burnt) 22%, transparent),
+              0 2px 8px rgba(15, 9, 6, 0.4);
+}
+.site-header__brand .brand-accent { color: var(--ember); } /* r12: burnt failed on espresso */
 
 .site-header__nav {
   display: none;
-  gap: 1.75rem;
 }
 @media (min-width: 1024px) {
   .site-header__nav { display: flex; }
+  /* r40 (owner request): the nav is a centred frosted pill — logo stays
+     left, Enquire stays right, the pill floats dead-centre between them.
+     Test-pinned rule above stays byte-exact for test_g1_pill_nav. */
+  .site-header__nav {
+    align-items: center;
+    gap: 0.15rem;
+    padding: 0.3rem 0.45rem;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--cream) 11%, transparent);
+    border: 1px solid color-mix(in srgb, var(--cream) 26%, transparent);
+    box-shadow: inset 0 1px 0 color-mix(in srgb, var(--cream) 14%, transparent),
+                0 10px 28px -12px rgba(15, 9, 6, 0.65);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+  }
+  /* Links become pill chips: generous side padding, rounded-full hover
+     wash, and the open page (aria-current) lights up as a cream chip. */
+  .site-header__nav .nav-link {
+    padding: 0.45rem 0.95rem;
+    border-radius: 999px;
+    opacity: 1;
+    transition: background-color var(--t-fast) var(--ease),
+                color var(--t-fast) var(--ease);
+  }
+  .site-header__nav .nav-link:hover {
+    color: var(--cream);
+    background: color-mix(in srgb, var(--cream) 12%, transparent);
+  }
+  .site-header__nav .nav-link:focus-visible {
+    outline: 2px solid var(--ember);
+    outline-offset: 0;
+  }
+  .site-header__nav .nav-link[aria-current="page"] {
+    color: var(--espresso);
+    background: var(--cream);
+  }
+  .site-header__nav .nav-link[aria-current="page"]:hover {
+    color: var(--espresso);
+    background: var(--cream);
+  }
+  .site-header__nav .nav-link[aria-current="page"] .nav-link__index {
+    color: var(--burnt); /* ember fails on cream; burnt is 5.38:1 */
+  }
+}
+/* Tight desktop widths (1024–1239px): drop the index numerals so the
+   centred pill never crowds the logo or the Enquire CTA. */
+@media (min-width: 1024px) and (max-width: 1239px) {
+  .site-header__nav .nav-link__index { display: none; }
+  .site-header__nav .nav-link { padding-inline: 0.75rem; }
 }
 
 /* r13: "How we check" is a sub-page under Contact. Pure-CSS reveal on
    hover/focus-within — the sub-link stays in the accessibility tree. */
 .nav-item { position: relative; }
 .nav-link__caret {
-  font-size: 0.7em;
-  margin-left: -0.15rem;
+  font-size: 0.8em;
+  margin-left: -0.05rem;
+  opacity: 0.75;
   transition: transform var(--t-fast) var(--ease);
 }
 .nav-sub {
@@ -976,7 +1049,8 @@
   color: var(--burnt);
   margin-right: 0.5em;
 }
-.mobile-menu .site-header__brand span { color: var(--burnt); }
+.mobile-menu .site-header__brand .brand-accent { color: var(--burnt); }
+.mobile-menu .brand-mark { box-shadow: 0 0 0 4px color-mix(in srgb, var(--burnt) 20%, transparent); }
 .mobile-menu__signout {
   width: 100%;
   text-align: left;
@@ -1046,10 +1120,14 @@
   .site-header__quick { display: none; }
 }
 .site-header__cta {
-  display: none;
+  display: inline-flex;
 }
-@media (min-width: 810px) {
-  .site-header__cta { display: inline-flex; }
+/* r40 (owner + vision critique): the Enquire CTA stays visible at EVERY
+   width — it is the site's primary conversion, never only inside the
+   mobile menu. The sm size keeps it comfortable next to the hamburger. */
+@media (max-width: 480px) {
+  .site-header__cta .btn__arrow { display: none; }
+  .site-header__cta { padding-inline: 1rem; }
 }
 
 .site-header__hamburger {
