@@ -365,15 +365,16 @@ def test_home_has_no_we_are_new_copy():
 
 def test_home_hero_and_footer_read_the_new_brand_defaults():
     """The healed BrandSettings defaults lead with the three Mombasa
-    markets instead of the founding-date story (core.0006), and the r13
-    slogan reads "Good homes, properly checked." (core.0007)."""
+    markets instead of the founding-date story (core.0006), and the r43
+    slogan reads "A place to come home to." (core.0011 — owner asked for
+    a warm, home-like framing instead of "Good homes, properly checked.")."""
     from apps.core.models import BrandSettings
 
     brand = BrandSettings.load()
     assert brand.hero_tag == "Gabriel Homes · Mombasa, Kenya"
-    assert brand.hero_heading_lead == "Good homes,"
-    assert brand.hero_heading_accent == "properly"
-    assert brand.hero_heading_tail == "checked."
+    assert brand.hero_heading_lead == "A place to"
+    assert brand.hero_heading_accent == "come home"
+    assert brand.hero_heading_tail == "to."
     assert brand.about_heading == "We would rather show our working."
     assert "new" not in brand.footer_lead.lower()
     body = Client().get("/").content.decode()

@@ -90,4 +90,6 @@ def test_invalid_content_is_not_saved():
     )
     assert response.status_code == 200
     assert "Ensure this value has at most 80 characters" in response.content.decode()
-    assert BrandSettings.load().hero_heading_accent == "properly"
+    # r43: slogan defaults swapped (core.0011) — invalid POST must leave
+    # the current accent, "come home", untouched.
+    assert BrandSettings.load().hero_heading_accent == "come home"

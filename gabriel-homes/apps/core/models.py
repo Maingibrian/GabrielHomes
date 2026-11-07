@@ -90,13 +90,16 @@ class BrandSettings(models.Model):
         help_text="Short label above the homepage headline.",
     )
     hero_heading_lead = models.CharField(
-        max_length=120, default="Good homes,"
+        # r43 (owner request): "Good homes, properly checked." read as a
+        # clinical framing — the headline now leads with the warm, home-like
+        # promise; the checking story stays in hero_subtitle.
+        max_length=120, default="A place to"
     )
     hero_heading_accent = models.CharField(
-        max_length=80, default="properly"
+        max_length=80, default="come home"
     )
     hero_heading_tail = models.CharField(
-        max_length=160, default="checked."
+        max_length=160, default="to."
     )
     hero_subtitle = models.TextField(
         max_length=500,

@@ -1431,16 +1431,20 @@ html.motion-ready [data-reveal].is-visible {
   max-width: 24ch;
   margin-top: 0.5rem;
 }
-/* Partner CTA card — no photo, warm gradient + grain so the mosaic reads
-   as even whatever the agency count. */
+/* Closing CTA card — no photo. r43: was a flat dark clay→brown tile; the
+   owner asked for brighter, less dull cards, so it is now a warm cream/
+   sand end-card with espresso text — a bright full stop at the end of the
+   mosaic (all colours via tokens, no hex). */
 .bento-card--cta {
-  background: linear-gradient(135deg, var(--clay), var(--brown));
+  background: linear-gradient(160deg, var(--cream) 0%, var(--sand) 100%);
+  color: var(--espresso);
 }
-.bento-card--cta .bento-card__scrim {
-  background: linear-gradient(180deg, rgba(28,21,17,0.12) 0%, rgba(28,21,17,0.85) 100%);
+.bento-card--cta .bento-card__scrim { background: none; }
+.bento-card--cta .bento-card__index {
+  color: color-mix(in srgb, var(--burnt) 82%, var(--espresso));
 }
-.bento-card--cta .bento-card__name { font-style: italic; }
-.bento-card--cta .bento-card__meta { max-width: 34ch; }
+.bento-card--cta .bento-card__name { font-style: italic; color: var(--espresso); }
+.bento-card--cta .bento-card__meta { max-width: 34ch; color: var(--taupe); }
 /* Tasteful stagger: cards cascade in as the mosaic enters the viewport
    (motion.js reveals each element once; delays only apply on reveal). */
 html.motion-ready .bento-grid .bento-card[data-reveal]:nth-child(3n+2) { transition-delay: 70ms; }
@@ -1464,13 +1468,53 @@ html.motion-ready .bento-grid .bento-card[data-reveal]:nth-child(3n) { transitio
 .bento-card__scrim {
   position: absolute;
   inset: 0;
-  /* r12: strengthened — cream text must clear 4.5:1 even over a pure-white
-     photo; 0.66 at the mid text zone ≈ 5.5:1, bottom stop ≈ 12.9:1 */
+  /* r43 (owner request — "the cards are dark, don't make things dull"):
+     the old blanket gradient (0.10 top → 0.66 @45% → 0.96 bottom) darkened
+     well over half of every photo. The scrim now only covers the measured
+     text zone, per breakpoint (real measurements, r43_e3_scrim_contrast.py):
+       ≥1021px 3-col grid — worst eyebrow 48.4% → photo clear to 36%, 0.66
+         from 46%; the spotlight (eyebrow ~69%) is clear to 48%.
+       641-1020px carousel — worst eyebrow 49.6% → clear to 30%, 0.66 @46%.
+       ≤640px carousel — the text block fills most of the ~300px card
+         (worst eyebrow 28.8%; the OLD 0.66@45% gradient only managed ~3.2:1
+         there) → fuller scrim with 0.66 from 20%.
+     Every breakpoint keeps cream text ≥ 4.5:1 over a pure-white photo
+     (the r12 contract) — E3 verifies all cards at 8 widths. */
   background: linear-gradient(180deg,
-              rgba(28,21,17,0.10) 0%,
-              rgba(28,21,17,0.66) 45%,
-              rgba(28,21,17,0.96) 100%);
+              rgba(28,21,17,0.08) 0%,
+              rgba(28,21,17,0.66) 20%,
+              rgba(28,21,17,0.94) 100%);
   z-index: -1;
+}
+/* Carousel band (641-1020px): worst-case eyebrow 49.6% — clear top 30%. */
+@media (min-width: 641px) and (max-width: 1020px) {
+  .bento-card__scrim {
+    background: linear-gradient(180deg,
+                rgba(28,21,17,0) 0%,
+                rgba(28,21,17,0.02) 30%,
+                rgba(28,21,17,0.66) 46%,
+                rgba(28,21,17,0.95) 100%);
+  }
+}
+/* Full 3-col grid + shape-shift (≥1021px): worst-case eyebrow 48.4% —
+   clear top 36%, steep ramp into the text zone. */
+@media (min-width: 1021px) {
+  .bento-card__scrim {
+    background: linear-gradient(180deg,
+                rgba(28,21,17,0) 0%,
+                rgba(28,21,17,0) 36%,
+                rgba(28,21,17,0.66) 46%,
+                rgba(28,21,17,0.94) 100%);
+  }
+  /* Spotlight (span 3×2, eyebrow at ~69%): its photo is the biggest —
+     let the upper half breathe completely. */
+  .bento-card--spotlight .bento-card__scrim {
+    background: linear-gradient(180deg,
+                rgba(28,21,17,0) 0%,
+                rgba(28,21,17,0) 48%,
+                rgba(28,21,17,0.66) 64%,
+                rgba(28,21,17,0.95) 100%);
+  }
 }
 /* ---- Framer-reference de-zoom (all bento grids) ----
    Measured from design-reference/index.html with a trusted hover and

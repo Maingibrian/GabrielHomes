@@ -12,8 +12,9 @@ def test_home_page_returns_200(client):
     response = client.get("/")
     assert response.status_code == 200
     assert b"Gabriel Homes" in response.content
-    # design-language markers from the placeholder hero (r13 slogan)
-    assert b"properly" in response.content
+    # design-language markers from the placeholder hero
+    # r43: slogan swapped to the home-like framing (core.0011)
+    assert b"come home" in response.content
 
 
 def test_admin_login_page_loads(client):
