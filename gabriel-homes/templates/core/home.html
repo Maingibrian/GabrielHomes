@@ -41,29 +41,32 @@
            poster="{% staticv 'img/real/hero-poster.jpg' %}"
            src="{% staticv 'video/hero-loop.mp4' %}"></video>
   </div>
-  {# r50: hero remodel, second pass against the owner's reference.      #}
-  {# Upper band: headline stack | featured-listing carousel top-right.  #}
-  {# Lower band: the search pill owns the full width (the reference's    #}
-  {# ~74%-wide lower pill), popular-area chips under it, market stat     #}
-  {# bottom-left (kept, owner request). The eyebrow tag is gone — the   #}
-  {# reference headline opens the page. The search pill stays the ONE   #}
-  {# hero gesture (pinned by test_h2_hero); the carousel adds links and #}
-  {# plain dot controls only — no CTA buttons.                          #}
+  {# r50/r51: hero remodel, second and third pass against the owner's #}
+  {# reference. Upper band: headline stack | featured-listing carousel #}
+  {# top-right. Lower band: the search pill owns the full width (the #}
+  {# reference's ~74%-wide lower pill), popular-area chips under it. #}
+  {# r51: the bottom-left market stat is GONE (owner request) — the #}
+  {# bottom band keeps only the pill, the chips and the scroll cue. #}
+  {# The eyebrow tag is gone — the reference headline opens the page. #}
+  {# The search pill stays the ONE hero gesture (pinned by #}
+  {# test_h2_hero); the carousel adds links and plain dot controls #}
+  {# only — no CTA buttons. #}
   <div class="container hv2-hero">
     <div class="hero__grid">
       <div class="hero__main">
         <h1 class="hero__title hv2-rise" style="--d:0" data-hero-headline>{{ brand.hero_heading_lead }} <em class="hero__accent">{{ brand.hero_heading_accent }}</em> {{ brand.hero_heading_tail }}</h1>
         <p class="hero__subtitle hv2-rise" style="--d:1">{{ brand.hero_subtitle }}</p>
 
-        {# r50: frosted assurance strip, reworded. No agents on this site #}
-        {# (owner: none of the team are agents), no banned "verified"    #}
-        {# (p0 checked language) — the strip now states what actually     #}
-        {# happens: listings are checked, prices are confirmed in         #}
-        {# writing, and a person replies. New icon family: house / tag /  #}
-        {# chat bubble — everyday objects, one stroke weight; the old     #}
-        {# shield-plus-check, two-people and headset pictograms read as   #}
-        {# generated filler.                                              #}
-        <ul class="hero__assurances hv2-rise" style="--d:2" aria-label="What Gabriel Homes promises">
+        {# r50/r51: assurance strip, reworded and shrunk. No agents on #}
+        {# this site (owner: none of the team are agents), no banned #}
+        {# "verified" (p0 checked language) — the strip states what #}
+        {# actually happens: listings are checked, prices are confirmed #}
+        {# in writing, and a person replies. Icon family: house / tag / #}
+        {# chat bubble — everyday objects, one stroke weight. r51: the #}
+        {# pill now HUGS its content (inline-flex, home.css) and each #}
+        {# item pops in on its own (ha-pop stagger) instead of the whole #}
+        {# strip rising as one slab — no hv2-rise here any more. #}
+        <ul class="hero__assurances" aria-label="What Gabriel Homes promises">
           <li>
             <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4.6 10.9 12 4.4l7.4 6.5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/><path d="M6.3 9.5v10.1h11.4V9.5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/><path d="M10.1 19.6v-5h3.8v5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
             Checked listings
@@ -150,10 +153,13 @@
         </button>
       </form>
 
-      {# r49: popular-area chips — live top-4 Mombasa areas by listing #}
+      {# r49/r51: popular-area chips — live top-4 Mombasa areas by listing #}
       {# count (view-built); thumbs are decorative stock, hence alt="". #}
+      {# r51: each chip rises in on its own (ha-chip stagger in #}
+      {# home.css) after the pill settles — the block-level hv2-rise #}
+      {# is retired. #}
       {% if popular_areas %}
-      <nav class="hero__locations hv2-rise" style="--d:4" aria-label="Popular Mombasa areas">
+      <nav class="hero__locations" aria-label="Popular Mombasa areas">
         <span class="hero__locations-label">Popular:</span>
         {% for area in popular_areas %}
           <a class="hero__loc" href="{{ area.url }}">
@@ -167,16 +173,6 @@
     </div>
   </div>
 
-  {# r49/r50: market stat, bottom-left over the scrim (owner's         #}
-  {# reference; kept at the bottom, owner request). The +12% YoY      #}
-  {# figure is the owner's provided content.                          #}
-  <div class="hero__market" aria-label="Mombasa property market">
-    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4.5 20V14M10.5 20V9.5M16.5 20v-8M21 20H3.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
-    <div class="hero__market-text">
-      <strong>Mombasa property market</strong>
-      <span>Growing demand <b>+12% YoY</b></span>
-    </div>
-  </div>
   <a class="hv2-scroll" href="#checks" aria-label="Scroll to how we check listings"><span></span></a>
 </section>
 

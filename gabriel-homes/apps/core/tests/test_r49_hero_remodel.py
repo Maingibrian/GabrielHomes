@@ -23,7 +23,12 @@ card became a dynamic pane carousel pinned top-right, the search pill
 moved to a lower hero__search-zone band, and the eyebrow tag is gone.
 The r49 pins below are updated to the r50 reality; the ones the r50
 pass did not touch (uniform rows, scrim, accent bar, sides hiding,
-market stat, chips) still pin their r49 contracts.
+chips) still pin their r49 contracts.
+
+r51 third pass (see test_r51_hero_polish): the bottom-left market
+stat ("Mombasa property market / Growing demand +12% YoY") is REMOVED
+at the owner's request (it was kept in r49/r50 — the owner has now
+called it in), and the r49 pins below are updated to that reality.
 """
 from __future__ import annotations
 
@@ -131,10 +136,15 @@ class HeroMarkupTests(SimpleTestCase):
         # the dots only render when there is something to rotate
         self.assertIn("{% if hero_card_listings|length > 1 %}", self.html)
 
-    def test_market_stat_carries_the_owner_figure(self):
-        self.assertIn('class="hero__market"', self.html)
-        self.assertIn("Mombasa property market", self.html)
-        self.assertIn("+12% YoY", self.html)
+    def test_market_stat_is_removed(self):
+        """r51: the owner asked for the bottom-left market stat ("Mombasa
+        property market / Growing demand +12% YoY") to go — markup,
+        CSS rules and the 1020px hide block are all gone."""
+        self.assertNotIn('class="hero__market"', self.html)
+        self.assertNotIn("Mombasa property market", self.html)
+        self.assertNotIn("+12% YoY", self.html)
+        css = HOME_CSS.read_text(encoding="utf-8")
+        self.assertNotIn(".hero__market", css, "the dead rules must go too")
 
 
 class HeroCSSTests(SimpleTestCase):
@@ -160,15 +170,16 @@ class HeroCSSTests(SimpleTestCase):
         self.assertIn("backdrop-filter: blur(10px)", self.block)
         self.assertIn(".hero__assurances li + li { border-left:", self.block)
 
-    def test_chips_and_card_and_stat_present(self):
-        for hook in (".hero__loc ", ".hero-card ", ".hero__market "):
+    def test_chips_and_card_present(self):
+        for hook in (".hero__loc ", ".hero-card "):
             self.assertIn(hook, self.block)
 
     def test_sides_hide_gracefully_off_desktop(self):
         self.assertIn("@media (max-width: 1199px)", self.block)
         self.assertIn(".hero-card { display: none; }", self.block)
-        self.assertIn("@media (max-width: 1020px)", self.block)
-        self.assertIn(".hero__market { display: none; }", self.block)
+        # r51: the 1020px block existed only to hide the market stat —
+        # with the stat gone it is removed whole
+        self.assertNotIn(".hero__market", self.block)
 
     def test_scrim_rebalanced_toward_warm(self):
         """The old near-black band (0.72 -> 0.48 left-to-right, 0.34 mid)

@@ -18,9 +18,11 @@ Owner round two on the r49 hero, three asks:
    HORIZONTAL pane (photo left ~44%, details right, the on-photo
    badge at the image's top-left); the search pill drops into a
    lower hero__search-zone band that spans the container with the
-   popular-area chips under it; the market stat stays bottom-left
-   (owner request); the eyebrow tag is gone — the headline opens
-   the page like the reference.
+   popular-area chips under it; the eyebrow tag is gone — the
+   headline opens the page like the reference. (r51: the market
+   stat this pass kept bottom-left is now REMOVED — see
+   test_r51_hero_polish; the pane swap also gained a drift, but
+   every r50-pinned prefix below survives verbatim.)
 
 3. "better wording (no agents in this website) and better icons" —
    the strip reads "Checked listings / Prices in writing / A person

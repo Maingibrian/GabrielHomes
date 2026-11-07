@@ -80,8 +80,8 @@
        soft vignette pool behind the text block (the reference's "dark
        left-side vignette" — slide 2's sun-lit window measured 1.13:1
        without it; re-verified >=4.5:1 by pixel probe, r49), the left
-       band, and the vertical top/bottom bands that carry the nav, the
-       market stat and the marquee hand-off. */
+       band, and the vertical top/bottom bands that carry the nav and
+       the marquee hand-off (r51: the market stat is gone). */
     radial-gradient(ellipse 62% 55% at 30% 42%, rgba(28,21,17,.58), rgba(28,21,17,0) 72%),
     linear-gradient(90deg, rgba(28,21,17,.66) 0%, rgba(28,21,17,.42) 44%, rgba(28,21,17,.06) 82%),
     linear-gradient(180deg, rgba(28,21,17,.52) 0%, rgba(42,33,28,.20) 42%, rgba(42,33,28,.18) 60%, rgba(42,33,28,.74) 100%);
@@ -118,13 +118,15 @@
    search-zone below owns the pill's rhythm now. */
 
 /* ============================================================
-   r50 — HERO, SECOND PASS (owner request, against the reference)
-   The reference's three bands, restored: the featured-listing card
-   sits TOP-RIGHT as a horizontal pane (photo left, details right)
-   and cycles through up to five showcase listings (hero-card.js);
-   the search pill drops to a lower band that spans the container
-   with the popular-area chips under it; the eyebrow tag is gone.
-   The market stat stays bottom-left (owner request). Zero new hex
+   r50 — HERO, SECOND PASS (owner request, against the reference);
+   r51 third-pass notes inline. The reference's three bands,
+   restored: the featured-listing card sits TOP-RIGHT as a
+   horizontal pane (photo left, details right) and cycles through
+   up to five showcase listings (hero-card.js); the search pill
+   drops to a lower band that spans the container with the
+   popular-area chips under it; the eyebrow tag is gone.
+   r51: the bottom-left market stat is REMOVED (owner request)
+   and the assurance pill now hugs its content. Zero new hex
    (F1 ratchet): tokens, color-mix and rgba() only.
    ============================================================ */
 .hero__grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 2.5rem; }
@@ -135,11 +137,15 @@
 }
 .hero__subtitle { margin: 0 0 1.6rem; }
 
-/* frosted service-tags strip, reworded r50: no agents on this site,
-   no banned "verified" — the strip states what actually happens */
+/* frosted service-tags strip, reworded r50; SHRUNK r51: the owner
+   called the old full-column pill "too large" — it stretched across
+   the whole text column with ~250px of dead glass after the last
+   label. inline-flex now sizes the pill to its CONTENT; paddings,
+   icons and metrics are tightened with it (~56px tall -> ~40px). */
 .hero__assurances {
-  display: flex; flex-wrap: wrap; align-items: stretch;
-  margin: 0 0 1.6rem; padding: 9px 6px;
+  display: inline-flex; flex-wrap: wrap; align-items: center;
+  max-width: 100%;
+  margin: 0 0 1.6rem; padding: 4px 6px;
   border-radius: 999px;
   background: rgba(28,21,17,.38);
   border: 1px solid rgba(245,239,227,.14);
@@ -147,17 +153,34 @@
   backdrop-filter: blur(10px);
 }
 .hero__assurances li {
-  display: inline-flex; align-items: center; gap: 10px;
-  padding: 6px 18px;
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 4px 14px;
   font-size: var(--text-sm);
   font-weight: 500;
   color: color-mix(in srgb, var(--cream) 94%, transparent);
 }
 .hero__assurances li + li { border-left: 1px solid rgba(245,239,227,.14); }
 .hero__assurances svg {
-  width: 17px; height: 17px; flex: none;
+  width: 15px; height: 15px; flex: none;
   color: color-mix(in srgb, var(--clay) 78%, var(--cream));
 }
+
+/* r51: the three items pop in one by one — rise, tiny overshoot,
+   settle (the r47 bubbly language, at pill scale). Pure CSS like
+   hv2-rise: it runs with or without JS, and the reduced-motion
+   block kills it (animation: none leaves the base state visible —
+   there is NO hidden state without the animation, so it fails
+   open). Delays continue the r50 sequence: the strip was --d:2
+   (0.36s), so the items run .36/.45/.54. */
+@keyframes ha-pop {
+  from { opacity: 0; transform: translateY(12px) scale(.92); }
+  70%  { opacity: 1; transform: translateY(-2px) scale(1.02); }
+  to   { opacity: 1; transform: none; }
+}
+.hero__assurances li { animation: ha-pop .7s var(--ease-out, cubic-bezier(.16,1,.3,1)) both; }
+.hero__assurances li:nth-child(1) { animation-delay: .36s; }
+.hero__assurances li:nth-child(2) { animation-delay: .45s; }
+.hero__assurances li:nth-child(3) { animation-delay: .54s; }
 
 /* lower band: the search pill spans the container (the reference's
    wide lower pill), capped near the reference's ~74% proportion; the
@@ -169,7 +192,20 @@
   max-width: 1080px;
 }
 
-/* popular-area chips (live top-4 from the view) */
+/* popular-area chips (live top-4 from the view). r51: each chip
+   rises in on its own after the pill settles — the r50 block-level
+   hv2-rise (--d:4 = 0.62s) is retired; the label leads, then the
+   chips at 70ms intervals. Same fail-open pattern as ha-pop. */
+@keyframes ha-chip {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: none; }
+}
+.hero__locations-label { animation: ha-chip .6s var(--ease-out, cubic-bezier(.16,1,.3,1)) both; animation-delay: .62s; }
+.hero__loc { animation: ha-chip .6s var(--ease-out, cubic-bezier(.16,1,.3,1)) both; }
+.hero__loc:nth-of-type(1) { animation-delay: .69s; }
+.hero__loc:nth-of-type(2) { animation-delay: .76s; }
+.hero__loc:nth-of-type(3) { animation-delay: .83s; }
+.hero__loc:nth-of-type(4) { animation-delay: .90s; }
 .hero__locations {
   display: flex; align-items: center; flex-wrap: wrap; gap: 10px;
   margin-top: 0;
@@ -224,15 +260,18 @@
   overflow: hidden;
   box-shadow: 0 22px 55px rgba(45,31,23,.35);
 }
-/* the incoming pane is in-flow (owns the track height); the outgoing
-   pane is absolutely stacked ON TOP and fades out over it */
+/* the outgoing pane fades ON TOP of the incoming one and, r51,
+   DRIFTS left as it dissolves — the swap reads as a slide-through
+   instead of a plain fade. The incoming pane is in-flow (owns the
+   track height) beneath it. */
 .hero-card__pane.is-active {
   display: grid; position: relative; z-index: 1; opacity: 1;
 }
 .hero-card__pane.is-leaving {
   display: grid; position: absolute; inset: 0; z-index: 2; opacity: 0;
+  transform: translateX(-16px) scale(.99);
 }
-html.motion-ready .hero-card__pane { transition: opacity .55s var(--ease-out); }
+html.motion-ready .hero-card__pane { transition: opacity .55s var(--ease-out), transform .55s var(--ease-out); }
 /* kill switches — the swap itself is content (hero-card.js keeps
    rotating in every tier); only the fade is motion, so both switches
    render it an instant swap (r48 triple, same doctrine) */
@@ -308,37 +347,10 @@ html:not([data-fx]) .hero-card__pane { transition: none !important; }
 .hero-card__dot:hover { background: color-mix(in srgb, var(--cream) 70%, transparent); }
 .hero-card__dot.is-active { background: var(--cream); }
 
-/* bottom-left market stat */
-.hero__market {
-  position: absolute;
-  left: clamp(20px, 4.5vw, 64px);
-  bottom: 26px;
-  z-index: 2;
-  display: flex; align-items: center; gap: 13px;
-}
-.hero__market > svg {
-  width: 44px; height: 44px; padding: 10px;
-  border-radius: 12px;
-  background: color-mix(in srgb, var(--burnt) 90%, transparent);
-  color: var(--white);
-  box-sizing: content-box;
-  box-shadow: 0 10px 26px rgba(45,31,23,.30);
-}
-.hero__market-text strong {
-  display: block;
-  font-size: var(--text-sm);
-  font-weight: 600;
-  color: var(--cream);
-}
-.hero__market-text span {
-  font-size: var(--text-sm);
-  color: color-mix(in srgb, var(--cream) 86%, transparent);
-}
-.hero__market-text b {
-  /* green-deep lifted toward cream so it clears the dark scrim */
-  color: color-mix(in srgb, var(--green-deep) 38%, var(--cream));
-  font-weight: 700;
-}
+/* r51: the bottom-left market stat block ("Mombasa property market
+   / Growing demand +12% YoY") is REMOVED at the owner's request —
+   markup, rules and its 1020px hide all gone. The bottom band
+   keeps only the search pill, the chips and the scroll cue. */
 
 @media (min-width: 1200px) {
   /* the card pins TOP-RIGHT (the reference's upper band) — no r49
@@ -350,13 +362,24 @@ html:not([data-fx]) .hero-card__pane { transition: none !important; }
   /* single column: the bento below already carries the listings */
   .hero-card { display: none; }
 }
-@media (max-width: 1020px) {
-  .hero__market { display: none; }
-}
+/* r51: the max-width:1020px block is gone with the market stat —
+   it existed only to hide it. */
 @media (max-width: 640px) {
-  .hero__assurances { gap: 4px; padding: 8px 4px; }
-  .hero__assurances li { padding: 5px 10px; }
+  .hero__assurances { gap: 4px; padding: 4px; }
+  .hero__assurances li { padding: 4px 10px; }
   .hero__assurances li + li { border-left: none; }
+}
+
+/* r51: the search pill leans in 2px when engaged — transform-only,
+   gated behind html.motion-ready (JS ran) so no-JS never moves; the
+   reduced-motion parity block below kills the transform and the
+   tokens-level kill takes the transition. M6 invite, pill scale. */
+html.motion-ready .hero__search {
+  transition: transform var(--t-med) var(--ease-out), box-shadow var(--t-med) var(--ease-out);
+}
+html.motion-ready .hero__search:focus-within {
+  transform: translateY(-2px);
+  box-shadow: 0 18px 40px rgba(45,31,23,.35);
 }
 
 
@@ -1212,8 +1235,15 @@ html.motion-ready .bento-grid--shift .bento-card[data-reveal] {
 
 /* ---- reduced motion: keep layout, drop movement ---------------- */
 @media (prefers-reduced-motion: reduce) {
-  .hv2-rise, .hv2-marquee__track, .hv2-scroll span { animation: none !important; }
+  /* r51: ha-pop / ha-chip join the list — animation: none drops the
+     entrance and leaves the base state (fully visible, no hidden
+     state in the base rule) — the fail-open contract. */
+  .hv2-rise, .hv2-marquee__track, .hv2-scroll span,
+  .hero__assurances li, .hero__loc, .hero__locations-label { animation: none !important; }
   .hv2-steps::before, .hv2-steps__dot { transition: none !important; transform: none !important; }
+  /* r51: the focus-within pill lift renders as a plain 2px jump at
+     worst — kill the transform so the pill stays put. */
+  .hero__search:focus-within { transform: none !important; }
 }
 
 /* ---- checklist used on the services and checks pages ---------- */
