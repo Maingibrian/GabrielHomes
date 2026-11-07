@@ -102,9 +102,11 @@ def test_about_story_figure_is_the_unused_sea_bedroom_capped_45():
     body = _page("/about/")
     m = re.search(r'<img src="[^"]*real-(\d+)-([^"]+)"[^>]*>', body.split('about-story__figure', 1)[1])
     assert m, "story figure img missing"
-    # real-04 is the only real photo no other page uses (home bento and
-    # services already run 01/02/03/05/06/07/08)
-    assert m.group(1) == "04", "the story figure must be real-04-bedroom-sea"
+    # r55: real-04-bedroom-sea read as cheap stock (vision pass: cloud-print
+    # duvet + beach canvas) and its caption promised "listing checks" — the
+    # taste-led story now runs real-06-living-terrace (the terrace room IS
+    # the coastal-living story). Still the 4/5 capped crop.
+    assert m.group(1) == "06", "the story figure must be real-06-living-terrace"
     assert 'width="1200"' in m.group(0) and 'height="800"' in m.group(0)
     css = PAGES_CSS.split(".about-story__figure img", 1)[1].split("}", 1)[0]
     assert "aspect-ratio: 4 / 5" in css, "figure crop is 4/5"
@@ -118,7 +120,8 @@ def test_about_values_have_header_band_and_three_iconed_cards():
     body = _page("/about/")
     assert "[ PRINCIPLES ]" in body
     assert 'class="values-head__title" data-reveal>What we stand for.' in body
-    assert "Three principles run through everything we do" in body
+    # r55: taste-led intro (owner: less checked-listings language)
+    assert "Three instincts run through everything we do" in body
     # every value card carries an icon from the 1.7-stroke family
     cards = re.findall(r'<article class="value-card".*?</article>', body, re.S)
     assert len(cards) == 3
@@ -164,8 +167,10 @@ def test_about_founder_band_is_an_editorial_portrait_with_quote():
 # ---------------------------------------------------------------------------
 def test_about_cta_no_longer_repeats_the_footer_cta_heading():
     body = _page("/about/")
-    # the footer band (shared include) owns this heading now
-    assert "See the homes we have checked." in body
+    # the footer band (shared include) owns this heading now.
+    # r55: the about CTA leads with taste ("Homes worth crossing town
+    # for.") — the checked-listings framing retired per the owner round.
+    assert "Homes worth crossing town for." in body
     cta = body.split('class="section cta"', 1)[1].split("</section>", 1)[0]
     assert "Tell us what you are looking for" not in cta, (
         "the about CTA must not repeat the footer CTA heading")

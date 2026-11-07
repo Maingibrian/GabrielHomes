@@ -723,7 +723,11 @@
   .footer-cols { grid-template-columns: repeat(4, 1fr); gap: 3rem; }
 }
 @media (min-width: 1200px) {
-  .footer-cols { grid-template-columns: repeat(5, 1fr); gap: 2.5rem; }
+  /* r55: the browse column was the fifth equal track and wrapped
+     ("BY PROPERTY / TYPE", "Flats & Apartments" on two lines) — the
+     vision pass read it as a layout collapse at 1600px. Wider fifth
+     track + nowrap subheads. */
+  .footer-cols { grid-template-columns: repeat(4, 1fr) 1.35fr; gap: 2.5rem; }
 }
 .footer-cols__col h4 {font-family: var(--font-mono);
   font-size: var(--text-xs);
@@ -741,6 +745,11 @@
   transition: color var(--t-fast) var(--ease);
 }
 .footer-cols__col a:hover { color: var(--burnt); }
+/* r55: phone tap targets — the 390px vision pass read footer links as
+   ~30px single-line rows (below the 44px comfortable tap size). */
+@media (max-width: 560px) {
+  .footer-cols__col a { padding: 0.55rem 0; }
+}
 
 
 /* ============================================================
@@ -1366,9 +1375,11 @@ html.motion-ready [data-reveal].is-visible {
   /* r53: scrim rebalanced (vision pass called the old one muddy) — the
      middle thins so the photo reads warm instead of grey sludge, while
      the top/bottom edges deepen to carry the tag and the proof strip.
-     Large display text sits in the ~0.56 zone: cream on that ≈ 7:1. */
+     r55 pass-2: mid 0.56 -> 0.60 (still <= the pinned 0.62) — the
+     vision pass read the band as a failed hero load; the deeper middle
+     commits it to a dark band with warm photo hints. */
   background:
-    linear-gradient(180deg, rgba(28,21,17,0.88) 0%, rgba(42,33,28,0.56) 50%, rgba(28,21,17,0.93) 100%),
+    linear-gradient(180deg, rgba(28,21,17,0.88) 0%, rgba(42,33,28,0.60) 50%, rgba(28,21,17,0.93) 100%),
     url("../img/real/hero-poster.jpg") center/cover no-repeat,
     var(--espresso);
   color: var(--cream);
@@ -1395,7 +1406,13 @@ html.motion-ready [data-reveal].is-visible {
   max-width: 56ch;
   margin: -0.75rem auto 2rem;
 }
-.cta .section-tag--light { margin-bottom: 1.25rem; }
+.cta .section-tag--light {
+  margin-bottom: 1.25rem;
+  /* r55: the shared light tag was clay/sand at 48% — on the photo band
+     the vision pass read [ THE PROOF ] as barely legible. Scoped bump
+     so home/about/contact all clear it without touching the shared tag. */
+  color: color-mix(in srgb, var(--clay) 82%, var(--sand));
+}
 
 /* ============================================================
    Bento mosaic — one full-width spotlight card, then a 3-column
@@ -1678,6 +1695,9 @@ html.motion-ready .bento-grid .bento-card[data-reveal]:nth-child(3n) { transitio
   margin-top: 0.75rem;
 }
 .footer-cols__subhead {font-family: var(--font-mono); font-weight: 600;
+  /* r55: nowrap — the subhead wrapped mid-phrase inside the narrow
+     browse column ("BY PROPERTY / TYPE"). */
+  white-space: nowrap;
   font-size: 0.75rem;
   text-transform: uppercase;
   letter-spacing: 0.08em;

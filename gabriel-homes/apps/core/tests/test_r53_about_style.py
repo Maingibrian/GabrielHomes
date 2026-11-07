@@ -117,8 +117,10 @@ def test_about_cta_carries_proof_strip():
     body = _page("/about/")
     cta = body.split('class="section cta"', 1)[1].split("</section>", 1)[0]
     assert 'class="cta__proof-strip"' in cta
+    # r55: real-08-aerial read as an unfinished construction site (vision
+    # pass) — the triptych closes on real-03-bedroom-garden instead.
     imgs = re.findall(r'src="[^"]*real-(\d+)-', cta)
-    assert imgs == ["01", "05", "08"], "three real listing-check photos"
+    assert imgs == ["01", "05", "03"], "three real listing photos"
     assert "honest photography" in cta
 
 

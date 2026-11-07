@@ -12,58 +12,65 @@
 
 {% block content %}
 
-{% comment %} r52: the hero drops the "Our story" eyebrow — it said the same
-thing as the frosted [ ABOUT ] pill above it. A mono place-and-year line
-grounds the band instead (same facts the story copy already states). {% endcomment %}
+{% comment %} r55: the owner asked the language to lead with taste — unique
+homes and coastal experiences — instead of the checked-listings story.
+The hero now sells the feeling of the coast; the checking story keeps
+its home on /checks/ and one quiet line in the quote band. {% endcomment %}
 <section class="page-hero">
   <div class="container">
     <p class="section-tag" data-reveal>[ ABOUT ]</p>
-    <h1 class="page-hero__title" data-reveal>Real estate with a human point of view.</h1>
+    <h1 class="page-hero__title" data-reveal>Homes with taste, from the Kenyan coast.</h1>
     <p class="page-hero__subtitle" data-reveal>
-      Gabriel Homes is a Kenyan property agency built on a simple idea: people
-      come first, property second. We help you buy, rent, and short-stay across
-      the Kenyan coast and beyond.
+      Gabriel Homes is a small agency for people who care where they wake
+      up. Sea-view apartments in Nyali, garden homes in Bamburi, quiet
+      villas in Shanzu — we help you buy, rent and short-stay along the
+      coast.
     </p>
     <p class="page-hero__meta" data-reveal>Mombasa · Kenya — founded 2026</p>
   </div>
 </section>
 
-{% comment %} r52: story remodel. The old band left a dead zone under the
-copy (three short paragraphs next to a very tall sticky photo) and the
-"What we stand for" heading dangled over nothing — the values now live in
-their own headed band below. Here, the philosophy line is pulled out of
-the body as a display pull-quote so the copy column carries real weight,
-and the figure swaps to the one real photo no other page uses
-(real-04-bedroom-sea), cropped 4/5 and height-capped so it can never run
-away into wallpaper. The fee-disclosure paragraph keeps its pinned
-phrases (test_h1_home_order). {% endcomment %}
+{% comment %} r55: taste-led story rewrite (owner: "about taste and unique
+special homes and experiences from the coast, less about checked
+listings"). The verification story now lives in one line on /checks/;
+this copy talks about light, streets and evenings instead. The figure
+swaps real-04-bedroom-sea -> real-06-living-terrace (the vision pass
+read the old bedroom as cheap stock; the terrace room is the taste
+story). The fee-disclosure paragraph keeps its pinned phrase
+(test_h1_home_order). The mono "what we look for" list fills the dead
+zone the vision pass found under three short paragraphs. {% endcomment %}
 <section class="section">
   <div class="container about-story">
     <div class="about-story__copy">
       <p class="section-tag" data-reveal>[ OUR STORY ]</p>
       <p data-reveal>
         We started Gabriel Homes because property in Kenya too often feels
-        transactional — endless listings, vague details, and agents who disappear
-        after the deposit lands. We wanted to build the opposite: a small, sharp
-        team that verifies every listing before it goes live, tells you what a
-        place is really like, and stays involved long after the keys change hands.
-        That is what "a human point of view" means to us, and it shapes every part
-        of how we work.
+        transactional — endless listings, vague details, and agents who
+        disappear once the deposit clears. We wanted the opposite: a small
+        team that talks about the things that actually make a home — the
+        light at four in the afternoon, the street outside, the short walk
+        to the water — and stays around long after the keys change hands.
       </p>
       <p data-reveal>
-        We are a new company, founded in 2026 and centred in Kenya. We are
-        building our listings one checked property at a time, with honest
-        photography. If something is wrong with a property, we tell you before
-        you ask.
+        We are young — founded in 2026, centred in Mombasa — and we are
+        building the collection slowly: homes with character, photographed
+        as they really are, on streets we would live on ourselves.
       </p>
       <p data-reveal>
-        If we could not check something, we tell you. Buyers pay Gabriel Homes
-        a fee, and we tell you the exact amount before you commit to anything.
+        Buyers pay Gabriel Homes a fee, and we tell you the exact amount
+        before you commit to anything. If something is wrong with a home,
+        we say so before you ask.
       </p>
+      <ul class="about-story__taste" data-reveal aria-label="What we look for in a home">
+        <li class="about-story__taste-k">[ WHAT WE LOOK FOR ]</li>
+        <li>Light, air, and a view worth pausing for</li>
+        <li>A street you would walk at dusk</li>
+        <li>Rooms that feel bigger with the windows open</li>
+      </ul>
     </div>
     <figure class="about-story__figure" data-reveal>
-      <img src="{% staticv 'img/real/real-04-bedroom-sea.jpg' %}" alt="A bedroom in a Mombasa home from our listing checks" loading="lazy" width="1200" height="800">
-      <figcaption><span>[ SITE VISIT ]</span> A Mombasa home from our listing checks.</figcaption>
+      <img src="{% staticv 'img/real/real-06-living-terrace.jpg' %}" alt="A Mombasa living room opening onto its terrace" loading="lazy" width="1200" height="800">
+      <figcaption><span>[ COASTAL LIVING ]</span> Rooms that open to the breeze.</figcaption>
     </figure>
   </div>
 </section>
@@ -81,6 +88,9 @@ phrases (test_h1_home_order). {% endcomment %}
       We would rather publish fewer homes that we have checked than many
       that we have not.
     </blockquote>
+    {# r55: taste kicker anchors the band's empty lower half and reframes #}
+    {# the quote — the paperwork is the floor, the home is the point.    #}
+    <p class="about-quote__kicker" data-reveal>The paperwork is the floor. The home is the point.</p>
   </div>
 </section>
 
@@ -90,8 +100,8 @@ phrases (test_h1_home_order). {% endcomment %}
       <p class="section-tag" data-reveal>[ PRINCIPLES ]</p>
       <h2 class="values-head__title" data-reveal>What we stand for.</h2>
       <p class="values-head__intro" data-reveal>
-        Three principles run through everything we do, from the first phone call
-        to the final handover.
+        Three instincts run through everything we do — about homes, about
+        people, about this coast.
       </p>
     </div>
     <div class="story__values">
@@ -102,8 +112,9 @@ phrases (test_h1_home_order). {% endcomment %}
         <p class="value-card__tag">[ 001 — People ]</p>
         <h3 class="value-card__title">People first, property second.</h3>
         <p class="value-card__body">
-          We start with what you're trying to do — move closer to school,
-          downsize, or find a place to retire to. The property comes second.
+          We start with the life you want — the school run, the sea breeze,
+          the long weekends — and find the home that fits it. Not the other
+          way round.
         </p>
       </article>
       <article class="value-card" data-reveal>
@@ -113,8 +124,8 @@ phrases (test_h1_home_order). {% endcomment %}
         <p class="value-card__tag">[ 002 — Transparency ]</p>
         <h3 class="value-card__title">Radical transparency.</h3>
         <p class="value-card__body">
-          Checked listings, full disclosures, and a paper trail at every step.
-          If something's wrong with a property, we tell you before you ask.
+          No airbrushed photos, no surprise costs, no small-print games.
+          What you see on the page is what you find at the gate.
         </p>
       </article>
       <article class="value-card" data-reveal>
@@ -124,9 +135,9 @@ phrases (test_h1_home_order). {% endcomment %}
         <p class="value-card__tag">[ 003 — Support ]</p>
         <h3 class="value-card__title">Support beyond the keys.</h3>
         <p class="value-card__body">
-          We stay involved after the deal closes — handover, fit-out, connecting
-          you with trusted local trades. The relationship doesn't end at
-          completion.
+          We stay involved after the deal closes — handover, fit-out, and
+          the local trades only neighbours know. The relationship doesn't
+          end at completion.
         </p>
       </article>
     </div>
@@ -164,10 +175,13 @@ phrases (test_h1_home_order). {% endcomment %}
         <p class="hv2-founder__name">Gabriel Omulu</p>
       </div>
     </div>
+    {# r55: a fourth rail fact (taste-led) fills the short right column #}
+    {# the vision pass called left-heavy. The three r53 pins stay.     #}
     <ul class="about-founder__rail" data-reveal>
       <li><span class="about-founder__rail-k">Founded</span><span class="about-founder__rail-v">2026</span></li>
       <li><span class="about-founder__rail-k">Based</span><span class="about-founder__rail-v">Mombasa · Kenya</span></li>
       <li><span class="about-founder__rail-k">Standard</span><span class="about-founder__rail-v">Every home walked through</span></li>
+      <li><span class="about-founder__rail-k">Focus</span><span class="about-founder__rail-v">Coastal homes &amp; stays</span></li>
     </ul>
   </div>
 </section>
@@ -182,18 +196,32 @@ phrases (test_h1_home_order). {% endcomment %}
   <div class="container">
     <p class="section-tag section-tag--light" data-reveal>[ THE PROOF ]</p>
     <h2 class="cta__title" data-reveal>
-      See the homes we have checked.
+      Homes worth crossing town for.
     </h2>
     <a class="btn btn--primary btn--lg" href="/properties/" data-reveal>
       Explore listings <span class="btn__arrow" aria-hidden="true">&rarr;</span>
     </a>
     <div class="cta__proof" data-reveal>
+      {% comment %} r55: the aerial read as a construction site (vision
+      pass) — it swaps for the garden bedroom; the strip widens so the
+      photos stop reading as tall placeholders. "honest photography"
+      stays pinned. (Multi-line note: {# #} renders literally — this
+      block is the safe form.) {% endcomment %}
       <div class="cta__proof-strip">
-        <img src="{% staticv 'img/real/real-01-kitchen-island.jpg' %}" alt="Kitchen island from a checked listing" loading="lazy" width="1200" height="800">
-        <img src="{% staticv 'img/real/real-05-dining.jpg' %}" alt="Dining room from a checked listing" loading="lazy" width="1200" height="800">
-        <img src="{% staticv 'img/real/real-08-aerial.jpg' %}" alt="Aerial view of a checked listing" loading="lazy" width="1200" height="800">
+        <figure>
+          <img src="{% staticv 'img/real/real-01-kitchen-island.jpg' %}" alt="Kitchen island in a Mombasa home" loading="lazy" width="1200" height="800">
+          <figcaption>Kitchen</figcaption>
+        </figure>
+        <figure>
+          <img src="{% staticv 'img/real/real-05-dining.jpg' %}" alt="Dining room in a Mombasa home" loading="lazy" width="1200" height="800">
+          <figcaption>Dining</figcaption>
+        </figure>
+        <figure>
+          <img src="{% staticv 'img/real/real-03-bedroom-garden.jpg' %}" alt="Bedroom with a garden view in a Mombasa home" loading="lazy" width="1200" height="800">
+          <figcaption>Bedroom</figcaption>
+        </figure>
       </div>
-      <p class="cta__proof-note">From our listing checks — honest photography.</p>
+      <p class="cta__proof-note">Real rooms, real light — honest photography.</p>
     </div>
   </div>
 </section>

@@ -2,16 +2,16 @@
 {% load core_tags static %}
 
 {% block title %}Gabriel Homes — Homes for sale, rent and short stays in Mombasa{% endblock %}
-{% block meta_description %}Homes for sale, long-term rentals and short stays across Mombasa. Every listing is checked by Gabriel and the team before it is published.{% endblock %}
+{% block meta_description %}Homes for sale, rent and short stays across Mombasa — sea-view apartments, garden villas and coastal hideaways, chosen for character.{% endblock %}
 
 {% block canonical %}
   <link rel="canonical" href="{{ request.build_absolute_uri }}">
 {% endblock %}
 
 {% block og_title %}Gabriel Homes — Homes for sale, rent and short stays in Mombasa{% endblock %}
-{% block og_description %}Homes for sale, long-term rentals and short stays across Mombasa. Every listing is checked before it is published.{% endblock %}
+{% block og_description %}Homes for sale, rent and short stays across Mombasa — chosen for character, from Nyali sea views to Old Town courtyards.{% endblock %}
 {% block twitter_title %}Gabriel Homes — Homes for sale, rent and short stays in Mombasa{% endblock %}
-{% block twitter_description %}Homes for sale, rent and short stays in Mombasa. Checked before it is published.{% endblock %}
+{% block twitter_description %}Homes for sale, rent and short stays in Mombasa — chosen for character.{% endblock %}
 
 {% block styles %}
   <link rel="preload" as="image" href="{% staticv 'img/real/hero-slide-1.webp' %}" fetchpriority="high">
@@ -323,9 +323,9 @@
         <div class="bento-card__scrim" aria-hidden="true"></div>
         <div class="bento-card__body">
           <p class="bento-card__index">[ {% if showcase_listings %}BROWSE ALL{% else %}ASK US{% endif %} ]</p>
-          <h3 class="bento-card__name">{% if showcase_listings %}Every listing, checked first.{% else %}Ask about any property.{% endif %}</h3>
+          <h3 class="bento-card__name">{% if showcase_listings %}Every home, chosen for character.{% else %}Ask about any property.{% endif %}</h3>
           <p class="bento-card__meta">
-            {% if showcase_listings %}Each listing is checked before it goes live. Browse all&nbsp;&rarr;{% else %}Tell us what you are looking for. A person replies.&nbsp;&rarr;{% endif %}
+            {% if showcase_listings %}From first flat to family villa — browse them all&nbsp;&rarr;{% else %}Tell us what you are looking for. A person replies.&nbsp;&rarr;{% endif %}
           </p>
         </div>
       </a>
@@ -344,8 +344,10 @@
         <h2 class="home-market__title" data-bubble-title>Homes for the way you want to move.</h2>
       </div>
       <div class="home-market__aside" data-reveal>
-        <p>A small, hand-picked set of homes for sale, long-term rent and short stays across Mombasa. Every one is visited and checked by the Gabriel Homes team before it appears here.</p>
-        <a class="home-market__aside-cta" href="/properties/">Browse every checked home <span aria-hidden="true">→</span></a>
+        {# r55: taste-led rewrite (owner: less checked-listings language) — #}
+        {# the walked-through promise stays, the check-jargon goes.        #}
+        <p>A small, hand-picked set of homes for sale, long-term rent and short stays across Mombasa — each one walked through by the team before it appears here.</p>
+        <a class="home-market__aside-cta" href="/properties/">Browse every home <span aria-hidden="true">→</span></a>
       </div>
     </div>
 

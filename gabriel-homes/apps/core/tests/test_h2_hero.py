@@ -65,17 +65,24 @@ def test_lcp_image_is_preloaded_in_head():
     assert "hero-slide-1" in m.group(1)
 
 
-def test_marquee_has_edge_fade_mask():
-    """The five-checks ticker must dissolve at the edges (mask), not be
-    sliced mid-word — owner mobile screenshot defect. Colour keywords
-    only, so the F1 hex ratchet is untouched."""
+def test_marquee_has_edge_fade_caps():
+    """The five-checks ticker must dissolve at the edges, not be sliced
+    mid-word — owner mobile screenshot defect. r55: the r24 strip-level
+    mask also faded the strip's own background, which read as white
+    "caps" clipping the bar (vision pass); the strip is now solid and
+    two burnt gradient caps paint over the running text at the viewport
+    edges. Colour keywords only, so the F1 hex ratchet is untouched."""
     css = HOME_CSS.read_text(encoding="utf-8")
     rule = re.search(r"\.hv2-marquee \{(.*?)\}", css, re.S)
     assert rule, ".hv2-marquee rule missing"
     body = rule.group(1)
-    assert "mask-image: linear-gradient" in body
-    assert "-webkit-mask-image" in body
-    assert "transparent" in body
+    assert "mask-image" not in body, "the strip must not fade its own bg"
+    assert "position: relative" in body
+    caps = re.findall(r"\.hv2-marquee::(?:before|after) \{[^}]*\}", css)
+    burnt = [c for c in caps if "var(--burnt" in c]
+    assert len(burnt) == 2, "two burnt gradient caps over the running text"
+    assert any("linear-gradient(90deg" in c for c in burnt), "left cap fades in"
+    assert any("linear-gradient(270deg" in c for c in burnt), "right cap fades in"
     # the fade is expressed with colour keywords — the F1 hex ratchet
     # (global count may only go down) is guarded by test_f1_token_integrity
 

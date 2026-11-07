@@ -103,10 +103,13 @@ class BrandSettings(models.Model):
     )
     hero_subtitle = models.TextField(
         max_length=500,
+        # r55 (owner request): taste-led rewrite — the subtitle sells the
+        # coast's homes and experiences; the walked-through line carries
+        # the trust without the check-ledger language.
         default=(
-            "Buy, rent or book a short stay anywhere in Mombasa. Gabriel and "
-            "the team check every listing before it goes live — and if we "
-            "cannot check something, we tell you."
+            "Buy, rent or book a short stay along the Kenyan coast — from "
+            "sea-view apartments in Nyali to quiet villas in Shanzu. Every "
+            "home here is one we have walked through ourselves."
         ),
     )
     about_heading = models.CharField(
@@ -144,9 +147,11 @@ class BrandSettings(models.Model):
     footer_lead = models.CharField(
         max_length=220,
         # r12: listings-first lead line instead of the founding-date line.
+        # r55: taste-led rewrite (owner request) — character and coast
+        # lead; the checking story lives on /checks/.
         default=(
-            "Homes for sale, rent and short stays across Mombasa, checked "
-            "before they are published."
+            "Homes for sale, rent and short stays across Mombasa — chosen "
+            "for character, from Nyali sea views to Old Town courtyards."
         ),
     )
     updated_at = models.DateTimeField(auto_now=True)

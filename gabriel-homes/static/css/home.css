@@ -1148,11 +1148,27 @@ html.motion-ready .bento-grid--shift .bento-card[data-reveal] {
 .hv2-marquee {
   background: var(--burnt, #a0522d); color: var(--white, #fff);
   overflow: hidden; padding: 18px 0; white-space: nowrap;
-  /* r24: edge fade so the running text dissolves instead of being cut
-     mid-word at the viewport edges (owner mobile screenshot). Colour
-     keywords, not hex, to respect the F1 hex ratchet. */
-  -webkit-mask-image: linear-gradient(90deg, transparent, black 36px, black calc(100% - 36px), transparent);
-  mask-image: linear-gradient(90deg, transparent, black 36px, black calc(100% - 36px), transparent);
+  position: relative;
+  /* r55: the r24 strip-level mask faded the strip's own background too,
+     which the vision pass read as white "caps" clipping the bar at both
+     ends. The strip now stays solid edge to edge; two burnt gradient
+     caps (below) dissolve only the running text at the viewport edges. */
+}
+.hv2-marquee::before,
+.hv2-marquee::after {
+  content: "";
+  position: absolute;
+  top: 0; bottom: 0; width: 64px;
+  z-index: 1;
+  pointer-events: none;
+}
+.hv2-marquee::before {
+  left: 0;
+  background: linear-gradient(90deg, var(--burnt, #a0522d), transparent);
+}
+.hv2-marquee::after {
+  right: 0;
+  background: linear-gradient(270deg, var(--burnt, #a0522d), transparent);
 }
 .hv2-marquee__track {
   display: inline-flex; gap: 28px; align-items: center;

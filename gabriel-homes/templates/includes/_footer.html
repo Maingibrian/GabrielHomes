@@ -17,7 +17,9 @@
 
     <div class="site-footer__top">
       <div>
-        <p class="section-tag section-tag--light">[ FOOTER ]</p>
+        {# r55: "[ FOOTER ]" read as dev scaffolding (vision pass) — the #}
+        {# band now carries a real place line instead.                          #}
+        <p class="section-tag section-tag--light">[ MOMBASA · KENYA ]</p>
         <p class="site-footer__lead">{{ brand.footer_lead }}</p>
       </div>
 
@@ -72,7 +74,9 @@
     <div class="site-footer__row site-footer__newsletter" id="newsletter" data-reveal>
       <div>
         <h2 class="featured__title">New listings, by email.</h2>
-        <p class="site-footer__newsletter-note">We send a newsletter once ten new listings have been published since the last one. Opt in and confirm by email; unsubscribe with one click.</p>
+        {# r55: microcopy rewritten — the vision pass caught the old line #}
+        {# breaking mid-clause and confusing ("once ten new listings…").  #}
+        <p class="site-footer__newsletter-note">A short note whenever ten new homes have gone up — no schedule, no noise. Opt in and confirm by email; unsubscribe with one click.</p>
       </div>
       <form class="newsletter-form" method="post" action="{% url 'newsletter_subscribe' %}">
         {% csrf_token %}

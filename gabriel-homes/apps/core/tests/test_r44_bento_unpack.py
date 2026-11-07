@@ -151,7 +151,7 @@ def test_cta_tile_and_check_cards_stay_plain():
     """The closing BROWSE ALL tile (and the five-check fallback cards)
     never grow a drawer — the unpacking belongs to property cards."""
     body = _home_body()
-    cta = _card_slice(body, "Every listing, checked first.")
+    cta = _card_slice(body, "Every home, chosen for character.")
     assert "bento-card--cta" in cta
     assert "bento-card__drawer" not in cta
     assert "bento-card__more" not in cta

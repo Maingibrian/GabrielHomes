@@ -204,8 +204,10 @@ def about(request):
         body_class="page-about",
         page_title="About us — Gabriel Homes",
         meta_description=(
-            "Gabriel Homes is a new Kenyan real estate company, founded in 2026. "
-            "Every listing is checked by hand before it goes live."
+            # r55: taste-led (owner request) — the coast and its homes lead;
+            # the checking story keeps its own page on /checks/.
+            "Gabriel Homes is a small Mombasa agency — coastal homes for sale, "
+            "rent and short stays, chosen for character."
         ),
         canonical_url="/about/",
         agencies=agencies,
