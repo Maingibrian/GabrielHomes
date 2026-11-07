@@ -730,7 +730,7 @@
 /* ---------- Listing page refresh ---------- */
 .detail-page-v2 { padding: 28px 0 0; }
 .detail-intro { margin: 0 auto 22px; max-width: 1050px; }
-.detail-intro__eyebrow { display:flex; align-items:center; gap:12px; color:var(--burnt); font:700 10px var(--font-mono); letter-spacing:.12em; text-transform:uppercase; }
+.detail-intro__eyebrow { display:flex; align-items:center; gap:12px; color:var(--burnt); font:700 13px var(--font-mono); letter-spacing:.12em; text-transform:uppercase; }
 .detail-intro__checked { display:inline-flex; align-items:center; gap:5px; color:#2f665a; letter-spacing:.04em; }
 .detail-intro__title { margin:12px 0 14px; max-width:24ch; color:var(--ink); font:500 clamp(2.2rem,4.6vw,4rem)/.99 var(--font-display); letter-spacing:-.045em; }
 .detail-intro__bottom { display:flex; align-items:center; gap:18px; flex-wrap:wrap; }
@@ -751,7 +751,7 @@
 .detail-layout--revamp .detail-video { margin-bottom:34px; }
 .detail-layout--revamp .detail-description { margin-bottom:38px; }
 .detail-layout--revamp .detail-description__title,
-.detail-layout--revamp .amenities__title { margin-bottom:12px; color:var(--taupe); font-size:10px; letter-spacing:.14em; }
+.detail-layout--revamp .amenities__title { margin-bottom:12px; color:var(--taupe); font-size:13px; letter-spacing:.14em; }
 .detail-layout--revamp .detail-description__body { max-width:68ch; font-size:17px; line-height:1.75; }
 .detail-layout--revamp .amenities { margin-bottom:44px; }
 .detail-layout--revamp .amenities__grid { grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; }
@@ -764,19 +764,19 @@
 .detail-layout--revamp .enquiry-form__title { margin:6px 0 10px; }
 .nearby-amenities { margin:0 0 42px; padding:28px; border:1px solid var(--sand-60); border-radius:20px; background:#f6f1e9; }
 .nearby-amenities__heading { display:flex; justify-content:space-between; align-items:end; gap:16px; margin-bottom:10px; }
-.nearby-amenities__eyebrow { margin:0 0 7px; color:var(--burnt); font:700 10px var(--font-mono); letter-spacing:.13em; }
+.nearby-amenities__eyebrow { margin:0 0 7px; color:var(--burnt); font:700 13px var(--font-mono); letter-spacing:.13em; }
 .nearby-amenities__heading h2,.detail-map__heading h2 { margin:0; color:var(--ink); font:500 clamp(1.7rem,3vw,2.35rem)/1.05 var(--font-display); letter-spacing:-.03em; }
-.nearby-amenities__heading > span,.detail-map__heading > span {flex:none; color:var(--taupe); font: 600 10px var(--font-mono); letter-spacing:.06em; text-transform:uppercase;}
-.nearby-amenities__note { margin:0 0 16px; color:var(--taupe); font-size:12px; }
+.nearby-amenities__heading > span,.detail-map__heading > span {flex:none; color:var(--taupe); font: 600 13px var(--font-mono); letter-spacing:.06em; text-transform:uppercase;}
+.nearby-amenities__note { margin:0 0 16px; color:var(--taupe); font-size:13px; }
 .nearby-amenities__grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; }
 .nearby-amenity { display:flex; align-items:center; gap:12px; min-width:0; padding:14px; border:1px solid rgba(90,64,50,.1); border-radius:14px; background:#fff; }
 .nearby-amenity__icon { display:grid; place-items:center; flex:none; width:38px; height:38px; border-radius:12px; background:#f2e5d8; color:var(--burnt); font-size:20px; }
-.nearby-amenity__type { color:var(--taupe); font:700 9px var(--font-mono); letter-spacing:.1em; text-transform:uppercase; }
+.nearby-amenity__type { color:var(--taupe); font:700 13px var(--font-mono); letter-spacing:.1em; text-transform:uppercase; }
 .nearby-amenity h3 { margin:4px 0 2px; color:var(--ink); font-size:13px; line-height:1.25; }
-.nearby-amenity p { margin:0; color:var(--taupe); font-size:11px; }
+.nearby-amenity p { margin:0; color:var(--taupe); font-size:13px; }
 .detail-layout--revamp .detail-map { margin:0; }
 .detail-map__heading { display:flex; justify-content:space-between; align-items:end; gap:16px; margin-bottom:14px; }
-.detail-map__title { margin:0 0 7px; color:var(--burnt); font:700 10px var(--font-mono); letter-spacing:.13em; }
+.detail-map__title { margin:0 0 7px; color:var(--burnt); font:700 13px var(--font-mono); letter-spacing:.13em; }
 #detail-map { height:350px; overflow:hidden; border:1px solid var(--sand-60); border-radius:18px; background:#e8e2da; }
 #detail-map .maplibregl-ctrl-group { overflow:hidden; border:0; border-radius:11px; box-shadow:0 5px 16px rgba(28,21,17,.16); }
 #detail-map .maplibregl-ctrl-attrib { background:rgba(255,255,255,.9); font-size:9px; }

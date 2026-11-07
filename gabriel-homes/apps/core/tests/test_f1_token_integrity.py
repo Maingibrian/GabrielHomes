@@ -39,8 +39,20 @@ TOKENS = CSS / "tokens.css"
 FONT_FLOOR_PX = 13
 
 # --- ratchet baselines, recorded at r17 (first green F1 run) --------------
-HEX_BASELINE = 201   # hard-coded hex outside tokens.css; may only go DOWN (240 @r17, 236 @r18, 217 @r21 after the HYG-1 dead-rule purge, 215 @r24 after the .stat--light removal, 214 @r30 audit re-pin, 211 @r34 — the r34 G4 build removed a pre-existing dead rule fragment at the components.css tail which carried 3 hex literals; survey regex aligned with the test counter r30; 201 @r38 — the F1 T2 lift tokenised search.css to zero hex: 8x #fff -> var(--white), 2x #e7e4df -> new token --map-stage, D-LOOP-38a; computed-style A/B proof: 13/13 probes identical)
-SUB13_BASELINE = 43  # px font sizes below 13px; may only go DOWN (44 pre-r22, true count corrected to 43 at r22 D-LOOP-22a; constant re-pinned to the recorded ratchet at r34)
+HEX_BASELINE = 198   # hard-coded hex outside tokens.css; may only go DOWN
+                           # (240 @r17, 236 @r18, 217 @r21, 215 @r24, 214 @r30,
+                           # 211 @r34, 201 @r38 — search.css fully tokenised,
+                           # D-LOOP-38a; 200 @r58; 198 @r59 — the coastal
+                           # home-nearby band swapped its 60%-alpha grey
+                           # whites for solid rgba() whites, D-LOOP-59a)
+SUB13_BASELINE = 4  # px font sizes below 13px; may only go DOWN (44 pre-r22,
+                     # corrected to 43 @r22 D-LOOP-22a, re-pinned @r34; 43 -> 4
+                     # @r59 — the owner-round-nine accessibility sweep
+                     # ("words can be read and are not too small") lifted
+                     # EVERY visitor-facing sub-13px size to the 13px
+                     # --text-xs floor: home.css 18 -> 0, search.css 13 -> 1,
+                     # detail.css 9 -> 1, components.css 1 -> 0. Survivors:
+                     # maplibre attributions + staff dashboard labels only)
 
 # (file, px) -> reason. A sub-floor size whose (file, px) pair is not listed
 # here is a failure. Listed pairs also have per-pair baselines (below) so
@@ -48,42 +60,20 @@ SUB13_BASELINE = 43  # px font sizes below 13px; may only go DOWN (44 pre-r22, t
 FONT_FLOOR_ALLOWLIST = {
     ("dashboard.css", 10): "admin/staff dashboard micro labels — staff-only "
                            "tool surface, not visitor-facing",
-    ("components.css", 12): "footer newsletter form label (moved from the "
-                            "home band with the form, r18)",
-    ("detail.css", 9): "maplibre attribution overlay + nearby-amenity mono "
-                       "type tag",
-    ("detail.css", 10): "amenities/nearby eyebrow micro labels "
-                        "(uppercase mono)",
-    ("detail.css", 11): "nearby-amenity small print",
-    ("detail.css", 12): "nearby-amenities note small print",
-    ("home.css", 10): "market band eyebrow micro labels (uppercase mono)",
-    ("home.css", 11): "market band eyebrows + facts (uppercase mono)",
-    ("home.css", 12): "founder role, card tags, fee label — uppercase mono "
-                      "micro type",
-    ("search.css", 9): "map property popup micro label (mono)",
-    ("search.css", 10): "map attribution + mobile reset control + map "
-                        "heading eyebrow",
-    ("search.css", 11): "map filter chip mono label + listing-row type "
-                        "eyebrow",
-    ("search.css", 12): "map popup text, listing facts chips, mobile action "
-                        "buttons, map price pin",
+    ("detail.css", 9): "maplibre attribution overlay — third-party license "
+                       "fine print the map SDK renders itself",
+    ("search.css", 10): "maplibre attribution overlay — third-party license "
+                        "fine print the map SDK renders itself",
 }
 
-# per-(file, px) counts at r17 — listed pairs must not grow either
+# per-(file, px) counts, re-pinned at r59 (owner round nine) — the
+# accessibility sweep lifted every visitor-facing sub-13px size to the
+# floor, so the allowlist is now only maplibre attributions and the
+# staff dashboard. Listed pairs must not grow either.
 FONT_FLOOR_PAIR_BASELINE = {
     ("dashboard.css", 10): 2,
-    ("components.css", 12): 1,
-    ("detail.css", 9): 2,
-    ("detail.css", 10): 5,
-    ("detail.css", 11): 1,
-    ("detail.css", 12): 1,
-    ("home.css", 10): 7,
-    ("home.css", 11): 6,
-    ("home.css", 12): 6,
-    ("search.css", 9): 2,
-    ("search.css", 10): 5,
-    ("search.css", 11): 2,
-    ("search.css", 12): 4,
+    ("detail.css", 9): 1,
+    ("search.css", 10): 1,
 }
 
 

@@ -96,12 +96,15 @@
   /* Size scale seen in the reference */
   --text-xs:   0.8125rem; /* 13px — floor for UI text; was 12px (too small) */
 
-  /* F1 font-floor allowlist (r17, DECISIONS D-LOOP-17c): px sizes below the
-     13px floor are allowed ONLY for the pairs listed in
-     apps/core/tests/test_f1_token_integrity.py::FONT_FLOOR_ALLOWLIST
-     (map/attribution overlays, uppercase-mono eyebrow micro type, staff
-     dashboard labels). The sub-floor total is a ratchet: 44 at r17 and it
-     may only go DOWN. New sub-floor sizes fail pytest. */
+  /* F1 font-floor allowlist (r17, DECISIONS D-LOOP-17c; re-pinned r59):
+     px sizes below the 13px floor are allowed ONLY for the pairs in
+     apps/core/tests/test_f1_token_integrity.py::FONT_FLOOR_ALLOWLIST —
+     after the r59 accessibility sweep ("words can be read and are not
+     too small", owner round nine) that is just the third-party maplibre
+     attributions and the staff dashboard labels; every visitor-facing
+     size now sits at or above this floor (sub-floor total 43 -> 4).
+     The sub-floor total is a ratchet: it may only go DOWN. New
+     sub-floor sizes fail pytest. */
   --text-sm:   0.875rem;  /* 14px */
   --text-base: 1rem;      /* 16px */
   --text-md:   1.125rem;  /* 18px */

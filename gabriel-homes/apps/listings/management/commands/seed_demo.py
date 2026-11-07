@@ -291,6 +291,28 @@ def _demo_photo(caption: str, pool: str) -> ContentFile | None:
     return ContentFile(src.read_bytes(), name=name)
 
 
+def _curated_cover(filename: str, title: str, type_slug: str) -> ContentFile:
+    """r59 (D-LOOP-59a): resolve a curated row's cover photo.
+
+    'pool:<pool>/<file>.jpg' refs the git-bundled demo-photos bundle
+    (always shipped since r57); bare filenames keep the legacy
+    static/img/stock lookup. If neither resolves, the listing type's
+    own pool picks a deterministic real photo before Pillow art is
+    ever drawn — a fresh reseed can no longer put gradient placeholder
+    cards on the homepage (the r58 'cards are back' class of bug,
+    spotted again on the closing coastal band)."""
+    if filename.startswith("pool:"):
+        src = Path(settings.MEDIA_ROOT) / "demo-photos" / filename.split(":", 1)[1]
+        if src.exists():
+            return ContentFile(src.read_bytes(), name=src.name)
+    else:
+        src = Path(settings.BASE_DIR) / "static" / "img" / "stock" / filename
+        if src.exists():
+            return ContentFile(src.read_bytes(), name=filename)
+    return (_demo_photo(title, DEMO_TYPE_POOL.get(type_slug, "house"))
+            or _cover_image(title))
+
+
 # ---------------------------------------------------------------------------
 # Command
 # ---------------------------------------------------------------------------
@@ -499,14 +521,14 @@ class Command(BaseCommand):
         # deliberately marked as demo content and can be replaced from the
         # owner dashboard without changing the page design.
         curated = [
-            ("4BR Tropical Villa near Nyali Beach", "villas", "Nyali Centre", "sale", 48_000_000, "total", False, 4, 5, 360, "Palm-lined family villa with a private garden, generous entertaining spaces and quick access to Nyali Beach.", "Near Nyali Beach, schools and supermarkets", "mombasa-villa.jpg"),
-            ("3BR Apartment near City Mall, Nyali", "flats-apartments", "Mkomani", "sale", 19_500_000, "total", False, 3, 3, 190, "Bright modern apartment with a balcony, lift and secure parking in one of Nyali's most convenient pockets.", "Minutes from City Mall and Nyali Centre", "nyali-apartment.jpg"),
-            ("3BR Sea-view Apartment in Mkomani", "flats-apartments", "Mkomani", "rent", 165_000, "monthly", False, 3, 3, 175, "A calm long-term home with an ocean-facing balcony, airy living room and reliable security.", "Near English Point Marina and the Nyali Bridge", "ocean-bedroom.jpg"),
-            ("4BR Family Home in Nyali", "houses", "Nyali Centre", "rent", 250_000, "monthly", False, 4, 4, 290, "Spacious family house with a green compound, staff room and easy school-run connections.", "Close to schools, healthcare and Nyali Centre", "green-apartments.jpg"),
-            ("Pool Villa Short Stay in Shanzu", "villas", "Shanzu", "rent", 28_000, "nightly", True, 4, 4, 310, "Furnished coastal villa for short stays, with a private pool and relaxed indoor-outdoor living.", "Near Shanzu Beach and north-coast resorts", "pool-villa-night.jpg"),
-            ("Ocean-view BnB Apartment in Nyali", "flats-apartments", "Nyali Centre", "rent", 18_000, "nightly", True, 2, 2, 130, "Fully furnished short-stay apartment with a sea-view bedroom, fast Wi-Fi and a practical work area.", "Near Nyali Beach, cafés and entertainment", "coastal-living.jpg"),
-            ("2BR Apartment by Nyali Centre", "flats-apartments", "Nyali Centre", "rent", 95_000, "monthly", False, 2, 2, 125, "Contemporary apartment for convenient everyday living, with a balcony, parking and on-site security.", "Walkable to Nyali Centre and public transport", "modern-living.jpg"),
-            ("3BR Home near Haller Park, Bamburi", "houses", "Bamburi Mwisho", "sale", 15_800_000, "total", False, 3, 3, 210, "Well-planned family home with a shaded garden and quick connections to Bamburi's shops and leisure facilities.", "Near Haller Park, City Mall and the beach road", "pool-villa-day.jpg"),
+            ("4BR Tropical Villa near Nyali Beach", "villas", "Nyali Centre", "sale", 48_000_000, "total", False, 4, 5, 360, "Palm-lined family villa with a private garden, generous entertaining spaces and quick access to Nyali Beach.", "Near Nyali Beach, schools and supermarkets", "pool:house/house-02.jpg"),
+            ("3BR Apartment near City Mall, Nyali", "flats-apartments", "Mkomani", "sale", 19_500_000, "total", False, 3, 3, 190, "Bright modern apartment with a balcony, lift and secure parking in one of Nyali's most convenient pockets.", "Minutes from City Mall and Nyali Centre", "pool:apartment/apartment-07.jpg"),
+            ("3BR Sea-view Apartment in Mkomani", "flats-apartments", "Mkomani", "rent", 165_000, "monthly", False, 3, 3, 175, "A calm long-term home with an ocean-facing balcony, airy living room and reliable security.", "Near English Point Marina and the Nyali Bridge", "pool:interior/interior-04.jpg"),
+            ("4BR Family Home in Nyali", "houses", "Nyali Centre", "rent", 250_000, "monthly", False, 4, 4, 290, "Spacious family house with a green compound, staff room and easy school-run connections.", "Close to schools, healthcare and Nyali Centre", "pool:house/house-10.jpg"),
+            ("Pool Villa Short Stay in Shanzu", "villas", "Shanzu", "rent", 28_000, "nightly", True, 4, 4, 310, "Furnished coastal villa for short stays, with a private pool and relaxed indoor-outdoor living.", "Near Shanzu Beach and north-coast resorts", "pool:house/house-04.jpg"),
+            ("Ocean-view BnB Apartment in Nyali", "flats-apartments", "Nyali Centre", "rent", 18_000, "nightly", True, 2, 2, 130, "Fully furnished short-stay apartment with a sea-view bedroom, fast Wi-Fi and a practical work area.", "Near Nyali Beach, cafés and entertainment", "pool:interior/interior-07.jpg"),
+            ("2BR Apartment by Nyali Centre", "flats-apartments", "Nyali Centre", "rent", 95_000, "monthly", False, 2, 2, 125, "Contemporary apartment for convenient everyday living, with a balcony, parking and on-site security.", "Walkable to Nyali Centre and public transport", "pool:apartment/apartment-15.jpg"),
+            ("3BR Home near Haller Park, Bamburi", "houses", "Bamburi Mwisho", "sale", 15_800_000, "total", False, 3, 3, 210, "Well-planned family home with a shaded garden and quick connections to Bamburi's shops and leisure facilities.", "Near Haller Park, City Mall and the beach road", "pool:house/house-09.jpg"),
         ]
         made = 0
         for index, item in enumerate(curated[:target]):
@@ -546,9 +568,7 @@ class Command(BaseCommand):
             )
             obj.amenities.set(random.sample(amenities, k=4))
             if with_images:
-                source = Path(settings.BASE_DIR) / "static" / "img" / "stock" / filename
-                cover = (ContentFile(source.read_bytes(), name=filename)
-                         if source.exists() else _cover_image(title))
+                cover = _curated_cover(filename, title, type_slug)
                 PropertyImage.objects.create(
                     property=obj, image=cover, caption=title,
                     position=0, is_cover=True,
