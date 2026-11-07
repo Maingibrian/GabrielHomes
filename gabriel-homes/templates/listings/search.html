@@ -87,6 +87,18 @@
   </button>
 </section>
 
+{% comment %}
+  r60 (owner round ten): the listings band — everything from the results
+  header down to the related searches. The coast palm sentinels
+  (listings/_palms.html) anchor to this band and span exactly its
+  height, so their sticky palms hold still beside the listings and
+  depart exactly when the footer arrives. The inner blocks keep
+  their original indentation on purpose — smallest possible diff.
+  ({% comment %} not {# #}: multi-line {# #} comments leak, run-4 bug class.)
+{% endcomment %}
+<div class="listings-band">
+  {% include "listings/_palms.html" %}
+
 {# Results header #}
 <div class="container">
   <div class="results-header">
@@ -142,6 +154,7 @@
   </div>
 </section>
 {% endif %}
+</div>{# /listings-band #}
 
 {# Mobile filter drawer (slide-over) #}
 <div class="filter-drawer" data-filter-drawer aria-hidden="true">
