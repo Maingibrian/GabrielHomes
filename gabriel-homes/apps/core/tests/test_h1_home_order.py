@@ -78,11 +78,13 @@ def test_trust_message_at_most_two_places_on_home():
 # ---------------------------------------------------------------------------
 def test_about_block_lives_on_about_page():
     body = body_of("/about/")
-    assert "fewer homes that we have checked" in body, (
+    # r56: the philosophy line is taste-led now (owner round seven);
+    # the checked-ledger version lives on /checks/.
+    assert "ten homes you'll love" in body, (
         "the home about philosophy line must live on /about/"
     )
     assert "exact amount before you commit" in body, (
-        "the buyer-fee disclosure must live on /about/"
+        "the buyer-fee disclosure must live on /about/ (footer FAQ)"
     )
 
 
@@ -108,7 +110,7 @@ def test_faq_lives_in_footer():
     body = home()
     assert "Things people ask us" in body
     assert "Who pays your fee?" in body
-    assert "How do you check a listing?" in body
+    assert "How do you choose which homes to list?" in body
 
 
 def test_browse_links_live_in_footer():

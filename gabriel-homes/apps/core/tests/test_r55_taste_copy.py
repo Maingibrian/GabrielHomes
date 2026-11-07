@@ -59,15 +59,16 @@ def test_about_hero_and_story_lead_with_taste():
     assert "care where they wake" in body  # subtitle wraps mid-phrase in HTML
     story = body.split("about-story__copy", 1)[1].split("</section>", 1)[0]
     assert "light at four in the afternoon" in story  # wraps across template lines
-    assert "homes with character, photographed" in story  # wraps after "photographed"
+    assert "homes with character" in story
     # the check-ledger lines are gone from the story…
     assert "verifies every listing" not in body
     assert "one checked property at a time" not in body
     assert "If we could not check something" not in body
-    # …but the fee-disclosure pin survives (test_h1_home_order finds the
-    # contiguous phrase in the footer FAQ; the story wraps it across lines)
-    assert "Buyers pay Gabriel Homes a fee" in story
-    assert "exact amount" in story and "before you commit" in story
+    # r56: the fee disclosure left the story for the footer FAQ (its
+    # logistics, not a feeling) — the story column no longer carries it
+    assert "Buyers pay Gabriel Homes a fee" not in story
+    assert "Buyers pay Gabriel Homes a fee" in body  # footer FAQ keeps it
+    assert "exact amount" in body and "before you commit" in body
 
 
 def test_about_story_carries_the_taste_list_and_terrace_figure():
@@ -82,17 +83,23 @@ def test_about_story_carries_the_taste_list_and_terrace_figure():
 def test_quote_band_gains_the_taste_kicker():
     body = _page("/about/")
     band = body.split('class="section about-quote"', 1)[1].split("</section>", 1)[0]
-    assert "fewer homes that we have checked" in band  # h1 pin, unchanged
-    assert "The paperwork is the floor. The home is the point." in band
+    # r56: the band explains WHY the collection is small, in taste
+    # terms — the checked-ledger quote lives on /checks/ only.
+    assert "ten homes you'll love" in band
+    assert "Every home here is one we would happily move into ourselves." in band
     assert 'class="about-quote__kicker"' in band
+    assert "checked" not in band
 
 
 def test_founder_rail_gains_the_coastal_focus_fact():
     body = _page("/about/")
     rail = body.split("about-founder__rail", 1)[1].split("</ul>", 1)[0]
-    for fact in ("2026", "Mombasa · Kenya", "Every home walked through",
+    # r56: Territory replaces the walked-through standard — places,
+    # not process (the checks live on /checks/).
+    for fact in ("2026", "Mombasa · Kenya", "Nyali to Shanzu",
                  "Coastal homes &amp; stays"):
         assert fact in rail, f"the rail must state {fact!r}"
+    assert "Every home walked through" not in rail
 
 
 def test_about_cta_is_taste_led_with_the_garden_bedroom():
@@ -100,10 +107,12 @@ def test_about_cta_is_taste_led_with_the_garden_bedroom():
     cta = body.split('class="section cta"', 1)[1].split("</section>", 1)[0]
     assert "Homes worth crossing town for." in cta
     assert "See the homes we have checked" not in cta
-    assert "honest photography" in cta  # r53 pin, survives
-    # r55 pass-2: each proof photo carries a room micro-caption
+    # r56: the band is the sunlit collection, not the evidence exhibit
+    assert "Sunlight, salt air, and rooms that breathe." in cta
+    assert "honest photography" not in cta
+    # r56 pass: each collection photo carries a sensory micro-caption
     caps = re.findall(r'<figcaption>([^<]+)</figcaption>', cta)
-    assert caps == ["Kitchen", "Dining", "Bedroom"]
+    assert caps == ["Golden hour", "Sea light", "Slow mornings"]
 
 
 def test_about_meta_description_is_taste_led():
@@ -119,8 +128,10 @@ def test_brand_defaults_and_migration_adopt_taste_copy():
     from apps.core.models import BrandSettings
 
     brand = BrandSettings.load()
-    assert "walked through ourselves" in brand.hero_subtitle
-    assert "check every listing before it goes live" not in brand.hero_subtitle
+    # r56: the subtitle closes on the feeling ("weeks you wish would
+    # never end"); the walked-through line lives on /checks/ + FAQ.
+    assert "weeks you wish would never end" in brand.hero_subtitle
+    assert "walked through ourselves" not in brand.hero_subtitle
     assert "chosen for character" in brand.footer_lead
     assert "checked" not in brand.footer_lead
     body = _page("/")
@@ -130,9 +141,10 @@ def test_brand_defaults_and_migration_adopt_taste_copy():
 
 def test_home_market_aside_and_bento_cta_are_taste_led():
     body = _page("/")
-    assert "walked through by the team before it appears here" in body
+    assert "picked for how they feel to live in" in body
     assert "Every home, chosen for character." in body
     assert "Every listing, checked first" not in body
+    assert "walked through by the team before it appears here" not in body
     assert "Browse every home" in body
 
 
@@ -154,7 +166,7 @@ def test_value_card_titles_level_the_row():
 def test_founder_portrait_wears_the_warm_grade():
     rule = re.search(
         r"\.about-founder__portrait \.hv2-founder__photo \{[^}]*\}", PAGES_CSS)
-    assert rule and "filter: saturate(0.9) sepia(0.1)" in rule.group(0)
+    assert rule and "filter: saturate(0.86) sepia(0.17)" in rule.group(0)
 
 
 def test_founder_caption_is_constrained_on_phones():

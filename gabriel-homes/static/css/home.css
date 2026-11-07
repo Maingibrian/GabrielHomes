@@ -75,16 +75,15 @@
   position: absolute;
   inset: 0;
   background:
-    /* r49: rebalanced so the room reads WARM (owner: the old near-black
-       left-to-right band made the hero a "dark void"). Three layers: a
-       soft vignette pool behind the text block (the reference's "dark
-       left-side vignette" — slide 2's sun-lit window measured 1.13:1
-       without it; re-verified >=4.5:1 by pixel probe, r49), the left
-       band, and the vertical top/bottom bands that carry the nav and
-       the marquee hand-off (r51: the market stat is gone). */
-    radial-gradient(ellipse 62% 55% at 30% 42%, rgba(28,21,17,.58), rgba(28,21,17,0) 72%),
-    linear-gradient(90deg, rgba(28,21,17,.66) 0%, rgba(28,21,17,.42) 44%, rgba(28,21,17,.06) 82%),
-    linear-gradient(180deg, rgba(28,21,17,.52) 0%, rgba(42,33,28,.20) 42%, rgba(42,33,28,.18) 60%, rgba(42,33,28,.74) 100%);
+    /* r56: lighter for the sunlit r56 slide set (white Swahili villa,
+       sunlit arches, sea-view rooms). The old r49 weights were tuned
+       for dark interiors and made the new bright photos read as dusk;
+       the text-side pool keeps its strength for the headline, the
+       right side opens further to the light. Headline contrast
+       re-verified by pixel probe after the change. */
+    radial-gradient(ellipse 62% 55% at 30% 42%, rgba(28,21,17,.54), rgba(28,21,17,0) 72%),
+    linear-gradient(90deg, rgba(28,21,17,.48) 0%, rgba(28,21,17,.22) 44%, rgba(28,21,17,.04) 82%),
+    linear-gradient(180deg, rgba(28,21,17,.42) 0%, rgba(42,33,28,.16) 42%, rgba(42,33,28,.16) 60%, rgba(42,33,28,.66) 100%);
 }
 .hero .container { position: relative; z-index: 1; width: 100%; }
 /* r50: the eyebrow tag rule is gone with its template line — the reference
@@ -130,11 +129,10 @@
    (F1 ratchet): tokens, color-mix and rgba() only.
    ============================================================ */
 .hero__grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 2.5rem; }
-.hero__title {
-  /* the reference's orange accent bar beside the headline */
-  border-left: 4px solid var(--burnt);
-  padding-left: 22px;
-}
+/* r56: the reference's orange accent bar is GONE — the r56 vision pass
+   read the 4px bar beside the headline as "a CSS placeholder, not a
+   design decision". The headline opens clean; the photo does the
+   talking behind it. */
 .hero__subtitle { margin: 0 0 1.6rem; }
 
 /* frosted service-tags strip, reworded r50; SHRUNK r51: the owner

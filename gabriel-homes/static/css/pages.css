@@ -569,12 +569,18 @@
   max-width: 54ch;
 }
 .about-story__taste li {
-  padding-block: 0.7rem;
+  padding-block: 0.95rem;
   border-top: 1px solid var(--sand-60);
-  color: color-mix(in srgb, var(--ink) 82%, var(--taupe));
-  font-size: var(--text-md);
-  line-height: var(--leading-body);
+  /* r56: elevated — the r56 vision pass called this list "the best
+     copy on the page, visually the most de-emphasised element". It
+     now reads as a display list: Fraunces at text-lg, full ink, the
+     hairline rules kept. */
+  font-family: var(--font-display);
+  font-size: var(--text-lg);
+  font-weight: 480;
+  line-height: 1.45;
   letter-spacing: var(--track-tight);
+  color: var(--ink);
 }
 .about-story__taste li:first-child {
   border-top: 0;
@@ -719,9 +725,12 @@ html.motion-ready:not([data-fx="none"]) .story__values .value-card:nth-child(3) 
   object-fit: cover;
   display: block;
   box-shadow: 0 18px 45px rgba(45, 31, 23, 0.18);
-  /* r55: the same quiet warm grade the story figure wears — the vision
-     pass read the studio-blue backdrop as clashing with the palette. */
-  filter: saturate(0.9) sepia(0.1);
+  /* r56: a stronger warm grade + a burnt ring — the r56 vision pass
+     read the studio headshot as "tonally at war" with the sunlit page.
+     The frame now pulls the placeholder toward the palette until the
+     owner drops in a real golden-hour portrait (asset swap only). */
+  filter: saturate(0.86) sepia(0.17) contrast(0.97);
+  border: 3px solid color-mix(in srgb, var(--burnt) 42%, var(--cream));
 }
 .about-founder__quote {
   margin: 1.5rem 0;
@@ -981,7 +990,24 @@ html.motion-ready:not([data-fx="none"]) .story__values .value-card:nth-child(3) 
   .about-quote .about-story__pull { font-size: 1.85rem; line-height: 1.28; }
   .about-quote .about-story__pull::before { margin-bottom: 1.25rem; }
   .about-values .value-card { padding: 1.4rem 1.3rem; }
-  .cta__proof-strip { gap: 10px; }
+  /* r56: the 390px vision pass read the stacked triptych as
+     "extremely narrow slivers of yellow" — the strip becomes a
+     scroll-snap filmstrip instead (three ~74%-wide cards, centred
+     snaps, no visible scrollbar). */
+  .cta__proof-strip {
+    display: flex;
+    gap: 12px;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 4px;
+    scrollbar-width: none;
+  }
+  .cta__proof-strip::-webkit-scrollbar { display: none; }
+  .cta__proof-strip figure {
+    flex: 0 0 68%;
+    scroll-snap-align: center;
+  }
   /* r55: the 390px vision pass caught the founder band broken — the
      mono caption ([ FOUNDER — MOMBASA ], ~170px unwrapped) drove the
      portrait's auto track to 170px and squeezed the copy column to

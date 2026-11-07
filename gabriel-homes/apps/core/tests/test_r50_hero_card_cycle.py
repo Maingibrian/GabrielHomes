@@ -102,30 +102,37 @@ class R50MarkupTests(SimpleTestCase):
         self.assertNotIn("btn--", self.html.split("</section>", 1)[0])
 
     def test_strip_reworded_agent_free(self):
-        for label in ("Checked listings", "Prices in writing",
-                      "A person replies"):
+        # r56: comfort-led labels (owner round seven); the r50 check-ledger
+        # labels are retired with the how-we-check story (→ /checks/).
+        for label in ("Homes with character", "Sea-breeze mornings",
+                      "Coastal short stays"):
             self.assertIn(label, self.html)
         for banned in ("Local agents", "Trusted listings",
-                       "Dedicated support", "Verified Agents"):
+                       "Dedicated support", "Verified Agents",
+                       "Checked listings", "Prices in writing"):
             self.assertNotIn(banned, self.html)
 
     def test_new_icon_family_everyday_objects(self):
-        """House / price tag / chat bubble — one 1.7px stroke family;
-        the old compound-metaphor pictograms are gone (the headless
-        shield-with-check, the two-people and the headset)."""
+        """r56: house / sun / waves — one 1.7px stroke family for the
+        comfort-led labels (character, sea-breeze mornings, short
+        stays); the old compound-metaphor pictograms are gone (the
+        headless shield-with-check, the two-people and the headset)."""
         ul = self.html.split('class="hero__assurances', 1)[1].split("</ul>", 1)[0]
         self.assertEqual(ul.count("<svg"), 3, "exactly three strip icons")
         # house: gable roofline
         self.assertIn('d="M4.6 10.9 12 4.4l7.4 6.5"', ul)
-        # price tag: pentagon + punch-hole circle
-        self.assertIn('d="M4.5 12.5 12 5h8v8l-7.5 7.5-8-8Z"', ul)
-        self.assertIn('<circle cx="16.4" cy="8.6" r="1.5"', ul)
-        # chat bubble: rounded rect with tail
-        self.assertIn('d="M7 5h10a3 3 0 0 1 3 3v6a3 3 0 0 1-3 3h-6.4l-4.1 3.5', ul)
-        # the r49 pictograms are gone
+        # sun: core circle + eight rays
+        self.assertIn('<circle cx="12" cy="12" r="4"', ul)
+        self.assertIn('d="M12 3v2M12 19v2M3 12h2M19 12h2', ul)
+        # waves: two breaking swell lines
+        self.assertIn('d="M3 10.5c2.2 0 2.2-1.6 4.5-1.6', ul)
+        self.assertIn('d="M3 15.5c2.2 0 2.2-1.6 4.5-1.6', ul)
+        # the r49 pictograms and the r50 ledger icons are gone
         self.assertNotIn("M12 3 5 5.8", ul)      # old shield
         self.assertNotIn('cx="9" cy="8.4" r="3.1"', ul)  # old two-people
         self.assertNotIn("M4.5 13v-1.6a7.5", ul)  # old headset
+        self.assertNotIn('d="M4.5 12.5 12 5h8v8l-7.5 7.5-8-8Z"', ul)  # price tag
+        self.assertNotIn('d="M7 5h10a3 3 0 0 1 3 3v6', ul)  # chat bubble
 
 
 # ---------------------------------------------------------------------------

@@ -103,13 +103,13 @@ class BrandSettings(models.Model):
     )
     hero_subtitle = models.TextField(
         max_length=500,
-        # r55 (owner request): taste-led rewrite — the subtitle sells the
-        # coast's homes and experiences; the walked-through line carries
-        # the trust without the check-ledger language.
+        # r56 (owner round seven): comfort-led rewrite — the subtitle sells
+        # the feeling of waking up on the coast; the walked-through story
+        # lives on /checks/ and in the footer FAQ, not in the hero.
         default=(
-            "Buy, rent or book a short stay along the Kenyan coast — from "
-            "sea-view apartments in Nyali to quiet villas in Shanzu. Every "
-            "home here is one we have walked through ourselves."
+            "Sea-view apartments in Nyali, garden homes in Bamburi, quiet "
+            "villas in Shanzu — homes for sale, for rent, and for the weeks "
+            "you wish would never end."
         ),
     )
     about_heading = models.CharField(

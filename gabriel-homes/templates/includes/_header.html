@@ -18,7 +18,7 @@
       <div class="nav-item nav-item--has-sub">
         <a class="nav-link" href="/contact/" {% if request.path == '/contact/' %}aria-current="page"{% endif %}><span class="nav-link__index">04</span> Contact <span class="nav-link__caret" aria-hidden="true">▾</span></a>
         <div class="nav-sub">
-          <a class="nav-sub__link" href="/checks/">How we check listings <span aria-hidden="true">→</span></a>
+          <a class="nav-sub__link" href="/checks/">How we choose homes <span aria-hidden="true">→</span></a>
         </div>
       </div>
     </nav>
@@ -77,7 +77,7 @@
     <a class="mobile-menu__link" href="/services/"><span class="mobile-menu__index">03</span>Services</a>
     <a class="mobile-menu__link" href="/contact/"><span class="mobile-menu__index">04</span>Contact</a>
     {# r13: "How we check" lives under Contact — indented sub-page link #}
-    <a class="mobile-menu__link mobile-menu__link--sub" href="/checks/">How we check listings <span aria-hidden="true">→</span></a>
+    <a class="mobile-menu__link mobile-menu__link--sub" href="/checks/">How we choose homes <span aria-hidden="true">→</span></a>
     {% if request.user.is_authenticated %}
       <a class="mobile-menu__link" href="/account/saved/">Saved</a>
       {% if request.user.is_agent %}

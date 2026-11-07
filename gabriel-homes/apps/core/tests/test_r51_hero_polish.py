@@ -77,9 +77,10 @@ class R51MarkupTests(SimpleTestCase):
         self.assertIn('<nav class="hero__locations" aria-label=', self.html)
         self.assertNotIn("hero__assurances hv2-rise", self.html)
         self.assertNotIn("hero__locations hv2-rise", self.html)
-        # the words themselves stay (owner's wording, pinned by r49/r50)
-        for label in ("Checked listings", "Prices in writing",
-                      "A person replies"):
+        # the words themselves stay (r56 comfort labels, pinned by
+        # r49/r50/r56)
+        for label in ("Homes with character", "Sea-breeze mornings",
+                      "Coastal short stays"):
             self.assertIn(label, self.html)
 
 
@@ -241,10 +242,10 @@ class TestR51Rendered:
         for gone in ("Mombasa property market", "Growing demand",
                      "+12% YoY", 'class="hero__market"'):
             assert gone not in html
-        # the strip and its owner wording survive the shrink
-        assert "Checked listings" in html
-        assert "Prices in writing" in html
-        assert "A person replies" in html
+        # the strip and its r56 comfort wording survive the shrink
+        assert "Homes with character" in html
+        assert "Sea-breeze mornings" in html
+        assert "Coastal short stays" in html
         assert 'class="hero__assurances"' in html
 
     def test_rendered_home_keeps_the_h2_contracts(self):

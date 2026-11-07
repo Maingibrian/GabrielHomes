@@ -77,7 +77,7 @@ def test_showcase_cards_carry_the_unpack_drawer():
         'class="bento-card__more"',
         'class="bento-card__flag"',
         "View this home",
-        "Checked first",
+        "Seen in person",
     ):
         assert fragment in body, f"home page missing drawer fragment: {fragment!r}"
 

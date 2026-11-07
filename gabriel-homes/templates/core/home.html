@@ -66,18 +66,18 @@
         {# pill now HUGS its content (inline-flex, home.css) and each #}
         {# item pops in on its own (ha-pop stagger) instead of the whole #}
         {# strip rising as one slab — no hv2-rise here any more. #}
-        <ul class="hero__assurances" aria-label="What Gabriel Homes promises">
+        <ul class="hero__assurances" aria-label="What Gabriel Homes is about">
           <li>
             <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4.6 10.9 12 4.4l7.4 6.5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/><path d="M6.3 9.5v10.1h11.4V9.5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/><path d="M10.1 19.6v-5h3.8v5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            Checked listings
+            Homes with character
           </li>
           <li>
-            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4.5 12.5 12 5h8v8l-7.5 7.5-8-8Z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><circle cx="16.4" cy="8.6" r="1.5" fill="none" stroke="currentColor" stroke-width="1.7"/></svg>
-            Prices in writing
+            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M12 3v2M12 19v2M3 12h2M19 12h2M5.6 5.6 7 7M17 17l1.4 1.4M18.4 5.6 17 7M7 17l-1.4 1.4" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+            Sea-breeze mornings
           </li>
           <li>
-            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M7 5h10a3 3 0 0 1 3 3v6a3 3 0 0 1-3 3h-6.4l-4.1 3.5V17H7a3 3 0 0 1-3-3V8a3 3 0 0 1 3-3Z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg>
-            A person replies
+            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M3 10.5c2.2 0 2.2-1.6 4.5-1.6s2.3 1.6 4.5 1.6 2.2-1.6 4.5-1.6 2.3 1.6 4.5 1.6" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/><path d="M3 15.5c2.2 0 2.2-1.6 4.5-1.6s2.3 1.6 4.5 1.6 2.2-1.6 4.5-1.6 2.3 1.6 4.5 1.6" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Coastal short stays
           </li>
         </ul>
       </div>
@@ -173,20 +173,25 @@
     </div>
   </div>
 
-  <a class="hv2-scroll" href="#checks" aria-label="Scroll to how we check listings"><span></span></a>
+  <a class="hv2-scroll" href="#checks" aria-label="Scroll to explore the homes"><span></span></a>
 </section>
 
 {# ============================================================ #}
-{# 2. MARQUEE — the five checks, running                          #}
+{# 2. MARQUEE — the coast, on repeat (r56: the five-checks     #}
+{#    ticker lives on /checks/ and in the footer FAQ; the home     #}
+{#    ribbon sells the feeling of the place).                    #}
 {# ============================================================ #}
-<div class="hv2-marquee" id="checks" data-archetype="edge-strip" aria-label="The five checks every listing goes through">
+<div class="hv2-marquee" id="checks" data-archetype="edge-strip" aria-label="Coastal living, on repeat">
   <div class="hv2-marquee__track">
     {% for i in "x"|ljust:"2" %}
-    <span>Ownership</span><i aria-hidden="true">✦</i>
-    <span>Written mandate</span><i aria-hidden="true">✦</i>
-    <span>Site visit where possible</span><i aria-hidden="true">✦</i>
-    <span>Price confirmed in writing</span><i aria-hidden="true">✦</i>
-    <span>Encumbrances checked</span><i aria-hidden="true">✦</i>
+    <span>Sea views</span><i aria-hidden="true">✦</i>
+    <span>Old Town courtyards</span><i aria-hidden="true">✦</i>
+    <span>Garden mornings</span><i aria-hidden="true">✦</i>
+    <span>Sunset terraces</span><i aria-hidden="true">✦</i>
+    <span>Salt air</span><i aria-hidden="true">✦</i>
+    <span>Nyali</span><i aria-hidden="true">✦</i>
+    <span>Bamburi</span><i aria-hidden="true">✦</i>
+    <span>Shanzu</span><i aria-hidden="true">✦</i>
     {% endfor %}
   </div>
 </div>
@@ -206,7 +211,7 @@
     size. (Multi-line note: {# #} renders literally — use this block.)
   {% endcomment %}
   <div class="bento-flank bento-flank--gabriel" aria-hidden="true"><span class="bento-flank__word">gabriel</span></div>
-  <span class="visually-hidden">{% if showcase_listings %}HOMES · Published homes, each one checked before it went live.{% else %}HOW WE CHECK · Five checks before anything goes live. We check who has the right to let or sell.{% endif %}</span>
+  <span class="visually-hidden">{% if showcase_listings %}HOMES · A small, chosen collection of coastal homes.{% else %}HOW WE CHECK · Five checks before anything goes live. We check who has the right to let or sell.{% endif %}</span>
   <div class="container">
     <div class="featured__header">
       <div>
@@ -246,7 +251,7 @@
               <p class="bento-card__meta">
                 <span class="bento-card__price">{{ property.price|kes }}</span>
                 {% if property.price_period == "monthly" %}<span class="bento-card__period"> / month</span>{% endif %}
-                <span class="bento-card__loc">{{ property.location.full_path }}</span>
+                <span class="bento-card__loc">{{ property.location.name }}{% if property.location.parent %}, {{ property.location.parent.name }}{% endif %}</span>
                 {% if property.bedrooms %}<span class="bento-card__fact">{{ property.bedrooms }} bed</span>{% endif %}
                 {% if property.bathrooms %}<span class="bento-card__fact">{{ property.bathrooms }} bath</span>{% endif %}
               </p>
@@ -255,7 +260,7 @@
                 <div class="bento-card__drawer-inner">
                   <p class="bento-card__drawer-label">Inside this home</p>
                   <ul class="bento-card__drawer-items">
-                    {% if property.is_verified %}<li class="bento-card__drawer-item--checked"><span aria-hidden="true">&#10003;</span> Checked first</li>{% endif %}
+                    {% if property.is_verified %}<li class="bento-card__drawer-item--checked"><span aria-hidden="true">&#10003;</span> Seen in person</li>{% endif %}
                     {% for amenity in property.amenities.all|slice:":6" %}
                       <li>{{ amenity.name }}</li>
                     {% endfor %}
@@ -346,7 +351,7 @@
       <div class="home-market__aside" data-reveal>
         {# r55: taste-led rewrite (owner: less checked-listings language) — #}
         {# the walked-through promise stays, the check-jargon goes.        #}
-        <p>A small, hand-picked set of homes for sale, long-term rent and short stays across Mombasa — each one walked through by the team before it appears here.</p>
+        <p>A small, slowly chosen set of homes for sale, long-term rent and short stays across Mombasa — picked for how they feel to live in: the light, the street, the walk to the water.</p>
         <a class="home-market__aside-cta" href="/properties/">Browse every home <span aria-hidden="true">→</span></a>
       </div>
     </div>

@@ -67,7 +67,7 @@ def test_about_hero_drops_redundant_eyebrow_and_gains_meta_line():
     assert "Our story" not in hero
     assert "[ ABOUT ]" in hero
     # the mono place-and-year line (facts already stated by the copy)
-    assert "Mombasa · Kenya — founded 2026" in hero
+    assert "Mombasa · Kenya — by the Indian Ocean" in hero
     assert "page-hero__meta" in hero
 
 
@@ -90,9 +90,10 @@ def test_page_hero_scrim_deepened_for_contrast():
 def test_about_story_pull_quote_carries_the_philosophy_line():
     body = _page("/about/")
     assert 'class="about-story__pull"' in body
-    # the pinned philosophy line (test_h1_home_order) now lives in the quote
-    assert "fewer homes that we have checked" in body
-    # the fee disclosure keeps its place
+    # r56: the philosophy line is taste-led now (owner round seven);
+    # the checked-ledger line lives on /checks/ only
+    assert "ten homes you'll love" in body
+    # the fee disclosure keeps its place (footer FAQ, rendered on about)
     assert "exact amount before you commit" in body
     # the dangling heading left the story column (it heads the values band)
     assert '<h2 data-reveal>What we stand for</h2>' not in body
@@ -152,9 +153,10 @@ def test_about_founder_band_is_an_editorial_portrait_with_quote():
     body = _page("/about/")
     assert 'class="about-founder__portrait"' in body
     assert 'class="about-founder__quote"' in body
-    # the quote restates established copy in the founder's voice — nothing new
-    assert "walked through ourselves" in body
-    assert "we tell you before you ask" in body
+    # r56: the quote leads with the feeling and closes on the standard —
+    # taste-led, no paperwork clause (owner: comfort first, not proven homes)
+    assert "the feeling of coming home to" in body
+    assert "has to give you that feeling" in body
     # signature block on its rule
     assert 'class="about-founder__sig"' in body
     assert "Gabriel Omulu" in body and "Founder" in body
@@ -175,7 +177,7 @@ def test_about_cta_no_longer_repeats_the_footer_cta_heading():
     assert "Tell us what you are looking for" not in cta, (
         "the about CTA must not repeat the footer CTA heading")
     assert 'href="/properties/"' in cta
-    assert "[ THE PROOF ]" in cta
+    assert "[ THE COLLECTION ]" in cta
 
 
 def test_about_cta_phrase_appears_once_on_the_page():

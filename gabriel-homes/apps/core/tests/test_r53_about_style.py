@@ -67,7 +67,9 @@ def test_about_quote_band_is_espresso_display_quote():
     band = body.split('class="section about-quote"', 1)[1].split("</section>", 1)[0]
     # the blockquote keeps its r52 class inside the new band
     assert 'class="about-story__pull"' in band
-    assert "[ THE STANDARD ]" in band
+    # r56: the tag explains WHY the collection is small (taste), not the
+    # checking standard — the checked-ledger quote lives on /checks/.
+    assert "[ WHY WE'RE SMALL ]" in band
     # the story column no longer carries the pull
     story = body.split('class="about-story__copy"', 1)[1].split("</section>", 1)[0]
     assert "about-story__pull" not in story, "the pull-quote left the story column"
@@ -102,7 +104,10 @@ def test_about_founder_band_carries_caption_and_rail():
     assert 'class="about-founder__caption"' in body
     assert "[ FOUNDER — MOMBASA ]" in body
     rail = body.split('class="about-founder__rail"', 1)[1].split("</ul>", 1)[0]
-    for fact in ("2026", "Mombasa · Kenya", "Every home walked through"):
+    # r56: the rail states places, not process — "Standard: Every home
+    # walked through" moved to /checks/; Territory carries the coast.
+    for fact in ("2026", "Mombasa · Kenya", "Nyali to Shanzu",
+                 "Coastal homes &amp; stays"):
         assert fact in rail, f"the rail must state {fact!r}"
     css = re.search(r"\.about-founder \{[^}]*\}", PAGES_CSS)
     assert css, "the .about-founder grid rule must exist"
@@ -117,11 +122,11 @@ def test_about_cta_carries_proof_strip():
     body = _page("/about/")
     cta = body.split('class="section cta"', 1)[1].split("</section>", 1)[0]
     assert 'class="cta__proof-strip"' in cta
-    # r55: real-08-aerial read as an unfinished construction site (vision
-    # pass) — the triptych closes on real-03-bedroom-garden instead.
+    # r56: the triptych is the sunlit collection — golden hour villa,
+    # sea-light living room, slow-mornings bedroom (vision-curated).
     imgs = re.findall(r'src="[^"]*real-(\d+)-', cta)
-    assert imgs == ["01", "05", "03"], "three real listing photos"
-    assert "honest photography" in cta
+    assert imgs == ["09", "10", "11"], "three sunlit collection photos"
+    assert "Sunlight, salt air, and rooms that breathe." in cta
 
 
 def test_shared_cta_scrim_is_rebalanced():

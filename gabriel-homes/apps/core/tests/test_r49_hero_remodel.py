@@ -94,15 +94,18 @@ class HeroMarkupTests(SimpleTestCase):
         self.assertNotIn("hero__w", self.html)
 
     def test_assurance_strip_three_items(self):
-        """r50: reworded — no agents on this site (owner: none of the team
-        are agents), no banned "verified". The strip states what actually
-        happens; the old r49 labels are gone."""
+        """r56: comfort-led reword (owner round seven — "comfort and the
+        home feeling", not proven homes). The strip carries the three
+        coastal feelings; the r50 check-ledger labels are gone."""
         self.assertIn('class="hero__assurances', self.html)
-        for label in ("Checked listings", "Prices in writing",
-                      "A person replies"):
+        for label in ("Homes with character", "Sea-breeze mornings",
+                      "Coastal short stays"):
             self.assertIn(label, self.html)
         for banned in ("Local agents", "Dedicated support",
-                       "Trusted listings"):
+                       "Trusted listings", "Checked listings",
+                       "Prices in writing"):
+            # NB: "A person replies" survives in the no-listings bento
+            # fallback CTA tile only — not in the hero strip.
             self.assertNotIn(banned, self.html)
 
     def test_search_pill_still_the_single_hero_gesture(self):
@@ -156,15 +159,16 @@ class HeroCSSTests(SimpleTestCase):
         end = css.index("3. Featured properties", start)
         self.block = css[start:end]
 
-    def test_accent_bar_beside_the_headline(self):
+    def test_headline_opens_clean_no_accent_bar(self):
+        """r56: the reference's orange accent bar read as "a CSS
+        placeholder" in the vision pass — it is gone; every .hero__title
+        rule is free of border-left."""
         css = HOME_CSS.read_text(encoding="utf-8")
         rules = re.findall(r"^\.hero__title \{[^}]*\}", css, re.M)
         self.assertTrue(rules, ".hero__title rule must exist")
-        # the r49 remodel restates the title rule to add the accent bar —
-        # at least one .hero__title rule must carry it
-        self.assertTrue(
-            any("border-left: 4px solid var(--burnt)" in r for r in rules),
-            "the reference's orange accent bar must be styled")
+        for rule in rules:
+            self.assertNotIn("border-left", rule,
+                             "the accent bar is retired (r56 vision pass)")
 
     def test_frosted_assurance_strip(self):
         self.assertIn("backdrop-filter: blur(10px)", self.block)
@@ -182,14 +186,16 @@ class HeroCSSTests(SimpleTestCase):
         self.assertNotIn(".hero__market", self.block)
 
     def test_scrim_rebalanced_toward_warm(self):
-        """The old near-black band (0.72 -> 0.48 left-to-right, 0.34 mid)
-        made the room unreadable; the r49 scrim opens the right side to
-        the photo (0.06) while the title band keeps its legibility."""
+        """r56: re-tuned for the sunlit slide set — the left band opens
+        (0.66→0.48) so bright exteriors stay bright; the text-side radial
+        pool keeps the headline's legibility (pixel-probed)."""
         scrim = HOME_CSS.read_text(encoding="utf-8").split(
             ".hero__bg::after", 1)[1][:900]
-        self.assertIn("rgba(28,21,17,.66) 0%", scrim)
-        self.assertIn("rgba(28,21,17,.06) 82%", scrim)
+        self.assertIn("rgba(28,21,17,.48) 0%", scrim)
+        self.assertIn("rgba(28,21,17,.04) 82%", scrim)
         self.assertNotIn("0.72) 0%", scrim, "the old dead-dark band is gone")
+        self.assertNotIn("rgba(28,21,17,.66)", scrim,
+                         "the r49 heavy left band is retired (r56)")
 
     def test_r50_block_adds_no_hex(self):
         """F1 ratchet: home.css hex count may only go down — the r50
@@ -229,12 +235,14 @@ class TestHeroViewData:
         html = Client().get("/").content.decode()
         assert re.search(r'hero__loc-count">\d+<', html)
 
-    def test_rendered_hero_copy_is_checked_language(self):
-        """No "verified" on public pages (p0) and no agent wording (the
-        site has none); the strip reads Checked/Prices/A person."""
+    def test_rendered_hero_copy_is_comfort_language(self):
+        """No "verified" on public pages (p0), no agent wording (the site
+        has none), and r56: no check-ledger labels in the hero — the
+        strip reads character / sea-breeze / short stays."""
         html = Client().get("/").content.decode()
-        assert "Checked listings" in html
-        assert "Prices in writing" in html
-        assert "A person replies" in html
+        assert "Homes with character" in html
+        assert "Sea-breeze mornings" in html
+        assert "Coastal short stays" in html
+        assert "Checked listings" not in html
         assert "Local agents" not in html
         assert "verified" not in html.lower()
