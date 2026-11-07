@@ -86,7 +86,7 @@
   font-size: var(--text-xs);
   letter-spacing: var(--track-mono);
   text-transform: uppercase;
-  font-weight: 500;
+  font-weight: 600;
   color: color-mix(in srgb, var(--cream) 92%, var(--sand)); /* r12: was 78% cream */
   margin-bottom: 1.25rem;
 }
@@ -283,6 +283,7 @@
 }
 .story__founder-meta {
   font-family: var(--font-mono);
+  font-weight: 600;
   font-size: var(--text-xs);
   letter-spacing: var(--track-mono);
   text-transform: uppercase;
@@ -454,6 +455,7 @@
 }
 .browse__link-count {
   font-family: var(--font-mono);
+  font-weight: 500;
   font-size: var(--text-xs);
   color: color-mix(in srgb, var(--taupe) 55%, var(--ink));
   letter-spacing: var(--track-mono);
@@ -667,6 +669,7 @@ html.motion-ready .bento-grid--shift .bento-card[data-reveal] {
   display: inline-flex; gap: 28px; align-items: center;
   animation: hv2-marquee 38s linear infinite;
   font-family: var(--font-mono, monospace); font-size: 14px; letter-spacing: var(--track-mono, .02em);
+  font-weight: 600;
   text-transform: uppercase;
 }
 .hv2-marquee__track i { font-style: normal; opacity: .7; }
@@ -698,7 +701,7 @@ html.motion-ready .bento-grid--shift .bento-card[data-reveal] {
   width: 60px; height: 60px; border-radius: 50%; flex: none;
   object-fit: cover; display: block;
 }
-.hv2-founder__role { font-family: var(--font-mono, monospace); font-size: 12px; text-transform: uppercase; letter-spacing: .08em; color: var(--clay, #b06a3b); margin: 0 0 2px !important; }
+.hv2-founder__role {font-family: var(--font-mono, monospace); font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: .08em; color: var(--clay, #b06a3b); margin: 0 0 2px !important;}
 .hv2-founder__name { font-family: var(--font-display, Georgia, serif); font-size: 1.25rem; color: var(--ink, #1c1511) !important; margin: 0 0 2px !important; }
 .hv2-founder__note { font-size: 15px; color: var(--taupe, #6b5e53) !important; margin: 0 !important; }
 
@@ -729,7 +732,7 @@ html.motion-ready .bento-grid--shift .bento-card[data-reveal] {
   margin-top: 56px; padding: 26px 30px; border-radius: var(--radius-card, 18px);
   background: var(--white, #fff); border-left: 4px solid var(--burnt, #a0522d);
 }
-.hv2-fee__label { font-family: var(--font-mono, monospace); font-size: 12px; text-transform: uppercase; letter-spacing: .08em; color: var(--clay, #b06a3b); margin: 0 0 6px !important; }
+.hv2-fee__label {font-family: var(--font-mono, monospace); font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: .08em; color: var(--clay, #b06a3b); margin: 0 0 6px !important;}
 .hv2-fee p { color: var(--brown, #5a4032); margin: 0; }
 
 /* ---- responsive -------------------------------------------------- */
@@ -764,7 +767,7 @@ html.motion-ready .bento-grid--shift .bento-card[data-reveal] {
   padding: 24px 28px; border-radius: var(--radius-card, 18px);
   background: var(--white, #fff); border: 1px solid rgba(90,64,50,.12);
 }
-.checks-list__num { font-family: var(--font-mono, monospace); color: var(--burnt, #a0522d); font-size: 15px; padding-top: 4px; }
+.checks-list__num {font-family: var(--font-mono, monospace); font-weight: 600; color: var(--burnt, #a0522d); font-size: 15px; padding-top: 4px;}
 .checks-list h3 { font-family: var(--font-display, Georgia, serif); font-size: 1.4rem; font-weight: 500; margin: 0 0 6px; color: var(--ink, #1c1511); }
 .checks-list p { margin: 0; color: var(--taupe, #6b5e53); }
 .band-soft { background: var(--paper); }
@@ -777,7 +780,7 @@ html.motion-ready .bento-grid--shift .bento-card[data-reveal] {
 .home-market__title { max-width: 780px; margin: 0 0 64px; font: 500 clamp(2.5rem,6vw,5.5rem)/.96 var(--font-display,Georgia,serif); letter-spacing: -.045em; }
 .home-market__group { padding: 42px 0 70px; border-top: 1px solid rgba(90,64,50,.18); }
 .home-market__heading { display: flex; align-items: end; justify-content: space-between; gap: 24px; margin-bottom: 28px; }
-.home-market__heading > div > span { font: 12px var(--font-mono,monospace); color: var(--burnt,#a0522d); }
+.home-market__heading > div > span {font: 600  12px var(--font-mono,monospace); color: var(--burnt,#a0522d);}
 .home-market__heading h2,.home-market__heading h3 { margin: 5px 0 0; font: 500 clamp(1.8rem,3vw,3rem)/1 var(--font-display,Georgia,serif); }
 .home-market__heading p { margin: 10px 0 0; max-width: 590px; color: var(--taupe,#6b5e53); }
 .home-market__heading > a { color: var(--burnt,#a0522d); font-weight: 600; white-space: nowrap; }
@@ -788,11 +791,11 @@ html.motion-ready .bento-grid--shift .bento-card[data-reveal] {
 .home-property:hover .home-property__media img { transform: scale(1.045); }
 .demo-chip { position: absolute; top: 16px; left: 16px; padding: 7px 10px; background: #fff6; color: #fff; border: 1px solid #fff9; border-radius: 999px; backdrop-filter: blur(12px); font: 700 10px var(--font-mono,monospace); letter-spacing: .08em; text-transform: uppercase; }
 .home-property__body { padding: 25px; }
-.home-property__eyebrow { margin: 0 0 8px; color: var(--burnt,#a0522d); font: 11px var(--font-mono,monospace); text-transform: uppercase; letter-spacing: .08em; }
+.home-property__eyebrow {margin: 0 0 8px; color: var(--burnt,#a0522d); font: 600  11px var(--font-mono,monospace); text-transform: uppercase; letter-spacing: .08em;}
 .home-property h3 { margin: 0; font: 500 clamp(1.35rem,2vw,2rem)/1.1 var(--font-display,Georgia,serif); }
 .home-property__price { margin: 12px 0; font-weight: 700; }.home-property__price small { font-weight: 500; color: var(--taupe,#6b5e53); }
 .home-property__copy,.home-property__near { color: var(--taupe,#6b5e53); line-height: 1.55; }.home-property__near { color: var(--brown,#5a4032); font-weight: 600; }
-.home-property__facts { font: 12px var(--font-mono,monospace); text-transform: uppercase; }
+.home-property__facts {font: 600  12px var(--font-mono,monospace); text-transform: uppercase;}
 .home-property__actions { display: flex; flex-wrap: wrap; gap: 9px; margin-top: 20px; }
 .home-property__actions a { padding: 9px 13px; border: 1px solid rgba(90,64,50,.23); border-radius: 999px; font-size: 13px; }
 .home-property__actions a:first-child { background: var(--ink,#1c1511); color: #fff; border-color: var(--ink,#1c1511); }
@@ -812,11 +815,11 @@ html.motion-ready .bento-grid--shift .bento-card[data-reveal] {
 .market-feature__price { position: absolute; right: 16px; bottom: 16px; padding: .6em 1.15em; background: #fff; color: var(--ink,#1c1511); border-radius: 999px; font: 700 15px var(--font-sans,sans-serif); box-shadow: 0 10px 30px rgba(20,12,8,.28); }
 .market-feature__price small { font-weight: 500; color: var(--taupe,#6b5e53); }
 .market-feature__body { padding: 26px 28px 30px; display: grid; gap: 12px; justify-items: start; }
-.market-feature__eyebrow { margin: 0; color: var(--burnt,#a0522d); font: 11px var(--font-mono,monospace); text-transform: uppercase; letter-spacing: .08em; }
+.market-feature__eyebrow {margin: 0; color: var(--burnt,#a0522d); font: 600  11px var(--font-mono,monospace); text-transform: uppercase; letter-spacing: .08em;}
 .market-feature__title { margin: 0; font: 500 clamp(1.5rem,2.4vw,2.2rem)/1.08 var(--font-display,Georgia,serif); letter-spacing: -.02em; }
 .market-feature__title a { color: inherit; text-decoration: none; }
 .market-feature__copy { margin: 0; max-width: 58ch; color: var(--taupe,#6b5e53); line-height: 1.55; }
-.market-card__facts { margin: 0; font: 12px var(--font-mono,monospace); text-transform: uppercase; letter-spacing: .06em; color: var(--brown,#5a4032); }
+.market-card__facts {margin: 0; font: 600  12px var(--font-mono,monospace); text-transform: uppercase; letter-spacing: .06em; color: var(--brown,#5a4032);}
 .market-card__actions { display: flex; flex-wrap: wrap; gap: 9px; margin-top: 6px; }
 .market-card__actions a { padding: 9px 14px; border: 1px solid rgba(90,64,50,.23); border-radius: 999px; font-size: 13px; font-weight: 500; text-decoration: none; color: inherit; }
 .market-card__actions a:hover { border-color: var(--burnt,#a0522d); color: var(--burnt,#a0522d); }
@@ -828,13 +831,13 @@ html.motion-ready .bento-grid--shift .bento-card[data-reveal] {
 .market-rail__media { display: block; aspect-ratio: 1; border-radius: 12px; overflow: hidden; background: #ece4d8; }
 .market-rail__media img { width: 100%; height: 100%; object-fit: cover; }
 .market-rail__body { min-width: 0; }
-.market-rail__eyebrow { margin: 0 0 4px; color: var(--burnt,#a0522d); font: 10px var(--font-mono,monospace); text-transform: uppercase; letter-spacing: .08em; }
+.market-rail__eyebrow {margin: 0 0 4px; color: var(--burnt,#a0522d); font: 600  10px var(--font-mono,monospace); text-transform: uppercase; letter-spacing: .08em;}
 .market-rail__body h3 { margin: 0; font: 500 1.12rem/1.15 var(--font-display,Georgia,serif); }
 .market-rail__body h3 a { color: inherit; text-decoration: none; }
 .market-rail__meta { margin: 7px 0 0; display: flex; flex-wrap: wrap; align-items: baseline; gap: 10px; }
 .market-rail__price { font-weight: 700; }
 .market-rail__price small { font-weight: 500; color: var(--taupe,#6b5e53); }
-.market-rail__facts { font: 11px var(--font-mono,monospace); text-transform: uppercase; color: var(--taupe,#6b5e53); }
+.market-rail__facts {font: 600  11px var(--font-mono,monospace); text-transform: uppercase; color: var(--taupe,#6b5e53);}
 .market-rail__more { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 4px; padding: 22px 24px; border: 1.5px dashed rgba(90,64,50,.35); border-radius: 18px; color: var(--burnt,#a0522d); font-weight: 600; text-decoration: none; transition: background .25s, border-color .25s; }
 .market-rail__more:hover { background: #fff; border-color: var(--burnt,#a0522d); }
 .market-rent { display: flex; flex-direction: column; gap: 24px; }
@@ -844,7 +847,7 @@ html.motion-ready .bento-grid--shift .bento-card[data-reveal] {
 .market-banner:hover .market-banner__media img { transform: scale(1.04); }
 .market-banner:nth-child(even) .market-banner__media { order: 2; }
 .market-banner__body { padding: 30px 34px; display: grid; gap: 12px; align-content: center; justify-items: start; }
-.market-banner__eyebrow { margin: 0; color: var(--burnt,#a0522d); font: 11px var(--font-mono,monospace); text-transform: uppercase; letter-spacing: .08em; }
+.market-banner__eyebrow {margin: 0; color: var(--burnt,#a0522d); font: 600  11px var(--font-mono,monospace); text-transform: uppercase; letter-spacing: .08em;}
 .market-banner__title { margin: 0; font: 500 clamp(1.35rem,2vw,1.9rem)/1.1 var(--font-display,Georgia,serif); letter-spacing: -.02em; }
 .market-banner__title a { color: inherit; text-decoration: none; }
 .market-banner__copy { margin: 0; max-width: 56ch; color: var(--taupe,#6b5e53); line-height: 1.55; }
@@ -861,10 +864,10 @@ html.motion-ready .bento-grid--shift .bento-card[data-reveal] {
 .market-stay__price { position: absolute; left: 16px; bottom: 16px; padding: .55em 1.05em; background: #fff; color: var(--ink,#1c1511); border-radius: 999px; font: 700 14px var(--font-sans,sans-serif); box-shadow: 0 10px 30px rgba(20,12,8,.25); }
 .market-stay__price small { font-weight: 500; color: var(--taupe,#6b5e53); }
 .market-stay__body { padding: 20px 22px 24px; display: grid; gap: 8px; justify-items: start; }
-.market-stay__eyebrow { margin: 0; color: var(--burnt,#a0522d); font: 10px var(--font-mono,monospace); text-transform: uppercase; letter-spacing: .08em; }
+.market-stay__eyebrow {margin: 0; color: var(--burnt,#a0522d); font: 600  10px var(--font-mono,monospace); text-transform: uppercase; letter-spacing: .08em;}
 .market-stay__body h3 { margin: 0; font: 500 1.3rem/1.12 var(--font-display,Georgia,serif); }
 .market-stay__body h3 a { color: inherit; text-decoration: none; }
-.market-stay__meta { margin: 0; font: 11px var(--font-mono,monospace); text-transform: uppercase; color: var(--taupe,#6b5e53); }
+.market-stay__meta {margin: 0; font: 600  11px var(--font-mono,monospace); text-transform: uppercase; color: var(--taupe,#6b5e53);}
 .market-stay__link { font-size: 14px; font-weight: 600; color: var(--burnt,#a0522d); text-decoration: none; }
 .market-stay__link:hover { text-decoration: underline; }
 .home-market__more { color: var(--burnt,#a0522d); font-weight: 600; white-space: nowrap; }
@@ -872,7 +875,7 @@ html.motion-ready .bento-grid--shift .bento-card[data-reveal] {
 .home-nearby .home-market__heading p { color: #fff9; }.home-nearby .home-market__heading > a { color: #e4aa82; }
 .home-nearby__grid { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: 18px; }
 .nearby-card { color: #fff; }.nearby-card img { width: 100%; aspect-ratio: 4/3; object-fit: cover; border-radius: 16px; margin-bottom: 16px; transition: transform .4s; }.nearby-card:hover img { transform: translateY(-5px); }
-.nearby-card span { color: #e4aa82; font: 10px var(--font-mono,monospace); text-transform: uppercase; letter-spacing: .06em; }.nearby-card h3 { margin: 7px 0; font: 500 1.25rem/1.15 var(--font-display,Georgia,serif); }.nearby-card p { margin: 0; color: #fff9; }
+.nearby-card span {color: #e4aa82; font: 600  10px var(--font-mono,monospace); text-transform: uppercase; letter-spacing: .06em;}.nearby-card h3 { margin: 7px 0; font: 500 1.25rem/1.15 var(--font-display,Georgia,serif); }.nearby-card p { margin: 0; color: #fff9; }
 @media (max-width: 900px) {
   .home-property-grid,.home-nearby__grid { grid-template-columns: repeat(2,minmax(0,1fr)); }
   /* r13 market layouts collapse to single columns; the stagger offset

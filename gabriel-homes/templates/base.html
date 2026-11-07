@@ -32,6 +32,10 @@
   {% endblock %}
 
   <link rel="preconnect" href="{% static 'fonts/' %}" crossorigin>
+  {% comment %} r42: tokens + base + components as flat <link>s with mtime
+     cache-busters — replaces base.css's @import chain (which double-shipped
+     components.css and left tokens.css uncache-busted). {% endcomment %}
+  <link rel="stylesheet" href="{% staticv 'css/tokens.css' %}">
   <link rel="stylesheet" href="{% staticv 'css/base.css' %}">
   <link rel="stylesheet" href="{% staticv 'css/components.css' %}">
   {% block styles %}{% endblock %}

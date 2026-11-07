@@ -152,6 +152,7 @@
 .prose a:hover { color: var(--brown); }
 .prose__updated {
   font-family: var(--font-mono);
+  font-weight: 500;
   font-size: var(--text-xs);
   color: var(--taupe);
   letter-spacing: var(--track-tight);
@@ -195,6 +196,7 @@
 .contact-card__icon svg { width: 22px; height: 22px; }
 .contact-card__tag {
   font-family: var(--font-mono);
+  font-weight: 600;
   font-size: var(--text-xs);
   color: var(--burnt);
   letter-spacing: var(--track-tight);
@@ -316,6 +318,7 @@
   gap: 0.5rem;
   margin-top: 1.4rem;
   font-family: var(--font-mono);
+  font-weight: 600;
   font-size: var(--text-sm);
   letter-spacing: var(--track-mono);
   text-transform: uppercase;
@@ -370,13 +373,11 @@
   border-color: var(--burnt);
   box-shadow: 0 18px 45px rgba(45, 31, 23, 0.12);
 }
-.contact-channel__label {
-  font-family: var(--font-mono);
+.contact-channel__label {font-family: var(--font-mono); font-weight: 600;
   font-size: var(--text-xs);
   letter-spacing: var(--track-mono);
   text-transform: uppercase;
-  color: var(--burnt);
-}
+  color: var(--burnt);}
 .contact-channel__value {
   font-family: var(--font-display);
   font-size: var(--text-xl);
@@ -405,14 +406,12 @@
   border-radius: var(--radius-card, 18px);
   box-shadow: 0 10px 35px rgba(45, 31, 23, 0.06);
 }
-.contact-path__tag {
-  margin: 0;
-  font-family: var(--font-mono);
+.contact-path__tag {margin: 0;
+  font-family: var(--font-mono); font-weight: 600;
   font-size: var(--text-xs);
   letter-spacing: var(--track-mono);
   text-transform: uppercase;
-  color: var(--burnt);
-}
+  color: var(--burnt);}
 .contact-path__title {
   margin: 0;
   font-family: var(--font-display);
@@ -516,6 +515,7 @@
   align-items: baseline;
   margin-top: 0.9rem;
   font-family: var(--font-mono);
+  font-weight: 600;
   font-size: var(--text-xs);
   letter-spacing: var(--track-mono);
   text-transform: uppercase;
@@ -532,6 +532,7 @@
 .page-hero__crumb {
   margin: 1.4rem 0 0;
   font-family: var(--font-mono);
+  font-weight: 600;
   font-size: var(--text-xs);
   letter-spacing: var(--track-mono);
   text-transform: uppercase;

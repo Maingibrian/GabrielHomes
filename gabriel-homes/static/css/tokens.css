@@ -81,7 +81,16 @@
 
   /* --- Typography (WORK.md §10.2) --- */
   --font-sans: "Geist", "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-  --font-mono: "Geist Mono", "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+  /* r42 (owner request): the thin "microtext" voice (Geist Mono) was retired
+     site-wide — every label / eyebrow / counter / meta that referenced
+     --font-mono now renders in the Geist sans. The token NAME is kept so all
+     ~110 call sites (incl. the pinned tests) stay untouched; the Geist Mono
+     @font-face below stays because test_phase2_home pins the self-host
+     contract, and an unused @font-face family is never downloaded by the
+     browser (zero shipped bytes). Pair this with the r42 weight floor in the
+     component files: uppercase micro labels get >= 600, sentence-case small
+     print >= 500, so nothing renders thin. */
+  --font-mono: "Geist", "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   --font-display: "Fraunces", "Iowan Old Style", Georgia, "Times New Roman", serif;
 
   /* Size scale seen in the reference */

@@ -79,6 +79,7 @@
   background: var(--espresso-88);
   color: var(--cream);
   font-family: var(--font-mono);
+  font-weight: 600;
   font-size: var(--text-xs);
   letter-spacing: var(--track-tight);
   text-transform: uppercase;
@@ -113,6 +114,7 @@
   background: var(--espresso-88);
   color: var(--cream);
   font-family: var(--font-mono);
+  font-weight: 600;
   font-size: var(--text-xs);
   padding: 0.35rem 0.75rem;
   border-radius: var(--radius-pill);
@@ -230,6 +232,7 @@
   align-items: center;
   gap: 0.4rem;
   font-family: var(--font-mono);
+  font-weight: 600;
   font-size: var(--text-xs);
   letter-spacing: var(--track-tight);
   text-transform: uppercase;
@@ -256,13 +259,11 @@
   flex-direction: column;
   gap: 0.25rem;
 }
-.facts-bar__label {
-  font-family: var(--font-mono);
+.facts-bar__label {font-family: var(--font-mono); font-weight: 600;
   font-size: var(--text-xs);
   letter-spacing: var(--track-tight);
   text-transform: uppercase;
-  color: var(--taupe);
-}
+  color: var(--taupe);}
 .facts-bar__value {
   font-size: var(--text-lg);
   font-weight: 500;
@@ -275,14 +276,12 @@
 .detail-description {
   margin-bottom: 2.5rem;
 }
-.detail-description__title {
-  font-family: var(--font-mono);
+.detail-description__title {font-family: var(--font-mono); font-weight: 600;
   font-size: var(--text-xs);
   letter-spacing: var(--track-tight);
   text-transform: uppercase;
   color: var(--burnt);
-  margin-bottom: 1rem;
-}
+  margin-bottom: 1rem;}
 .detail-description__body {
   font-size: var(--text-md);
   line-height: var(--leading-body);
@@ -295,14 +294,12 @@
 .amenities {
   margin-bottom: 2.5rem;
 }
-.amenities__title {
-  font-family: var(--font-mono);
+.amenities__title {font-family: var(--font-mono); font-weight: 600;
   font-size: var(--text-xs);
   letter-spacing: var(--track-tight);
   text-transform: uppercase;
   color: var(--burnt);
-  margin-bottom: 1.25rem;
-}
+  margin-bottom: 1.25rem;}
 .amenities__grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -332,14 +329,12 @@
 .detail-map {
   margin-bottom: 2.5rem;
 }
-.detail-map__title {
-  font-family: var(--font-mono);
+.detail-map__title {font-family: var(--font-mono); font-weight: 600;
   font-size: var(--text-xs);
   letter-spacing: var(--track-tight);
   text-transform: uppercase;
   color: var(--burnt);
-  margin-bottom: 1rem;
-}
+  margin-bottom: 1rem;}
 .detail-map__note {
   font-size: var(--text-xs);
   color: var(--taupe);
@@ -361,6 +356,7 @@
   height: 100%;
   margin: 0;
   font-family: var(--font-mono);
+  font-weight: 500;
   font-size: var(--text-xs);
   letter-spacing: var(--track-tight);
   color: var(--taupe);
@@ -371,6 +367,7 @@
   height: 100%;
   margin: 0;
   font-family: var(--font-mono);
+  font-weight: 500;
   font-size: var(--text-xs);
   letter-spacing: var(--track-tight);
   color: var(--taupe);
@@ -386,6 +383,7 @@
   background: var(--espresso-88);
   color: var(--cream);
   font-family: var(--font-mono);
+  font-weight: 500;
   font-size: var(--text-xs);
   letter-spacing: var(--track-tight);
   padding: 0.35rem 0.85rem;
@@ -410,20 +408,18 @@
     line-height: 1.5;
   }
 }
-.detail-map__google {
-  display: inline-flex;
+.detail-map__google {display: inline-flex;
   align-items: center;
   gap: 0.35rem;
   margin-top: 0.6rem;
-  font-family: var(--font-mono);
+  font-family: var(--font-mono); font-weight: 600;
   font-size: var(--text-xs);
   letter-spacing: var(--track-tight);
   text-transform: uppercase;
   color: var(--burnt);
   text-decoration: none;
   border-bottom: 1px solid transparent;
-  transition: border-color var(--t-fast) var(--ease);
-}
+  transition: border-color var(--t-fast) var(--ease);}
 .detail-map__google:hover { border-color: var(--burnt); }
 /* MapLibre GL controls, themed to match the site (the Leaflet rules they
    replace left with the Leaflet map in run 14). */
@@ -440,11 +436,9 @@
 .detail-map .maplibregl-ctrl button .maplibregl-ctrl-icon {
   filter: invert(0); /* keep native glyphs legible on the light basemap */
 }
-.detail-map .maplibregl-ctrl-attrib {
-  font-family: var(--font-mono);
+.detail-map .maplibregl-ctrl-attrib {font-family: var(--font-mono); font-weight: 500;
   font-size: var(--text-xs);
-  border-radius: var(--radius-sm) 0 0 0;
-}
+  border-radius: var(--radius-sm) 0 0 0;}
 .detail-map .maplibregl-popup-content {
   border-radius: var(--radius-sm);
   font-family: var(--font-sans);
@@ -499,13 +493,11 @@
   color: var(--ink);
   letter-spacing: var(--track-tight);
 }
-.agent-card-sticky__role {
-  font-family: var(--font-mono);
+.agent-card-sticky__role {font-family: var(--font-mono); font-weight: 600;
   font-size: var(--text-xs);
   color: var(--taupe);
   letter-spacing: var(--track-tight);
-  text-transform: uppercase;
-}
+  text-transform: uppercase;}
 .agent-card-sticky__contact {
   display: flex;
   flex-direction: column;
@@ -548,14 +540,12 @@
 .enquiry-form-container {
   /* Wraps the form + success/error partials for HTMX swap */
 }
-.enquiry-form__title {
-  font-family: var(--font-mono);
+.enquiry-form__title {font-family: var(--font-mono); font-weight: 600;
   font-size: var(--text-xs);
   letter-spacing: var(--track-tight);
   text-transform: uppercase;
   color: var(--burnt);
-  margin-bottom: 0.75rem;
-}
+  margin-bottom: 0.75rem;}
 .enquiry-form .form__input,
 .enquiry-form .form__textarea {
   width: 100%;
@@ -717,14 +707,12 @@
 .detail-video {
   margin-bottom: 2.5rem;
 }
-.detail-video__tag {
-  font-family: var(--font-mono);
+.detail-video__tag {font-family: var(--font-mono); font-weight: 600;
   font-size: var(--text-xs);
   letter-spacing: var(--track-tight);
   text-transform: uppercase;
   color: var(--burnt);
-  margin-bottom: 1.25rem;
-}
+  margin-bottom: 1.25rem;}
 .detail-video__player {
   display: block;
   width: 100%;
@@ -778,7 +766,7 @@
 .nearby-amenities__heading { display:flex; justify-content:space-between; align-items:end; gap:16px; margin-bottom:10px; }
 .nearby-amenities__eyebrow { margin:0 0 7px; color:var(--burnt); font:700 10px var(--font-mono); letter-spacing:.13em; }
 .nearby-amenities__heading h2,.detail-map__heading h2 { margin:0; color:var(--ink); font:500 clamp(1.7rem,3vw,2.35rem)/1.05 var(--font-display); letter-spacing:-.03em; }
-.nearby-amenities__heading > span,.detail-map__heading > span { flex:none; color:var(--taupe); font:10px var(--font-mono); letter-spacing:.06em; text-transform:uppercase; }
+.nearby-amenities__heading > span,.detail-map__heading > span {flex:none; color:var(--taupe); font: 600 10px var(--font-mono); letter-spacing:.06em; text-transform:uppercase;}
 .nearby-amenities__note { margin:0 0 16px; color:var(--taupe); font-size:12px; }
 .nearby-amenities__grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; }
 .nearby-amenity { display:flex; align-items:center; gap:12px; min-width:0; padding:14px; border:1px solid rgba(90,64,50,.1); border-radius:14px; background:#fff; }

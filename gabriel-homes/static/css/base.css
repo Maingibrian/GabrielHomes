@@ -1,10 +1,12 @@
 /* =============================================================
    Gabriel Homes — base stylesheet (reset + body defaults)
-   Imports tokens, then components, then page-specific sheets.
+   r42: tokens.css and components.css are now <link>ed directly from
+   base.html with mtime cache-busters ({% staticv %}) — the old @import
+   chain shipped components.css TWICE (import URL had no ?v, the <link>
+   URL did) and left tokens.css uncache-busted, so edits could go stale in
+   visitors' browsers. Load order lives in base.html: tokens → base →
+   components → page sheets.
    ============================================================= */
-
-@import url("./tokens.css");
-@import url("./components.css");
 
 /* ---------- Reset ---------- */
 *, *::before, *::after { box-sizing: border-box; }

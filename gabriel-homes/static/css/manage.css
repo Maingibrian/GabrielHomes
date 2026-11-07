@@ -38,6 +38,7 @@
   background: var(--burnt);
   color: var(--white);
   font-family: var(--font-mono);
+  font-weight: 600;
   font-size: var(--text-xs);
   letter-spacing: 0.08em;
   flex: none;
@@ -54,7 +55,7 @@
 
 .manage-topbar__name small {
   font-family: var(--font-mono);
-  font-weight: 400;
+  font-weight: 600;
   font-size: var(--text-xs);
   color: var(--ember);
   letter-spacing: 0.06em;
@@ -88,6 +89,7 @@
 
 .manage-card__tag {
   font-family: var(--font-mono);
+  font-weight: 600;
   font-size: var(--text-xs);
   letter-spacing: 0.14em;
   color: var(--clay);
@@ -228,6 +230,7 @@
 .manage-next__label {
   margin: 0 0 0.375rem;
   font-family: var(--font-mono);
+  font-weight: 600;
   font-size: var(--text-xs);
   letter-spacing: 0.14em;
   text-transform: uppercase;
@@ -297,16 +300,14 @@
   gap: 0.5rem;
 }
 
-.manage-check__pill {
-  font-family: var(--font-mono);
+.manage-check__pill {font-family: var(--font-mono); font-weight: 600;
   font-size: var(--text-xs);
   letter-spacing: 0.08em;
   text-transform: uppercase;
   padding: 0.125rem 0.625rem;
   border-radius: var(--radius-pill);
   border: 1px solid var(--sand);
-  color: var(--taupe);
-}
+  color: var(--taupe);}
 
 .manage-check__pill.is-done {
   background: var(--cream);
@@ -327,6 +328,7 @@
 .manage-check__auto {
   margin: 0.75rem 0 0;
   font-family: var(--font-mono);
+  font-weight: 500;
   font-size: var(--text-xs);
   letter-spacing: 0.06em;
   color: var(--taupe);
