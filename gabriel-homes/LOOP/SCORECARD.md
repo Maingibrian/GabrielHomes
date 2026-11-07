@@ -46,7 +46,7 @@ Build order: r35 (AUDIT G4 + WATCH + RETRO D-LOOP-35a) → r36 = BUILDER F2 T2 l
 4. Hard-coded hex count outside tokens.css recorded as a baseline constant in the test; count may only go down (ratchet).
 
 **F2 Capability gate (5)** — proving test `apps/core/tests/test_f2_capability_gate.py`
-1. One small deferred script sets `html[data-fx]` ∈ {rich, lite, none} from: prefers-reduced-motion ⇒ none; Save-Data ⇒ no richer than lite; hardwareConcurrency or deviceMemory ≤ 4 ⇒ lite; coarse pointer / no hover ⇒ pointer-driven effects off.
+1. One small deferred script sets `html[data-fx]` ∈ {rich, lite, none} from: prefers-reduced-motion ⇒ none; Save-Data ⇒ no richer than lite; coarse pointer / no hover ⇒ pointer-driven effects off. (r58: the hardwareConcurrency/deviceMemory ≤ 4 demotions were removed — the memory report rounds down to a power of two, so 4-7 GB laptops all report 4 and the owner's own machine was demoted to lite, killing the bento shape-shift.)
 2. Every shipped effect keys off `[data-fx]`; none behaves exactly like today's reduced-motion behaviour.
 3. With data-fx="none", no effect runs (decision-table test + static check that motion JS gates on data-fx).
 4. D-MOTION-SAFE: without JS (no data-fx attr) all content visible, effects off.

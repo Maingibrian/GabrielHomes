@@ -1,5 +1,5 @@
 /* =============================================================
-   Gabriel Homes — capability gate (F2)
+   Gabriel Homes — capability gate (F2, r58)
 
    One tiny deferred script decides, ONCE, what this device gets:
 
@@ -9,12 +9,23 @@
        none — prefers-reduced-motion. Behaves exactly like the old
               reduced-motion path: no effects run, content is fully
               visible (motion.js renders everything instantly).
-       lite — constrained device: Save-Data on, or <= 4 CPU cores,
-              or <= 4 GB deviceMemory. Essential behaviour runs;
+       lite — Save-Data on: the visitor asked to save data, so the
+              data-hungry upgrades stay off. Essential behaviour runs;
               decorative/pointer effects do not.
        rich — full effects. Pointer-driven DECORATIVE effects
               (bento shape-shift, cursor polish) additionally
               require [data-fine].
+
+   r58: the old "<= 4 CPU cores or <= 4 GB memory means lite" demotions
+   are GONE, deliberately. The browser's memory report is rounded DOWN
+   to a power of two and capped, so every 4-7 GB laptop reports 4, and
+   4-core machines are most of the market — the old proxies demoted the
+   owner's own machine to lite and silently killed the bento
+   shape-shift ("the animation of expanding cards is broken", r57
+   report). The gate now trusts only signals the VISITOR actually
+   chose: their reduced-motion preference and their Save-Data toggle.
+   Everything in the rich tier is a GPU-composited transform/clip/
+   opacity animation on a handful of elements — cheap on 4 cores.
 
    D-FX-GATE contract: every effect keys off these attributes — no
    effect re-checks prefers-reduced-motion or pointer media queries
@@ -35,17 +46,8 @@
   // Pure decision function: (mq, nav) -> "rich" | "lite" | "none".
   function computeFx(mq, nav) {
     if (mq("(prefers-reduced-motion: reduce)")) return "none";
-    var cap = "rich";
-    if (nav.connection && nav.connection.saveData) cap = "lite";
-    if (typeof nav.hardwareConcurrency === "number" &&
-        nav.hardwareConcurrency <= 4) {
-      cap = "lite";
-    }
-    if (typeof nav.deviceMemory === "number" &&
-        nav.deviceMemory <= 4) {
-      cap = "lite";
-    }
-    return cap;
+    if (nav.connection && nav.connection.saveData) return "lite";
+    return "rich";
   }
 
   function apply(doc, win, nav) {

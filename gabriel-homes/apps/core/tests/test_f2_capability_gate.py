@@ -23,22 +23,18 @@ BASE_HTML = REPO / "templates" / "base.html"
 # ---------------------------------------------------------------------------
 # Mirror of fx-gate.js computeFx(mq, nav) — keep in sync with the JS.
 # mq: a callable(query) -> bool, as window.matchMedia(q).matches.
-# nav: dict with optional connection/hardwareConcurrency/deviceMemory.
+# nav: dict with optional connection. (r58: hardwareConcurrency and
+# deviceMemory are no longer inputs — core/memory proxies demoted the
+# owner's own 4-core machine to lite and killed the bento shape-shift.
+# The gate trusts only visitor-chosen signals: reduced-motion, Save-Data.)
 # ---------------------------------------------------------------------------
 def compute_fx(mq, nav):
     if mq("(prefers-reduced-motion: reduce)"):
         return "none"
-    cap = "rich"
     connection = nav.get("connection") or {}
     if connection.get("saveData"):
-        cap = "lite"
-    hc = nav.get("hardwareConcurrency")
-    if isinstance(hc, (int, float)) and not isinstance(hc, bool) and hc <= 4:
-        cap = "lite"
-    dm = nav.get("deviceMemory")
-    if isinstance(dm, (int, float)) and not isinstance(dm, bool) and dm <= 4:
-        cap = "lite"
-    return cap
+        return "lite"
+    return "rich"
 
 
 def make_mq(reduced=False):
@@ -60,17 +56,32 @@ def test_fx_gate_exists_and_is_csp_clean():
     )
 
 
-def test_fx_gate_reads_the_five_runbook_inputs():
+def test_fx_gate_reads_the_three_visitor_signals():
+    """r58: the gate's inputs are exactly the signals a visitor chose —
+    reduced-motion, Save-Data, pointer/hover — never hardware proxies."""
     js = FX_GATE.read_text(encoding="utf-8")
     for needle in (
         "(prefers-reduced-motion: reduce)",   # reduced motion -> none
         "saveData",                            # Save-Data -> no richer than lite
-        "hardwareConcurrency",                 # <= 4 cores -> lite
-        "deviceMemory",                        # <= 4 GB -> lite
         "(hover: hover) and (pointer: fine)",  # -> data-fine
         '"rich"', '"lite"', '"none"',          # exactly the three tiers
     ):
         assert needle in js, f"fx-gate.js lost input/tier token: {needle}"
+
+
+def test_fx_gate_has_no_hardware_proxies():
+    """r58 regression pin: core-count and memory proxies must STAY OUT of
+    the gate. The browser rounds its memory report down to a power of two
+    (4-7 GB machines report 4) and 4-core laptops are most of the market,
+    so the old '<= 4 means lite' demotion switched the owner's own
+    machine off — reported as 'the bento animation is broken' (r57)."""
+    js = FX_GATE.read_text(encoding="utf-8")
+    assert "hardwareConcurrency" not in js, (
+        "core-count proxies must not demote the fx tier (r58 lesson)"
+    )
+    assert "deviceMemory" not in js, (
+        "memory proxies must not demote the fx tier (r58 lesson)"
+    )
 
 
 def test_fx_gate_sets_data_fine_only_for_fine_pointers():
@@ -100,16 +111,22 @@ def test_save_data_caps_at_lite():
                                   "hardwareConcurrency": 8}) == "lite"
 
 
-def test_weak_hardware_caps_at_lite_boundary_is_four():
-    assert compute_fx(make_mq(), {"hardwareConcurrency": 4}) == "lite"
-    assert compute_fx(make_mq(), {"hardwareConcurrency": 5}) == "rich"
-    assert compute_fx(make_mq(), {"deviceMemory": 4}) == "lite"
-    assert compute_fx(make_mq(), {"deviceMemory": 8}) == "rich"
+def test_hardware_reports_never_demote():
+    """r58: a 2-core / 1 GB report is still rich — the rich tier is all
+    GPU-composited transforms on a handful of elements, and the proxies
+    are both unreliable and how the owner's machine got demoted."""
+    assert compute_fx(make_mq(), {"hardwareConcurrency": 2,
+                                  "deviceMemory": 1}) == "rich"
+    assert compute_fx(make_mq(), {"hardwareConcurrency": 4,
+                                  "deviceMemory": 4}) == "rich"
 
 
 def test_unknown_hardware_types_do_not_demote():
     assert compute_fx(make_mq(), {"hardwareConcurrency": "many"}) == "rich"
     assert compute_fx(make_mq(), {"deviceMemory": None}) == "rich"
+    # ...and even absent hardware info the tier is rich (fail open for
+    # decoration, fail closed for content — motion.js still renders
+    # everything visibly under every tier).
 
 
 # ---------------------------------------------------------------------------
