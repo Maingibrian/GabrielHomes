@@ -182,7 +182,7 @@ def test_mobile_menu_has_one_consistently_numbered_link_per_primary_page():
     assert mobile_menu.count(">04</span>") == 1
 
 
-def test_home_page_has_footer_with_meta_row():
+def test_home_page_has_footer_with_wordmark():
     c = Client()
     r = c.get("/")
     body = r.content.decode()
@@ -190,12 +190,12 @@ def test_home_page_has_footer_with_meta_row():
     assert 'action="/newsletter/subscribe/"' in body
     assert 'name="consent" value="yes" required' in body
     assert "checked" not in body.split('name="consent"')[1].split(">")[0]
-    # r63: the giant "Homes" wordmark is gone (it duplicated the header
-    # brand) — the footer closes with a quiet meta bar instead.
-    assert 'class="site-footer__meta-row"' in body
-    assert "wordmark--footer" not in body
+    # r64: the giant "Homes" wordmark is BACK (owner round twelve) —
+    # removed in r63, asked back one round later.
+    assert 'class="wordmark wordmark--footer"' in body
+    assert body.count('class="wordmark__letter"') == 5
+    # Footer location string — case matches template
     assert "Kenya" in body
-    assert "Gabriel Homes. All rights reserved." in body
 
 
 def test_home_page_has_design_language_markers():

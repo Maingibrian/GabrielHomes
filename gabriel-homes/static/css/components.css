@@ -753,12 +753,43 @@
 
 
 /* ============================================================
-   12. Footer wordmark — REMOVED r63 (owner round eleven)
-   The giant "Homes" duplicated the header brand ("Gabriel Homes")
-   and the copyright line; the footer now closes with the quiet
-   .site-footer__meta-row (§14). The per-letter hover spans went with
-   it — nothing references .wordmark in any template or script.
+   12. Giant footer wordmark — "Homes" (r64: RESTORED)
+   Removed in r63 at the owner's request, asked back one round
+   later — the signature oversized "Homes" closes the page.
+   Per-letter spans give each glyph its own hover colour.
    ============================================================ */
+.wordmark {
+  font-family: var(--font-display);
+  font-weight: 480;
+  font-variation-settings: "opsz" 144;
+  font-size: var(--text-wordmark);
+  letter-spacing: -0.02em;
+  line-height: 0.9;
+  color: var(--cream);
+  text-align: left;
+  margin: 0;
+  user-select: none;
+}
+.wordmark--footer {
+  font-size: clamp(4rem, 1rem + 22vw, 9rem);
+  overflow: hidden;
+  white-space: nowrap;
+}
+.wordmark__letter {
+  display: inline-block;
+  transition: color var(--t-med) var(--ease);
+}
+.wordmark__letter:hover { color: var(--ember); } /* r12: burnt hover failed on espresso footer */
+.site-footer__wordmark-row {
+  border-top: 1px solid color-mix(in srgb, var(--sand) 18%, transparent);
+  padding-top: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  /* r64 (owner round twelve): the restored wordmark is the page's
+     signature close — 0.5rem jammed KENYA against the baseline
+     (8px). 1.25rem gives it the room a 9rem display line earns. */
+  gap: 1.25rem;
+}
 
 
 /* ============================================================
@@ -1326,18 +1357,8 @@ html.motion-ready [data-reveal].is-visible {
   max-width: 20ch;
   margin-bottom: 1.5rem;
 }
-/* r63 (owner round eleven): the giant "Homes" wordmark is gone — it
-   duplicated the header brand. A quiet meta bar closes the footer:
-   hairline rule, place on the left, copyright on the right. */
-.site-footer__meta-row {
-  border-top: 1px solid color-mix(in srgb, var(--sand) 18%, transparent);
-  padding-top: 1.5rem;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 1rem;
-  flex-wrap: wrap;
-}
+/* r64: the r63 meta-row rule is gone — the restored wordmark row
+   (§12 above) owns the closing bar again; these two sit inside it. */
 .site-footer__meta {
   font-family: var(--font-mono);
   font-weight: 600;
@@ -1364,8 +1385,15 @@ html.motion-ready [data-reveal].is-visible {
      the top/bottom edges deepen to carry the tag and the proof strip.
      r55 pass-2: mid 0.56 -> 0.60 (still <= the pinned 0.62) — the
      vision pass read the band as a failed hero load; the deeper middle
-     commits it to a dark band with warm photo hints. */
+     commits it to a dark band with warm photo hints.
+     r64 (owner round twelve, vision critic): pixel measurement found
+     near-white patches (luma 240) behind the RIGHT half of the centered
+     headline — the cream text vanished in spots. A soft radial now
+     shadows the text zone (centre, widest at the headline/button); the
+     linear mid stays at the r55-pinned 0.60 so the photo keeps reading
+     warm at the band's outer edges. */
   background:
+    radial-gradient(72% 55% at 50% 44%, rgba(28,21,17,0.70) 0%, rgba(28,21,17,0.35) 60%, rgba(28,21,17,0) 100%),
     linear-gradient(180deg, rgba(28,21,17,0.88) 0%, rgba(42,33,28,0.60) 50%, rgba(28,21,17,0.93) 100%),
     url("../img/real/hero-poster.jpg") center/cover no-repeat,
     var(--espresso);
@@ -1681,6 +1709,11 @@ html.motion-ready .bento-grid .bento-card[data-reveal]:nth-child(3n) { transitio
   max-width: 48ch;
   margin-top: 0.75rem;
 }
+/* r64 (owner round twelve, vision critic): the newsletter heading
+   inherited the footer's cream-at-80% body colour and read muted /
+   disabled next to the full-cream FAQ heading — same weight class,
+   same band, one colour. */
+.site-footer__newsletter .featured__title { color: var(--cream); }
 .footer-cols__subhead {font-family: var(--font-mono); font-weight: 600;
   /* r55: nowrap — the subhead wrapped mid-phrase inside the narrow
      browse column ("BY PROPERTY / TYPE"). */
@@ -1707,7 +1740,9 @@ html.motion-ready .bento-grid .bento-card[data-reveal]:nth-child(3n) { transitio
   display: grid;
   grid-template-columns: 1fr;
   gap: 0;
-  max-width: 60rem;
+  /* r64 (owner round twelve, vision critic): the 60rem cap left ~285px
+     of dead dark on the right — the grid now closes flush with the
+     container edge like every other footer row. */
 }
 @media (min-width: 810px) {
   .footer-faq__list { grid-template-columns: 1fr 1fr; gap: 0 3rem; }

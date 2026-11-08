@@ -564,7 +564,11 @@
    Fraunces display-list treatment with hairline rules between items. */
 .about-story__taste {
   margin: 2.2rem 0 0;
-  max-width: 54ch;
+  /* r64 (owner round twelve, vision critic): 54ch → 62ch — the story
+     paragraphs render 62ch (≈658px) and the list hairlines stopped
+     85px short of their rag, reading as arbitrarily truncated. Same
+     measure as the copy now. */
+  max-width: 62ch;
 }
 .about-story__taste-tag { margin-bottom: 0.35rem; }
 .about-story__taste-list li {
@@ -737,6 +741,10 @@ html.motion-ready:not([data-fx="none"]) .story__values .value-card:nth-child(3) 
   line-height: 1.38;
   color: var(--burnt);
   max-width: 32ch;
+  /* r64 (owner round twelve, vision critic): the quote ended on a
+     two-word orphan ("that feeling."). Balance spreads the rag
+     evenly across the 3–4 lines at every viewport; copy untouched. */
+  text-wrap: balance;
 }
 .about-founder__lede {
   color: color-mix(in srgb, var(--ink) 78%, var(--taupe));
@@ -828,6 +836,10 @@ html.motion-ready:not([data-fx="none"]) .story__values .value-card:nth-child(3) 
   text-transform: uppercase;
   color: color-mix(in srgb, var(--cream) 62%, var(--sand));
   max-width: 46ch;
+  /* r64 (owner round twelve, vision critic): "OURSELVES." orphaned
+     alone on line two of the letterspaced caps. Balance evens the
+     two lines; copy untouched. */
+  text-wrap: balance;
 }
 
 /* 2. Values row (r63, owner round eleven — "single row, large numerals,
@@ -986,11 +998,15 @@ html.motion-ready:not([data-fx="none"]) .story__values .value-card:nth-child(3) 
 .cta__proof-strip {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  grid-auto-rows: 190px;
+  grid-auto-rows: 210px;
   gap: 12px;
   /* r63: the bento is the band's centrepiece — 680→920px so the
-     large tile can breathe (owner goal: asymmetric bento grid). */
-  max-width: 920px;
+     large tile can breathe (owner goal: asymmetric bento grid).
+     r64 (owner round twelve, vision critic): 920 left 180px of dead
+     photo on EACH side of a 1208px container — widened to 1080 (64px
+     sides) with the rows bumped to match so the collage owns the
+     band. */
+  max-width: 1080px;
   margin: 0 auto;
 }
 .about-tile {

@@ -114,12 +114,18 @@
       </div>
     </div>
 
-    {# r63 (owner round eleven): the giant "Homes" wordmark is gone — it #}
-    {# duplicated the header brand ("Gabriel Homes") and the copyright    #}
-    {# line beside it. The row is now a quiet meta bar: place + copyright. #}
-    <div class="site-footer__meta-row">
-      <span class="site-footer__meta">Kenya</span>
-      <span class="site-footer__copyright">&copy; {% now "Y" %} Gabriel Homes. All rights reserved.</span>
+    {# r64 (owner round twelve): the giant "Homes" wordmark is BACK — #}
+    {# the owner asked for its return one round after r63 removed it.  #}
+    {# Markup restored exactly as r62 shipped it (per-letter spans for #}
+    {# the CSS letter hover). Kenya + copyright ride alongside.        #}
+    <div class="site-footer__wordmark-row">
+      <p class="wordmark wordmark--footer" aria-label="Homes">
+        <span class="wordmark__letter">H</span><span class="wordmark__letter">o</span><span class="wordmark__letter">m</span><span class="wordmark__letter">e</span><span class="wordmark__letter">s</span>
+      </p>
+      <div style="display: flex; justify-content: space-between; align-items: center; gap: 1rem; flex-wrap: wrap;">
+        <span class="site-footer__meta">Kenya</span>
+        <span class="site-footer__copyright">&copy; {% now "Y" %} Gabriel Homes. All rights reserved.</span>
+      </div>
     </div>
 
   </div>

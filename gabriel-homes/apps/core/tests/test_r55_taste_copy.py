@@ -190,8 +190,9 @@ def test_founder_caption_is_constrained_on_phones():
 
 def test_proof_strip_widened_and_note_brightened():
     strip = re.search(r"\.cta__proof-strip \{[^}]*\}", PAGES_CSS).group(0)
-    # r63: 680→920px so the large bento tile can breathe (owner goal 3)
-    assert "max-width: 920px" in strip
+    # r63: 680→920px so the large bento tile can breathe (owner goal 3).
+    # r64: 920→1080px — the critic found 180px of dead photo per side.
+    assert "max-width: 1080px" in strip
     note = re.search(r"\.cta__proof-note \{[^}]*\}", PAGES_CSS).group(0)
     assert "84%" in note
 

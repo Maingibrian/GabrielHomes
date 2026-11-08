@@ -115,12 +115,18 @@ def test_founder_caption_clears_the_offset_frame():
 # 5. Footer meta row + newsletter (owner goals 7 + 8)
 # ---------------------------------------------------------------------------
 def test_footer_meta_row_is_styled():
-    rule = re.search(r"\.site-footer__meta-row \{[^}]*\}", COMPONENTS_CSS)
-    assert rule, "the meta row needs its own rule (the wordmark row it replaced was the only styling)"
-    for prop in ("justify-content: space-between", "flex-wrap: wrap"):
-        assert prop in rule.group(0)
-    # the dead wordmark styles went with the markup
-    assert ".wordmark--footer" not in COMPONENTS_CSS
+    # r64 (owner round twelve): the owner asked the wordmark BACK one
+    # round after r63 removed it — the restored .site-footer__wordmark-row
+    # owns the closing bar; the r63 meta-row rule is gone.
+    rule = re.search(r"\.site-footer__wordmark-row \{[^}]*\}", COMPONENTS_CSS)
+    assert rule, "the wordmark row rule must exist (r64 restore)"
+    assert "border-top" in rule.group(0)
+    wordmark = re.search(r"\.wordmark--footer \{[^}]*\}", COMPONENTS_CSS)
+    assert wordmark and "clamp(4rem" in wordmark.group(0), (
+        "the giant footer wordmark is a signature element — restored r64"
+    )
+    letters = re.search(r"\.wordmark__letter:hover \{[^}]*\}", COMPONENTS_CSS)
+    assert letters, "the per-letter hover survived the round trip"
 
 
 def test_newsletter_button_shares_the_input_line_on_desktop():
