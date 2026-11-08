@@ -111,8 +111,13 @@ def test_about_cta_is_taste_led_with_the_garden_bedroom():
     assert "Sunlight, salt air, and rooms that breathe." in cta
     assert "honest photography" not in cta
     # r56 pass: each collection photo carries a sensory micro-caption
-    caps = re.findall(r'<figcaption>([^<]+)</figcaption>', cta)
+    # (r63: the captions ride inside bento tiles — class attr present)
+    caps = re.findall(
+        r'<figcaption class="about-tile__caption">([^<]+)</figcaption>', cta)
     assert caps == ["Golden hour", "Sea light", "Slow mornings"]
+    # r63: asymmetric bento — one large tile, two small
+    assert 'about-tile about-tile--lg' in cta
+    assert cta.count('class="bento-card about-tile"') == 2
 
 
 def test_about_meta_description_is_taste_led():
@@ -176,12 +181,17 @@ def test_founder_caption_is_constrained_on_phones():
     m = re.search(r"\.about-founder__caption \{[^}]*\}", block)
     assert m, "the ≤560px founder caption rule must exist"
     assert "white-space: normal" in m.group(0)
-    assert "width: 96px" in m.group(0)
+    # r63: the band STACKS on phones — the caption follows the 160px
+    # portrait (96px was the old side-by-side squeeze) and clears the
+    # 10px frame offset line.
+    assert "width: 160px" in m.group(0)
+    assert "calc(10px + 0.6rem)" in m.group(0)
 
 
 def test_proof_strip_widened_and_note_brightened():
     strip = re.search(r"\.cta__proof-strip \{[^}]*\}", PAGES_CSS).group(0)
-    assert "max-width: 680px" in strip
+    # r63: 680→920px so the large bento tile can breathe (owner goal 3)
+    assert "max-width: 920px" in strip
     note = re.search(r"\.cta__proof-note \{[^}]*\}", PAGES_CSS).group(0)
     assert "84%" in note
 

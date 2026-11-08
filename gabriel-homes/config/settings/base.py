@@ -218,7 +218,12 @@ OWNER_EMAIL = env.str("OWNER_EMAIL", default="")
 # Site meta (used by core context processor)
 # ---------------------------------------------------------------------------
 SITE_NAME = "Gabriel Homes"
-SITE_DOMAIN = env.str("SITE_DOMAIN", default="http://localhost:8000")
+# r63 (owner round eleven): the production domain is the DEFAULT so
+# canonical links and og:url never emit a localhost URL — they must point
+# at the one true origin wherever the site is served from (preview, local
+# run, production). Matches DEPLOY.md §nginx (gabrielhomes.co.ke). A dev
+# override is still possible via the SITE_DOMAIN env var.
+SITE_DOMAIN = env.str("SITE_DOMAIN", default="https://gabrielhomes.co.ke")
 DEFAULT_META_DESCRIPTION = (
     "Gabriel Homes — real estate with a human point of view. "
     "Buy and rent property in Mombasa, Nairobi, Kilifi, Diani, Kiambu and Kajiado."

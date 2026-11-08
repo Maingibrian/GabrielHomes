@@ -558,17 +558,16 @@
 }
 .about-story__figure figcaption span { color: var(--burnt); }
 /* r55: mono "what we look for" list — fills the dead zone the vision
-   pass found under the story paragraphs (the copy column ended ~40%
-   up the photo). Same hairline-rule language as the founder rail. */
+   pass found under the story paragraphs. r63 (owner round eleven): the
+   bracketed label is a real eyebrow element ABOVE the list — never the
+   first bullet (semantics + screen readers). The three points keep the
+   Fraunces display-list treatment with hairline rules between items. */
 .about-story__taste {
-  list-style: none;
   margin: 2.2rem 0 0;
-  padding: 0;
-  /* r55 pass-2: 46→54ch — the vision pass read the shorter list as an
-     unbalanced hole in the middle column. */
   max-width: 54ch;
 }
-.about-story__taste li {
+.about-story__taste-tag { margin-bottom: 0.35rem; }
+.about-story__taste-list li {
   padding-block: 0.95rem;
   border-top: 1px solid var(--sand-60);
   /* r56: elevated — the r56 vision pass called this list "the best
@@ -581,16 +580,6 @@
   line-height: 1.45;
   letter-spacing: var(--track-tight);
   color: var(--ink);
-}
-.about-story__taste li:first-child {
-  border-top: 0;
-  padding-top: 0;
-  font-family: var(--font-mono);
-  font-weight: 600;
-  font-size: var(--text-xs);
-  letter-spacing: var(--track-mono);
-  text-transform: uppercase;
-  color: var(--burnt);
 }
 @media (max-width: 900px) {
   .about-story { grid-template-columns: 1fr; }
@@ -663,11 +652,15 @@
 }
 
 /* Values band header — "What we stand for" no longer dangles at the
-   bottom of the story copy; the grid follows the head, not 3rem below. */
+   bottom of the story copy; the grid follows the head, not 3rem below.
+   r63 (owner round eleven): the heading steps up to the display scale
+   (Fraunces, opsz 90) so the section reads editorial, matching the
+   founder and closing bands' hierarchy. */
 .values-head { max-width: 64ch; }
 .values-head__title {
-  font-size: var(--text-2xl);
-  font-weight: 500;
+  font-size: clamp(1.9rem, 1.5rem + 1.7vw, 2.6rem);
+  font-weight: 520;
+  font-variation-settings: "opsz" 90;
   letter-spacing: var(--track-tighter);
   margin: 0.9rem 0 0.7rem;
 }
@@ -698,9 +691,11 @@ html.motion-ready:not([data-fx="none"]) .story__values .value-card:nth-child(3) 
    the photo keeps its class + F3 attrs (test_founder_portrait). */
 .about-founder {
   display: grid;
-  /* r53: third column — the mono fact rail fills the dead right half
-     (vision pass). Align START so the quote tops out with the portrait. */
-  grid-template-columns: auto minmax(0, 1fr) minmax(170px, 210px);
+  /* r63 (owner round eleven): a deliberate two-column lockup —
+     portrait | quote + name. The fact rail moved out into its own
+     bento strip below (see .about-founder__rail). Align START so the
+     quote tops out with the portrait. */
+  grid-template-columns: auto minmax(0, 1.35fr);
   gap: clamp(2.5rem, 5vw, 4.5rem);
   align-items: start;
 }
@@ -759,18 +754,21 @@ html.motion-ready:not([data-fx="none"]) .story__values .value-card:nth-child(3) 
 }
 @media (max-width: 900px) {
   .about-founder { grid-template-columns: 1fr; align-items: start; gap: 2.25rem; }
+  /* r63: the rail's own responsive rules now live WITH the rail, after
+     its 4-column rule (source order matters — see the r63 fix note). */
 }
-/* r52 pass-2: at phone widths the stacked portrait orphaned above the
-   copy left a dead band — the founder goes SIDE BY SIDE instead: 96px
-   portrait + quote/signature in the remaining column, frame offset
-   shrunk to 10px to match. The caption under the story photo also
-   drops its flex row (the [ SITE VISIT ] label wrapped alone with a
-   gap) and flows inline. */
+/* r63 (owner round eleven): phones STACK — portrait above, copy full
+   width below (the owner's brief asks for stacking mobile). The old
+   r52 side-by-side squeezed the copy into a 212px column: the 48px
+   heading wrapped to four lines and the quote ran nine. 160px portrait
+   keeps the founder moment; the caption clears the 10px frame offset.
+   The story-photo caption rule below is unchanged r52. */
 @media (max-width: 560px) {
-  .about-founder { grid-template-columns: auto minmax(0, 1fr); gap: 1.4rem; }
+  .about-founder { grid-template-columns: 1fr; gap: 1.8rem; }
   .about-founder__portrait { margin: 0 10px 10px 0; }
   .about-founder__portrait::before { inset: 10px -10px -10px 10px; }
-  .about-founder__portrait .hv2-founder__photo { width: 96px; height: 96px; }
+  .about-founder__portrait .hv2-founder__photo { width: 160px; height: 160px; }
+  .about-founder__caption { margin-top: calc(10px + 0.6rem); }
   .about-founder__quote { font-size: 1.15rem; margin: 1rem 0 0.9rem; }
   .about-founder__sig { margin-top: 1.2rem; padding-top: 1rem; }
   .about-story__figure figcaption { display: block; }
@@ -832,41 +830,84 @@ html.motion-ready:not([data-fx="none"]) .story__values .value-card:nth-child(3) 
   max-width: 46ch;
 }
 
-/* 2. Values cards, de-SaaS'd (vision pass: "white rounded rectangles
-   with soft shadows … imported from a different brand"). The 40px app
-   radius comes down to the house 20px card radius, a 3px burnt rule
-   replaces the neutral top edge, the shadow flattens, and the body
-   ink deepens off taupe. Scoped to the about values band only — the
-   shared .value-card base (home) keeps its r52 look. */
+/* 2. Values row (r63, owner round eleven — "single row, large numerals,
+   subtle divider, not three equal floating columns"). The white cards,
+   shadows and burnt top-rules are gone: the three principles now sit
+   in one editorial row separated by hairlines. Each cell leads with a
+   display-scale Fraunces numeral (the 001/002/003 the owner asked to
+   keep), the icon medallion sits opposite it, and the bracket eyebrow
+   carries the word. The stagger + equal-title rules the tests pin stay.
+   Scoped to the about values band only — the shared .value-card base
+   (home) keeps its look. */
+.about-values .story__values {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0;
+  margin-top: 2.4rem;
+  align-items: stretch;
+}
 .about-values .value-card {
-  border-radius: var(--radius-card);
-  border-top: 3px solid var(--burnt);
-  padding: 1.9rem 1.75rem;
-  box-shadow: 0 14px 34px -22px rgba(45, 31, 23, 0.28);
+  background: none;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  padding: 0.25rem clamp(1.5rem, 3vw, 2.75rem) 0.25rem 0;
+  transition: none;
+}
+.about-values .value-card:hover { transform: none; box-shadow: none; }
+/* subtle divider between the three cells (desktop only — phones stack
+   on horizontal rules instead) */
+@media (min-width: 811px) {
+  .about-values .value-card + .value-card {
+    border-left: 1px solid var(--sand-60);
+  }
+}
+@media (max-width: 810px) {
+  .about-values .story__values { grid-template-columns: 1fr; }
+  .about-values .value-card {
+    padding: 1.6rem 0;
+    border-top: 1px solid var(--sand-60);
+  }
+  .about-values .value-card:first-child { border-top: 0; padding-top: 0.25rem; }
+}
+/* the numeral + icon head row */
+.value-card__head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 0.9rem;
+}
+.value-card__num {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-variation-settings: "opsz" 144;
+  font-size: clamp(2.9rem, 2.2rem + 2.6vw, 4.1rem);
+  line-height: 0.9;
+  letter-spacing: var(--track-display);
+  color: var(--burnt);
+  margin: 0;
 }
 .about-values .value-card__icon {
-  /* circular medallion — the rounded-14 chip read app-tile (vision pass). */
   border-radius: 50%;
+  margin-bottom: 0;
+  flex: none;
 }
-.about-values .value-card:hover {
-  box-shadow: 0 20px 44px -24px rgba(45, 31, 23, 0.34);
-  border-color: color-mix(in srgb, var(--clay) 45%, var(--sand-60));
-  border-top-color: var(--burnt);
-}
+.about-values .value-card__tag { margin-bottom: 0.55rem; }
+.about-values .value-card__title { min-height: 2.5em; }
 .about-values .value-card__body {
   color: color-mix(in srgb, var(--ink) 85%, var(--taupe));
 }
-/* r55: card 1's title wraps to two lines at desktop while cards 2–3
-   stay single — the vision pass caught the ragged body baselines. A
-   two-line min-height on every title levels the row. */
-.about-values .value-card__title { min-height: 2.5em; }
 
 /* 3. Founder band — caption under the photo, larger quote (the page's
    strongest moment per the pass), and the mono fact rail that fills
    the dead right half. Rail values set in Fraunces so the facts read
    editorial, not dashboard. */
 .about-founder__caption {
-  margin-top: 0.85rem;
+  /* r63 fix: the offset sand frame extends 16px below the photo — the
+     caption must clear that line, not sit on it (was 0.85rem = 13.6px,
+     a 17px collision). calc clears the line and keeps air beneath it. */
+  margin-top: calc(16px + 1.05rem);
   font-family: var(--font-mono);
   font-weight: 600;
   font-size: var(--text-xs);
@@ -880,24 +921,26 @@ html.motion-ready:not([data-fx="none"]) .story__values .value-card:nth-child(3) 
   max-width: 34ch;
 }
 .about-founder__lede { max-width: 52ch; }
+/* r63 (owner round eleven): the four facts are a compact bento strip
+   under the founder lockup — one squircle cell per fact, mono eyebrow
+   label over a Fraunces value (clear label/value hierarchy, per the
+   owner's goal). 4-across on desktop, 2×2 on small screens. */
 .about-founder__rail {
   list-style: none;
-  margin: 0.5rem 0 0;
+  margin: 3rem 0 0;
   padding: 0;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+.about-founder__rail-cell {
   display: flex;
   flex-direction: column;
-  align-self: start;
-}
-.about-founder__rail li {
-  display: flex;
-  flex-direction: column;
-  gap: 0.22rem;
-  padding-block: 0.95rem;
-  border-top: 1px solid var(--sand-60);
-}
-.about-founder__rail li:first-child {
-  border-top: 0;
-  padding-top: 0.55rem;
+  gap: 0.35rem;
+  background: var(--white);
+  border: 1px solid var(--sand-60);
+  border-radius: var(--radius-card);
+  padding: 1.15rem 1.3rem 1.25rem;
 }
 .about-founder__rail-k {
   font-family: var(--font-mono);
@@ -915,43 +958,93 @@ html.motion-ready:not([data-fx="none"]) .story__values .value-card:nth-child(3) 
   letter-spacing: var(--track-tight);
   color: var(--ink);
 }
+/* r63 fix: these responsive rules MUST sit after the 4-column rule
+   above — the r52-era ≤900 rule further up the file lost the source-
+   order race and phones rendered four 76px slivers with clipped
+   labels. Declared here, 2×2 wins below 900px. */
+@media (max-width: 900px) {
+  .about-founder__rail {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    margin-top: 2.25rem;
+  }
+}
+@media (max-width: 560px) {
+  .about-founder__rail-cell { padding: 0.95rem 1.05rem 1.05rem; }
+}
 
 /* 4. Closing band proof strip (about-only markup; the shared .cta
    geometry/scrim lives in components.css so home and contact render
-   the identical band). A triptych of real listing-check photos —
-   "see the homes" now shows the homes. */
+   the identical band). r63 (owner round eleven): the three sunlit
+   rooms sit in an ASYMMETRIC bento — one large tile spanning two
+   columns and rows, two small tiles stacked beside it — reusing the
+   homepage bento-card language (squircle corners, scrim, de-zoom +
+   saturate on hover). Real <img> elements keep lazy loading and
+   width/height for the coastal connection. */
 .cta__proof {
   margin-top: 2.6rem;
 }
 .cta__proof-strip {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-auto-rows: 190px;
   gap: 12px;
-  /* r55: 520→680px — the vision pass read the tall narrow strips as
-     broken aspect-ratio placeholders; wider reads as a triptych. */
-  max-width: 680px;
+  /* r63: the bento is the band's centrepiece — 680→920px so the
+     large tile can breathe (owner goal: asymmetric bento grid). */
+  max-width: 920px;
   margin: 0 auto;
 }
-.cta__proof-strip img {
-  display: block;
-  width: 100%;
-  aspect-ratio: 3 / 2;
-  object-fit: cover;
-  border-radius: 12px;
-  box-shadow: 0 12px 28px -14px rgba(10, 6, 4, 0.5);
+.about-tile {
+  /* bento-card base (components.css) gives position/overflow/flex;
+     these figures are NOT links — no pointer cursor, sand fallback
+     behind the photo while it loads. margin: 0 is REQUIRED — the UA
+     default figure margin (1em 40px) shrank every tile 80px per side
+     and clipped the small-tile captions on phones (r63 fix). */
+  cursor: default;
+  margin: 0;
+  background: linear-gradient(160deg, var(--cream) 0%, var(--sand) 100%);
+  border-radius: var(--radius-card);
+  justify-content: flex-end;
 }
-/* r55 pass-2: room micro-captions under each photo — the vision pass
-   read the bare triptych as three floating cards with no anchor. */
-.cta__proof-strip figure { margin: 0; }
-.cta__proof-strip figcaption {
-  margin-top: 0.6rem;
+.about-tile--lg {
+  grid-column: span 2;
+  grid-row: span 2;
+}
+.about-tile__photo {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: -1;
+  /* The homepage bento de-zoom, adapted for a real <img>: the photo
+     rests zoomed-in under a quiet warm grade; hover springs it out to
+     the full shot in full colour ("saturated photo on hover"). The
+     same curve runs in reverse on unhover. */
+  transform: scale(1.15);
+  filter: saturate(0.9) sepia(0.06);
+  transition: transform 1.05s cubic-bezier(0.34, 1.2, 0.5, 1),
+              filter 0.6s var(--ease-out);
+}
+.about-tile:hover .about-tile__photo,
+.about-tile:focus-visible .about-tile__photo {
+  transform: scale(1);
+  filter: saturate(1) sepia(0);
+}
+@media (prefers-reduced-motion: reduce) {
+  .about-tile__photo { transition: none; }
+}
+/* Captions ride inside the tiles, bottom-left on the scrim (the
+   homepage bento body position) — same mono caps voice they had. */
+.about-tile__caption {
+  position: relative;
+  z-index: 1;
+  padding: 0 1.1rem 1rem;
   font-family: var(--font-mono);
   font-weight: 600;
   font-size: var(--text-xs);
   letter-spacing: var(--track-mono);
   text-transform: uppercase;
-  text-align: center;
-  color: color-mix(in srgb, var(--cream) 78%, transparent);
+  color: var(--cream);
 }
 .cta__proof-note {
   margin: 1rem auto 0;
@@ -964,62 +1057,41 @@ html.motion-ready:not([data-fx="none"]) .story__values .value-card:nth-child(3) 
      legible on the photo band. */
   color: color-mix(in srgb, var(--cream) 84%, transparent);
 }
+/* Bento breakpoints: tablet keeps one large tile full-width with the
+   two smalls side by side; phones stack large-then-two-up so no tile
+   collapses into a sliver (the r56 lesson). */
+@media (max-width: 900px) {
+  .cta__proof-strip {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-auto-rows: 170px;
+  }
+  .about-tile--lg { grid-column: span 2; grid-row: span 2; }
+}
+@media (max-width: 560px) {
+  .cta__proof-strip {
+    grid-auto-rows: 150px;
+  }
+  .about-tile--lg { grid-row: span 2; }
+}
 
 /* 5. Mobile refinements (vision pass item 8): the fixed header overlays
    this hero, so the H1 needs real clearance below it; the quote band
-   and cards breathe at phone widths; the founder rail drops under the
-   copy as a horizontal row (portrait + quote stay side by side at
-   ≤560 per r52 pass-2). */
-@media (max-width: 900px) {
-  .about-founder { grid-template-columns: auto minmax(0, 1fr); }
-  .about-founder__rail {
-    grid-column: 1 / -1;
-    flex-direction: row;
-    flex-wrap: wrap;
-    gap: 0 2.2rem;
-    margin-top: 1.6rem;
-  }
-  .about-founder__rail li {
-    border-top: 0;
-    padding: 0;
-  }
-}
+   and values row breathe at phone widths. (r63: the rail's responsive
+   rules live with the rail itself — see the r63 fix note there; the
+   proof filmstrip is gone with the bento.) */
 @media (max-width: 560px) {
   .page-hero { padding-top: calc(var(--section-pad-y) + 3rem); }
   .about-quote { padding-block: clamp(3rem, 2.4rem + 4vw, 3.8rem); }
   .about-quote .about-story__pull { font-size: 1.85rem; line-height: 1.28; }
   .about-quote .about-story__pull::before { margin-bottom: 1.25rem; }
-  .about-values .value-card { padding: 1.4rem 1.3rem; }
-  /* r56: the 390px vision pass read the stacked triptych as
-     "extremely narrow slivers of yellow" — the strip becomes a
-     scroll-snap filmstrip instead (three ~74%-wide cards, centred
-     snaps, no visible scrollbar). */
-  .cta__proof-strip {
-    display: flex;
-    gap: 12px;
-    overflow-x: auto;
-    scroll-snap-type: x mandatory;
-    -webkit-overflow-scrolling: touch;
-    padding-bottom: 4px;
-    scrollbar-width: none;
-  }
-  .cta__proof-strip::-webkit-scrollbar { display: none; }
-  .cta__proof-strip figure {
-    flex: 0 0 68%;
-    scroll-snap-align: center;
-  }
-  /* r55: the 390px vision pass caught the founder band broken — the
-     mono caption ([ FOUNDER — MOMBASA ], ~170px unwrapped) drove the
-     portrait's auto track to 170px and squeezed the copy column to
-     ~150px, clipping the headline. The caption now wraps inside the
-     photo's width so the track stays 96px. */
+  /* r63: the founder band stacks at phone width — the caption follows
+     the 160px portrait (was pinned to the old 96px side-by-side) and
+     clears the 10px frame offset (r55 pass-2 kept the line-height). */
   .about-founder__caption {
-    width: 96px;
+    width: 160px;
     white-space: normal;
     overflow-wrap: anywhere;
-    /* r55 pass-2: the wrapped caption hugged the photo (vision pass) —
-       line-height + a touch more air. */
     line-height: 1.55;
-    margin-top: 0.6rem;
+    margin-top: calc(10px + 0.6rem);
   }
 }

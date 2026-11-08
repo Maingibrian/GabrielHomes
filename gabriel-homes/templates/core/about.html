@@ -57,12 +57,16 @@ garden — matching its "Rooms that open to the breeze" caption at last.
         building the collection slowly: homes with character, on streets
         we would live on ourselves.
       </p>
-      <ul class="about-story__taste" data-reveal aria-label="What we look for in a home">
-        <li class="about-story__taste-k">[ WHAT WE LOOK FOR ]</li>
-        <li>Light, air, and a view worth pausing for</li>
-        <li>A street you would walk at dusk</li>
-        <li>Rooms that feel bigger with the windows open</li>
-      </ul>
+      {# r63 (owner round eleven): the label is a real eyebrow above the #}
+      {# list — never the first bullet. Same copy, same bracket voice. #}
+      <div class="about-story__taste" data-reveal>
+        <p class="section-tag about-story__taste-tag">[ WHAT WE LOOK FOR ]</p>
+        <ul class="about-story__taste-list" aria-label="What we look for in a home">
+          <li>Light, air, and a view worth pausing for</li>
+          <li>A street you would walk at dusk</li>
+          <li>Rooms that feel bigger with the windows open</li>
+        </ul>
+      </div>
     </div>
     <figure class="about-story__figure" data-reveal>
       <img src="{% staticv 'img/real/real-06-living-terrace.jpg' %}" alt="A shaded veranda opening onto a Mombasa garden" loading="lazy" width="1200" height="800">
@@ -98,12 +102,18 @@ about-story__pull so the pinned selectors and tests carry over.
         people, about this coast.
       </p>
     </div>
+    {# r63 (owner round eleven): one editorial row — large Fraunces #}
+    {# numerals, hairline dividers between the three, no floating #}
+    {# cards. The icon medallions and the copy are unchanged. #}
     <div class="story__values">
       <article class="value-card" data-reveal>
-        <span class="value-card__icon" aria-hidden="true">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" focusable="false"><circle cx="12" cy="7.8" r="3.4"/><path d="M5.4 19.8c.8-3.6 3.4-5.4 6.6-5.4s5.8 1.8 6.6 5.4"/></svg>
-        </span>
-        <p class="value-card__tag">[ 001 — People ]</p>
+        <div class="value-card__head">
+          <p class="value-card__num" aria-hidden="true">001</p>
+          <span class="value-card__icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" focusable="false"><circle cx="12" cy="7.8" r="3.4"/><path d="M5.4 19.8c.8-3.6 3.4-5.4 6.6-5.4s5.8 1.8 6.6 5.4"/></svg>
+          </span>
+        </div>
+        <p class="value-card__tag">[ People ]</p>
         <h3 class="value-card__title">People first, property second.</h3>
         <p class="value-card__body">
           We start with the life you want — the school run, the sea breeze,
@@ -112,10 +122,13 @@ about-story__pull so the pinned selectors and tests carry over.
         </p>
       </article>
       <article class="value-card" data-reveal>
-        <span class="value-card__icon" aria-hidden="true">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" focusable="false"><circle cx="12" cy="12" r="4"/><path d="M12 3v2M12 19v2M3 12h2M19 12h2M5.6 5.6 7 7M17 17l1.4 1.4M18.4 5.6 17 7M7 17l-1.4 1.4"/></svg>
-        </span>
-        <p class="value-card__tag">[ 002 — Character ]</p>
+        <div class="value-card__head">
+          <p class="value-card__num" aria-hidden="true">002</p>
+          <span class="value-card__icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" focusable="false"><circle cx="12" cy="12" r="4"/><path d="M12 3v2M12 19v2M3 12h2M19 12h2M5.6 5.6 7 7M17 17l1.4 1.4M18.4 5.6 17 7M7 17l-1.4 1.4"/></svg>
+          </span>
+        </div>
+        <p class="value-card__tag">[ Character ]</p>
         <h3 class="value-card__title">Homes with soul.</h3>
         <p class="value-card__body">
           Light, air, a street you'd walk at dusk — if a home doesn't make
@@ -124,10 +137,13 @@ about-story__pull so the pinned selectors and tests carry over.
         </p>
       </article>
       <article class="value-card" data-reveal>
-        <span class="value-card__icon" aria-hidden="true">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" focusable="false"><circle cx="8" cy="12" r="3.4"/><path d="M11.4 12h9.1"/><path d="M16.6 12v3.2"/><path d="M19.6 12v2.2"/></svg>
-        </span>
-        <p class="value-card__tag">[ 003 — Support ]</p>
+        <div class="value-card__head">
+          <p class="value-card__num" aria-hidden="true">003</p>
+          <span class="value-card__icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" focusable="false"><circle cx="8" cy="12" r="3.4"/><path d="M11.4 12h9.1"/><path d="M16.6 12v3.2"/><path d="M19.6 12v2.2"/></svg>
+          </span>
+        </div>
+        <p class="value-card__tag">[ Support ]</p>
         <h3 class="value-card__title">Support beyond the keys.</h3>
         <p class="value-card__body">
           We stay around long after the keys change hands — through the
@@ -139,56 +155,70 @@ about-story__pull so the pinned selectors and tests carry over.
   </div>
 </section>
 
-{% comment %} r53: the founder band opens into a three-column editorial
-  lockup — portrait | quote+lede | mono fact rail — filling the dead right
-  half the vision pass flagged. The portrait grows 160→200px (source stays
-  the 240px WebP; density 1.2x, noted in test_founder_portrait). The rail
-  restates only established facts (founded 2026, Mombasa · Kenya, and the
-  quote's own "walked through ourselves"). The caption moves under the
-  photo where the eye looks for it. {% endcomment %}
+{% comment %} r63 (owner round eleven): the founder band is a deliberate
+  two-column lockup — portrait | quote + name — and the four facts move
+  out into their own compact bento strip under the band (clear
+  label/value hierarchy, one fact per squircle cell). The portrait keeps
+  its square 200×200 crop (source is the 240px WebP, 1.2x density —
+  noted in test_founder_portrait) and its alt text. {% endcomment %}
 <section class="section" id="team">
-  <div class="container about-founder">
-    <figure class="about-founder__portrait" data-reveal>
-      <img class="hv2-founder__photo" src="{% staticv 'img/real/founder-portrait.webp' %}"
-           width="200" height="200" loading="lazy"
-           alt="Gabriel Omulu, founder of Gabriel Homes">
-      <figcaption class="about-founder__caption">[ FOUNDER — MOMBASA ]</figcaption>
-    </figure>
-    <div class="about-founder__copy">
-      <p class="section-tag" data-reveal>[ TEAM ]</p>
-      <h2 class="featured__title" data-reveal>Founded by Gabriel Omulu.</h2>
-      <blockquote class="about-founder__quote" data-reveal>
-        &ldquo;I started Gabriel Homes for the feeling of coming home to
-        the coast — the light, the sea air, the slow evenings. Every
-        home we take on has to give you that feeling.&rdquo;
-      </blockquote>
-      <p class="about-founder__lede" data-reveal>
-        Gabriel Homes was founded in 2026. Gabriel chooses the homes
-        himself — the ones he would happily live in.
-      </p>
-      <div class="about-founder__sig" data-reveal>
-        <p class="hv2-founder__role">Founder</p>
-        <p class="hv2-founder__name">Gabriel Omulu</p>
+  <div class="container">
+    <div class="about-founder">
+      <figure class="about-founder__portrait" data-reveal>
+        <img class="hv2-founder__photo" src="{% staticv 'img/real/founder-portrait.webp' %}"
+             width="200" height="200" loading="lazy"
+             alt="Gabriel Omulu, founder of Gabriel Homes">
+        <figcaption class="about-founder__caption">[ FOUNDER — MOMBASA ]</figcaption>
+      </figure>
+      <div class="about-founder__copy">
+        <p class="section-tag" data-reveal>[ TEAM ]</p>
+        <h2 class="featured__title" data-reveal>Founded by Gabriel Omulu.</h2>
+        <blockquote class="about-founder__quote" data-reveal>
+          &ldquo;I started Gabriel Homes for the feeling of coming home to
+          the coast — the light, the sea air, the slow evenings. Every
+          home we take on has to give you that feeling.&rdquo;
+        </blockquote>
+        <p class="about-founder__lede" data-reveal>
+          Gabriel Homes was founded in 2026. Gabriel chooses the homes
+          himself — the ones he would happily live in.
+        </p>
+        <div class="about-founder__sig" data-reveal>
+          <p class="hv2-founder__role">Founder</p>
+          <p class="hv2-founder__name">Gabriel Omulu</p>
+        </div>
       </div>
     </div>
     {# r56: the rail states places, not process — "Standard: Every home  #}
-    {# walked through" went to /checks/ where it belongs.                #}
-    <ul class="about-founder__rail" data-reveal>
-      <li><span class="about-founder__rail-k">Founded</span><span class="about-founder__rail-v">2026</span></li>
-      <li><span class="about-founder__rail-k">Based</span><span class="about-founder__rail-v">Mombasa · Kenya</span></li>
-      <li><span class="about-founder__rail-k">Territory</span><span class="about-founder__rail-v">Nyali to Shanzu</span></li>
-      <li><span class="about-founder__rail-k">Focus</span><span class="about-founder__rail-v">Coastal homes &amp; stays</span></li>
+    {# walked through" went to /checks/ where it belongs.              #}
+    {# r63: the rail becomes the facts bento strip — one fact per cell.  #}
+    <ul class="about-founder__rail" data-reveal aria-label="Gabriel Homes at a glance">
+      <li class="about-founder__rail-cell">
+        <span class="about-founder__rail-k">Founded</span>
+        <span class="about-founder__rail-v">2026</span>
+      </li>
+      <li class="about-founder__rail-cell">
+        <span class="about-founder__rail-k">Based</span>
+        <span class="about-founder__rail-v">Mombasa · Kenya</span>
+      </li>
+      <li class="about-founder__rail-cell">
+        <span class="about-founder__rail-k">Territory</span>
+        <span class="about-founder__rail-v">Nyali to Shanzu</span>
+      </li>
+      <li class="about-founder__rail-cell">
+        <span class="about-founder__rail-k">Focus</span>
+        <span class="about-founder__rail-v">Coastal homes &amp; stays</span>
+      </li>
     </ul>
   </div>
 </section>
 
 {% comment %} r56: "THE PROOF" and "honest photography" are gone (owner:
-comfort, not proven homes). The band is now the collection — three
-sunlit rooms with sensory captions instead of an evidence exhibit.
-Photos: real-09 (cream villa, golden hour), real-10 (airy living, sea
-light), real-11 (sunlit bedroom, slow mornings). The strip is a
-scroll-snap row on phones (pages.css) so it stops collapsing into
-slivers. {% endcomment %}
+comfort, not proven homes). The band is now the collection. r63 (owner
+round eleven): the three sunlit rooms sit in an asymmetric bento — one
+large tile, two small — reusing the homepage bento-card language
+(squircle, scrim, de-zoom + saturate on hover). Real image elements
+(not background divs) keep lazy loading + width/height for the coastal
+connection; captions stay, exactly as they were. {% endcomment %}
 <section class="section cta">
   <div class="container">
     <p class="section-tag section-tag--light" data-reveal>[ THE COLLECTION ]</p>
@@ -200,17 +230,20 @@ slivers. {% endcomment %}
     </a>
     <div class="cta__proof" data-reveal>
       <div class="cta__proof-strip">
-        <figure>
-          <img src="{% staticv 'img/real/real-09-golden-hour.jpg' %}" alt="A cream villa in warm evening light on the Kenya coast" loading="lazy" width="1200" height="800">
-          <figcaption>Golden hour</figcaption>
+        <figure class="bento-card about-tile about-tile--lg">
+          <img class="about-tile__photo" src="{% staticv 'img/real/real-09-golden-hour.jpg' %}" alt="A cream villa in warm evening light on the Kenya coast" loading="lazy" width="1200" height="800">
+          <div class="bento-card__scrim" aria-hidden="true"></div>
+          <figcaption class="about-tile__caption">Golden hour</figcaption>
         </figure>
-        <figure>
-          <img src="{% staticv 'img/real/real-10-sea-light.jpg' %}" alt="An airy living room washed in sea light" loading="lazy" width="1200" height="800">
-          <figcaption>Sea light</figcaption>
+        <figure class="bento-card about-tile">
+          <img class="about-tile__photo" src="{% staticv 'img/real/real-10-sea-light.jpg' %}" alt="An airy living room washed in sea light" loading="lazy" width="1200" height="800">
+          <div class="bento-card__scrim" aria-hidden="true"></div>
+          <figcaption class="about-tile__caption">Sea light</figcaption>
         </figure>
-        <figure>
-          <img src="{% staticv 'img/real/real-11-slow-mornings.jpg' %}" alt="A sunlit bedroom made for slow mornings" loading="lazy" width="1200" height="800">
-          <figcaption>Slow mornings</figcaption>
+        <figure class="bento-card about-tile">
+          <img class="about-tile__photo" src="{% staticv 'img/real/real-11-slow-mornings.jpg' %}" alt="A sunlit bedroom made for slow mornings" loading="lazy" width="1200" height="800">
+          <div class="bento-card__scrim" aria-hidden="true"></div>
+          <figcaption class="about-tile__caption">Slow mornings</figcaption>
         </figure>
       </div>
       <p class="cta__proof-note">Sunlight, salt air, and rooms that breathe.</p>

@@ -89,11 +89,22 @@ def test_about_value_cards_are_restyled_in_scope():
     assert 'class="section about-values"' in body
     # articles keep the shared class (r52 regex-safe)
     assert len(re.findall(r'<article class="value-card"', body)) == 3
+    # r63 (owner round eleven): one editorial row — large numerals over
+    # icon chips, hairline dividers, NO floating card chrome.
+    assert len(re.findall(r'class="value-card__num"', body)) == 3
+    for num in (">001<", ">002<", ">003<"):
+        assert num in body, f"display numeral {num} missing"
     scoped = re.search(r"\.about-values \.value-card \{[^}]*\}", PAGES_CSS)
     assert scoped, "the about values band has its own card rules"
     css = scoped.group(0)
-    assert "border-top: 3px solid var(--burnt)" in css, "burnt top rule"
-    assert "border-radius: var(--radius-card);" in css, "the 40px app radius is gone (house 20px card radius)"
+    assert "background: none" in css and "border: 0" in css, "flat cells, no card chrome"
+    assert "box-shadow: none" in css, "no floating shadow (owner goal 4)"
+    divider = re.search(
+        r"@media \(min-width: 811px\) \{\s*"
+        r"\.about-values \.value-card \+ \.value-card \{[^}]*\}",
+        PAGES_CSS.replace("\n", " "),
+    )
+    assert divider and "border-left" in divider.group(0), "hairline divider between cells"
 
 
 # ---------------------------------------------------------------------------
@@ -109,9 +120,11 @@ def test_about_founder_band_carries_caption_and_rail():
     for fact in ("2026", "Mombasa · Kenya", "Nyali to Shanzu",
                  "Coastal homes &amp; stays"):
         assert fact in rail, f"the rail must state {fact!r}"
+    # r63: the four facts are one-cell-per-fact bento cells.
+    assert rail.count('class="about-founder__rail-cell"') == 4
     css = re.search(r"\.about-founder \{[^}]*\}", PAGES_CSS)
     assert css, "the .about-founder grid rule must exist"
-    assert "minmax(170px, 210px)" in css.group(0), "three-column lockup: rail track"
+    assert "minmax(0, 1.35fr)" in css.group(0), "two-column lockup: portrait | copy"
     assert "align-items: start" in css.group(0), "quote tops out with the portrait"
 
 

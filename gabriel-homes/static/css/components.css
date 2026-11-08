@@ -753,30 +753,12 @@
 
 
 /* ============================================================
-   12. Giant footer wordmark — "Homes" at 120px with -0.08em tracking
+   12. Footer wordmark — REMOVED r63 (owner round eleven)
+   The giant "Homes" duplicated the header brand ("Gabriel Homes")
+   and the copyright line; the footer now closes with the quiet
+   .site-footer__meta-row (§14). The per-letter hover spans went with
+   it — nothing references .wordmark in any template or script.
    ============================================================ */
-.wordmark {
-  font-family: var(--font-display);
-  font-weight: 480;
-  font-variation-settings: "opsz" 144;
-  font-size: var(--text-wordmark);
-  letter-spacing: -0.02em;
-  line-height: 0.9;
-  color: var(--cream);
-  text-align: left;
-  margin: 0;
-  user-select: none;
-}
-.wordmark--footer {
-  font-size: clamp(4rem, 1rem + 22vw, 9rem);
-  overflow: hidden;
-  white-space: nowrap;
-}
-.wordmark__letter {
-  display: inline-block;
-  transition: color var(--t-med) var(--ease);
-}
-.wordmark__letter:hover { color: var(--ember); } /* r12: burnt hover failed on espresso footer */
 
 
 /* ============================================================
@@ -1344,12 +1326,17 @@ html.motion-ready [data-reveal].is-visible {
   max-width: 20ch;
   margin-bottom: 1.5rem;
 }
-.site-footer__wordmark-row {
+/* r63 (owner round eleven): the giant "Homes" wordmark is gone — it
+   duplicated the header brand. A quiet meta bar closes the footer:
+   hairline rule, place on the left, copyright on the right. */
+.site-footer__meta-row {
   border-top: 1px solid color-mix(in srgb, var(--sand) 18%, transparent);
   padding-top: 1.5rem;
   display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
 }
 .site-footer__meta {
   font-family: var(--font-mono);
@@ -1737,6 +1724,19 @@ html.motion-ready .bento-grid .bento-card[data-reveal]:nth-child(3n) { transitio
   list-style-position: outside;
 }
 .footer-faq__list summary::marker { color: var(--burnt); }
+/* r63 fix: the outside marker hangs left of the summary's border box —
+   at phone width the container padding is only ~17px, so the chevron
+   clipped off-screen (padding-left alone cannot make room for it).
+   The classic hanging indent: inside placement + negative text-indent
+   puts the marker at the container edge and keeps wrapped lines
+   aligned with the text. */
+@media (max-width: 560px) {
+  .footer-faq__list summary {
+    list-style-position: inside;
+    padding-left: 1.3rem;
+    text-indent: -1.3rem;
+  }
+}
 .footer-faq__list details p {
   color: color-mix(in srgb, var(--cream) 70%, transparent);
   font-size: var(--text-sm);
@@ -1746,6 +1746,10 @@ html.motion-ready .bento-grid .bento-card[data-reveal]:nth-child(3n) { transitio
 
 /* ---- newsletter sign-up (site-wide footer since H1/r18) ------ */
 /* ---- newsletter sign-up (site-wide footer since H1/r18) ------ */
+/* r63 (owner round eleven): desktop puts the input and button on one
+   line; the consent line is smaller (13px — the r59 readability
+   floor, never below), softer, and sits directly under the input,
+   aligned with it. Phones keep the stacked form. */
 .newsletter-form { display: grid; gap: 10px; margin-top: 18px; }
 .newsletter-form__label {font-family: var(--font-mono, monospace); font-weight: 600; font-size: 13px; text-transform: uppercase; letter-spacing: .08em; color: rgba(250,248,244,.8);}
 .newsletter-form__input {
@@ -1753,9 +1757,16 @@ html.motion-ready .bento-grid .bento-card[data-reveal]:nth-child(3n) { transitio
   background: rgba(250,248,244,.08); color: var(--cream, #faf8f4);
 }
 .newsletter-form__input::placeholder { color: rgba(250,248,244,.5); }
-.newsletter-form__consent { display: flex; gap: 10px; font-size: 14px; color: rgba(250,248,244,.85); align-items: flex-start; }
+.newsletter-form__consent { display: flex; gap: 10px; font-size: 13px; color: rgba(250,248,244,.72); align-items: flex-start; }
 .newsletter-form__consent input { margin-top: 4px; }
 .newsletter-form .btn { justify-self: start; }
+@media (min-width: 561px) {
+  .newsletter-form { grid-template-columns: minmax(0, 1fr) auto; }
+  .newsletter-form__label { grid-column: 1 / -1; }
+  .newsletter-form__input { min-width: 0; }
+  .newsletter-form .btn { grid-row: 2; grid-column: 2; }
+  .newsletter-form__consent { grid-column: 1; }
+}
 
 /* ============================================================
    12c. G4 pointer polish (r34) — cursor-view bubble (M5 confirm)
