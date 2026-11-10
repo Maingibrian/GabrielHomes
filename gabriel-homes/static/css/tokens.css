@@ -52,6 +52,10 @@
   --map-stage: #e7e4df; /* r38 (D-LOOP-38a): map stage / tile backdrop behind
                            the maplibre canvas — tokenised from the last two
                            raw hexes in search.css (F1 T2 lift) */
+  --sand-band: #f4eee6; /* r65: the curated market band's sand — tokenised
+                           from home.css's last one-off hex so the band's
+                           fade veil (and the parallax work around it) can
+                           reuse it; hex ratchet 198 → 197 (D-LOOP-65a) */
   --taupe:    #6b5e53;  /* muted text, divider lines (r12: was #8a7d70,
                            3.77:1 on cream — darkened to 5.91:1, WCAG AA) */
   --clay:     #965634;  /* secondary accent (r12: was #a66a4d, 4.13:1 on

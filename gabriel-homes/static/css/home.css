@@ -1284,22 +1284,55 @@ html.motion-ready .bento-grid--shift .bento-card[data-reveal] {
    IN MOMBASA down to the Short stays & BnB". The ::before sits at
    z-index:-1 inside the section's own stacking context (isolation:
    isolate), so it paints above the sand background but below every
-   card and heading. The mask holds the field solid through the head
-   and the three market groups and fades it out only across the last
-   stretch (84%→100% — live-measured: the Short stays & BnB group
-   ends at ~97% of the section height at 1600px), so coverage runs
-   exactly from RECOMMENDED IN MOMBASA down to Short stays & BnB and
-   the TALK TO US strip at the very bottom sits on clean sand.
-   Token-only colours (hex ratchet holds); no font sizes touched;
-   decorative, so nothing for screen readers or pointers to find. */
-.home-market { background: #f4eee6; position: relative; isolation: isolate; }
+   card and heading.
+
+   r65 (owner round thirteen): the palm field now drifts on a
+   scroll-linked parallax. Architecture change, same stills: the
+   TRAVELING ::before (overfilled ±170px beyond the section, the
+   drift never exposes a gap) carries the tile alone; the bottom
+   FADE moved off the traveler onto a static ::after veil, so the
+   TALK TO US strip keeps its clean sand at every drift offset (the
+   old mask rode the ::before box and would have wobbled with it);
+   overflow: clip on the section keeps the overfill strictly inside
+   the band — the parallax is the "true parallax" D-LOOP-31a
+   deferred until a clipped layer existed. Non-supporting browsers
+   (no animation-timeline) render the overfilled, clipped, veiled
+   field EXACTLY as r46 did — pixel-identical stills. The fade veil
+   holds the field solid through the head and the three market
+   groups and clears it only across the last stretch (84%→100% —
+   live-measured: the Short stays & BnB group ends at ~97% of the
+   section height at 1600px). Token-only colours (the band sand is
+   --sand-band, r65); no font sizes touched; decorative, so nothing
+   for screen readers or pointers to find. */
+.home-market {
+  background: var(--sand-band);
+  position: relative; isolation: isolate;
+  /* r65: the parallax field travels ±140px — clip the overfill so it
+     can never paint over the neighbouring bands (overflow: clip, not
+     hidden: no scroll container is created; nothing in this band is
+     sticky or meant to escape — the head veil insets stay inside the
+     section padding, card shadows end inside the band). */
+  overflow: clip;
+}
 .home-market::before {
-  content: ""; position: absolute; inset: 0; z-index: -1;
+  content: ""; position: absolute;
+  /* r65: overfilled one drift-margin past the ±140px travel so the
+     tile always covers the section while the parallax runs; the
+     excess is clipped by the section (see above). */
+  inset: -170px 0;
+  z-index: -1;
   background-image: url("../img/palm-field.svg");
   background-repeat: repeat;
   background-size: 1400px 1600px;
-  -webkit-mask-image: linear-gradient(to bottom, black 0%, black 84%, transparent 100%);
-  mask-image: linear-gradient(to bottom, black 0%, black 84%, transparent 100%);
+  pointer-events: none;
+}
+/* r65: the static bottom fade (was the ::before mask). Paints above
+   the traveling field (::after follows ::before at the same z-index)
+   and below every in-flow card, so the fade never rides the drift. */
+.home-market::after {
+  content: ""; position: absolute; inset: 0; z-index: -1;
+  background: linear-gradient(to bottom,
+    transparent 0%, transparent 84%, var(--sand-band) 100%);
   pointer-events: none;
 }
 /* the soft veil that keeps the head's mid-grey body copy off the
@@ -1312,6 +1345,32 @@ html.motion-ready .bento-grid--shift .bento-card[data-reveal] {
   background: radial-gradient(closest-side,
     color-mix(in srgb, var(--cream) 78%, transparent), transparent);
   pointer-events: none;
+}
+/* r65 (owner round thirteen) — palm-field parallax. The whole field
+   translates ±140px against the page over the band's FULL cover
+   traversal (the section is taller than any viewport, so entry/exit
+   ranges would stall mid-band; cover 0%→100% spans the entire
+   scroll through the market band): the fronds lag the cards by
+   ~5% of the scroll distance — the classic slower-background depth
+   read, gentle by design (280px of total swing across a ~5200px
+   traversal; the 1600px tile period makes that a slow drift, never
+   a strobe). Transform-only and compositor-fed (r58 gate
+   philosophy); reversible — scrolling back up rewinds the drift.
+   Gated html[data-fx="rich"], same tier as the palm wind sway:
+   reduced-motion (fx=none), Save-Data (lite) and scripts blocked
+   (no attribute — fails closed) all get the r46 stills. The drift
+   margin (170px in ::before's inset) clears the travel (140px) by
+   30px of safety. */
+@keyframes palm-field-parallax {
+  from { transform: translateY(-140px); }
+  to   { transform: translateY(140px); }
+}
+@supports (animation-timeline: view()) {
+  html[data-fx="rich"] .home-market::before {
+    animation: palm-field-parallax linear both;
+    animation-timeline: view();
+    animation-range: cover 0% cover 100%;
+  }
 }
 /* finer grain on small screens — the 1400px tile would show only
    slivers of two fronds at phone widths */

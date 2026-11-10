@@ -4,12 +4,17 @@ Owner request: "palm leaves in svg in the background... it covers the
 background from the RECOMMENDED IN MOMBASA down to the Short stays &
 BnB". The field is one seamless tile (static/img/palm-field.svg, drawn
 by scripts/r46_palm_field.py) carried by .home-market::before at
-z-index:-1 inside the section's own stacking context, masked so it
-dissolves just past the short-stays group.
+z-index:-1 inside the section's own stacking context, faded out just
+past the short-stays group.
 
-These tests pin the structural contract (the CSS wiring, the stacking
-order, the fade, the asset hygiene) — not the artwork itself, which the
-generator redraws deterministically from seed 46.
+r65 (owner round thirteen) re-platformed the same stills for the
+palm-field parallax: the ::before is now an OVERFILLED traveler
+(inset -170px 0, clipped by overflow: clip on the section) and the
+bottom fade moved to a STATIC .home-market::after veil so the TALK
+TO US strip keeps its clean sand at every drift offset. The r46
+contract tests below pin the new wiring; the parallax itself is
+pinned by test_r65_palm_parallax.py. The artwork contract (tiny
+seamless <use> tile, brand washes, deterministic seed) is untouched.
 """
 from __future__ import annotations
 
@@ -105,20 +110,44 @@ class PalmFieldCSSTests(SimpleTestCase):
         self.assertIn("background-repeat: repeat", rule)
         self.assertIn("z-index: -1", rule)
         self.assertIn("pointer-events: none", rule)
-        # decorative + fails safe: unsupported mask → the field just
-        # extends to the section bottom, nothing breaks
+        # r65: the traveler is OVERFILLED past the ±140px drift (inset
+        # -170px top/bottom) so the tile can never expose a gap while
+        # the parallax runs — the section's overflow: clip trims it.
+        self.assertIn("inset: -170px 0", rule)
+        # r65: the mask is GONE from the traveler — the fade must never
+        # ride the drift (it lives on the static ::after veil).
+        self.assertNotIn("mask", rule)
+
+    def test_section_clips_the_traveling_field(self):
+        """r65: the overfilled ::before must be clipped by the section
+        itself, or the ±170px overfill would paint over the bands
+        above and below the market section (positioned z:-1 content
+        of a LATER stacking context paints over an earlier sibling's
+        text). overflow: clip, not hidden — no scroll container is
+        created and nothing sticky lives in this band."""
+        css = HOME_CSS.read_text(encoding="utf-8")
+        m = re.search(r"\.home-market \{([^}]*)\}", css)
+        assert m, ".home-market rule not found"
+        self.assertIn("overflow: clip", m.group(1))
 
     def test_coverage_runs_through_short_stays(self):
         """Fade holds solid to 84% and clears by 100% — live-measured
         (1600px viewport): the Short stays & BnB group ends at ~97% of
         the section height, so coverage spans head → short stays and
-        only the TALK TO US strip sits on clean sand."""
+        only the TALK TO US strip sits on clean sand. r65: the fade is
+        the STATIC ::after veil (transparent → --sand-band), so it
+        stays glued to the section while the ::before drifts."""
         block = _palm_block()
-        for mask in ("-webkit-mask-image", "mask-image"):
-            m = re.search(re.escape(mask) + r":\s*([^;]+);", block)
-            assert m, f"{mask} not found in the palm block"
-            self.assertIn("black 84%", m.group(1))
-            self.assertIn("transparent 100%", m.group(1))
+        m = re.search(r"\.home-market::after \{([^}]*)\}", block)
+        assert m, ".home-market::after veil rule not found"
+        rule = m.group(1)
+        self.assertIn("linear-gradient", rule)
+        self.assertIn("transparent 84%", rule)
+        self.assertIn("var(--sand-band) 100%", rule)
+        self.assertIn("z-index: -1", rule)
+        self.assertIn("pointer-events: none", rule)
+        # the veil is glued to the section box, not overfilled
+        self.assertIn("inset: 0", rule)
 
     def test_head_veil_present(self):
         """The design-sheet review asked for a soft veil behind the
@@ -146,15 +175,14 @@ class PalmFieldCSSTests(SimpleTestCase):
 
     def test_palm_block_adds_no_hex(self):
         """The F1 hex ratchet holds block-locally too — every colour
-        the palm wiring introduces is a token or a keyword. The one
-        hex inside the block range is the PRE-EXISTING section sand
-        (.home-market's own background, already counted in the F1
-        baseline since r13) — it may stay, nothing else may join it."""
+        the palm wiring introduces is a token or a keyword. r65
+        tokenised the section sand (#f4eee6 → var(--sand-band),
+        D-LOOP-65a), so the block now carries ZERO hex at all."""
         block = _palm_block().replace("../img/palm-field.svg", "")
         hexes = set(re.findall(r"#[0-9a-fA-F]{3,8}", block))
-        self.assertEqual(hexes, {"#f4eee6"},
-                         "only the pre-existing section sand may appear — "
-                         "use tokens/color-mix for anything new")
+        self.assertEqual(hexes, set(),
+                         "the palm block is fully tokenised — use "
+                         "tokens/color-mix for anything new")
 
     def test_no_dom_change_for_the_field(self):
         """The field is CSS-only — no palm markup snuck into the
