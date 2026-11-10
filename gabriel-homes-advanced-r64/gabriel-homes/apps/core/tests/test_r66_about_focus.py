@@ -1,29 +1,37 @@
-"""r66 — owner round: the About focus pass.
+"""r66 + r67 — owner rounds: the About focus pass, twice over.
 
-Three owner asks drive this round:
+r66 shipped three owner asks:
 
 1. "Remove the carousel — Homes worth crossing town for — it doesn't
    look good, the background and images are shaded."  →  the closing
    band's shaded photo strip (and every about-tile rule) left the page;
    the band keeps the tag, the taste-led headline and the Explore
-   button. (Removal pins also live in the updated r53/r55/r63/r64
-   files; this file pins the new whole.)
+   button.
 
 2. "The cards above should get better styling... cards stacked in
    columns that you hover and they expand and reveal more info."
-   →  the 001/002/003 principles are now tall white panels in an
-   accordion row: fine pointers collapse them to numeral strips and
-   bloom the hovered/focused card open, detail (title + body) fading
-   in behind the panel. Phones, touch, no-JS and print render every
-   card fully open — the reveal is a nicety, never a gate.
+   →  the 001/002/003 principles became stacked columns that bloom
+   open on hover/focus.
 
 3. "Remove the palm tree background in the about us page... maybe some
-   waves patterns."  →  .about-values::before now tiles wave-field.svg
+   waves patterns."  →  .about-values::before tiles wave-field.svg
    (scripts/r66_wave_field.py — nine sine rows, the palm's clay pair),
    same z-index -1 / pointer-events none / bottom-fade contract.
 
-This file pins all three so a future refactor cannot silently drop
-them.
+r67 (owner round): "looks bad." The E3 pass read the r66 white boxes
+as floating on a void with "no real-estate warmth", and the collapsed
+accordion strips hid the photography the site sells with. The columns
+are now PHOTO EXPANDERS: tall coast photographs (object-fit cover, NO
+shading filter — the carousel complaint was the scrim crushing the
+pictures; only the copy zone carries a gradient) with numeral + tag +
+title + body on a bottom-anchored panel. Fine pointers collapse the
+row and bloom the hovered/focused card open; every other context
+renders the same cards fully open — the reveal is a nicety, never a
+gate.
+
+This file pins the current contract (r64 precedent: obsolete pins are
+rewritten to pin the NEW whole) so a future refactor cannot silently
+drop any of it.
 """
 import re
 from pathlib import Path
@@ -53,7 +61,7 @@ def _page(path):
 
 
 # ---------------------------------------------------------------------------
-# 1. The accordion — markup
+# 1. The photo expander — markup
 # ---------------------------------------------------------------------------
 def test_every_principle_card_is_focusable_and_carries_its_detail():
     body = _page("/about/")
@@ -72,35 +80,31 @@ def test_every_principle_card_is_focusable_and_carries_its_detail():
     assert len(details) == 3
 
 
-def test_collapsed_panels_carry_their_spine():
-    """r66 pass-2 (VLM): the first pass's collapsed strips read as
-    "loading content" — every card now carries an aria-hidden vertical
-    spine (its title, mono caps) that makes the collapse a deliberate
-    book-spine pose and crossfades out when the detail blooms in."""
+def test_every_card_is_a_tall_photo_with_honest_alt_text():
+    """r67: the icon medallions left with the white panels — every card
+    is now a coast photograph. The photos are CONTENT (real alt text,
+    intrinsic width/height), not decoration; the scrim that keeps the
+    copy readable is the aria-hidden span, never a filter on the img."""
     body = _page("/about/")
     values = body.split('class="section about-values"', 1)[1].split("</section>", 1)[0]
-    spines = re.findall(
-        r'<span class="value-card__spine" aria-hidden="true">([^<]+)</span>', values)
-    assert spines == ["People first, property second.",
-                      "Homes with soul.",
-                      "Support beyond the keys."], (
-        "each spine carries its card's title, in order"
-    )
-    # the spine lives ONLY inside the accordion gate — hidden everywhere
-    # else (phones/touch/print keep it out of the flow)
-    base = re.search(r"\.about-values \.value-card__spine \{ display: none; \}",
-                     PAGES_CSS)
-    assert base, "a base display:none keeps the spine out of the fallback"
-    gate = _gate_block()
-    spine = re.search(r"\.about-values \.value-card__spine \{[^}]*\}", gate)
-    assert spine and "writing-mode: vertical-rl" in spine.group(0), (
-        "the spine reads as a vertical book-spine label"
-    )
-    gone = re.search(
-        r"\.value-card:focus-within \.value-card__spine \{[^}]*\}", gate)
-    assert gone and "opacity: 0" in gone.group(0), (
-        "the spine crossfades out as the panel blooms open"
-    )
+    cards = re.findall(r'<article class="value-card".*?</article>', values, re.S)
+    assert len(cards) == 3
+    for card in cards:
+        assert 'class="value-card__photo"' in card, "the photo backs the panel"
+        assert re.search(r'alt="[A-Z][^"]*"', card), "honest alt text, capitalised"
+        assert 'loading="lazy"' in card and 'width="' in card and 'height="' in card, (
+            "lazy load + intrinsic size — no layout shift"
+        )
+        assert 'class="value-card__scrim" aria-hidden="true"' in card, (
+            "the readability gradient is decorative and unlabeled"
+        )
+    # the trio (pass-4, E3 contact-sheet verdicts): slow mornings
+    # (the life first) / golden hour (the dusk street — the one frame
+    # that feels like the coast, A-tier) / sea light through the open
+    # doors (life after the keys, A-tier)
+    for photo in ("real-11-slow-mornings", "real-09-golden-hour",
+                  "real-10-sea-light"):
+        assert photo in values, f"{photo} backs its principle"
 
 
 def test_principle_copy_survives_the_restyle():
@@ -119,28 +123,28 @@ def test_principle_copy_survives_the_restyle():
 
 
 # ---------------------------------------------------------------------------
-# 2. The accordion — CSS behaviour
+# 2. The photo expander — CSS behaviour
 # ---------------------------------------------------------------------------
 def _gate_block():
     m = re.search(
         r"@media \(hover: hover\) and \(pointer: fine\) and \(min-width: 811px\) \{.*?\n\}",
         PAGES_CSS, re.S)
-    assert m, "the accordion gate block must exist"
+    assert m, "the expander gate block must exist"
     return m.group(0)
 
 
-def test_accordion_collapses_and_blooms_on_hover_and_focus():
+def test_expander_blooms_on_hover_and_focus():
     gate = _gate_block()
-    # the row becomes a flex of tall panels
+    # the row becomes a flex of tall photo panels
     assert ".about-values .story__values" in gate
     assert "display: flex" in gate
-    assert "min-height: 29rem" in gate, "tall panels — the accordion look"
+    assert "min-height: 32rem" in gate, "tall columns — the expander look"
     # the hovered/focused card grows, the siblings shrink
     grow = re.search(
         r"\.about-values \.story__values \.value-card:hover,\s*"
         r"\.about-values \.story__values \.value-card:focus-within \{[^}]*\}",
         gate)
-    assert grow and "flex-grow: 4.2" in grow.group(0), (
+    assert grow and "flex-grow: 2.8" in grow.group(0), (
         ":hover AND :focus-within bloom the panel (keyboard parity)"
     )
     # the growth animates on flex-grow specifically
@@ -151,7 +155,7 @@ def test_accordion_collapses_and_blooms_on_hover_and_focus():
     )
 
 
-def test_accordion_detail_reveals_after_the_panel_leads():
+def test_expander_detail_reveals_after_the_panel_leads():
     gate = _gate_block()
     detail = re.search(r"\.about-values \.value-card__detail \{[^}]*\}", gate)
     assert detail, "the detail rule ships inside the gate"
@@ -160,8 +164,7 @@ def test_accordion_detail_reveals_after_the_panel_leads():
         "collapsed panels hide the detail (never display:none — the copy "
         "stays in the a11y tree)"
     )
-    assert "width: 26rem" in css, "fixed width — no mid-expand text reflow"
-    assert "margin-top: auto" in css, "the text rides the panel floor"
+    assert "width: 24rem" in css, "fixed width — no mid-expand text reflow"
     reveal = re.search(
         r"\.value-card:focus-within \.value-card__detail \{[^}]*\}", gate)
     assert reveal and "opacity: 1" in reveal.group(0)
@@ -170,7 +173,7 @@ def test_accordion_detail_reveals_after_the_panel_leads():
     )
 
 
-def test_accordion_is_gated_to_fine_pointers_only():
+def test_expander_is_gated_to_fine_pointers_only():
     """Phones, touch tablets and print must render every card fully open —
     the base grid (outside the gate) carries all the copy at full size."""
     gate = _gate_block()
@@ -178,18 +181,35 @@ def test_accordion_is_gated_to_fine_pointers_only():
         "the collapse/expand lives behind the hover-capability gate"
     )
     assert "(min-width: 811px)" in gate
-    # the base (gate-free) card rule keeps the panels readable everywhere
-    base = re.search(r"\.about-values \.value-card \{[^}]*\}", PAGES_CSS)
-    assert base and "display" not in base.group(0), (
+    # the detail hides NOWHERE outside the gate — every non-gate context
+    # shows title + body in full. The allowed stragglers are the base
+    # alignment rule (bottom-anchored flex, min-height — a leveller, not
+    # a hider) and the reduced-motion kill (transition: none).
+    outside = PAGES_CSS.replace(gate, "")
+    stragglers = re.findall(r"\.about-values \.value-card__detail \{[^}]*\}",
+                            outside)
+    for rule in stragglers:
+        assert "opacity" not in rule and "display: none" not in rule, (
+            f"outside the gate a detail rule must never hide copy: {rule}"
+        )
+    assert any("min-height: 11rem" in rule for rule in stragglers), (
+        "the baseline leveller ships outside the gate (all contexts align)"
+    )
+    assert any("transition: none" in rule for rule in stragglers), (
+        "the reduced-motion kill still ships"
+    )
+    # and the base card rule never hides anything (display:flex is the
+    # panel's bottom-anchor layout, not a hider — the ban is on
+    # display:none / opacity:0 style gating)
+    base = re.search(r"\.about-values \.value-card \{[^}]*\}", outside)
+    assert base, "the base card rule ships outside the gate"
+    assert "display: none" not in base.group(0) and "opacity" not in base.group(0), (
         "the base card never hides anything — opacity/flex tricks live in "
         "the gate only"
     )
-    # and no opacity:0 outside the gate
-    outside = PAGES_CSS.replace(gate, "")
-    assert ".about-values .value-card__detail { margin-top: 0.2rem; }" in outside
 
 
-def test_accordion_respects_reduced_motion():
+def test_expander_respects_reduced_motion():
     """State changes stay (collapsed/expanded), motion does not."""
     block = re.search(
         r"@media \(prefers-reduced-motion: reduce\) \{[^@]*?"
@@ -200,14 +220,71 @@ def test_accordion_respects_reduced_motion():
 
 
 def test_reveal_stagger_never_delays_the_hover_expand():
-    """The stagger delays grew to five values so the reveal rise keeps its
-    trail while flex-grow/border/shadow react instantly to hover."""
+    """The stagger delays lead with the reveal pair only so the rise
+    keeps its trail while flex-grow/border/shadow react instantly to
+    hover (a delayed expand would read as lag)."""
     for n, ms in ((2, "110ms"), (3, "220ms")):
         rule = re.search(
             rf"html\.motion-ready:not\(\[data-fx=\"none\"\]\) "
             rf"\.story__values \.value-card:nth-child\({n}\) "
             rf"\{{ transition-delay: {ms}, {ms}, 0s, 0s, 0s; \}}", PAGES_CSS)
         assert rule, f"card {n} stagger must lead with the reveal pair only"
+
+
+def test_photos_are_unshaded_and_only_the_copy_zone_carries_a_scrim():
+    """The owner's carousel complaint was the scrim crushing the images.
+    The value photos carry NO filter; readability comes from a bottom
+    espresso gradient that owns the copy zone (the lower ~60% of the
+    card) and dissolves in the top fifth — the picture breathes."""
+    photo = re.search(r"\.about-values \.value-card__photo \{[^}]*\}", PAGES_CSS)
+    assert photo, "the photo rule ships"
+    assert "filter" not in photo.group(0), "no shading filter on the photos"
+    assert "object-fit: cover" in photo.group(0)
+    scrim = re.search(r"\.about-values \.value-card__scrim \{[^}]*\}", PAGES_CSS)
+    css = scrim.group(0)
+    assert "linear-gradient(to top" in css, "the gradient lifts toward the sky"
+    assert css.count("var(--espresso)") == 4, "token-only scrims (no new palette)"
+    assert "92%" in css and "transparent 93%" in css, (
+        "solid under the copy, gone by the top fifteenth — the photo breathes"
+    )
+    assert "62%" in css, "the mid-zone stays espresso-rich where the numerals sit"
+    assert "pointer-events: none" in css, "the scrim never steals a click"
+
+
+def test_panel_copy_is_cream_on_the_photo():
+    """The shared components.css value-card text is the ink-on-white
+    set; the photo context overrides it — ember numeral, cream tag,
+    white Fraunces title, base-size cream body (the E3 pass called the
+    old sm grey 'cramped and marginal')."""
+    num = re.search(r"\.about-values \.value-card__num \{[^}]*\}", PAGES_CSS)
+    assert "var(--ember)" in num.group(0), "ember reads warm on espresso"
+    tag = re.search(r"\.about-values \.value-card__tag \{[^}]*\}", PAGES_CSS)
+    assert "var(--cream)" in tag.group(0)
+    title = re.search(r"\.about-values \.value-card__title \{[^}]*\}", PAGES_CSS)
+    assert "var(--white)" in title.group(0)
+    assert "var(--font-display)" in title.group(0), "Fraunces, not UI sans"
+    body_rule = re.search(r"\.about-values \.value-card__body \{[^}]*\}",
+                          PAGES_CSS)
+    assert "var(--cream)" in body_rule.group(0)
+    assert "var(--text-base)" in body_rule.group(0), "base size, not sm"
+
+
+def test_base_cards_are_tall_photo_panels_everywhere():
+    """The base (gate-free) card is already the expander at rest — tall,
+    espresso-framed (the photo's bed while it loads), with the shared
+    components.css card frame (2.25rem inset + hover lift) killed."""
+    base = re.search(r"\.about-values \.value-card \{[^}]*\}", PAGES_CSS)
+    css = base.group(0)
+    assert "min-height: 30rem" in css, "tall columns at rest"
+    assert "overflow: hidden" in css, "the photo clips to the squircle"
+    assert "padding: 0" in css, "the panel owns the inset, not the card"
+    assert "transform: none" in css, "no hover bounce on a photo column"
+    assert "background: var(--espresso)" in css
+    mobile = re.search(
+        r"@media \(max-width: 810px\) \{[^@]*?\.about-values \.story__values "
+        r"\{ grid-template-columns: 1fr; \}[^@]*?\.about-values \.value-card "
+        r"\{ min-height: 26rem; \}", PAGES_CSS)
+    assert mobile, "phones stack the columns one-per-row, still tall"
 
 
 # ---------------------------------------------------------------------------
@@ -258,9 +335,17 @@ def test_closing_band_is_the_quiet_cta():
     assert cta.count("<img") == 0, "no shaded photos remain in the band"
 
 
-def test_no_shaded_photo_assets_load_on_the_page():
-    """The three strip photos are gone from the about page entirely —
-    lazy or not, they are not referenced."""
+def test_the_carousel_stays_gone_while_the_values_photos_load():
+    """r66 evicted the shaded strip (and its photos) from the page; r67
+    brought real-09/real-11 back as UNSHADED value-card photos — a
+    different job with a different treatment. The pin keeps its teeth:
+    the carousel MARKUP must stay gone, and the quiet close stays
+    photo-free."""
     body = _page("/about/")
-    for gone in ("real-09-golden-hour", "real-10-sea-light", "real-11-slow-mornings"):
-        assert gone not in body, f"{gone} left with the carousel"
+    assert "about-tile" not in body and "cta__proof" not in body, (
+        "the carousel markup never returns"
+    )
+    values = body.split('class="section about-values"', 1)[1].split("</section>", 1)[0]
+    assert values.count('class="value-card__photo"') == 3, (
+        "the three value photos load as card backgrounds"
+    )

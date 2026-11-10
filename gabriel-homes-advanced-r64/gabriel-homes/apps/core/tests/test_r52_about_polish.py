@@ -117,19 +117,23 @@ def test_about_story_figure_is_the_unused_sea_bedroom_capped_45():
 # ---------------------------------------------------------------------------
 # 4. Values band — header, icons, motion-gated stagger
 # ---------------------------------------------------------------------------
-def test_about_values_have_header_band_and_three_iconed_cards():
+def test_about_values_have_header_band_and_three_photo_cards():
     body = _page("/about/")
     assert "[ PRINCIPLES ]" in body
     assert 'class="values-head__title" data-reveal>What we stand for.' in body
     # r55: taste-led intro (owner: less checked-listings language)
     assert "Three instincts run through everything we do" in body
-    # every value card carries an icon from the 1.7-stroke family
+    # r67 (owner round): the icon medallions left with the r66 white
+    # panels — every card is now a tall coast photograph (unsheathed;
+    # the copy rides a bottom scrim). The pin moved from stroke icons
+    # to real photos with intrinsic sizes and honest alt text.
     cards = re.findall(r'<article class="value-card".*?</article>', body, re.S)
     assert len(cards) == 3
     for card in cards:
-        assert 'class="value-card__icon"' in card
-        assert 'stroke-width="1.7"' in card
-    # the icon trio: person / eye / key (everyday objects, no AI-look)
+        assert 'class="value-card__photo"' in card
+        assert re.search(r'alt="[A-Z][^"]*"', card), "alt text, capitalised"
+        assert 'loading="lazy"' in card
+        assert 'width="' in card and 'height="' in card
 
 
 def test_about_value_stagger_is_motion_gated_with_kill_switches():

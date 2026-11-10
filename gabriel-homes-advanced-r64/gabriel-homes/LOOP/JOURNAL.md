@@ -1,3 +1,65 @@
+Run 67 | BUILDER (owner round, off-loop) | 2026-11-10 ~21:00-22:30 +03:00 | items:
+(1) **OWNER ASK — "looks bad"** (on the delivered r66 values redesign,
+both the white-panel accordion and its stripped collapsed pose).
+The 001/002/003 principles are now PHOTO EXPANDER COLUMNS: each card
+a tall coast photograph, object-fit cover, deliberately UNSHADED (the
+carousel complaint was the scrim crushing pictures — the only veil is
+the bottom gradient the copy sits on), with numeral (ember Fraunces)
++ bracket tag + title (white Fraunces) + body (cream, text-base)
+riding a bottom-anchored panel over an espresso gradient. Markup:
+photos with honest alt text + intrinsic sizes, aria-hidden scrim
+span, icons + spine GONE, tabindex=0 kept (keyboard parity via
+:focus-within). CSS: base = equal grid of 30rem-tall panels (26rem
+under 810px), all copy visible — phones/touch/no-JS/print render
+exactly this; gate @media (hover:hover) and (pointer:fine) and
+(min-width:811px) = flex row 32rem, hovered/focused card flex-grow
+1→2.8 (0.55s ease-out), detail (fixed 24rem, no reflow) fading in at
+0.16s behind the panel; reduced-motion kills all transitions, keeps
+states; reveal-stagger delays unchanged (5-value list, transition
+list specificity (0,3,0) still outranks html.motion-ready
+[data-reveal] (0,2,1)). Shared components.css card frame killed in
+scope (padding:0 — the panel owns the inset; transform:none — a
+photo column must not bounce on hover).
+(2) **E3 drove five visual passes.** pass-1 VLM on the r66 state:
+white boxes "floating on a textureless void, no real-estate warmth"
+→ photo columns. pass-2: scrim too weak (numerals fighting pool
+water), kitchen photo MLS-grade → gradient deepened, 003→dining,
+002 crop weighted down. pass-3: baselines ragged + 002 still thin →
+detail block became a bottom-anchored flex column with min-height
+11rem (measured result: all three stacks identical — num top 180px,
+body bottom 29px), mid-scrim to 55%. pass-4: contact sheet of 8
+candidate photos graded A/B/C by VLM → 002 real-09-golden-hour
+(A-tier, "the only frame that feels like coastal Kenya", back with
+the stronger scrim + object-position center 62%), 003
+real-10-sea-light (A-tier, "your first morning here"); rejected
+real-02-living (AC unit hero, blown-out walls) and real-05-dining
+(range hood behind text). pass-5: text zone (bottom 6-62% of card)
+deepened to 84-62% espresso, top fifth stays clean — final VLM:
+"all text comfortably readable", "one coherent warm editorial set",
+expanded state "intentional… no bugs", mobile 390px "strong
+contrast… no bugs", full page "polished, cohesive component",
+card→founder spacing "reasonable" (bottom padding halved).
+Section bottom padding halved (dead zone), intro text-wrap:balance
+(orphan rag), num margin 0.7→0.95rem.
+GATES: check 0 · makemigrations 0 · **868 passed** (r66 baseline
+865; +3 net — test_r66_about_focus.py rewritten to pin the photo
+expander (13→16 tests: unshaded-photo pin, cream-on-photo pin,
+base-panels pin; spine pins retired with the spine); r52 icon pin →
+photo pin, r53 white-panel pin → espresso-frame pin, both rewritten
+in place per the r64 precedent). Wave field + closing-CTA pins
+carried over untouched; listings palm untouched (r65 contract).
+E3: base/expanded/mobile/full-page verdicts above; geometry
+measured browser-side; headless gotcha — Chromium reports
+(hover:none)(pointer:none) so the gate was verified by injecting the
+gate's cssRules unconditionally + .focus() (678px vs 243px
+siblings); mobile scrollWidth>clientWidth is the known marquee
+phantom (scrollX 0). Deliverables in download/:
+r67-values-final.jpg, r67-values-expanded.jpg,
+r67-values-mobile.jpg.
+FOR THE NEXT RUN: preview bootstrap is scripts/start_preview.sh
+(self-healing after sandbox recycles). Owner's cloud PAT still
+"Later" — push when provided, delete after use.
+
 Run 66 | BUILDER (owner round, off-loop) | 2026-11-10 11:35-11:55 +03:00 | items:
 (1) **OWNER ASK — "remove the carousel — Homes worth crossing town
 for — it doesn't look good, the background and images are shaded."**

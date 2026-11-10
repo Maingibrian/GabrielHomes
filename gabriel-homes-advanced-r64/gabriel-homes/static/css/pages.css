@@ -672,13 +672,14 @@
   color: var(--taupe);
   font-size: var(--text-md);
   line-height: var(--leading-body);
+  text-wrap: balance;            /* pass-2 (E3): no one-word orphan rag */
 }
 .values-head + .story__values { margin-top: 1.75rem; }
 
 /* Value cards reveal in a short stagger (cards 2 and 3 trail card 1).
    The base [data-reveal] transition (components.css §12) owns the
    rise; only the delay is added here. r66: the delay lists grew to
-   five values — the about cards' accordion transition (below) layers
+   five values — the about cards' expander transition (below) layers
    flex-grow/border/shadow after the reveal pair, and the stagger must
    delay ONLY the reveal (a delayed hover expand would read as lag).
    Extra values are ignored where the shorter transition applies. */
@@ -989,22 +990,27 @@ html.motion-ready:not([data-fx="none"]) .story__values .value-card:nth-child(3) 
 }
 
 /* 2. Values row. r63 (owner round eleven): one editorial row, large
-   Fraunces numerals, hairline dividers. r65: the palm field + head
-   veil behind it. r66 (owner round): "the cards above should get
-   better styling… cards stacked in columns that you hover and they
-   expand and reveal more info" + "remove the palm tree background in
-   the about us page… maybe some waves patterns." The three
-   principles are now tall white panels over a repeating wave field
-   (wave-field.svg — the sea answer to the palm, same clay pair,
-   scripts/r66_wave_field.py). On hover-capable pointers the row
-   collapses to numeral strips and the hovered/focused card blooms
-   open (flex-grow), its .value-card__detail (title + body) fading in
-   after the panel is most of the way there. Every other context —
-   phones, touch tablets, no-JS, print — renders the same cards fully
-   open in the equal grid: the reveal is a nicety, never a gate
-   (D-MOTION-SAFE spirit; reduced-motion drops the transition, keeps
-   the state). */
+   Fraunces numerals, hairline dividers. r65: the palm field behind it
+   (traded for the wave field in r66). r66: white-panel accordion.
+   r67 (owner round): "looks bad" — the E3 pass read the white boxes
+   as floating on a void with "no real-estate warmth", and the
+   accordion's collapsed strips hid the photography the site sells
+   with. The principles are now PHOTO EXPANDER COLUMNS over the wave
+   field: tall coast photographs (object-fit cover, NO shading filter
+   — the owner's carousel complaint was the scrim crushing the
+   pictures; the only veil is the bottom gradient the copy sits on)
+   with numeral + tag + title + body on a bottom-anchored panel. On
+   hover-capable pointers the row tightens and the hovered/focused
+   card blooms open (flex-grow), the detail fading in after the panel
+   is most of the way there. Every other context — phones, touch
+   tablets, no-JS, print — renders the same cards fully open in the
+   equal grid: the reveal is a nicety, never a gate (D-MOTION-SAFE
+   spirit; reduced-motion drops the transition, keeps the state). */
 .about-values { position: relative; }
+/* r67 pass-2 (E3): the cards grew tall; the default section padding
+   left a ~100px waves-only dead zone before the founder band — the
+   values band now halves its own bottom padding. */
+.about-values { padding-bottom: calc(var(--section-pad-y) * 0.5); }
 .about-values::before {
   content: ""; position: absolute; inset: 0; z-index: -1;
   background-image: url("../img/wave-field.svg");
@@ -1025,41 +1031,114 @@ html.motion-ready:not([data-fx="none"]) .story__values .value-card:nth-child(3) 
     color-mix(in srgb, var(--cream) 80%, transparent), transparent);
   pointer-events: none;
 }
-/* base — three white panels, equal grid, every card fully readable
-   (this is what phones, touch and print render) */
+/* base — three tall photo panels, all copy riding the floor; this is
+   what phones, touch tablets, no-JS and print render. padding 0 and
+   transform none kill the shared components.css value-card frame
+   (2.25rem inset + hover lift) — the panel owns the inset, and a
+   photo column that bounces on hover would read as a bug. */
 .about-values .story__values {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 14px;
+  gap: 18px;
   margin-top: 2.4rem;
   align-items: stretch;
 }
 .about-values .value-card {
-  background: var(--white);
+  position: relative;            /* the photo + scrim anchor to the card */
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;     /* the panel rides the photo floor */
+  min-height: 30rem;
+  overflow: hidden;
+  padding: 0;
+  transform: none;
   border: 1px solid var(--sand-60);
   border-radius: var(--radius-card);
-  box-shadow: none;
-  padding: 1.9rem 1.75rem 1.8rem;
-}
-.about-values .value-card:hover {
-  transform: none;
-  border-color: color-mix(in srgb, var(--clay) 45%, var(--sand-60));
+  background: var(--espresso);   /* the frame while the photo loads */
   box-shadow: var(--shadow-card);
 }
-/* the accordion — fine pointers with room to breathe only */
+/* pass-3 (E3): the copy stacks share one baseline system — the
+   detail block is a bottom-anchored flex column with a min-height
+   that fits the tallest card's title+body, so numeral, tag, title
+   and body start at the same height on all three cards (the ragged
+   pass-2 tops read as misalignment). The spare space sits between
+   tag and title, over empty photo. */
+.about-values .value-card__detail {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  min-height: 11rem;
+}
+.about-values .value-card__photo {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  /* deliberately UNSHADED (E3 r67): the owner's carousel complaint
+     was the dark scrim crushing the images — the upper photo stays
+     at full brightness; only the copy zone gets a gradient. */
+}
+.about-values .value-card__scrim {
+  position: absolute;
+  inset: 0;
+  /* r67 pass-2 (E3): the first gradient (88%→16%, gone by 80%) left
+     the numerals fighting bright pool water and ceilings — the copy
+     stack owns the lower ~60% of the card, so the gradient now runs
+     strong to 60% and only dissolves in the top fifth. The photo
+     still breathes: above 82% there is no veil at all.
+     pass-3 (E3): the mid-zone deepened again (55% espresso at 66%) —
+     pass-2 still left the 002 numeral thin over bright foliage.
+     pass-5 (E3): deepened once more (62% at 55%) — the sea-light
+     floor under 003's body copy stayed bright through pass-4. The
+     measured text zone is the bottom 6%-62% of the card; that band
+     now sits under 84%-62% espresso while the top fifth stays clean. */
+  background: linear-gradient(to top,
+    color-mix(in srgb, var(--espresso) 92%, transparent) 0%,
+    color-mix(in srgb, var(--espresso) 84%, transparent) 30%,
+    color-mix(in srgb, var(--espresso) 62%, transparent) 55%,
+    color-mix(in srgb, var(--espresso) 20%, transparent) 80%,
+    transparent 93%);
+  pointer-events: none;
+}
+.about-values .value-card__panel {
+  position: relative;            /* above photo + scrim */
+  padding: 1.9rem 1.75rem 1.75rem;
+}
+.about-values .value-card__num {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-variation-settings: "opsz" 144;
+  font-size: clamp(2.6rem, 2rem + 2.2vw, 3.4rem);
+  line-height: 0.9;
+  letter-spacing: var(--track-display);
+  color: var(--ember);           /* r67: burnt-on-white → ember-on-photo */
+  margin: 0 0 0.95rem;           /* pass-2: breathing room before the tag */
+}
+/* pass-3 (E3): the golden-hour source centres its tree at the top —
+   weighting the crop downward favours the arches and the pool (the
+   actual "character") over the foliage. */
+.about-values .story__values .value-card:nth-child(2) .value-card__photo {
+  object-position: center 62%;
+}
+/* pass-4 (E3): the sea-light source is bright at the top (sky through
+   the sliders) — weighting downward keeps the calmer interior band in
+   frame behind the copy. */
+.about-values .story__values .value-card:nth-child(3) .value-card__photo {
+  object-position: center 60%;
+}
+/* the expander — fine pointers with room to breathe only */
 @media (hover: hover) and (pointer: fine) and (min-width: 811px) {
   .about-values .story__values {
     display: flex;
-    min-height: 29rem;
+    min-height: 32rem;
   }
   /* (0,3,0) — must outrank the reveal rule html.motion-ready
-     [data-reveal] (0,2,1) so the accordion owns the transition list;
+     [data-reveal] (0,2,1) so the expander owns the transition list;
      the reveal pair leads it so the rise keeps animating. */
   .about-values .story__values .value-card {
-    position: relative;            /* the spine anchors to the panel */
     flex: 1 1 0;
     min-width: 0;
-    overflow: hidden;
     transition: opacity var(--t-slow) var(--ease-out),
                 transform var(--t-slow) var(--ease-out),
                 flex-grow 0.55s var(--ease-out),
@@ -1068,41 +1147,15 @@ html.motion-ready:not([data-fx="none"]) .story__values .value-card:nth-child(3) 
   }
   .about-values .story__values .value-card:hover,
   .about-values .story__values .value-card:focus-within {
-    flex-grow: 4.2;
+    flex-grow: 2.8;
+    border-color: color-mix(in srgb, var(--clay) 45%, var(--sand-60));
+    box-shadow: var(--shadow-card-hover);
   }
-  /* the spine — the collapsed panel's book-spine label. r66 pass-2
-     (VLM): the first pass left the collapsed strips reading as
-     "loading content" — a vertical mono title makes the collapse a
-     deliberate pose, and crossfades out as the detail blooms in. */
-  .about-values .value-card__spine {
-    position: absolute;
-    top: 13.5rem;                  /* pass-3: one shared baseline under the
-                                      head+tag column — the ragged-top,
-                                      bottom-anchored pass-2 spines read as
-                                      misaligned across the three panels */
-    left: 50%;
-    transform: translateX(-50%);
-    display: block;
-    writing-mode: vertical-rl;
-    font-family: var(--font-mono);
-    font-weight: 600;
-    font-size: var(--text-xs);
-    letter-spacing: var(--track-mono);
-    text-transform: uppercase;
-    color: var(--taupe);
-    white-space: nowrap;
-    opacity: 1;
-    transition: opacity 0.25s var(--ease-out);
-    pointer-events: none;
-  }
-  .about-values .story__values .value-card:hover .value-card__spine,
-  .about-values .story__values .value-card:focus-within .value-card__spine {
-    opacity: 0;
-  }
+  /* the detail — hidden in the collapsed pose, blooming in after the
+     panel leads. Never display:none: the copy stays in the a11y tree
+     and rides the same floor in the base grid. */
   .about-values .value-card__detail {
-    margin-top: auto;             /* text rides the panel floor */
-    width: 26rem;                 /* fixed — no mid-expand reflow */
-    padding-top: 1.2rem;
+    width: 24rem;                 /* fixed — no mid-expand reflow */
     opacity: 0;
     transform: translateY(10px);
     transition: opacity 0.3s var(--ease-out),
@@ -1118,41 +1171,33 @@ html.motion-ready:not([data-fx="none"]) .story__values .value-card:nth-child(3) 
 @media (prefers-reduced-motion: reduce) {
   .about-values .value-card { transition: none; }
   .about-values .value-card__detail { transition: none; }
-  .about-values .value-card__spine { transition: none; }
 }
-/* the numeral + icon head row */
-.value-card__head {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 1rem;
+/* the panel text — cream on the espresso scrim (the shared
+   components.css values are the ink-on-white set; these scoped
+   overrides carry the photo context) */
+.about-values .value-card__tag {
+  color: color-mix(in srgb, var(--cream) 82%, transparent);
   margin-bottom: 0.9rem;
 }
-.value-card__num {
+.about-values .value-card__title {
   font-family: var(--font-display);
-  font-weight: 400;
-  font-variation-settings: "opsz" 144;
-  font-size: clamp(2.9rem, 2.2rem + 2.6vw, 4.1rem);
-  line-height: 0.9;
-  letter-spacing: var(--track-display);
-  color: var(--burnt);
-  margin: 0;
+  font-weight: 500;
+  font-variation-settings: "opsz" 60;
+  font-size: clamp(1.3rem, 1.1rem + 0.9vw, 1.65rem);
+  letter-spacing: var(--track-tighter);
+  color: var(--white);
+  margin-bottom: 0.55rem;
+  text-wrap: balance;            /* r64: no two-word orphans in titles */
 }
-.about-values .value-card__icon {
-  border-radius: 50%;
-  margin-bottom: 0;
-  flex: none;
-}
-.about-values .value-card__tag { margin-bottom: 0.55rem; }
-.about-values .value-card__detail { margin-top: 0.2rem; }
-/* the spine lives only in the accordion (gate below) — every other
-   context keeps it out of the flow entirely */
-.about-values .value-card__spine { display: none; }
 .about-values .value-card__body {
-  color: color-mix(in srgb, var(--ink) 85%, var(--taupe));
+  color: color-mix(in srgb, var(--cream) 92%, transparent);
+  font-size: var(--text-base);   /* r67: sm grey → base cream (E3) */
+  line-height: 1.5;
+  max-width: 34ch;
 }
 @media (max-width: 810px) {
   .about-values .story__values { grid-template-columns: 1fr; }
+  .about-values .value-card { min-height: 26rem; }
 }
 
 /* 3. Founder band — caption under the photo, larger quote (the page's

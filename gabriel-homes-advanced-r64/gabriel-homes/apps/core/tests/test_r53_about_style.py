@@ -89,16 +89,17 @@ def test_about_value_cards_are_restyled_in_scope():
     assert 'class="section about-values"' in body
     # articles keep the shared class (r52 regex-safe)
     assert len(re.findall(r'<article class="value-card"', body)) == 3
-    # r63: one editorial row — large numerals kept. r66 (owner round):
-    # the cells became white accordion panels — card chrome is BACK,
-    # deliberately: hairline border, squircle, quiet shadow on hover.
+    # r63: one editorial row — large numerals kept. r66: white accordion
+    # panels. r67 (owner round): the panels became tall coast PHOTO
+    # columns — espresso bed frame (visible while the photo loads),
+    # hairline border, squircle, all copy on the bottom scrim.
     assert len(re.findall(r'class="value-card__num"', body)) == 3
     for num in (">001<", ">002<", ">003<"):
         assert num in body, f"display numeral {num} missing"
     scoped = re.search(r"\.about-values \.value-card \{[^}]*\}", PAGES_CSS)
     assert scoped, "the about values band has its own card rules"
     css = scoped.group(0)
-    assert "background: var(--white)" in css, "r66: white panels over the wave field"
+    assert "background: var(--espresso)" in css, "r67: the photo's bed frame"
     assert "border: 1px solid var(--sand-60)" in css, "hairline panel border"
     assert "var(--radius-card)" in css, "squircle corners — the bento language"
 
