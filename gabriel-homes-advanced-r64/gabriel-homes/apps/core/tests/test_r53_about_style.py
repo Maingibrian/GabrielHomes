@@ -89,22 +89,18 @@ def test_about_value_cards_are_restyled_in_scope():
     assert 'class="section about-values"' in body
     # articles keep the shared class (r52 regex-safe)
     assert len(re.findall(r'<article class="value-card"', body)) == 3
-    # r63 (owner round eleven): one editorial row — large numerals over
-    # icon chips, hairline dividers, NO floating card chrome.
+    # r63: one editorial row — large numerals kept. r66 (owner round):
+    # the cells became white accordion panels — card chrome is BACK,
+    # deliberately: hairline border, squircle, quiet shadow on hover.
     assert len(re.findall(r'class="value-card__num"', body)) == 3
     for num in (">001<", ">002<", ">003<"):
         assert num in body, f"display numeral {num} missing"
     scoped = re.search(r"\.about-values \.value-card \{[^}]*\}", PAGES_CSS)
     assert scoped, "the about values band has its own card rules"
     css = scoped.group(0)
-    assert "background: none" in css and "border: 0" in css, "flat cells, no card chrome"
-    assert "box-shadow: none" in css, "no floating shadow (owner goal 4)"
-    divider = re.search(
-        r"@media \(min-width: 811px\) \{\s*"
-        r"\.about-values \.value-card \+ \.value-card \{[^}]*\}",
-        PAGES_CSS.replace("\n", " "),
-    )
-    assert divider and "border-left" in divider.group(0), "hairline divider between cells"
+    assert "background: var(--white)" in css, "r66: white panels over the wave field"
+    assert "border: 1px solid var(--sand-60)" in css, "hairline panel border"
+    assert "var(--radius-card)" in css, "squircle corners — the bento language"
 
 
 # ---------------------------------------------------------------------------
@@ -131,15 +127,16 @@ def test_about_founder_band_carries_caption_and_rail():
 # ---------------------------------------------------------------------------
 # 5. About — closing band proof triptych + shared scrim rebalance
 # ---------------------------------------------------------------------------
-def test_about_cta_carries_proof_strip():
+def test_about_cta_carries_no_proof_strip():
     body = _page("/about/")
     cta = body.split('class="section cta"', 1)[1].split("</section>", 1)[0]
-    assert 'class="cta__proof-strip"' in cta
-    # r56: the triptych is the sunlit collection — golden hour villa,
-    # sea-light living room, slow-mornings bedroom (vision-curated).
-    imgs = re.findall(r'src="[^"]*real-(\d+)-', cta)
-    assert imgs == ["09", "10", "11"], "three sunlit collection photos"
-    assert "Sunlight, salt air, and rooms that breathe." in cta
+    # r66 (owner round): the shaded photo carousel left the band — no
+    # strip, no bento tiles. The closing CTA survives on its own.
+    assert "cta__proof-strip" not in cta
+    assert "about-tile" not in cta
+    # the band still closes the page with the collection line + button
+    assert "Homes worth crossing town for." in cta
+    assert 'href="/properties/"' in cta
 
 
 def test_shared_cta_scrim_is_rebalanced():

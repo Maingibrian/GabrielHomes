@@ -232,20 +232,24 @@ def test_coast_band_uses_the_dhow_under_token_scrims():
 
 
 # ---------------------------------------------------------------------------
-# 5. About — the palm field behind the principles
+# 5. About — the field behind the principles. r65 shipped the palm
+#    tile; r66 (owner round) swapped it for the wave field ("remove
+#    the palm tree background in the about us page... maybe some waves
+#    patterns") — the palm stays on home + listings, the about band
+#    now carries the sea. Pins updated to the new contract.
 # ---------------------------------------------------------------------------
-def test_values_band_carries_the_palm_field():
+def test_values_band_carries_the_wave_field():
     rule = re.search(r"\.about-values::before \{[^}]*\}", PAGES_CSS)
-    assert rule, "the values palm-field rule must exist"
+    assert rule, "the values wave-field rule must exist"
     css = rule.group(0)
-    assert 'url("../img/palm-field.svg")' in css
+    assert 'url("../img/wave-field.svg")' in css, "the r66 wave tile"
+    assert "palm-field" not in css, "the palm left this band in r66"
     assert "background-repeat: repeat" in css
-    assert "z-index: -1" in rule.group(0) + css
+    assert "z-index: -1" in css
     assert "pointer-events: none" in css
-    # the finer grain suits the band's shorter run (home's narrow-screen tile)
-    assert "background-size: 860px 985px" in css
+    assert "background-size: 1000px 700px" in css, "the generator's native tile"
     m = re.search(r"mask-image:\s*linear-gradient\([^)]*\)", css)
-    assert m and "78%" in m.group(0), "the field dissolves before the founder band"
+    assert m and "78%" in m.group(0), "the field still dissolves before the founder band"
 
 
 def test_values_head_keeps_its_reading_veil():
@@ -257,7 +261,8 @@ def test_values_head_keeps_its_reading_veil():
 
 
 def test_palm_tile_is_the_home_asset():
-    """One asset, three surfaces (home market, listings band, about
-    values) — the brand's coast texture, unchanged."""
+    """One asset, two surfaces (home market, listings band) — the brand's
+    coast texture, unchanged. r66 moved the about values band to the
+    wave tile; the palm itself is untouched."""
     assert '<g id="palm-frond">' in PALM_SVG
     assert "#e7d9cd" in PALM_SVG and "#dcc6b8" in PALM_SVG

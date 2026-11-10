@@ -102,22 +102,19 @@ def test_founder_rail_gains_the_coastal_focus_fact():
     assert "Every home walked through" not in rail
 
 
-def test_about_cta_is_taste_led_with_the_garden_bedroom():
+def test_about_cta_is_taste_led_and_carousel_free():
     body = _page("/about/")
     cta = body.split('class="section cta"', 1)[1].split("</section>", 1)[0]
     assert "Homes worth crossing town for." in cta
     assert "See the homes we have checked" not in cta
-    # r56: the band is the sunlit collection, not the evidence exhibit
-    assert "Sunlight, salt air, and rooms that breathe." in cta
     assert "honest photography" not in cta
-    # r56 pass: each collection photo carries a sensory micro-caption
-    # (r63: the captions ride inside bento tiles — class attr present)
-    caps = re.findall(
-        r'<figcaption class="about-tile__caption">([^<]+)</figcaption>', cta)
-    assert caps == ["Golden hour", "Sea light", "Slow mornings"]
-    # r63: asymmetric bento — one large tile, two small
-    assert 'about-tile about-tile--lg' in cta
-    assert cta.count('class="bento-card about-tile"') == 2
+    # r66 (owner round): the shaded bento strip (and its captions +
+    # note) left the band — the owner read the scrimmed photos as
+    # "background and images are shaded". Pin the removal.
+    assert "Sunlight, salt air, and rooms that breathe." not in cta
+    assert "about-tile__caption" not in cta
+    assert "about-tile about-tile--lg" not in cta
+    assert 'class="bento-card about-tile"' not in cta
 
 
 def test_about_meta_description_is_taste_led():
@@ -164,8 +161,15 @@ def test_story_taste_list_and_quote_band_css_exist():
     assert "clamp(3.6rem, 2.8rem + 3.2vw, 6rem)" in band
 
 
-def test_value_card_titles_level_the_row():
-    assert ".about-values .value-card__title { min-height: 2.5em; }" in PAGES_CSS
+def test_value_card_detail_block_ships():
+    # r66 (owner round): title + body moved into a .value-card__detail
+    # block (the accordion's reveal target) — the old min-height
+    # leveller retired with the hairline row.
+    body = _page("/about/")
+    assert body.count('class="value-card__detail"') == 3, (
+        "every principle card carries a detail block"
+    )
+    assert ".about-values .value-card__title { min-height: 2.5em; }" not in PAGES_CSS
 
 
 def test_founder_portrait_wears_the_warm_grade():
@@ -188,13 +192,13 @@ def test_founder_caption_is_constrained_on_phones():
     assert "calc(10px + 0.6rem)" in m.group(0)
 
 
-def test_proof_strip_widened_and_note_brightened():
-    strip = re.search(r"\.cta__proof-strip \{[^}]*\}", PAGES_CSS).group(0)
-    # r63: 680→920px so the large bento tile can breathe (owner goal 3).
-    # r64: 920→1080px — the critic found 180px of dead photo per side.
-    assert "max-width: 1080px" in strip
-    note = re.search(r"\.cta__proof-note \{[^}]*\}", PAGES_CSS).group(0)
-    assert "84%" in note
+def test_proof_strip_css_left_with_the_markup():
+    # r66 (owner round): the strip's CSS went with its markup — no
+    # orphaned rules (the r55/r64 width+legibility fixes are history
+    # the moment the strip itself is).
+    assert ".cta__proof-strip" not in PAGES_CSS
+    assert ".cta__proof-note" not in PAGES_CSS
+    assert ".about-tile" not in PAGES_CSS
 
 
 def test_cta_band_tag_contrast_bumped():

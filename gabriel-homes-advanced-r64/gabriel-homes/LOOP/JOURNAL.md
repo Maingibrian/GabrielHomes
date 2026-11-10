@@ -1,3 +1,55 @@
+Run 66 | BUILDER (owner round, off-loop) | 2026-11-10 11:35-11:55 +03:00 | items:
+(1) **OWNER ASK — "remove the carousel — Homes worth crossing town
+for — it doesn't look good, the background and images are shaded."**
+The closing band's shaded bento photo strip (three scrimmed real-* photos,
+captions, proof note) left the page ENTIRELY — markup and every
+.cta__proof/.about-tile rule in pages.css. The shared .cta band
+(components.css §15, untouched) now carries the close alone: [ THE
+COLLECTION ] tag, the taste-led headline, one Explore button. Quiet
+espresso close after a textured page.
+(2) **OWNER ASK — "the cards above should get better styling... cards
+stacked in columns that you hover and they expand and reveal more
+info."** The 001/002/003 principles are now tall WHITE PANELS in an
+accordion row over the new wave field: base state = equal grid, every
+card fully readable (phones/touch/no-JS/print render exactly this);
+inside @media (hover:hover) and (pointer:fine) and (min-width:811px)
+the row becomes flex, panels collapse to numeral+tag strips, and
+:hover/:focus-within blooms the panel (flex-grow 1→4.2, 0.55s
+ease-out) with the .value-card__detail (title+body, fixed 26rem — no
+mid-expand reflow) fading in at 0.16s behind the panel. Pass-2 (VLM):
+collapsed strips first read as "loading content" → added
+.value-card__spine: an aria-hidden vertical-rl mono book-spine label
+per card (its title), top-aligned at 13.5rem, crossfading out on
+expand; base display:none keeps it out of every non-gate context.
+Keyboard parity via tabindex=0 + :focus-within (verified browser-side:
+hover 736px / siblings 219px, detail opacity 1). D-MOTION-SAFE:
+prefers-reduced-motion kills all three transitions, keeps the states;
+the reveal-stagger delays grew to five values so hover never lags.
+Transition list specificity (0,3,0) documented to outrank the
+html.motion-ready [data-reveal] rule (0,2,1).
+(3) **OWNER ASK — "remove the palm tree background in the about us
+page... maybe some waves patterns."** .about-values::before now tiles
+wave-field.svg (NEW asset, scripts/r66_wave_field.py): nine sine rows
+x bright+dim tone pair (the palm's #e7d9cd/#dcc6b8), wavelength 250
+(4 cycles/1000px — horizontal seam-exact), row step 700/9 (multiple of
+3 — phase rotation tiles cleanly), 1000x700 native grain, same
+z-index:-1 / pointer-events:none / 78% bottom-fade contract as the r65
+palm before it. The palm itself is untouched on home + listings.
+GATES: check 0 · makemigrations 0 · **865 passed** (r65 baseline 852;
++13 new test_r66_about_focus.py pins; 9 obsolete pins rewritten in
+r53/r55/r63/r64/r65 to pin the NEW contract — r64 precedent).
+E3: VLM pass-3 verdicts — collapsed "consistent and deliberately
+designed, cohesive system"; expanded "balanced and readable, no
+clipping"; waves "genuinely subtle and attractive"; mobile 390px cards
+fully readable, spine correctly display:none, zero actual horizontal
+scroll (scrollWidth phantom = marquee track, clipped, scrollX 0);
+0 console errors, 0 broken images. Spine alignment verified
+pixel-exact (all three top:495px) after a VLM false-positive.
+Deliverables in download/: r66-values-accordion.jpg (collapsed+hover),
+r66-cta-band-after.jpg, about-page-r66-{desktop,mobile}.png.
+FOR THE NEXT RUN: preview server bootstrap is scripts/start_preview.sh
+(self-healing: reinstall deps, recreate .env, reseed, setsid runserver
++ bridge :3000 — the sandbox recycle wipes gitignored state).
 # JOURNAL.md — append-only, newest first
 
 Run 65 | BUILDER (owner round, off-loop) | 2026-11-10 12:10-13:05 +03:00 | items:

@@ -119,15 +119,15 @@ def test_taste_list_matches_the_story_measure():
 
 
 # ---------------------------------------------------------------------------
-# 7. Bento owns the band
+# 7. Bento owns the band — r66 (owner round): the strip left the page
+#    ("remove the carousel... the background and images are shaded").
+#    The pin now guards the removal, not the geometry.
 # ---------------------------------------------------------------------------
-def test_bento_strip_fills_the_band():
-    strip = re.search(r"\.cta__proof-strip \{[^}]*\}", PAGES_CSS)
-    assert strip
-    assert "max-width: 1080px" in strip.group(0), (
-        "920px left 180px of dead photo per side of the 1208px container"
+def test_bento_strip_left_the_band():
+    assert ".cta__proof-strip" not in PAGES_CSS, (
+        "the shaded photo strip's CSS must stay gone with its markup"
     )
-    assert "grid-auto-rows: 210px" in strip.group(0)
+    assert ".about-tile" not in PAGES_CSS, "no orphaned tile rules"
 
 
 # ---------------------------------------------------------------------------

@@ -170,8 +170,17 @@ about-story__pull so the pinned selectors and tests carry over.
     {# r63 (owner round eleven): one editorial row — large Fraunces #}
     {# numerals, hairline dividers between the three, no floating #}
     {# cards. The icon medallions and the copy are unchanged. #}
+    {# r66 (owner round): the row becomes stacked accordion columns — #}
+    {# tall panels that expand on hover/focus and reveal the detail #}
+    {# (title + body) in a .value-card__detail block. Copy untouched; #}
+    {# non-hover viewports (phones, touch, no-JS) render every card #}
+    {# fully open — the reveal is a CSS-only nicety, never a gate. #}
+    {# tabindex=0 is deliberate: the cards are not controls (no role), #}
+    {# but keyboard users deserve the same reveal hover buys — #}
+    {# :focus-within blooms the panel exactly like :hover. #}
     <div class="story__values">
-      <article class="value-card" data-reveal>
+      <article class="value-card" data-reveal tabindex="0">
+        <span class="value-card__spine" aria-hidden="true">People first, property second.</span>
         <div class="value-card__head">
           <p class="value-card__num" aria-hidden="true">001</p>
           <span class="value-card__icon" aria-hidden="true">
@@ -179,14 +188,17 @@ about-story__pull so the pinned selectors and tests carry over.
           </span>
         </div>
         <p class="value-card__tag">[ People ]</p>
-        <h3 class="value-card__title">People first, property second.</h3>
-        <p class="value-card__body">
-          We start with the life you want — the school run, the sea breeze,
-          the long weekends — and find the home that fits it. Not the other
-          way round.
-        </p>
+        <div class="value-card__detail">
+          <h3 class="value-card__title">People first, property second.</h3>
+          <p class="value-card__body">
+            We start with the life you want — the school run, the sea breeze,
+            the long weekends — and find the home that fits it. Not the other
+            way round.
+          </p>
+        </div>
       </article>
-      <article class="value-card" data-reveal>
+      <article class="value-card" data-reveal tabindex="0">
+        <span class="value-card__spine" aria-hidden="true">Homes with soul.</span>
         <div class="value-card__head">
           <p class="value-card__num" aria-hidden="true">002</p>
           <span class="value-card__icon" aria-hidden="true">
@@ -194,14 +206,17 @@ about-story__pull so the pinned selectors and tests carry over.
           </span>
         </div>
         <p class="value-card__tag">[ Character ]</p>
-        <h3 class="value-card__title">Homes with soul.</h3>
-        <p class="value-card__body">
-          Light, air, a street you'd walk at dusk — if a home doesn't make
-          us feel something when we open the door, it doesn't join the
-          collection.
-        </p>
+        <div class="value-card__detail">
+          <h3 class="value-card__title">Homes with soul.</h3>
+          <p class="value-card__body">
+            Light, air, a street you'd walk at dusk — if a home doesn't make
+            us feel something when we open the door, it doesn't join the
+            collection.
+          </p>
+        </div>
       </article>
-      <article class="value-card" data-reveal>
+      <article class="value-card" data-reveal tabindex="0">
+        <span class="value-card__spine" aria-hidden="true">Support beyond the keys.</span>
         <div class="value-card__head">
           <p class="value-card__num" aria-hidden="true">003</p>
           <span class="value-card__icon" aria-hidden="true">
@@ -209,12 +224,14 @@ about-story__pull so the pinned selectors and tests carry over.
           </span>
         </div>
         <p class="value-card__tag">[ Support ]</p>
-        <h3 class="value-card__title">Support beyond the keys.</h3>
-        <p class="value-card__body">
-          We stay around long after the keys change hands — through the
-          first weeks, the fix-it list, and the local trades only
-          neighbours know.
-        </p>
+        <div class="value-card__detail">
+          <h3 class="value-card__title">Support beyond the keys.</h3>
+          <p class="value-card__body">
+            We stay around long after the keys change hands — through the
+            first weeks, the fix-it list, and the local trades only
+            neighbours know.
+          </p>
+        </div>
       </article>
     </div>
   </div>
@@ -279,11 +296,13 @@ about-story__pull so the pinned selectors and tests carry over.
 
 {% comment %} r56: "THE PROOF" and "honest photography" are gone (owner:
 comfort, not proven homes). The band is now the collection. r63 (owner
-round eleven): the three sunlit rooms sit in an asymmetric bento — one
-large tile, two small — reusing the homepage bento-card language
-(squircle, scrim, de-zoom + saturate on hover). Real image elements
-(not background divs) keep lazy loading + width/height for the coastal
-connection; captions stay, exactly as they were. {% endcomment %}
+round eleven): the three sunlit rooms sat in an asymmetric bento. r66
+(owner round): "remove the carousel — Homes worth crossing town for —
+it doesn't look good, the background and images are shaded." The
+shaded photo strip is gone entirely; the band keeps its job as the
+closing CTA — bracket tag, the taste-led headline, one Explore button.
+Clean espresso close after a textured page: the quiet ending is the
+point. {% endcomment %}
 <section class="section cta">
   <div class="container">
     <p class="section-tag section-tag--light" data-reveal>[ THE COLLECTION ]</p>
@@ -293,26 +312,6 @@ connection; captions stay, exactly as they were. {% endcomment %}
     <a class="btn btn--primary btn--lg" href="/properties/" data-reveal>
       Explore listings <span class="btn__arrow" aria-hidden="true">&rarr;</span>
     </a>
-    <div class="cta__proof" data-reveal>
-      <div class="cta__proof-strip">
-        <figure class="bento-card about-tile about-tile--lg">
-          <img class="about-tile__photo" src="{% staticv 'img/real/real-09-golden-hour.jpg' %}" alt="A cream villa in warm evening light on the Kenya coast" loading="lazy" width="1200" height="800">
-          <div class="bento-card__scrim" aria-hidden="true"></div>
-          <figcaption class="about-tile__caption">Golden hour</figcaption>
-        </figure>
-        <figure class="bento-card about-tile">
-          <img class="about-tile__photo" src="{% staticv 'img/real/real-10-sea-light.jpg' %}" alt="An airy living room washed in sea light" loading="lazy" width="1200" height="800">
-          <div class="bento-card__scrim" aria-hidden="true"></div>
-          <figcaption class="about-tile__caption">Sea light</figcaption>
-        </figure>
-        <figure class="bento-card about-tile">
-          <img class="about-tile__photo" src="{% staticv 'img/real/real-11-slow-mornings.jpg' %}" alt="A sunlit bedroom made for slow mornings" loading="lazy" width="1200" height="800">
-          <div class="bento-card__scrim" aria-hidden="true"></div>
-          <figcaption class="about-tile__caption">Slow mornings</figcaption>
-        </figure>
-      </div>
-      <p class="cta__proof-note">Sunlight, salt air, and rooms that breathe.</p>
-    </div>
   </div>
 </section>
 

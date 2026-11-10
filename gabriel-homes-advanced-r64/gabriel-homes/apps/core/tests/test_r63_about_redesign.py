@@ -40,22 +40,30 @@ def _page(path):
 
 
 # ---------------------------------------------------------------------------
-# 1. Bento tiles — the UA figure margin must be reset
+# 1. Bento tiles — r66 (owner round): the shaded photo strip left the page
+#    entirely ("remove the carousel — it doesn't look good, the background
+#    and images are shaded"). These pins keep it gone: no markup, no
+#    orphaned CSS.
 # ---------------------------------------------------------------------------
-def test_about_tile_resets_the_ua_figure_margin():
-    rule = re.search(r"\.about-tile \{[^}]*\}", PAGES_CSS)
-    assert rule, "the .about-tile rule must exist"
-    assert re.search(r"margin:\s*0", rule.group(0)), (
-        "without margin: 0 the UA default (1em 40px) shrinks every tile "
-        "and clips the small-tile captions on phones"
-    )
+def test_about_tile_css_is_gone_with_the_strip():
+    # the r63 fix pinned margin: 0 on .about-tile; r66 removed the whole
+    # block — the pin now guards against the rules sneaking back orphaned
+    assert ".about-tile {" not in PAGES_CSS
+    assert ".cta__proof" not in PAGES_CSS
+    assert "about-tile__photo" not in PAGES_CSS
 
 
-def test_about_tiles_are_real_images_with_dimensions():
+def test_about_closing_band_keeps_the_essential_cta():
     body = _page("/about/")
     cta = body.split('class="section cta"', 1)[1].split("</section>", 1)[0]
-    for attr in ("loading=\"lazy\"", "width=\"1200\"", "height=\"800\""):
-        assert cta.count(attr) == 3, f"{attr} must be on all three tiles"
+    # the band keeps its job: tag, taste-led headline, the explore button
+    assert "[ THE COLLECTION ]" in cta
+    assert "Homes worth crossing town for." in cta
+    assert 'href="/properties/"' in cta
+    # and no shaded photo carousel remains
+    assert "about-tile" not in cta
+    assert "cta__proof" not in cta
+    assert "<figure" not in cta
 
 
 # ---------------------------------------------------------------------------
