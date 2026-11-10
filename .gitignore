@@ -4,3 +4,6 @@ node_modules/
 # r44: full-project zip artifacts exceed GitHub 100MB — keep them out of git
 # (regenerable via gabriel-homes/scripts/r24_build_zip.py)
 download/gabriel-homes-full-*.zip
+
+# GitHub PAT — local credential, never commit
+.github_pat
