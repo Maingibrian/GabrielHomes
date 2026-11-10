@@ -1,0 +1,9 @@
+Thank you for asking to hear from Gabriel Homes.
+
+Please confirm your sign-up by opening this link:
+
+{{ link }}
+
+If you did not ask for this, you can ignore this email and nothing will be sent to you.
+
+Gabriel Homes, Kenya

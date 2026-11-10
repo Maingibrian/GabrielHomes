@@ -1,0 +1,178 @@
+{% extends "base.html" %}
+{% load core_tags static %}
+
+{% block title %}{{ page_title }}{% endblock %}
+{% block meta_description %}{{ meta_description }}{% endblock %}
+{% block canonical %}<link rel="canonical" href="{{ SITE_DOMAIN }}{{ canonical_url }}">{% endblock %}
+
+{% block styles %}
+  <link rel="stylesheet" href="{% staticv 'css/pages.css' %}">
+  <link rel="stylesheet" href="{% staticv 'css/home.css' %}">
+{% endblock %}
+
+{% block content %}
+
+{# ============================================================ #}
+{# 1. Page hero                                                   #}
+{# ============================================================ #}
+<section class="page-hero">
+  <div class="container">
+    <p class="section-tag" data-reveal>[ SERVICES ]</p>
+    <span class="eyebrow" data-reveal>What we do</span>
+    <h1 class="page-hero__title" data-reveal>Buying, renting, and talking to a person.</h1>
+    <p class="page-hero__subtitle" data-reveal>
+      Gabriel Homes is a new company, founded in 2026 and centred in Kenya.
+      These are the services we offer today.
+    </p>
+  </div>
+</section>
+
+{# ============================================================ #}
+{# 2. Buying                                                      #}
+{# ============================================================ #}
+<div class="container">
+  <p class="section-tag" data-reveal>[ 001 — BUYING ]</p>
+
+  <article class="svc-row" data-reveal>
+    <div class="svc-row__media" aria-hidden="true"
+         style="background-image: url('{% staticv 'img/real/real-01-kitchen-island.jpg' %}');"></div>
+    <div class="svc-row__body">
+      <span class="eyebrow">Buying</span>
+      <h2 class="svc-row__title">Find a home to buy.</h2>
+      <p>
+        Browse listings for sale that have passed our checks. Each listing
+        shows the date it was last confirmed.
+      </p>
+      <p>
+        Enquire on any listing and a person replies. We confirm the price and
+        details in writing with the owner or agent before we show you a
+        property, and we tell you what we checked and what we could not check.
+      </p>
+      <p>
+        Buyers pay Gabriel Homes a fee. We tell you the exact amount before you
+        commit to anything.
+      </p>
+      <a class="svc-row__link" href="/properties/">
+        See listings <span class="btn__arrow" aria-hidden="true">&rarr;</span>
+      </a>
+    </div>
+  </article>
+</div>
+
+{# ============================================================ #}
+{# How buying works — moved from the home page (r12). Company      #}
+{# explanations live on the service pages, not on the              #}
+{# listings-first home page.                                      #}
+{# ============================================================ #}
+<section class="section hv2-process" id="process">
+  <div class="container">
+    <div class="hv2-head" data-reveal>
+      <p class="section-tag">[ HOW BUYING WORKS ]</p>
+      <h2 class="hv2-h2">From first search to a viewing.</h2>
+      <p class="hv2-sub">Your agreement with the seller is between you and them. We recommend a lawyer reviews any contract before you sign.</p>
+    </div>
+
+    <ol class="hv2-steps" data-reveal>
+      <li><span class="hv2-steps__dot"></span><h3>Search</h3><p>Browse listings that have passed our checks.</p></li>
+      <li><span class="hv2-steps__dot"></span><h3>Enquire</h3><p>Send an enquiry on the listing. A named person replies.</p></li>
+      <li><span class="hv2-steps__dot"></span><h3>Confirm</h3><p>We confirm the price and details, and tell you what we checked.</p></li>
+      <li><span class="hv2-steps__dot"></span><h3>View</h3><p>Arrange a viewing where one is possible.</p></li>
+    </ol>
+
+    <div class="hv2-fee" data-reveal>
+      <p class="hv2-fee__label">Our fee</p>
+      <p>Buyers pay Gabriel Homes a fee. We tell you the exact amount before you commit, so you decide with the figure in front of you.</p>
+    </div>
+  </div>
+</section>
+
+{# ============================================================ #}
+{# 3. Renting                                                     #}
+{# ============================================================ #}
+<div class="container">
+  <p class="section-tag" data-reveal>[ 002 — RENTING ]</p>
+
+  <article class="svc-row svc-row--flip" data-reveal>
+    <div class="svc-row__media" aria-hidden="true"
+         style="background-image: url('{% staticv 'img/real/real-03-bedroom-garden.jpg' %}');"></div>
+    <div class="svc-row__body">
+      <span class="eyebrow">Renting</span>
+      <h2 class="svc-row__title">Find a home to rent.</h2>
+      <p>
+        Rental listings are checked against the rental contract before they are
+        published. The price, size, bedrooms and bathrooms are confirmed in
+        writing with the owner or agent.
+      </p>
+      <p>
+        Enquire on any rental listing and a person replies.
+      </p>
+      <a class="svc-row__link" href="/properties/">
+        See listings <span class="btn__arrow" aria-hidden="true">&rarr;</span>
+      </a>
+    </div>
+  </article>
+</div>
+
+{# ============================================================ #}
+{# 4. Enquiries                                                   #}
+{# ============================================================ #}
+<div class="container">
+  <p class="section-tag" data-reveal>[ 003 — ENQUIRIES ]</p>
+
+  <article class="svc-row svc-row--flip" data-reveal>
+    <div class="svc-row__media" aria-hidden="true"
+         style="background-image: url('{% staticv 'img/real/real-08-aerial.jpg' %}');"></div>
+    <div class="svc-row__body">
+      <span class="eyebrow">Enquiries</span>
+      <h2 class="svc-row__title">Talk to a person about a listing.</h2>
+      <p>
+        Each enquiry goes to a named person who knows the listing. Ask what has
+        been checked, what has not, and when a viewing might be possible.
+      </p>
+      <a class="svc-row__link" href="/contact/">
+        Contact us <span class="btn__arrow" aria-hidden="true">&rarr;</span>
+      </a>
+    </div>
+  </article>
+</div>
+
+{# ============================================================ #}
+{# 5. Owners and agents                                           #}
+{# ============================================================ #}
+<div class="container">
+  <p class="section-tag" data-reveal>[ 004 — LISTING WITH US ]</p>
+
+  <article class="svc-row" data-reveal>
+    <div class="svc-row__media" aria-hidden="true"
+         style="background-image: url('{% staticv 'img/real/cta-balcony.jpg' %}');"></div>
+    <div class="svc-row__body">
+      <span class="eyebrow">Owners &amp; agents</span>
+      <h2 class="svc-row__title">List a property with us.</h2>
+      <p>
+        We need written authority from the owner or agent to sell or let the
+        property. The checks on our <a href="/checks/">How we check</a> page run
+        before anything is published.
+      </p>
+      <a class="svc-row__link" href="/contact/">
+        Ask about listing <span class="btn__arrow" aria-hidden="true">&rarr;</span>
+      </a>
+    </div>
+  </article>
+</div>
+
+{# ============================================================ #}
+{# 6. Commitments                                                 #}
+{# ============================================================ #}
+<section class="section">
+  <div class="container">
+    <p class="section-tag" data-reveal>[ OUR COMMITMENTS ]</p>
+    <h2 class="featured__title" data-reveal>What we will and will not do.</h2>
+    <ul class="hv2-checklist" data-reveal>
+      <li>We will not publish a listing whose checks are incomplete.</li>
+      <li>We will say what we did not check, rather than leave it out.</li>
+      <li>We will not quote years of history, sales totals or client numbers we cannot back up.</li>
+    </ul>
+  </div>
+</section>
+
+{% endblock %}

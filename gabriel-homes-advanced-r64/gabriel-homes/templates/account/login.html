@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% comment %}
+  Agent sign-in page — replaces allauth's default login template.
+
+  Public sign-up is CLOSED on Gabriel Homes: accounts exist for agents
+  and staff only, provisioned through Django admin. So this page has no
+  "sign up" link at all; visitors are pointed back to browsing, and
+  password resets are handled by the office (not by email) since agent
+  accounts are admin-managed.
+{% endcomment %}
+{% load i18n %}
+
+{% block title %}Agent sign in — {{ SITE_NAME }}{% endblock %}
+{% block meta_description %}Sign-in for Gabriel Homes agents and staff.{% endblock %}
+{% block body_class %}page-login{% endblock %}
+
+{% block styles %}{% include "account/_auth_styles.html" %}{% endblock %}
+
+{% block content %}
+<div class="container auth-wrap">
+  <div class="auth-card">
+    <p class="auth-card__tag">[ Agent access ]</p>
+    <h1 class="auth-card__title">Agent sign in</h1>
+    <p class="auth-card__lede">
+      This area is for Gabriel Homes agents and staff.
+      You don&rsquo;t need an account to find a home &mdash;
+      <a href="/#featured">browse properties</a> freely or
+      <a href="/contact/">get in touch</a> and we&rsquo;ll help.
+    </p>
+
+    {% if form.non_field_errors %}
+      <div class="auth-errors auth-card__ok" role="alert">{{ form.non_field_errors }}</div>
+    {% endif %}
+
+    <form method="post" action="{% url 'account_login' %}">
+      {% csrf_token %}
+      {{ redirect_field }}
+
+      <div class="auth-field">
+        <label for="id_login">Email</label>
+        <input class="auth-input" type="email" name="login" id="id_login"
+               value="{{ form.login.value|default:'' }}"
+               placeholder="you@gabrielhomes.co.ke"
+               autocomplete="email" required autofocus>
+        {% if form.login.errors %}<div class="auth-errors">{{ form.login.errors }}</div>{% endif %}
+      </div>
+
+      <div class="auth-field">
+        <label for="id_password">Password</label>
+        <input class="auth-input" type="password" name="password" id="id_password"
+               placeholder="Your password"
+               autocomplete="current-password" required>
+        {% if form.password.errors %}<div class="auth-errors">{{ form.password.errors }}</div>{% endif %}
+      </div>
+
+      <div class="auth-card__actions">
+        <button type="submit" class="btn btn--primary">Sign in</button>
+      </div>
+    </form>
+
+    <p class="auth-card__footnote">
+      Forgot your password? Agent accounts are managed by the Gabriel Homes team &mdash;
+      please reach us through the <a href="/contact/">Contact page</a>.
+    </p>
+  </div>
+</div>
+{% endblock %}

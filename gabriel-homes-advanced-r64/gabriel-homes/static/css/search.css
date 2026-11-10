@@ -1,0 +1,804 @@
+/* =============================================================
+   Gabriel Homes — search results page
+   Composes existing components (listing-card, btn, divider, etc.)
+   into a results layout: sidebar + grid + pagination + empty state.
+   No new visual patterns (per WORK.md §11 Phase 3).
+   ============================================================= */
+
+.page-search { background: var(--cream); }
+
+/* OpenStreetMap vector map with property price pins; market cards follow immediately. */
+.search-map-shell { padding: 12px 0 46px; }
+.search-map-heading { margin: 0 0 18px; }
+.search-map-heading p { margin:0 0 7px; color:var(--burnt); font:700 13px var(--font-mono); letter-spacing:.11em; }
+.search-map-heading h1 { margin:0 0 5px; font:500 clamp(2rem,4vw,3.2rem)/1 var(--font-display); letter-spacing:-.045em; }
+.search-map-heading > span { color:var(--taupe); font-size:14px; }
+.search-map-stage { position: relative; overflow: hidden; border-radius: 24px; background: var(--map-stage); box-shadow: 0 12px 34px rgba(45,31,23,.10); isolation: isolate; }
+.search-map { position:relative; height: clamp(280px,32vw,390px); min-height: 280px; background: var(--map-stage); }
+.search-map > p { padding: 30px; color: var(--taupe); }
+.search-map .maplibregl-ctrl-group { overflow:hidden; border:0; border-radius:12px; box-shadow:0 5px 16px rgba(28,21,17,.14); }
+.search-map .maplibregl-ctrl-attrib { border-radius:8px 0 0 0; background:rgba(255,255,255,.88); font-size:10px; }
+/* "Show all homes" reset pill — top-left of the map stage, over the tiles.
+   Created by search-map.js once the pins are placed; hidden until then. */
+.search-map__reset { position:absolute; top:14px; left:14px; z-index:5; padding:9px 14px; border:1px solid rgba(28,21,17,.18); border-radius:999px; background:var(--ink); color:var(--white); box-shadow:0 5px 16px rgba(28,21,17,.2); font:700 13px var(--font-mono); letter-spacing:.08em; text-transform:uppercase; cursor:pointer; transition:transform .18s,background .18s; }
+.search-map__reset:hover, .search-map__reset:focus-visible { transform:scale(1.05); background:var(--burnt); outline:2px solid var(--white); }
+.search-map__reset[hidden] { display:none; }
+@media (max-width: 640px) { .search-map__reset { top:10px; left:10px; padding:8px 11px; font-size:13px; } }
+.map-price-pin { display:block; min-width:76px; padding:9px 12px; border:1px solid rgba(28,21,17,.18); border-radius:999px; background:var(--white); box-shadow:0 5px 16px rgba(28,21,17,.2); color:var(--ink); font:700 13px var(--font-sans); text-align:center; white-space:nowrap; cursor:pointer; transition:transform .18s,background .18s,color .18s; }
+.map-price-pin:hover,.map-price-pin:focus-visible { transform:scale(1.08); background:var(--ink); color:var(--white); outline:2px solid var(--white); }
+.map-price-pin--rent { border-color:rgba(47,102,90,.65); }.map-price-pin--bnb { border-color:rgba(35,56,77,.65); }
+.map-property-popup { display:grid; gap:7px; min-width:210px; padding:4px; }.map-property-popup small { color:var(--burnt); font:700 13px var(--font-mono); letter-spacing:.1em; }.map-property-popup strong { font:500 18px/1.1 var(--font-display); }.map-property-popup p { margin:0; color:var(--taupe); font-size:13px; }.map-property-popup a { margin-top:4px; color:var(--ink); font-size:13px; font-weight:700; }
+.market-filters { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:18px; margin-top:24px; }
+.market-filter { position:relative; min-height:260px; overflow:hidden; padding:24px; border-radius:24px; display:flex; flex-direction:column; color:var(--white); box-shadow:0 12px 35px rgba(28,21,17,.13); transition:transform .35s cubic-bezier(.2,.7,.2,1),box-shadow .35s; isolation:isolate; }
+.market-filter img { position:absolute; inset:0; z-index:-2; width:100%; height:100%; object-fit:cover; transition:transform .7s cubic-bezier(.2,.7,.2,1); }.market-filter__shade { position:absolute; inset:0; z-index:-1; background:linear-gradient(180deg,rgba(16,12,10,.18),rgba(16,12,10,.86)); }.market-filter:hover,.market-filter.is-active { transform:translateY(-7px); box-shadow:0 22px 48px rgba(28,21,17,.23); }.market-filter:hover img { transform:scale(1.065); }.market-filter.is-active::after { content:"Selected"; position:absolute; top:18px; right:18px; padding:7px 10px; border-radius:999px; background:var(--white); color:var(--ink); font:700 13px var(--font-mono); letter-spacing:.08em; text-transform:uppercase; }
+.market-filter__number { font:700 13px var(--font-mono); letter-spacing:.1em; opacity:.85; }.market-filter__copy { margin-top:auto; display:grid; gap:9px; padding-right:48px; }.market-filter__copy strong { font:500 clamp(1.65rem,2.6vw,2.5rem)/.98 var(--font-display); letter-spacing:-.03em; }.market-filter__copy small { max-width:30ch; color:rgba(255,255,255,.78); font-size:13px; line-height:1.4; }.market-filter__arrow { position:absolute; right:22px; bottom:22px; display:grid; place-items:center; width:42px; height:42px; border:1px solid rgba(255,255,255,.55); border-radius:50%; background:rgba(255,255,255,.1); font-size:20px; backdrop-filter:blur(8px); }
+.listing-tools { margin-bottom: 22px; }
+
+
+/* ---------- Breadcrumbs ---------- */
+.breadcrumbs {
+  padding-block: 1.25rem 0.5rem;
+  font-family: var(--font-mono);
+  font-weight: 600;
+  font-size: var(--text-xs);
+  letter-spacing: var(--track-tight);
+  text-transform: uppercase;
+  color: var(--taupe);
+}
+.breadcrumbs ol {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+}
+.breadcrumbs li {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.breadcrumbs li:not(:last-child)::after {
+  content: "›";
+  color: var(--sand);
+  margin-left: 0.25rem;
+}
+.breadcrumbs a:hover { color: var(--burnt); }
+.breadcrumbs li:last-child { color: var(--ink); }
+
+
+/* ---------- Results header ---------- */
+.results-header {
+  padding-block: 1rem 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+.results-header__h1 {
+  font-size: var(--text-display-2);
+  font-weight: 500;
+  letter-spacing: var(--track-display);
+  line-height: var(--leading-tight);
+  margin: 0;
+}
+.results-header__meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--sand-60);
+}
+.results-header__count {
+  font-family: var(--font-mono);
+  font-weight: 500;
+  font-size: var(--text-sm);
+  color: var(--taupe);
+  letter-spacing: var(--track-tight);
+}
+.results-header__count strong {
+  color: var(--ink);
+  font-weight: 500;
+}
+.results-header__sort {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.results-header__sort label {font-family: var(--font-mono); font-weight: 600;
+  font-size: var(--text-xs);
+  letter-spacing: var(--track-tight);
+  text-transform: uppercase;
+  color: var(--taupe);}
+.results-header__sort select {
+  border: 1px solid var(--sand-60);
+  border-radius: var(--radius-pill);
+  padding: 0.4rem 2rem 0.4rem 0.85rem;
+  font-size: var(--text-sm);
+  font-weight: 500;
+  color: var(--ink);
+  background: var(--white);
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8' fill='none'%3E%3Cpath d='M1 1L6 6L11 1' stroke='%238a7d70' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.85rem center;
+  cursor: pointer;
+}
+.results-header__sort select:focus { outline: 2px solid var(--burnt); outline-offset: 2px; }
+
+
+/* ---------- Layout: sidebar + grid ---------- */
+.results-layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2rem;
+  padding-bottom: 3rem;
+}
+@media (min-width: 1200px) {
+  .results-layout {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+}
+
+
+/* ---------- Filter sidebar (desktop) ---------- */
+.filter-sidebar {
+  display: none;
+}
+@media (min-width: 1200px) {
+  .filter-sidebar {
+    display: block;
+    position: sticky;
+    top: 5rem;
+    align-self: start;
+    max-height: calc(100vh - 6rem);
+    overflow-y: auto;
+  }
+}
+.filter-sidebar__title {font-family: var(--font-mono); font-weight: 600;
+  font-size: var(--text-xs);
+  letter-spacing: var(--track-tight);
+  text-transform: uppercase;
+  color: var(--burnt);
+  margin-bottom: 1.5rem;}
+.filter-group {
+  padding-block: 1.25rem;
+  border-bottom: 1px solid var(--sand-60);
+}
+.filter-group:last-of-type { border-bottom: 0; }
+.filter-group__label {
+  display: block;
+  font-size: var(--text-sm);
+  font-weight: 500;
+  letter-spacing: var(--track-tight);
+  color: var(--ink);
+  margin-bottom: 0.75rem;
+}
+.filter-group__inputs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem;
+}
+.filter-group__input {
+  border: 1px solid var(--sand-60);
+  border-radius: var(--radius-sm);
+  padding: 0.5rem 0.65rem;
+  font-size: var(--text-sm);
+  color: var(--ink);
+  background: var(--white);
+  width: 100%;
+}
+.filter-group__input:focus { outline: 2px solid var(--burnt); outline-offset: -1px; }
+.filter-group__select {
+  width: 100%;
+  border: 1px solid var(--sand-60);
+  border-radius: var(--radius-sm);
+  padding: 0.5rem 0.65rem;
+  font-size: var(--text-sm);
+  color: var(--ink);
+  background: var(--white);
+  appearance: none;
+}
+.filter-group__checkboxes {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  max-height: 200px;
+  overflow-y: auto;
+}
+.filter-group__checkbox {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: var(--text-sm);
+  color: var(--ink);
+  cursor: pointer;
+}
+.filter-group__checkbox input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--burnt);
+}
+.filter-actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 1.5rem;
+}
+.filter-actions .btn { flex: 1; justify-content: center; }
+
+
+/* ---------- Mobile filter toggle + drawer ---------- */
+.filter-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: var(--white);
+  border: 1px solid var(--sand-60);
+  border-radius: var(--radius-pill);
+  padding: 0.6rem 1.1rem;
+  font-size: var(--text-sm);
+  font-weight: 500;
+  color: var(--ink);
+  cursor: pointer;
+}
+@media (min-width: 1200px) {
+  .filter-toggle { display: none; }
+}
+
+.filter-drawer {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-overlay);
+  display: none;
+}
+.filter-drawer.is-open { display: block; }
+.filter-drawer__backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.4);
+}
+.filter-drawer__panel {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: min(360px, 85vw);
+  background: var(--cream);
+  padding: 1.5rem;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+.filter-drawer__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--sand-60);
+}
+.filter-drawer__title {
+  font-size: var(--text-lg);
+  font-weight: 500;
+  letter-spacing: var(--track-tight);
+}
+.filter-drawer__close {
+  background: transparent;
+  border: 0;
+  font-family: var(--font-mono);
+  font-weight: 600;
+  font-size: var(--text-xs);
+  text-transform: uppercase;
+  color: var(--taupe);
+  cursor: pointer;
+}
+
+
+/* ---------- Results grid ---------- */
+.results-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+@media (min-width: 560px) {
+  .results-grid { grid-template-columns: 1fr; }
+}
+@media (min-width: 1200px) {
+  .results-grid { grid-template-columns: 1fr; }
+}
+@media (min-width: 1440px) {
+  .results-grid { grid-template-columns: 1fr; }
+}
+
+/* r49: uniform card size (owner request). The track must be DEFINITE so
+   .listing-row__media's height:100% resolves — with height:auto the grid
+   row sized itself to each photo's natural aspect ratio, and one portrait
+   942x1280 image inflated its card to 883px while landscape cards sat at
+   397px. 460px is the measured worst-case content stack (456px) + slack;
+   verified against all rows: zero content overflow (scrollHeight check). */
+.listing-row { display: grid; grid-template-columns: minmax(0,1.08fr) minmax(340px,.92fr); height: 460px; background: var(--white); border: 1px solid rgba(90,64,50,.13); border-radius: 24px; overflow: hidden; box-shadow: 0 12px 42px rgba(45,31,23,.07); }
+.listing-row--reverse { grid-template-columns: minmax(340px,.92fr) minmax(0,1.08fr); }.listing-row--reverse .listing-row__media { order: 2; }.listing-row--reverse .listing-row__content { order: 1; }
+.listing-row__media { position: relative; min-height: 0; height: 100%; overflow: hidden; background: var(--sand); }.listing-row__media img { width: 100%; height: 100%; object-fit: cover; transition: transform .65s cubic-bezier(.2,.7,.2,1); }.listing-row:hover .listing-row__media img { transform: scale(1.04); }
+.listing-row__index,.listing-row__demo { position: absolute; top: 18px; padding: 8px 11px; border-radius: 999px; background: rgba(255,255,255,.84); backdrop-filter: blur(10px); font: 700 13px var(--font-mono); text-transform: uppercase; letter-spacing: .08em; }.listing-row__index { left: 18px; }.listing-row__demo { right: 18px; color: var(--burnt); }
+.listing-row__content { min-height: 0; overflow: hidden; padding: clamp(22px,2.4vw,32px); display: flex; flex-direction: column; justify-content: center; }.listing-row__type {margin: 0 0 10px; color: var(--burnt); font: 600  13px var(--font-mono); text-transform: uppercase; letter-spacing: .1em;}.listing-row h2 { display: -webkit-box; overflow: hidden; -webkit-box-orient: vertical; -webkit-line-clamp: 2; margin: 0; font: 500 clamp(1.9rem,2.6vw,2.7rem)/1.02 var(--font-display); letter-spacing: -.035em; }.listing-row__price { margin: 16px 0 7px; font-size: 1.2rem; font-weight: 700; }.listing-row__price small { font-weight: 500; color: var(--taupe); }.listing-row__location { display: -webkit-box; overflow: hidden; -webkit-box-orient: vertical; -webkit-line-clamp: 2; margin: 0 0 12px; color: var(--brown); font-weight: 600; }.listing-row__description { display: -webkit-box; overflow: hidden; -webkit-box-orient: vertical; -webkit-line-clamp: 3; margin: 0; color: var(--taupe); line-height: 1.55; max-width: 60ch; }.listing-row__facts { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }.listing-row__facts span { padding: 7px 10px; border-radius: 999px; background: var(--paper); font-size: 13px; }.listing-row__actions { display: flex; gap: 9px; flex-wrap: wrap; margin-top: auto; padding-top: 18px; }.listing-row__actions a { padding: 10px 14px; border: 1px solid var(--sand); border-radius: 999px; font-size: 13px; font-weight: 600; }.listing-row__actions .listing-row__whatsapp { display: inline-flex; align-items: center; gap: 8px; background: var(--ink); border-color: var(--ink); color: var(--cream); }.listing-row__whatsapp svg { width: 16px; height: 16px; fill: currentColor; flex: none; }.listing-row__actions .listing-row__view { border-color: transparent; background: none; color: var(--brown); }
+@media (max-width: 800px) {
+  .search-map-stage { border-radius:18px; }.search-map { height:250px; min-height:250px; }.search-map-heading h1 { font-size:2rem; }
+  .market-filters { grid-template-columns:none; grid-auto-flow:column; grid-auto-columns:82vw; gap:14px; margin-inline:calc(var(--container-pad,20px) * -1); padding:4px var(--container-pad,20px) 18px; overflow-x:auto; scroll-snap-type:x mandatory; scrollbar-width:none; }.market-filters::-webkit-scrollbar { display:none; }.market-filter { min-height:235px; scroll-snap-align:center; }
+  .listing-row,.listing-row--reverse { height:680px; min-height:680px; grid-template-columns:1fr; grid-template-rows:250px minmax(0,1fr); }.listing-row--reverse .listing-row__media,.listing-row--reverse .listing-row__content { order:initial; }.listing-row__media { height:250px; min-height:0; }.listing-row__content { padding:20px; }.listing-row h2 { font-size:clamp(1.65rem,6vw,2rem); }.listing-row__price { margin:12px 0 6px; }.listing-row__location { margin-bottom:8px; }.listing-row__description { -webkit-line-clamp:2; line-height:1.45; }.listing-row__facts { gap:6px; margin-top:8px; }.listing-row__facts span { padding:6px 9px; }.listing-row__actions { gap:7px; padding-top:12px; }.listing-row__actions a { padding:9px 11px; font-size:13px; }
+}
+.listing-tools .filter-toggle { display: inline-flex; }
+
+
+/* ---------- Empty state ---------- */
+.empty-state {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 4rem 1.5rem;
+  background: var(--white);
+  border-radius: var(--radius-frame);
+  border: 1px solid var(--sand-60);
+}
+.empty-state__tag {font-family: var(--font-mono); font-weight: 600;
+  font-size: var(--text-xs);
+  letter-spacing: var(--track-tight);
+  text-transform: uppercase;
+  color: var(--burnt);
+  margin-bottom: 1rem;}
+.empty-state__title {
+  font-size: var(--text-2xl);
+  font-weight: 500;
+  letter-spacing: var(--track-tighter);
+  line-height: var(--leading-tight);
+  margin-bottom: 0.85rem;
+}
+.empty-state__body {
+  color: var(--taupe);
+  font-size: var(--text-sm);
+  line-height: var(--leading-body);
+  max-width: 48ch;
+  margin: 0 auto 2rem;
+}
+.empty-state__suggestions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  align-items: center;
+  margin-top: 1.5rem;
+}
+.empty-state__suggestion {
+  font-size: var(--text-sm);
+  color: var(--burnt);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+
+/* ---------- Pagination ---------- */
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 3rem;
+  padding-top: 2rem;
+  border-top: 1px solid var(--sand-60);
+  flex-wrap: wrap;
+}
+.pagination__link,
+.pagination__current {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 40px;
+  height: 40px;
+  padding: 0 0.85rem;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--sand-60);
+  background: var(--white);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  color: var(--ink);
+  text-decoration: none;
+  cursor: pointer;
+  transition: background var(--t-fast) var(--ease), color var(--t-fast) var(--ease);
+}
+.pagination__link:hover {
+  background: var(--ink);
+  color: var(--cream);
+  border-color: var(--ink);
+}
+.pagination__current {
+  background: var(--burnt);
+  color: var(--white);
+  border-color: var(--burnt);
+}
+.pagination__disabled {
+  /* r12: was 0.4 (2.46:1 on white); 0.55 keeps the muted "disabled"
+     look at 3.77:1 — clearly visible but still reads as inactive */
+  opacity: 0.55;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+.pagination__ellipsis {
+  padding: 0 0.5rem;
+  color: var(--taupe);
+  font-family: var(--font-mono);
+}
+
+
+/* ---------- Related searches ---------- */
+.related {
+  padding-block: 3rem;
+  border-top: 1px solid var(--sand-60);
+}
+.related__title {font-family: var(--font-mono); font-weight: 600;
+  font-size: var(--text-xs);
+  letter-spacing: var(--track-tight);
+  text-transform: uppercase;
+  color: var(--burnt);
+  margin-bottom: 1.5rem;}
+.related__grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.75rem;
+}
+@media (min-width: 810px) {
+  .related__grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (min-width: 1200px) {
+  .related__grid { grid-template-columns: repeat(4, 1fr); }
+}
+.related__link {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.85rem 1rem;
+  background: var(--white);
+  border: 1px solid var(--sand-60);
+  border-radius: var(--radius-md);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  color: var(--ink);
+  transition: border-color var(--t-fast) var(--ease), color var(--t-fast) var(--ease);
+}
+.related__link:hover {
+  border-color: var(--burnt);
+  color: var(--burnt);
+}
+.related__link-arrow {
+  color: var(--taupe);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+}
+.related__link:hover .related__link-arrow { color: var(--burnt); }
+
+
+/* ---------- HTMX loading indicator ---------- */
+.htmx-indicator {
+  display: none;
+}
+.htmx-request .htmx-indicator,
+.htmx-settling .htmx-indicator {
+  display: block;
+}
+
+/* L1 — map & list sync (D-LOOP-23a) ----------------------------------- */
+.listing-row.is-flashed {
+  outline: 2px solid var(--burnt);
+  outline-offset: -2px;
+  animation: l1-row-flash 1.6s var(--ease-out) both;
+}
+@keyframes l1-row-flash {
+  0% { box-shadow: 0 0 0 0 rgba(160, 82, 45, .30); }
+  100% { box-shadow: 0 0 0 14px rgba(160, 82, 45, 0); }
+}
+.map-price-pin.is-hot {
+  transform: scale(1.08);
+  background: var(--ink);
+  color: var(--white);
+  outline: 2px solid var(--white);
+}
+.map-return-pill {
+  position: fixed;
+  left: 50%;
+  bottom: max(18px, env(safe-area-inset-bottom));
+  transform: translateX(-50%);
+  z-index: var(--z-modal);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6rem 1.15rem;
+  border: 1px solid var(--sand-60);
+  border-radius: var(--radius-pill);
+  background: var(--white);
+  color: var(--ink);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  box-shadow: var(--shadow-card);
+  cursor: pointer;
+}
+.map-return-pill:hover { box-shadow: var(--shadow-card-hover); }
+@media (prefers-reduced-motion: reduce) {
+  .listing-row.is-flashed { animation: none; }
+}
+html[data-fx="none"] .listing-row.is-flashed { animation: none; }
+
+/* r48 — alternating row slide-in (owner request) -----------------------
+   On scroll, listing rows glide in from alternating sides: odd rows
+   (media left) enter from the LEFT, reverse rows (media right) from
+   the RIGHT. motion.js setupRowSlides arms each row (data-slide-row)
+   and flips .is-slid at >=20% visibility; fully leaving the viewport
+   re-arms it, so the glide replays in both scroll directions.
+
+   SAFETY (same doctrine as [data-reveal] / r47 bt-armed):
+   * the hidden from-state requires BOTH html.motion-ready (motion.js
+     sets it as its first statement) AND .row-armed (added per row only
+     AFTER io.observe succeeds) — with JS stale, blocked or crashed the
+     rows simply render. CSS alone never hides a row.
+   * body overflow-x guard: armed rows rest translated ±--slide-dist
+     while off-screen; without the guard they would open a horizontal
+     scrollbar. search.css loads only on this page, so the guard is
+     scoped here (hidden fallback for browsers without overflow:clip).
+   * fx=none / missing gate / OS reduced motion kill the effect.
+   ------------------------------------------------------------------- */
+body { overflow-x: hidden; overflow-x: clip; }
+.results-grid { --slide-dist: clamp(80px, 24vw, 300px); }
+html.motion-ready .listing-row.row-armed {
+  opacity: 0;
+  transform: translateX(calc(var(--slide-dist) * -1));
+  transition: transform .8s var(--ease-out), opacity .5s var(--ease-out);
+}
+html.motion-ready .listing-row--reverse.row-armed {
+  transform: translateX(var(--slide-dist));
+}
+html.motion-ready .listing-row.is-slid {
+  opacity: 1;
+  transform: translateX(0);
+}
+@media (prefers-reduced-motion: reduce) {
+  html.motion-ready .listing-row.row-armed,
+  html.motion-ready .listing-row.is-slid {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+}
+html[data-fx="none"] .listing-row.row-armed,
+html:not([data-fx]) .listing-row.row-armed {
+  opacity: 1 !important;
+  transform: none !important;
+  transition: none !important;
+}
+
+
+
+/* ============================================================
+   r60 (owner round ten) — coast palm sentinels
+
+   "on the white sides next to each listings generate a coconut
+   tree... it will be stagnant parallax up to the start of the
+   footer."
+
+   r61 (same round, second pass) upsized the trees. r62 (third pass:
+   "they need to constantly be in the bottom... no white space under
+   them... make them move in the wind") re-anchors them: the sticky
+   top pins the box FLOOR on the viewport bottom edge (top + height
+   = 100vh exactly), the svg is sized width-first against the gutter
+   column so it can never letterbox a gap underneath, and the
+   generator dropped the viewBox bottom pad so the sand mound sits
+   flush on that floor. The palms stand at the bottom of the screen
+   at every scroll depth — never suspended mid-page — and hold that
+   floor until the footer has scrolled up over them (the sentinel
+   columns extend one tree height below the band so the release
+   happens entirely behind the footer: the trees never visibly move).
+   A gentle two-layer wind sway is gated to html[data-fx="rich"]
+   below; every other tier sees the same palms, standing still.
+
+   Two decorative coconut palms (templates/listings/_palms.html,
+   generated by scripts/r60_gen_palms.py, r46 frond lineage) in the
+   white gutters beside the results. STAGNANT PARALLAX, pure CSS:
+   each .palm-sentinel is an absolutely positioned column spanning
+   .listings-band exactly — results header down to the end of the
+   related searches, i.e. straight to the top of the footer — and the
+   .palm-sentinel__stick inside is position: sticky. Nothing
+   animates, so this works identically with JS blocked, under
+   html[data-fx="none"], and under prefers-reduced-motion
+   (D-LOOP-16a is not even consulted; there is no motion to gate).
+
+   Guardrails:
+   - shown only >= 1620px, where the white sides are genuinely wide
+     (gutter ~142px+). Below that the gutters are too narrow, so the
+     sentinels are display: none — phones and tablets never see them.
+   - pointer-events: none + z-index: -1: the palms can never steal a
+     click from the filters, rows or pagination, and paint strictly
+     behind every in-flow block.
+   - the columns stop 18px clear of the 1280px container box; the
+     svg fills the column width (never under text, so the r59
+     readability pass is untouched) and can only ever letterbox
+     SIDEWAYS — never vertically, so no gap can open under the
+     mound on any screen width.
+   - colour comes from the .palm-* rules below, tokens only — this
+     file keeps ZERO hex colours (D-LOOP-38a). The greens are mixes of
+     --green-deep, the trunk clay over sand, the nuts --brown.
+   ============================================================ */
+.listings-band { position: relative; }
+/* r65 (owner request): the palm field on the results band — "add the
+   pine background image seen in the home page to the listings page to
+   add some depth". Same treatment as the home market section
+   (.home-market::before, home.css r46 lineage): the seamless
+   arching-frond tile (static/img/palm-field.svg, generator seed 46)
+   repeats across the whole band and a bottom mask dissolves it over
+   the last stretch so the related-searches chips and the footer sit
+   on clean cream — coverage runs from the results header down to the
+   pagination, exactly where the sentinels stand.
+
+   Stacking (the one deliberate difference from home): the band must
+   NOT become its own stacking context — the palm sentinels rely on
+   painting in the ROOT negative layer so the footer can scroll up
+   over them (r62). So there is no isolation:isolate here; the ::before
+   simply joins the sentinels at z-index:-1 in the root context (tree
+   order: field first, trees after — the sentinels keep painting above
+   the field). It covers only the band box (inset: 0), never the map
+   shell above, and stays under every in-flow block: rows, chips,
+   pagination, footer.
+
+   Token-only (D-LOOP-38a holds — zero hex here); the clay washes in
+   the SVG were tuned for the home sand but read as the same soft
+   tone-on-tone depth over cream. Decorative only: pointer-events
+   none, nothing for screen readers or keyboards to find; a plain
+   repeating background with no animation, so JS-blocked, fx=none and
+   prefers-reduced-motion all render it identically (D-MOTION-SAFE is
+   not even consulted — there is no motion to gate). */
+.listings-band::before {
+  content: ""; position: absolute; inset: 0; z-index: -1;
+  background-image: url("../img/palm-field.svg");
+  background-repeat: repeat;
+  background-size: 1400px 1600px;
+  -webkit-mask-image: linear-gradient(to bottom, black 0%, black 84%, transparent 100%);
+  mask-image: linear-gradient(to bottom, black 0%, black 84%, transparent 100%);
+  pointer-events: none;
+}
+/* finer grain on narrow screens — the same 860px tile the home field
+   drops to under 1020px, so phones see whole fronds, not slivers */
+@media (max-width: 1020px) {
+  .listings-band::before { background-size: 860px 985px; }
+}
+.palm-sentinel {
+  position: absolute;
+  top: 0;
+  /* r62: the column runs one sticky-box height BELOW the band —
+     under the footer's top edge — so the sticky box can hold the
+     viewport floor until the footer has COMPLETELY covered the
+     trees. Without this, the sticky release pins the tree's floor on
+     the footer's top edge the moment it arrives and the palm visibly
+     RIDES UP the page (VLM r62 round: "trunk cut off at the footer's
+     edge... hard cut"). With it, the trees never visibly move: the
+     footer simply scrolls up over them, still — "constantly in the
+     bottom... up to the start of the footer". The extension paints
+     strictly behind the in-flow footer (z-index: -1), so nothing of
+     it is ever seen. */
+  bottom: calc(-1 * min(64vh, 660px));
+  /* -1: paint strictly BEHIND every in-flow block (cards, related
+     chips, borders, footer) — the palms can never sit on top of
+     content even if a future tweak grows the artwork (VLM round-4
+     hardening). */
+  z-index: -1;
+  display: none;
+  pointer-events: none;
+}
+.palm-sentinel--left {
+  left: 10px;
+  right: calc(50% + (var(--container-max) / 2) + 18px);
+}
+.palm-sentinel--right {
+  right: 10px;
+  left: calc(50% + (var(--container-max) / 2) + 18px);
+}
+.palm-sentinel__stick {
+  /* r62: the floor engine. The box keeps its height — min(64vh,
+     660px) — but the sticky top now pins the box BOTTOM on the
+     viewport bottom edge: top + height = 100vh exactly (36vh + 64vh
+     on shorter screens, (100vh - 660px) + 660px on tall ones), so
+     the palm stands on the floor of the screen at every scroll
+     depth and holds it until the footer has covered it outright
+     (the column extends one box height below the band for exactly
+     that). display:flex centres the svg in the gutter column;
+     align-items: flex-end stands it on the floor. */
+  position: sticky;
+  top: calc(100vh - min(64vh, 660px));
+  height: min(64vh, 660px);
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+}
+/* r62: the sticky box holds the viewport floor until the footer has
+   covered the trees outright — the column it lives in extends one
+   box height below the band (see .palm-sentinel above), so the
+   release happens entirely behind the footer and the palms never
+   visibly move. */
+@media (min-width: 1620px) {
+  .palm-sentinel { display: block; }
+}
+/* r62: width-first — the svg fills the gutter column's width and
+   derives its height from the viewBox ratio (height: auto), capped
+   by the box (max-height: 100%). Vertical letterboxing is now
+   impossible: whichever dimension binds, the drawing's mound lands
+   exactly on the box floor (the generator dropped the viewBox
+   bottom pad), so there is NO white strip under the tree.
+   transform-origin at the base is the wind pivot (below); the
+   tightened drop-shadow grounds the tree instead of floating it. */
+.palm-tree {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 100%;
+  transform-origin: 50% 100%;
+  filter: drop-shadow(0 10px 14px var(--taupe-35));
+}
+.palm-frond--back  { fill: color-mix(in srgb, var(--green-deep) 74%, var(--espresso)); }
+.palm-frond--mid   { fill: var(--green-deep); }
+.palm-frond--front { fill: color-mix(in srgb, var(--green-deep) 66%, var(--cream)); }
+.palm-trunk        { fill: color-mix(in srgb, var(--clay) 62%, var(--sand)); }
+.palm-trunk-ring   { fill: none;
+                     stroke: color-mix(in srgb, var(--clay) 52%, var(--espresso));
+                     stroke-width: 2.4;
+                     stroke-linecap: round; }
+.palm-boot         { fill: color-mix(in srgb, var(--brown) 60%, var(--espresso)); }
+.palm-nut          { fill: var(--brown); }
+.palm-nut--lit     { fill: color-mix(in srgb, var(--brown) 52%, var(--clay)); }
+.palm-nut-shadow   { fill: color-mix(in srgb, var(--sand) 55%, var(--taupe)); }
+.palm-mound        { fill: var(--sand); }
+.palm-mound--shade { fill: color-mix(in srgb, var(--sand) 55%, var(--taupe)); }
+.palm-grass        { fill: color-mix(in srgb, var(--green-deep) 72%, var(--cream)); }
+
+/* r62 — the wind ("make them move in the wind", owner round ten,
+   third pass). Two layers of motion: the whole tree sways a little
+   around its base, and the sun-lit frond layers flutter on top of
+   that (the back layer stays still — depth). Strictly gated to
+   html[data-fx="rich"] per the D-FX-GATE contract: reduced motion
+   (fx=none), Save-Data (lite) and scripts blocked (no attribute —
+   fails closed) all get the same palms, standing perfectly still;
+   the stagnant-parallax placement itself stays pure CSS and holds
+   with JS off. Transform-only and GPU-composited — two trees plus
+   four frond groups, cheap on four cores (the r58 gate philosophy).
+   The two trees deliberately run at different periods with
+   negative delays: wind never moves two trees in lockstep. */
+@keyframes palm-sway {
+  from { transform: rotate(-0.9deg); }
+  55%  { transform: rotate(1.2deg); }
+  to   { transform: rotate(-0.9deg); }
+}
+@keyframes palm-flutter {
+  from { transform: rotate(-0.55deg); }
+  55%  { transform: rotate(0.7deg); }
+  to   { transform: rotate(-0.55deg); }
+}
+.palm-frond--mid,
+.palm-frond--front {
+  transform-box: fill-box;
+  transform-origin: 50% 92%;
+}
+html[data-fx="rich"] .palm-tree {
+  animation: palm-sway 8.6s ease-in-out -2.4s infinite;
+}
+html[data-fx="rich"] .palm-sentinel--right .palm-tree {
+  animation-duration: 10.2s;
+  animation-delay: -6.1s;
+}
+html[data-fx="rich"] .palm-frond--mid,
+html[data-fx="rich"] .palm-frond--front {
+  animation: palm-flutter 5.4s ease-in-out -1.2s infinite;
+}
+html[data-fx="rich"] .palm-sentinel--left  .palm-frond--front {
+  animation-duration: 4.3s;
+  animation-delay: -0.6s;
+}
+html[data-fx="rich"] .palm-sentinel--right .palm-frond--mid {
+  animation-duration: 4.9s;
+  animation-delay: -3.1s;
+}
+html[data-fx="rich"] .palm-sentinel--right .palm-frond--front {
+  animation-duration: 5.8s;
+  animation-delay: -2.2s;
+}

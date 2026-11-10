@@ -1,0 +1,44 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+build/
+dist/
+.venv/
+venv/
+env/
+
+# Django
+*.sqlite3
+db.sqlite3-journal
+# Media is runtime data EXCEPT the demo-photo pools: those are curated
+# assets the seeder reads (VLM-screened stock photos, r57). They used to
+# live only on disk, so every sandbox recycle wiped them and the auto
+# re-seed fell back to Pillow gradient cards — the "cards are back"
+# regression that bit us three times. Bundling them in git ends that.
+/media/*
+!/media/demo-photos/
+/staticfiles/
+/.static/
+
+# Env / secrets
+.env
+.env.*
+!.env.example
+
+# Editors / OS
+.vscode/
+.idea/
+.DS_Store
+*.swp
+
+# Test / coverage
+.pytest_cache/
+.coverage
+htmlcov/
+coverage.xml
+
+# Logs
+*.log
+preview_bridge.log

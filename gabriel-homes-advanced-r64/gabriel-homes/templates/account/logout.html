@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% comment %}
+  Styled replacement for allauth's default logout confirmation page.
+  Sign-out is a POST (allauth requirement); the header links already use
+  POST forms, so most users never see this page — it only shows when
+  someone opens /account/logout/ directly.
+{% endcomment %}
+{% load i18n %}
+
+{% block title %}Sign out — {{ SITE_NAME }}{% endblock %}
+{% block meta_description %}Sign out of your Gabriel Homes agent account.{% endblock %}
+{% block body_class %}page-logout{% endblock %}
+
+{% block styles %}{% include "account/_auth_styles.html" %}{% endblock %}
+
+{% block content %}
+<div class="container auth-wrap">
+  <div class="auth-card">
+    <p class="auth-card__tag">[ Agent access ]</p>
+    <h1 class="auth-card__title">Sign out</h1>
+    <p class="auth-card__lede">
+      Ready to leave? Press the button below to sign out of this
+      browser, or head back to browsing the listings.
+    </p>
+    <form method="post" action="{% url 'account_logout' %}">
+      {% csrf_token %}
+      {% if redirect_field_value %}
+        <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}">
+      {% endif %}
+      <div class="auth-card__actions">
+        <button type="submit" class="btn btn--primary">Sign out</button>
+      </div>
+    </form>
+    <p class="auth-card__footnote">
+      Changed your mind? <a href="/">Back to the homepage</a>.
+    </p>
+  </div>
+</div>
+{% endblock %}

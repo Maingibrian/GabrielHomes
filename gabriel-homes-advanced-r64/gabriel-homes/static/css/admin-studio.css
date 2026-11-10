@@ -1,0 +1,165 @@
+/* =============================================================
+   Gabriel Homes "Studio" — branded admin skin (r11)
+   Re-skins Django's admin with the site tokens (tokens.css):
+   cream background, espresso header, burnt accent, Geist fonts.
+   Only overrides variables + a few surfaces; all admin layout
+   internals stay stock so upgrades stay safe.
+   ============================================================= */
+
+/* Geist — same faces the public site self-hosts (tokens.css) */
+@font-face {
+  font-family: "Geist";
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url("../fonts/Geist-Variable.woff2") format("woff2-variations"),
+       url("../fonts/Geist-Variable.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Geist Mono";
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url("../fonts/GeistMono-Variable.woff2") format("woff2-variations"),
+       url("../fonts/GeistMono-Variable.woff2") format("woff2");
+}
+
+:root {
+  /* Django admin CSS variables -> Gabriel tokens */
+  --primary: #af4715;                 /* burnt */
+  --primary-fg: #faf8f4;              /* cream */
+  --secondary: #2a211c;               /* espresso */
+  --accent: #af4715;
+  --body-fg: #211e1b;                 /* ink */
+  --body-bg: #faf8f4;                 /* cream */
+  --body-quiet-color: #6b5e53;  /* r12: was old taupe #8a7d70 — 3.37:1; taupe */
+  --body-loud-color: #211e1b;
+  --darkened-bg: #f0ebe3;             /* pressed cream */
+  --selected-row: #f5e9e0;            /* burnt wash */
+  --button-fg: #faf8f4;
+  --button-bg: #2a211c;
+  --button-hover-bg: #5a4032;         /* brown */
+  --default-button-bg: #af4715;
+  --default-button-hover-bg: #8f3811;
+  --close-button-bg: #6b5e53;
+  --close-button-hover-bg: #5a4032;
+  --delete-button-bg: #a3402a;
+  --delete-button-hover-bg: #7d2f1e;
+  --link-fg: #af4715;
+  --link-hover-color: #5a4032;
+  --link-selected-fg: #5a4032;
+  --header-color: #faf8f4;
+  --header-branding-color: #faf8f4;
+  --header-bg: #2a211c;
+  --header-link-color: #faf8f4;
+  --breadcrumbs-fg: #d8c9b8;          /* sand */
+  --breadcrumbs-link-fg: #d8c9b8;
+  --breadcrumbs-bg: #211e1b;          /* ink */
+  --hairline-color: #d8c9b8;
+  --border-color: #d8c9b8;
+  --error-fg: #a3402a;
+  --message-success-bg: #e7f2ec;
+  --message-warning-bg: #f7ecdd;
+  --message-error-bg: #f7e3de;
+  --font-family-primary: "Geist", "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+
+body {
+  font-family: var(--font-family-primary);
+  background: var(--body-bg);
+}
+
+/* Header — espresso bar with the Gabriel wordmark */
+#header {
+  background: var(--header-bg);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.5rem;
+  padding: 0.6rem 1.25rem;
+}
+#branding { display: flex; align-items: center; }
+.gh-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+.gh-brand__mark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  background: var(--primary);
+  color: #faf8f4;
+  font-family: "Geist Mono", monospace;
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+.gh-brand__name {
+  font-family: "Geist", sans-serif;
+  font-size: 1.15rem;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  color: #faf8f4;
+}
+.gh-brand__studio {
+  font-family: "Geist Mono", monospace;
+  font-size: 0.8125rem; /* r12: was 0.68rem — bumped to the 13px UI floor */
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: #d8c9b8;
+  border: 1px solid rgba(216, 201, 184, 0.35);
+  border-radius: 100px;
+  padding: 0.15rem 0.55rem;
+}
+.gh-studio-note {
+  margin: 0;
+  font-size: 0.75rem;
+  color: rgba(250, 248, 244, 0.75);
+}
+.gh-studio-note a { color: #d8c9b8; text-decoration: underline; }
+
+/* Module cards + changelist chrome */
+.module h2, .module caption {
+  background: var(--secondary);
+  color: #faf8f4;
+  font-family: "Geist", sans-serif;
+  font-weight: 500;
+}
+#changelist .results { border-radius: 8px; overflow: hidden; }
+th a { color: var(--link-fg) !important; }
+
+/* Index dashboard: app modules read as site sections */
+.dashboard #content-main .module caption {
+  font-size: 0.8rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+/* Buttons */
+.button, a.button, input[type="submit"], input[type="button"] {
+  border-radius: 100px;
+  font-family: var(--font-family-primary);
+}
+.button.default, input[type="submit"].default {
+  background: var(--default-button-bg);
+}
+
+/* Login page */
+body.login #header { justify-content: center; }
+body.login #content { max-width: 480px; margin: 3rem auto; }
+.login .module { border-radius: 12px; box-shadow: 0 24px 48px -18px rgba(42, 33, 28, 0.25); }
+
+/* Sidebar nav (enabled by default in 5.x) */
+#nav-sidebar {
+  background: #f0ebe3;
+}
+#nav-sidebar .module h2 { background: transparent; color: #211e1b; }
+
+/* Breadcrumbs + footer */
+div.breadcrumbs { background: var(--breadcrumbs-bg); color: var(--breadcrumbs-fg); }
+#footer { background: transparent; }

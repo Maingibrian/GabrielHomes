@@ -1,0 +1,126 @@
+{% extends "base.html" %}
+{% load core_tags static %}
+
+{% block title %}{{ page_title }}{% endblock %}
+{% block meta_description %}{{ meta_description }}{% endblock %}
+{% block canonical %}<link rel="canonical" href="{{ SITE_DOMAIN }}{{ canonical_url }}">{% endblock %}
+
+{% block styles %}
+  <link rel="stylesheet" href="{% staticv 'css/pages.css' %}">
+  <link rel="stylesheet" href="{% staticv 'css/home.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<section class="page-hero">
+  <div class="container">
+    <p class="section-tag" data-reveal>[ HOW WE CHECK ]</p>
+    <span class="eyebrow" data-reveal>Before a listing goes live</span>
+    <h1 class="page-hero__title" data-reveal>Five checks on every listing.</h1>
+    <p class="page-hero__subtitle" data-reveal>
+      First we choose a home for how it feels — the light, the air, the
+      street. Then these five checks make it safe to love. If a check
+      cannot be completed, the listing is not published.
+    </p>
+    {# r13: this page is a sub-page under Contact — crumb back to the parent. #}
+    <p class="page-hero__crumb" data-reveal><a href="/contact/">← Contact</a> · How we check</p>
+  </div>
+</section>
+
+{# 1. Listing checks #}
+<section class="section">
+  <div class="container">
+    <p class="section-tag" data-reveal>[ 001 — LISTING CHECKS ]</p>
+    <h2 class="featured__title" data-reveal>What we check.</h2>
+
+    <ol class="checks-list">
+      <li data-reveal>
+        <span class="checks-list__num">01</span>
+        <div>
+          <h3>Ownership</h3>
+          <p>For lettings, we check ownership against the rental contract.</p>
+        </div>
+      </li>
+      <li data-reveal>
+        <span class="checks-list__num">02</span>
+        <div>
+          <h3>Written mandate</h3>
+          <p>We obtain written authority from the owner or agent to sell or let the property.</p>
+        </div>
+      </li>
+      <li data-reveal>
+        <span class="checks-list__num">03</span>
+        <div>
+          <h3>Site visit</h3>
+          <p>Where a visit is possible, Gabriel or a team member visits the property and takes on-site photographs.</p>
+        </div>
+      </li>
+      <li data-reveal>
+        <span class="checks-list__num">04</span>
+        <div>
+          <h3>Price and details in writing</h3>
+          <p>Price, size, bedrooms and bathrooms are confirmed in writing with the owner or agent.</p>
+        </div>
+      </li>
+      <li data-reveal>
+        <span class="checks-list__num">05</span>
+        <div>
+          <h3>Encumbrances</h3>
+          <p>We check for caveats, outstanding rates or service charge, and any disputes.</p>
+        </div>
+      </li>
+    </ol>
+  </div>
+</section>
+
+{# 1b. Commitments — moved from home (H1 r18); the promises live here. #}
+<section class="section" id="commitments">
+  <div class="container">
+    <p class="section-tag" data-reveal>[ OUR COMMITMENTS ]</p>
+    <h2 class="featured__title" data-reveal>What you can hold us to.</h2>
+    <ol class="commit-list">
+      <li data-reveal>
+        <strong>No home goes live unchecked.</strong>
+        If a check cannot be finished, the listing does not make the website — whatever the deadline or the asking price.
+      </li>
+      <li data-reveal>
+        <strong>We say what we could not verify.</strong>
+        Nobody can check everything. When something is unconfirmed, you hear it from us first — not after you have paid.
+      </li>
+      <li data-reveal>
+        <strong>No invented track record.</strong>
+        We will not quote years, sales totals or client numbers we cannot back — we would rather show you our working.
+      </li>
+    </ol>
+  </div>
+</section>
+
+{# 2. Publication checks #}
+<section class="section band-soft">
+  <div class="container">
+    <p class="section-tag" data-reveal>[ 002 — BEFORE PUBLICATION ]</p>
+    <h2 class="featured__title" data-reveal>Checked again before it goes live.</h2>
+    <ul class="hv2-checklist" data-reveal>
+      <li>The five checks above are complete and signed off by Gabriel.</li>
+      <li>Photographs are dated and come from the property itself.</li>
+      <li>The description matches what we checked.</li>
+      <li>The contact and viewing arrangements are confirmed with the owner or agent.</li>
+      <li>Each listing shows the date it was last confirmed.</li>
+    </ul>
+  </div>
+</section>
+
+{# 3. What you can ask us #}
+<section class="section">
+  <div class="container">
+    <p class="section-tag" data-reveal>[ 003 — ASK US ]</p>
+    <h2 class="featured__title" data-reveal>Anything we have not checked, we will say.</h2>
+    <p class="hv2-lede" data-reveal>
+      When you enquire on a listing, ask what has been checked and what has not.
+      You can also ask about the checks before you decide.
+    </p>
+    <p data-reveal><a class="btn btn--primary" href="/contact/">Ask about a listing</a></p>
+  </div>
+</section>
+
+{% endblock %}

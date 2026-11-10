@@ -1,0 +1,129 @@
+{% extends "base.html" %}
+{% load core_tags static %}
+
+{% block title %}{{ page_title }}{% endblock %}
+{% block meta_description %}{{ meta_description }}{% endblock %}
+{% block canonical %}<link rel="canonical" href="{{ SITE_DOMAIN }}{{ canonical_url }}">{% endblock %}
+
+{% block styles %}
+  <link rel="stylesheet" href="{% staticv 'css/pages.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<section class="page-hero">
+  <div class="container">
+    <p class="section-tag" data-reveal>[ CONTACT ]</p>
+    <span class="eyebrow" data-reveal>Say hello</span>
+    <h1 class="page-hero__title" data-reveal>Talk to a human.</h1>
+    <p class="page-hero__subtitle" data-reveal>
+      No call centres, no ticket numbers. You'll reach a person who knows the
+      listings — and we reply within one working day.
+    </p>
+  </div>
+</section>
+
+{% comment %} r13: direct channels first, as big touch-friendly cards. Only the channels actually filled in the site settings are shown — the band renders nothing when the owner has not set them yet. {% endcomment %}
+{% if brand.whatsapp or brand.phone or brand.email %}
+<section class="section contact-channels">
+  <div class="container">
+    <p class="section-tag" data-reveal>[ FASTEST WAY ]</p>
+    <h2 class="contact-channels__title" data-reveal>Pick a channel. A person answers.</h2>
+    <div class="contact-channels__grid">
+      {% if brand.whatsapp %}
+      <a class="contact-channel" href="https://wa.me/{{ brand.whatsapp_digits }}" rel="noopener" data-reveal>
+        <span class="contact-channel__label">WhatsApp</span>
+        <span class="contact-channel__value">{{ brand.whatsapp }}</span>
+        <span class="contact-channel__hint">Message us any time <span aria-hidden="true">→</span></span>
+      </a>
+      {% endif %}
+      {% if brand.phone %}
+      <a class="contact-channel" href="tel:{{ brand.phone }}" data-reveal>
+        <span class="contact-channel__label">Call</span>
+        <span class="contact-channel__value">{{ brand.phone }}</span>
+        <span class="contact-channel__hint">During working hours <span aria-hidden="true">→</span></span>
+      </a>
+      {% endif %}
+      {% if brand.email %}
+      <a class="contact-channel" href="mailto:{{ brand.email }}" data-reveal>
+        <span class="contact-channel__label">Email</span>
+        <span class="contact-channel__value">{{ brand.email }}</span>
+        <span class="contact-channel__hint">We reply within one working day <span aria-hidden="true">→</span></span>
+      </a>
+      {% endif %}
+    </div>
+  </div>
+</section>
+{% endif %}
+
+{% comment %} r13: the two audience paths as separate bordered cards — clear separation instead of two thin text columns running together. {% endcomment %}
+<section class="section contact-paths">
+  <div class="container">
+    <div class="contact-paths__grid">
+      <article class="contact-path" data-reveal>
+        <p class="contact-path__tag">[ BUYERS &amp; RENTERS ]</p>
+        <h2 class="contact-path__title">Asking about a home?</h2>
+        <p class="contact-path__body">
+          Open the listing and use the <strong>Send enquiry</strong> button —
+          your message goes straight to the person who checked that home, with
+          the property details already attached.
+        </p>
+        <a class="btn btn--primary" href="/properties/">
+          Browse the listings
+          <span class="btn__arrow" aria-hidden="true">&rarr;</span>
+        </a>
+      </article>
+      <article class="contact-path" data-reveal>
+        <p class="contact-path__tag">[ OWNERS &amp; AGENTS ]</p>
+        <h2 class="contact-path__title">Listing a property with us?</h2>
+        <p class="contact-path__body">
+          We need written authority to sell or let. The five checks run before
+          anything is published — read what that involves, then send us the
+          property.
+        </p>
+        <a class="btn btn--outline" href="/checks/">
+          Read the five checks
+          <span class="btn__arrow" aria-hidden="true">&rarr;</span>
+        </a>
+      </article>
+    </div>
+  </div>
+</section>
+
+{% comment %} r13: "How we check" is now a sub-page of Contact — this band is its front door, mirroring the item under Contact in the main navigation. {% endcomment %}
+<section class="section contact-checks">
+  <div class="container contact-checks__inner">
+    <div data-reveal>
+      <p class="section-tag">[ UNDER CONTACT · HOW WE CHECK ]</p>
+      <h2 class="contact-checks__title">Five checks before a home goes live.</h2>
+      <p class="contact-checks__body">
+        Ownership, written mandate, a site visit where possible, price and
+        details confirmed in writing, and encumbrances. If a check cannot be
+        finished, the listing does not go live.
+      </p>
+    </div>
+    <a class="contact-checks__link" href="/checks/" data-reveal>
+      See how we check listings
+      <span aria-hidden="true">&rarr;</span>
+    </a>
+  </div>
+</section>
+
+<section class="section cta">
+  <div class="container">
+    <p class="section-tag section-tag--light" data-reveal>[ ENQUIRIES ]</p>
+    <h2 class="cta__title" data-reveal>
+      Asking about a specific property?
+    </h2>
+    <p class="cta__sub" data-reveal>
+      Open the listing and use the "Send enquiry" button — your message goes
+      straight to the listing agent with the property details attached, so you
+      won't have to repeat yourself.
+    </p>
+    <a class="btn btn--primary btn--lg" href="/property-for-sale/mombasa/" data-reveal>
+      Browse properties <span class="btn__arrow" aria-hidden="true">&rarr;</span>
+    </a>
+  </div>
+</section>
+
+{% endblock %}

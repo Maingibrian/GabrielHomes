@@ -1,0 +1,473 @@
+{% extends "base.html" %}
+{% load core_tags static %}
+
+{% block title %}Gabriel Homes — Homes for sale, rent and short stays in Mombasa{% endblock %}
+{% block meta_description %}Homes for sale, rent and short stays across Mombasa — sea-view apartments, garden villas and coastal hideaways, chosen for character.{% endblock %}
+
+{% block canonical %}
+  <link rel="canonical" href="{{ request.build_absolute_uri }}">
+{% endblock %}
+
+{% block og_title %}Gabriel Homes — Homes for sale, rent and short stays in Mombasa{% endblock %}
+{% block og_description %}Homes for sale, rent and short stays across Mombasa — chosen for character, from Nyali sea views to Old Town courtyards.{% endblock %}
+{% block twitter_title %}Gabriel Homes — Homes for sale, rent and short stays in Mombasa{% endblock %}
+{% block twitter_description %}Homes for sale, rent and short stays in Mombasa — chosen for character.{% endblock %}
+
+{% block styles %}
+  <link rel="preload" as="image" href="{% staticv 'img/real/hero-slide-1.webp' %}" fetchpriority="high">
+  <link rel="stylesheet" href="{% staticv 'css/home.css' %}">
+{% endblock %}
+
+{% block content %}
+
+{# ============================================================ #}
+{# 1. HERO — slideshow of real photos, confirmed facts only      #}
+{# ============================================================ #}
+<section class="hero" id="hero" data-archetype="full-bleed">
+  <div class="hero__bg" aria-hidden="true">
+    <div class="hero__slide" style="--slide-img: url('{% staticv 'img/real/hero-slide-1.webp' %}')"></div>
+    <div class="hero__slide" style="--slide-img: url('{% staticv 'img/real/hero-slide-2.webp' %}')"></div>
+    <div class="hero__slide" style="--slide-img: url('{% staticv 'img/real/hero-slide-3.webp' %}')"></div>
+    <div class="hero__slide" style="--slide-img: url('{% staticv 'img/real/hero-slide-4.webp' %}')"></div>
+    {% comment %}
+      H2.b (D-LOOP-21a): the loop is a rich-device upgrade. The gate lives in
+      motion.js setupHeroVideo and is test-pinned by test_h2_hero.py: this
+      video loads ONLY when html[data-fx]="rich" AND Save-Data is off;
+      anything else (lite, none, Save-Data, JS blocked) keeps the hidden
+      attribute — it never loads and the slides stay the visual.
+    {% endcomment %}
+    <video class="hero__video" data-hero-video hidden muted loop playsinline
+           preload="none" tabindex="-1" aria-hidden="true"
+           poster="{% staticv 'img/real/hero-poster.jpg' %}"
+           src="{% staticv 'video/hero-loop.mp4' %}"></video>
+  </div>
+  {# r50/r51: hero remodel, second and third pass against the owner's #}
+  {# reference. Upper band: headline stack | featured-listing carousel #}
+  {# top-right. Lower band: the search pill owns the full width (the #}
+  {# reference's ~74%-wide lower pill), popular-area chips under it. #}
+  {# r51: the bottom-left market stat is GONE (owner request) — the #}
+  {# bottom band keeps only the pill, the chips and the scroll cue. #}
+  {# The eyebrow tag is gone — the reference headline opens the page. #}
+  {# The search pill stays the ONE hero gesture (pinned by #}
+  {# test_h2_hero); the carousel adds links and plain dot controls #}
+  {# only — no CTA buttons. #}
+  <div class="container hv2-hero">
+    <div class="hero__grid">
+      <div class="hero__main">
+        <h1 class="hero__title hv2-rise" style="--d:0" data-hero-headline>{{ brand.hero_heading_lead }} <em class="hero__accent">{{ brand.hero_heading_accent }}</em> {{ brand.hero_heading_tail }}</h1>
+        <p class="hero__subtitle hv2-rise" style="--d:1">{{ brand.hero_subtitle }}</p>
+
+        {# r50/r51: assurance strip, reworded and shrunk. No agents on #}
+        {# this site (owner: none of the team are agents), no banned #}
+        {# "verified" (p0 checked language) — the strip states what #}
+        {# actually happens: listings are checked, prices are confirmed #}
+        {# in writing, and a person replies. Icon family: house / tag / #}
+        {# chat bubble — everyday objects, one stroke weight. r51: the #}
+        {# pill now HUGS its content (inline-flex, home.css) and each #}
+        {# item pops in on its own (ha-pop stagger) instead of the whole #}
+        {# strip rising as one slab — no hv2-rise here any more. #}
+        <ul class="hero__assurances" aria-label="What Gabriel Homes is about">
+          <li>
+            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4.6 10.9 12 4.4l7.4 6.5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/><path d="M6.3 9.5v10.1h11.4V9.5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/><path d="M10.1 19.6v-5h3.8v5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Homes with character
+          </li>
+          <li>
+            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M12 3v2M12 19v2M3 12h2M19 12h2M5.6 5.6 7 7M17 17l1.4 1.4M18.4 5.6 17 7M7 17l-1.4 1.4" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+            Sea-breeze mornings
+          </li>
+          <li>
+            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M3 10.5c2.2 0 2.2-1.6 4.5-1.6s2.3 1.6 4.5 1.6 2.2-1.6 4.5-1.6 2.3 1.6 4.5 1.6" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/><path d="M3 15.5c2.2 0 2.2-1.6 4.5-1.6s2.3 1.6 4.5 1.6 2.2-1.6 4.5-1.6 2.3 1.6 4.5 1.6" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Coastal short stays
+          </li>
+        </ul>
+      </div>
+
+      {% if hero_card_listings %}
+      {# r50: the featured-listing carousel — panes cycle through the    #}
+      {# showcase (hero-card.js, 6s; pause on hover/focus/hidden tab;    #}
+      {# dots give direct control). Pane #1 is active server-side, so    #}
+      {# no-JS shows the first listing; every pane is links only (media, #}
+      {# title and details all go to the detail page) — no forms, no CTA #}
+      {# button classes; the dots are plain controls.                    #}
+      <aside class="hero-card hv2-rise" style="--d:2" aria-label="Featured listings">
+        <div class="hero-card__track" data-hero-card-track>
+          {% for listing in hero_card_listings %}
+          <article class="hero-card__pane{% if forloop.first %} is-active{% endif %}" data-hero-card-pane>
+            <a class="hero-card__media" href="{{ listing.get_absolute_url }}" tabindex="-1">
+              {% if listing.images.all.0.image %}
+                <img src="{{ listing.images.all.0.image.url }}" alt="{{ listing.title }}" width="190" height="180" loading="lazy">
+              {% endif %}
+              <span class="hero-card__badge">{% if listing.is_short_stay %}Short stay{% else %}{{ listing.get_listing_type_display }}{% endif %}</span>
+            </a>
+            <div class="hero-card__body">
+              <p class="hero-card__title"><a href="{{ listing.get_absolute_url }}">{{ listing.title }}</a></p>
+              <p class="hero-card__loc">
+                <svg viewBox="0 0 10 12" width="9" height="11" aria-hidden="true" focusable="false"><path d="M5 11C5 11 9 7.2 9 4.4A4 4 0 0 0 1 4.4C1 7.2 5 11 5 11Z" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/><circle cx="5" cy="4.4" r="1.4" fill="currentColor"/></svg>
+                {{ listing.location.name }}{% if listing.location.parent %}, {{ listing.location.parent.name }}{% endif %}
+              </p>
+              <p class="hero-card__price">{{ listing.price|kes }}</p>
+              <a class="hero-card__link" href="{{ listing.get_absolute_url }}">View details <span aria-hidden="true">&rarr;</span></a>
+            </div>
+          </article>
+          {% endfor %}
+        </div>
+        {% if hero_card_listings|length > 1 %}
+        <ol class="hero-card__dots" data-hero-card-dots aria-label="Featured listings">
+          {% for listing in hero_card_listings %}
+            <li><button type="button" class="hero-card__dot{% if forloop.first %} is-active{% endif %}" data-hero-card-dot="{{ forloop.counter0 }}" aria-label="Show featured listing {{ forloop.counter }}: {{ listing.title }}">listing {{ forloop.counter }}</button></li>
+          {% endfor %}
+        </ol>
+        {% endif %}
+      </aside>
+      {% endif %}
+    </div>
+
+    {# r50: lower band — the search pill spans the container (the       #}
+    {# reference's wide lower pill), chips under it, both left-aligned  #}
+    {# on the same axis as the headline.                                #}
+    <div class="hero__search-zone">
+      <form class="search-bar hero__search hv2-rise" style="--d:3" action="/property-for-sale/" method="get" data-search-bar role="search" id="hero-search-form">
+        <input type="hidden" name="listing_type" value="sale">
+        <div class="search-bar__segment" role="group" aria-label="Buy or Rent">
+          <button type="button" class="search-bar__segment-btn is-active" data-segment="sale">Buy</button>
+          <button type="button" class="search-bar__segment-btn" data-segment="rent">Rent</button>
+        </div>
+        <label class="search-bar__group">
+          <span class="search-bar__label">Location</span>
+          <input class="search-bar__input" type="text" name="q" id="hero-search-q" aria-label="Search by location or title"
+                 placeholder="Town, county or area" autocomplete="off">
+          <input type="hidden" name="location_slug" id="hero-search-location" value="">
+        </label>
+        <label class="search-bar__group">
+          <span class="search-bar__label">Type</span>
+          <select class="search-bar__select" name="type" id="hero-search-type" aria-label="Property type">
+            <option value="">All types</option>
+            {% for entry in types_with_counts %}
+              <option value="{{ entry.type.slug_plural }}">{{ entry.type.name }}</option>
+            {% endfor %}
+          </select>
+        </label>
+        <button class="search-bar__submit" type="submit" data-magnetic>
+          Search
+          <span aria-hidden="true">&rarr;</span>
+        </button>
+      </form>
+
+      {# r49/r51: popular-area chips — live top-4 Mombasa areas by listing #}
+      {# count (view-built); thumbs are decorative stock, hence alt="". #}
+      {# r51: each chip rises in on its own (ha-chip stagger in #}
+      {# home.css) after the pill settles — the block-level hv2-rise #}
+      {# is retired. #}
+      {% if popular_areas %}
+      <nav class="hero__locations" aria-label="Popular Mombasa areas">
+        <span class="hero__locations-label">Popular:</span>
+        {% for area in popular_areas %}
+          <a class="hero__loc" href="{{ area.url }}">
+            <img src="{{ area.thumb }}" alt="" width="44" height="44" loading="lazy">
+            <span class="hero__loc-name">{{ area.name }}</span>
+            <span class="hero__loc-count">{{ area.count }}</span>
+          </a>
+        {% endfor %}
+      </nav>
+      {% endif %}
+    </div>
+  </div>
+
+  <a class="hv2-scroll" href="#checks" aria-label="Scroll to explore the homes"><span></span></a>
+</section>
+
+{# ============================================================ #}
+{# 2. MARQUEE — the coast, on repeat (r56: the five-checks     #}
+{#    ticker lives on /checks/ and in the footer FAQ; the home     #}
+{#    ribbon sells the feeling of the place).                    #}
+{# ============================================================ #}
+<div class="hv2-marquee" id="checks" data-archetype="edge-strip" aria-label="Coastal living, on repeat">
+  <div class="hv2-marquee__track">
+    {% for i in "x"|ljust:"2" %}
+    <span>Sea views</span><i aria-hidden="true">✦</i>
+    <span>Old Town courtyards</span><i aria-hidden="true">✦</i>
+    <span>Garden mornings</span><i aria-hidden="true">✦</i>
+    <span>Sunset terraces</span><i aria-hidden="true">✦</i>
+    <span>Salt air</span><i aria-hidden="true">✦</i>
+    <span>Nyali</span><i aria-hidden="true">✦</i>
+    <span>Bamburi</span><i aria-hidden="true">✦</i>
+    <span>Shanzu</span><i aria-hidden="true">✦</i>
+    {% endfor %}
+  </div>
+</div>
+
+{# ============================================================ #}
+{# 3. SHOWCASE — real published listings, or the five checks     #}
+{#    while there are none. Same bento component + shape shift. #}
+{# ============================================================ #}
+<section class="section showcase" id="bento" data-archetype="full-bleed">
+  {% comment %}
+    r44: the brand split around the bento — "gabriel" runs down the left
+    gutter from the top, "homes" down the right gutter to the bottom.
+    Book-spine vertical setting (fits the gutters at display size);
+    js/bento-flank.js lags them behind the scroll ("stagnant parallax").
+    Decorative only: aria-hidden + pointer-events none, hidden under
+    1440px where the gutters vanish. The bento itself keeps its exact
+    size. (Multi-line note: {# #} renders literally — use this block.)
+  {% endcomment %}
+  <div class="bento-flank bento-flank--gabriel" aria-hidden="true"><span class="bento-flank__word">gabriel</span></div>
+  <span class="visually-hidden">{% if showcase_listings %}HOMES · A small, chosen collection of coastal homes.{% else %}HOW WE CHECK · Five checks before anything goes live. We check who has the right to let or sell.{% endif %}</span>
+  <div class="container">
+    <div class="featured__header">
+      <div>
+        <p class="section-tag">[ {% if showcase_listings %}HOMES{% else %}HOW WE CHECK{% endif %} ]</p>
+        {# r47: bubbly title reveal — replays whenever the title re-enters #}
+        {# view (scroll down or back up). Container reveals removed so #}
+        {# the letter pop is never masked by a parent fade. #}
+        <h2 class="featured__title" data-bubble-title>
+          {% if showcase_listings %}Featured homes, ready to view.{% else %}Five checks before anything goes live.{% endif %}
+        </h2>
+      </div>
+      {% if showcase_listings %}
+      <a class="btn btn--outline" href="/properties/">
+        View all
+        <span class="btn__arrow" aria-hidden="true">&rarr;</span>
+      </a>
+      {% endif %}
+    </div>
+
+    <div class="bento-grid bento-grid--shift">
+      {% if showcase_listings %}
+        {% for property in showcase_listings %}
+          {% comment %}
+            r44: the card unpacks — flag chip, and a drawer that opens
+            inside the card when it expands (spotlight promotion, hover
+            fallback when the shift grid is not live, keyboard focus).
+          {% endcomment %}
+          <a class="bento-card bento-card--home{% if forloop.first %} bento-card--spotlight{% endif %}"
+             href="{{ property.get_absolute_url }}" data-reveal>
+            <div class="bento-card__bg" aria-hidden="true"
+                 {% if property.images.all.0.image %}style="background-image: url('{{ property.images.all.0.image.url }}');"{% endif %}></div>
+            <div class="bento-card__scrim" aria-hidden="true"></div>
+            <span class="bento-card__flag" aria-hidden="true">{{ property.get_listing_type_display }}</span>
+            <div class="bento-card__body">
+              <p class="bento-card__index">[ {{ forloop.counter|stringformat:"03d" }} ]{% if property.is_demo %} &middot; DEMO{% elif property.is_featured %} &middot; FEATURED{% endif %}</p>
+              <h3 class="bento-card__name">{{ property.title }}</h3>
+              <p class="bento-card__meta">
+                <span class="bento-card__price">{{ property.price|kes }}</span>
+                {% if property.price_period == "monthly" %}<span class="bento-card__period"> / month</span>{% endif %}
+                <span class="bento-card__loc">{{ property.location.name }}{% if property.location.parent %}, {{ property.location.parent.name }}{% endif %}</span>
+                {% if property.bedrooms %}<span class="bento-card__fact">{{ property.bedrooms }} bed</span>{% endif %}
+                {% if property.bathrooms %}<span class="bento-card__fact">{{ property.bathrooms }} bath</span>{% endif %}
+              </p>
+              {% if property.amenities.all or property.size_sqm or property.parking_spaces or property.furnishing != "unfurnished" %}
+              <div class="bento-card__drawer">
+                <div class="bento-card__drawer-inner">
+                  <p class="bento-card__drawer-label">Inside this home</p>
+                  <ul class="bento-card__drawer-items">
+                    {% if property.is_verified %}<li class="bento-card__drawer-item--checked"><span aria-hidden="true">&#10003;</span> Seen in person</li>{% endif %}
+                    {% for amenity in property.amenities.all|slice:":6" %}
+                      <li>{{ amenity.name }}</li>
+                    {% endfor %}
+                    {% if property.size_sqm %}<li>{{ property.size_sqm }} m&sup2;</li>{% endif %}
+                    {% if property.parking_spaces %}<li>{{ property.parking_spaces }} parking</li>{% endif %}
+                    {% if property.furnishing != "unfurnished" %}<li>{{ property.get_furnishing_display }}</li>{% endif %}
+                  </ul>
+                  <p class="bento-card__drawer-cta">View this home <span aria-hidden="true">&rarr;</span></p>
+                </div>
+              </div>
+              <span class="bento-card__more" aria-hidden="true"></span>
+              {% endif %}
+            </div>
+          </a>
+        {% endfor %}
+      {% else %}
+        <a class="bento-card bento-card--home bento-card--spotlight" href="#checks" data-reveal>
+          <div class="bento-card__bg" aria-hidden="true" style="background-image: url('{% staticv 'img/real/real-02-living.jpg' %}');"></div>
+          <div class="bento-card__scrim" aria-hidden="true"></div>
+          <div class="bento-card__body">
+            <p class="bento-card__index">[ 01 ] · OWNERSHIP</p>
+            <h3 class="bento-card__name">We check who has the right to let or sell.</h3>
+            <p class="bento-card__meta"><span class="bento-card__loc">For lettings, ownership is checked against the rental contract.</span></p>
+          </div>
+        </a>
+        <a class="bento-card bento-card--home" href="#checks" data-reveal>
+          <div class="bento-card__bg" aria-hidden="true" style="background-image: url('{% staticv 'img/real/real-05-dining.jpg' %}');"></div>
+          <div class="bento-card__scrim" aria-hidden="true"></div>
+          <div class="bento-card__body">
+            <p class="bento-card__index">[ 02 ] · MANDATE</p>
+            <h3 class="bento-card__name">Written authority first.</h3>
+            <p class="bento-card__meta"><span class="bento-card__loc">A written mandate from the owner or agent to sell or let.</span></p>
+          </div>
+        </a>
+        <a class="bento-card bento-card--home" href="#checks" data-reveal>
+          <div class="bento-card__bg" aria-hidden="true" style="background-image: url('{% staticv 'img/real/real-06-living-terrace.jpg' %}');"></div>
+          <div class="bento-card__scrim" aria-hidden="true"></div>
+          <div class="bento-card__body">
+            <p class="bento-card__index">[ 03 ] · SITE VISIT</p>
+            <h3 class="bento-card__name">Seen in person, where possible.</h3>
+            <p class="bento-card__meta"><span class="bento-card__loc">Gabriel or a team member visits and takes on-site photographs.</span></p>
+          </div>
+        </a>
+        <a class="bento-card bento-card--home" href="#checks" data-reveal>
+          <div class="bento-card__bg" aria-hidden="true" style="background-image: url('{% staticv 'img/real/real-08-aerial.jpg' %}');"></div>
+          <div class="bento-card__scrim" aria-hidden="true"></div>
+          <div class="bento-card__body">
+            <p class="bento-card__index">[ 04 ] · PRICE &amp; DETAILS</p>
+            <h3 class="bento-card__name">Confirmed in writing.</h3>
+            <p class="bento-card__meta"><span class="bento-card__loc">Price, size, bedrooms and bathrooms, agreed with the owner or agent.</span></p>
+          </div>
+        </a>
+        <a class="bento-card bento-card--home" href="#checks" data-reveal>
+          <div class="bento-card__bg" aria-hidden="true" style="background-image: url('{% staticv 'img/real/real-07-balcony.jpg' %}');"></div>
+          <div class="bento-card__scrim" aria-hidden="true"></div>
+          <div class="bento-card__body">
+            <p class="bento-card__index">[ 05 ] · ENCUMBRANCES</p>
+            <h3 class="bento-card__name">Nothing hidden underneath.</h3>
+            <p class="bento-card__meta"><span class="bento-card__loc">Caveats, outstanding rates or service charge, and any disputes.</span></p>
+          </div>
+        </a>
+      {% endif %}
+
+      <a class="bento-card bento-card--cta" href="{% if showcase_listings %}/properties/{% else %}/contact/{% endif %}" data-reveal>
+        <div class="bento-card__scrim" aria-hidden="true"></div>
+        <div class="bento-card__body">
+          <p class="bento-card__index">[ {% if showcase_listings %}BROWSE ALL{% else %}ASK US{% endif %} ]</p>
+          <h3 class="bento-card__name">{% if showcase_listings %}Every home, chosen for character.{% else %}Ask about any property.{% endif %}</h3>
+          <p class="bento-card__meta">
+            {% if showcase_listings %}From first flat to family villa — browse them all&nbsp;&rarr;{% else %}Tell us what you are looking for. A person replies.&nbsp;&rarr;{% endif %}
+          </p>
+        </div>
+      </a>
+    </div>
+  </div>
+  <div class="bento-flank bento-flank--homes" aria-hidden="true"><span class="bento-flank__word">homes</span></div>
+</section>
+
+{% comment %} Curated Mombasa presentation listings. Owner-replaceable demo data. r13: each market gets its own editorial layout — sale = feature + rail, rent = wide banners, short stays = staggered portraits — instead of twin side-by-side cards. {% endcomment %}
+{% if sale_listings or rent_listings or short_stay_listings %}
+<section class="section home-market" id="recommended" data-archetype="type-led">
+  <div class="container">
+    <div class="home-market__head">
+      <div class="home-market__head-main">
+        <p class="section-tag section-tag--rule" data-reveal>[ RECOMMENDED IN MOMBASA ]</p>
+        <h2 class="home-market__title" data-bubble-title>Homes for the way you want to move.</h2>
+      </div>
+      <div class="home-market__aside" data-reveal>
+        {# r55: taste-led rewrite (owner: less checked-listings language) — #}
+        {# the walked-through promise stays, the check-jargon goes.        #}
+        <p>A small, slowly chosen set of homes for sale, long-term rent and short stays across Mombasa — picked for how they feel to live in: the light, the street, the walk to the water.</p>
+        <a class="home-market__aside-cta" href="/properties/">Browse every home <span aria-hidden="true">→</span></a>
+      </div>
+    </div>
+
+    {% if sale_listings %}
+    <div class="home-market__group home-market__group--sale">
+      <div class="home-market__heading">
+        <div><span>01</span><h3 data-bubble-title>Homes for sale</h3></div>
+        <a class="home-market__more" href="/properties/?market=sale">See all for sale →</a>
+      </div>
+      {% comment %} r18: feature card left, the compact cards + closing tile in a real rail wrapper right — before this the cards auto-placed into a 2x2 grid and left the right column mostly empty. {% endcomment %}
+      <div class="market-sale">
+        {% for property in sale_listings %}
+          {% if forloop.first %}{% include "includes/_home_card_feature.html" %}{% endif %}
+        {% endfor %}
+        <div class="market-rail">
+          {% for property in sale_listings %}
+            {% if not forloop.first %}{% include "includes/_home_card_rail.html" %}{% endif %}
+          {% endfor %}
+          <a class="market-rail__more" href="/properties/?market=sale" data-reveal>
+            <small>Full sale list</small>
+            Every home for sale
+            <span aria-hidden="true">→</span>
+          </a>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+
+    {% if rent_listings %}
+    <div class="home-market__group home-market__group--rent">
+      <div class="home-market__heading">
+        <div><span>02</span><h3 data-bubble-title>Long-term rentals</h3></div>
+        <a class="home-market__more" href="/properties/?market=rent">See all rentals →</a>
+      </div>
+      <div class="market-rent">
+        {% for property in rent_listings %}{% include "includes/_home_card_banner.html" %}{% endfor %}
+      </div>
+    </div>
+    {% endif %}
+
+    {% if short_stay_listings %}
+    <div class="home-market__group home-market__group--stay">
+      <div class="home-market__heading">
+        <div><span>03</span><h3 data-bubble-title>Short stays &amp; BnB</h3></div>
+        <a class="home-market__more" href="/properties/?market=bnb">See all short stays →</a>
+      </div>
+      <div class="market-stagger">
+        {% for property in short_stay_listings %}{% include "includes/_home_card_stay.html" %}{% endfor %}
+        <a class="market-stay market-stay--more" href="/properties/?market=bnb" data-reveal>
+          <div class="market-stay__more-inner">
+            <p class="market-stay__eyebrow">Nightly rates · coast-wide</p>
+            <h3>More short stays around Mombasa.</h3>
+            <span class="market-stay__more-link">Browse all stays <span aria-hidden="true">→</span></span>
+          </div>
+        </a>
+      </div>
+    </div>
+    {% endif %}
+
+    {% if brand.whatsapp or brand.phone or brand.email %}
+    <div class="home-market__talk">
+      <p class="section-tag section-tag--rule">[ TALK TO US ]</p>
+      <h2 class="home-social__title" data-bubble-title>One message, three ways to send it.</h2>
+      <p class="home-social__sub">Ask about any home above — a person replies, whatever the channel.</p>
+      <div class="home-social__links">
+        {% if brand.whatsapp %}
+        <a class="home-social__link" href="https://wa.me/{{ brand.whatsapp_digits }}" rel="noopener">
+          <strong>WhatsApp</strong><span>Message us any time</span>
+        </a>
+        {% endif %}
+        {% if brand.phone %}
+        <a class="home-social__link" href="tel:{{ brand.phone }}">
+          <strong>Call</strong><span>{{ brand.phone }}</span>
+        </a>
+        {% endif %}
+        {% if brand.email %}
+        <a class="home-social__link" href="mailto:{{ brand.email }}">
+          <strong>Email</strong><span>{{ brand.email }}</span>
+        </a>
+        {% endif %}
+      </div>
+    </div>
+    {% endif %}
+  </div>
+</section>
+{% endif %}
+
+{# 3b. NEARBY — homes around amenities (mall, beach, schools). The   #}
+{# owner asked for this as the closing listings section of the page. #}
+{% if amenity_listings %}
+<section class="section home-nearby" id="nearby" data-archetype="type-led">
+  <div class="container">
+    <div class="home-market__heading">
+      <div><span>04</span><h2 data-bubble-title>Homes close to what matters.</h2><p>Malls, beaches, schools, parks and daily connections around Mombasa.</p></div>
+      <a href="/properties/">Explore the map →</a>
+    </div>
+    <div class="home-nearby__grid">
+      {% for property in amenity_listings %}
+      <a class="nearby-card" href="{{ property.get_absolute_url }}" data-reveal data-cursor-view>
+        {% if property.images.all.0.image %}<img src="{{ property.images.all.0.image.url }}" alt="{{ property.title }}" loading="lazy" width="600" height="460">{% endif %}
+        <span>{% if property.is_demo %}Demo · {% endif %}{{ property.address_text }}</span>
+        <h3>{{ property.title }}</h3>
+        <p>{{ property.price|kes }}{% if property.price_period == "monthly" %} / month{% elif property.price_period == "nightly" %} / night{% endif %}</p>
+      </a>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
+
+{% endblock %}
+
+{% block scripts %}
+  {{ block.super }}
+  <script src="{% staticv 'js/bento-shift.js' %}" defer></script>
+  <script src="{% staticv 'js/bento-flank.js' %}" defer></script>
+  <script src="{% staticv 'js/hero-card.js' %}" defer></script>
+{% endblock %}

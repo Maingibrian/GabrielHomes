@@ -1,0 +1,26 @@
+{% load core_tags %}
+{# r13: wide banner card — long-term rentals group (image beside text). #}
+<article class="market-banner" data-reveal>
+  <a class="market-banner__media" href="{{ property.get_absolute_url }}">
+    {% if property.images.all.0.image %}
+      <img src="{{ property.images.all.0.image.url }}" alt="{{ property.title }}" loading="lazy" width="1000" height="750" style="view-transition-name: prop-{{ property.pk }};">
+    {% endif %}
+    <span class="loc-chip loc-chip--on-media"><svg class="loc-chip__pin" viewBox="0 0 10 12" width="9" height="11" aria-hidden="true" focusable="false"><path d="M5 11C5 11 9 7.2 9 4.4A4 4 0 0 0 1 4.4C1 7.2 5 11 5 11Z" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/><circle cx="5" cy="4.4" r="1.4" fill="currentColor"/></svg>{{ property.location.name }}{% if property.is_demo %}<span class="loc-chip__flag">demo</span>{% endif %}</span>
+  </a>
+  <div class="market-banner__body">
+    <p class="market-banner__eyebrow">{{ property.get_listing_type_display }} · {{ property.location.full_path }}</p>
+    <h3 class="market-banner__title"><a href="{{ property.get_absolute_url }}">{{ property.title }}</a></h3>
+    <p class="market-banner__copy">{{ property.description|truncatewords:44 }}</p>
+    <p class="market-card__facts">
+      {% if property.bedrooms %}{{ property.bedrooms }} beds{% endif %}
+      {% if property.bathrooms %}{% if property.bedrooms %} · {% endif %}{{ property.bathrooms }} baths{% endif %}
+      {% if property.size_sqm %}{% if property.bedrooms or property.bathrooms %} · {% endif %}{{ property.size_sqm }}m²{% endif %}
+    </p>
+    <div class="market-banner__foot">
+      <span class="market-banner__price">{{ property.price|kes }}{% if property.price_period == "monthly" %} <small>/ month</small>{% endif %}</span>
+      <div class="market-card__actions">
+        <a class="market-card__actions-main" href="{{ property.get_absolute_url }}">View details <span aria-hidden="true">→</span></a>
+      </div>
+    </div>
+  </div>
+</article>

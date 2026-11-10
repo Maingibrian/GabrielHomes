@@ -1,0 +1,474 @@
+     1→     1→{% extends "base.html" %}
+     2→     2→{% load core_tags static %}
+     3→     3→
+     4→     4→{% block title %}Gabriel Homes — Homes for sale, rent and short stays in Mombasa{% endblock %}
+     5→     5→{% block meta_description %}Homes for sale, rent and short stays across Mombasa — sea-view apartments, garden villas and coastal hideaways, chosen for character.{% endblock %}
+     6→     6→
+     7→     7→{% block canonical %}
+     8→     8→  <link rel="canonical" href="{{ request.build_absolute_uri }}">
+     9→     9→{% endblock %}
+    10→    10→
+    11→    11→{% block og_title %}Gabriel Homes — Homes for sale, rent and short stays in Mombasa{% endblock %}
+    12→    12→{% block og_description %}Homes for sale, rent and short stays across Mombasa — chosen for character, from Nyali sea views to Old Town courtyards.{% endblock %}
+    13→    13→{% block twitter_title %}Gabriel Homes — Homes for sale, rent and short stays in Mombasa{% endblock %}
+    14→    14→{% block twitter_description %}Homes for sale, rent and short stays in Mombasa — chosen for character.{% endblock %}
+    15→    15→
+    16→    16→{% block styles %}
+    17→    17→  <link rel="preload" as="image" href="{% staticv 'img/real/hero-slide-1.webp' %}" fetchpriority="high">
+    18→    18→  <link rel="stylesheet" href="{% staticv 'css/home.css' %}">
+    19→    19→{% endblock %}
+    20→    20→
+    21→    21→{% block content %}
+    22→    22→
+    23→    23→{# ============================================================ #}
+    24→    24→{# 1. HERO — slideshow of real photos, confirmed facts only      #}
+    25→    25→{# ============================================================ #}
+    26→    26→<section class="hero" id="hero" data-archetype="full-bleed">
+    27→    27→  <div class="hero__bg" aria-hidden="true">
+    28→    28→    <div class="hero__slide" style="--slide-img: url('{% staticv 'img/real/hero-slide-1.webp' %}')"></div>
+    29→    29→    <div class="hero__slide" style="--slide-img: url('{% staticv 'img/real/hero-slide-2.webp' %}')"></div>
+    30→    30→    <div class="hero__slide" style="--slide-img: url('{% staticv 'img/real/hero-slide-3.webp' %}')"></div>
+    31→    31→    <div class="hero__slide" style="--slide-img: url('{% staticv 'img/real/hero-slide-4.webp' %}')"></div>
+    32→    32→    {% comment %}
+    33→    33→      H2.b (D-LOOP-21a): the loop is a rich-device upgrade. The gate lives in
+    34→    34→      motion.js setupHeroVideo and is test-pinned by test_h2_hero.py: this
+    35→    35→      video loads ONLY when html[data-fx]="rich" AND Save-Data is off;
+    36→    36→      anything else (lite, none, Save-Data, JS blocked) keeps the hidden
+    37→    37→      attribute — it never loads and the slides stay the visual.
+    38→    38→    {% endcomment %}
+    39→    39→    <video class="hero__video" data-hero-video hidden muted loop playsinline
+    40→    40→           preload="none" tabindex="-1" aria-hidden="true"
+    41→    41→           poster="{% staticv 'img/real/hero-poster.jpg' %}"
+    42→    42→           src="{% staticv 'video/hero-loop.mp4' %}"></video>
+    43→    43→  </div>
+    44→    44→  {# r50/r51: hero remodel, second and third pass against the owner's #}
+    45→    45→  {# reference. Upper band: headline stack | featured-listing carousel #}
+    46→    46→  {# top-right. Lower band: the search pill owns the full width (the #}
+    47→    47→  {# reference's ~74%-wide lower pill), popular-area chips under it. #}
+    48→    48→  {# r51: the bottom-left market stat is GONE (owner request) — the #}
+    49→    49→  {# bottom band keeps only the pill, the chips and the scroll cue. #}
+    50→    50→  {# The eyebrow tag is gone — the reference headline opens the page. #}
+    51→    51→  {# The search pill stays the ONE hero gesture (pinned by #}
+    52→    52→  {# test_h2_hero); the carousel adds links and plain dot controls #}
+    53→    53→  {# only — no CTA buttons. #}
+    54→    54→  <div class="container hv2-hero">
+    55→    55→    <div class="hero__grid">
+    56→    56→      <div class="hero__main">
+    57→    57→        <h1 class="hero__title hv2-rise" style="--d:0" data-hero-headline>{{ brand.hero_heading_lead }} <em class="hero__accent">{{ brand.hero_heading_accent }}</em> {{ brand.hero_heading_tail }}</h1>
+    58→    58→        <p class="hero__subtitle hv2-rise" style="--d:1">{{ brand.hero_subtitle }}</p>
+    59→    59→
+    60→    60→        {# r50/r51: assurance strip, reworded and shrunk. No agents on #}
+    61→    61→        {# this site (owner: none of the team are agents), no banned #}
+    62→    62→        {# "verified" (p0 checked language) — the strip states what #}
+    63→    63→        {# actually happens: listings are checked, prices are confirmed #}
+    64→    64→        {# in writing, and a person replies. Icon family: house / tag / #}
+    65→    65→        {# chat bubble — everyday objects, one stroke weight. r51: the #}
+    66→    66→        {# pill now HUGS its content (inline-flex, home.css) and each #}
+    67→    67→        {# item pops in on its own (ha-pop stagger) instead of the whole #}
+    68→    68→        {# strip rising as one slab — no hv2-rise here any more. #}
+    69→    69→        <ul class="hero__assurances" aria-label="What Gabriel Homes is about">
+    70→    70→          <li>
+    71→    71→            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4.6 10.9 12 4.4l7.4 6.5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/><path d="M6.3 9.5v10.1h11.4V9.5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/><path d="M10.1 19.6v-5h3.8v5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    72→    72→            Homes with character
+    73→    73→          </li>
+    74→    74→          <li>
+    75→    75→            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M12 3v2M12 19v2M3 12h2M19 12h2M5.6 5.6 7 7M17 17l1.4 1.4M18.4 5.6 17 7M7 17l-1.4 1.4" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+    76→    76→            Sea-breeze mornings
+    77→    77→          </li>
+    78→    78→          <li>
+    79→    79→            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M3 10.5c2.2 0 2.2-1.6 4.5-1.6s2.3 1.6 4.5 1.6 2.2-1.6 4.5-1.6 2.3 1.6 4.5 1.6" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/><path d="M3 15.5c2.2 0 2.2-1.6 4.5-1.6s2.3 1.6 4.5 1.6 2.2-1.6 4.5-1.6 2.3 1.6 4.5 1.6" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    80→    80→            Coastal short stays
+    81→    81→          </li>
+    82→    82→        </ul>
+    83→    83→      </div>
+    84→    84→
+    85→    85→      {% if hero_card_listings %}
+    86→    86→      {# r50: the featured-listing carousel — panes cycle through the    #}
+    87→    87→      {# showcase (hero-card.js, 6s; pause on hover/focus/hidden tab;    #}
+    88→    88→      {# dots give direct control). Pane #1 is active server-side, so    #}
+    89→    89→      {# no-JS shows the first listing; every pane is links only (media, #}
+    90→    90→      {# title and details all go to the detail page) — no forms, no CTA #}
+    91→    91→      {# button classes; the dots are plain controls.                    #}
+    92→    92→      <aside class="hero-card hv2-rise" style="--d:2" aria-label="Featured listings">
+    93→    93→        <div class="hero-card__track" data-hero-card-track>
+    94→    94→          {% for listing in hero_card_listings %}
+    95→    95→          <article class="hero-card__pane{% if forloop.first %} is-active{% endif %}" data-hero-card-pane>
+    96→    96→            <a class="hero-card__media" href="{{ listing.get_absolute_url }}" tabindex="-1">
+    97→    97→              {% if listing.images.all.0.image %}
+    98→    98→                <img src="{{ listing.images.all.0.image.url }}" alt="{{ listing.title }}" width="190" height="180" loading="lazy">
+    99→    99→              {% endif %}
+   100→   100→              <span class="hero-card__badge">{% if listing.is_short_stay %}Short stay{% else %}{{ listing.get_listing_type_display }}{% endif %}</span>
+   101→   101→            </a>
+   102→   102→            <div class="hero-card__body">
+   103→   103→              <p class="hero-card__title"><a href="{{ listing.get_absolute_url }}">{{ listing.title }}</a></p>
+   104→   104→              <p class="hero-card__loc">
+   105→   105→                <svg viewBox="0 0 10 12" width="9" height="11" aria-hidden="true" focusable="false"><path d="M5 11C5 11 9 7.2 9 4.4A4 4 0 0 0 1 4.4C1 7.2 5 11 5 11Z" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/><circle cx="5" cy="4.4" r="1.4" fill="currentColor"/></svg>
+   106→   106→                {{ listing.location.name }}{% if listing.location.parent %}, {{ listing.location.parent.name }}{% endif %}
+   107→   107→              </p>
+   108→   108→              <p class="hero-card__price">{{ listing.price|kes }}</p>
+   109→   109→              <a class="hero-card__link" href="{{ listing.get_absolute_url }}">View details <span aria-hidden="true">&rarr;</span></a>
+   110→   110→            </div>
+   111→   111→          </article>
+   112→   112→          {% endfor %}
+   113→   113→        </div>
+   114→   114→        {% if hero_card_listings|length > 1 %}
+   115→   115→        <ol class="hero-card__dots" data-hero-card-dots aria-label="Featured listings">
+   116→   116→          {% for listing in hero_card_listings %}
+   117→   117→            <li><button type="button" class="hero-card__dot{% if forloop.first %} is-active{% endif %}" data-hero-card-dot="{{ forloop.counter0 }}" aria-label="Show featured listing {{ forloop.counter }}: {{ listing.title }}">listing {{ forloop.counter }}</button></li>
+   118→   118→          {% endfor %}
+   119→   119→        </ol>
+   120→   120→        {% endif %}
+   121→   121→      </aside>
+   122→   122→      {% endif %}
+   123→   123→    </div>
+   124→   124→
+   125→   125→    {# r50: lower band — the search pill spans the container (the       #}
+   126→   126→    {# reference's wide lower pill), chips under it, both left-aligned  #}
+   127→   127→    {# on the same axis as the headline.                                #}
+   128→   128→    <div class="hero__search-zone">
+   129→   129→      <form class="search-bar hero__search hv2-rise" style="--d:3" action="/property-for-sale/" method="get" data-search-bar role="search" id="hero-search-form">
+   130→   130→        <input type="hidden" name="listing_type" value="sale">
+   131→   131→        <div class="search-bar__segment" role="group" aria-label="Buy or Rent">
+   132→   132→          <button type="button" class="search-bar__segment-btn is-active" data-segment="sale">Buy</button>
+   133→   133→          <button type="button" class="search-bar__segment-btn" data-segment="rent">Rent</button>
+   134→   134→        </div>
+   135→   135→        <label class="search-bar__group">
+   136→   136→          <span class="search-bar__label">Location</span>
+   137→   137→          <input class="search-bar__input" type="text" name="q" id="hero-search-q" aria-label="Search by location or title"
+   138→   138→                 placeholder="Town, county or area" autocomplete="off">
+   139→   139→          <input type="hidden" name="location_slug" id="hero-search-location" value="">
+   140→   140→        </label>
+   141→   141→        <label class="search-bar__group">
+   142→   142→          <span class="search-bar__label">Type</span>
+   143→   143→          <select class="search-bar__select" name="type" id="hero-search-type" aria-label="Property type">
+   144→   144→            <option value="">All types</option>
+   145→   145→            {% for entry in types_with_counts %}
+   146→   146→              <option value="{{ entry.type.slug_plural }}">{{ entry.type.name }}</option>
+   147→   147→            {% endfor %}
+   148→   148→          </select>
+   149→   149→        </label>
+   150→   150→        <button class="search-bar__submit" type="submit" data-magnetic>
+   151→   151→          Search
+   152→   152→          <span aria-hidden="true">&rarr;</span>
+   153→   153→        </button>
+   154→   154→      </form>
+   155→   155→
+   156→   156→      {# r49/r51: popular-area chips — live top-4 Mombasa areas by listing #}
+   157→   157→      {# count (view-built); thumbs are decorative stock, hence alt="". #}
+   158→   158→      {# r51: each chip rises in on its own (ha-chip stagger in #}
+   159→   159→      {# home.css) after the pill settles — the block-level hv2-rise #}
+   160→   160→      {# is retired. #}
+   161→   161→      {% if popular_areas %}
+   162→   162→      <nav class="hero__locations" aria-label="Popular Mombasa areas">
+   163→   163→        <span class="hero__locations-label">Popular:</span>
+   164→   164→        {% for area in popular_areas %}
+   165→   165→          <a class="hero__loc" href="{{ area.url }}">
+   166→   166→            <img src="{{ area.thumb }}" alt="" width="44" height="44" loading="lazy">
+   167→   167→            <span class="hero__loc-name">{{ area.name }}</span>
+   168→   168→            <span class="hero__loc-count">{{ area.count }}</span>
+   169→   169→          </a>
+   170→   170→        {% endfor %}
+   171→   171→      </nav>
+   172→   172→      {% endif %}
+   173→   173→    </div>
+   174→   174→  </div>
+   175→   175→
+   176→   176→  <a class="hv2-scroll" href="#checks" aria-label="Scroll to explore the homes"><span></span></a>
+   177→   177→</section>
+   178→   178→
+   179→   179→{# ============================================================ #}
+   180→   180→{# 2. MARQUEE — the coast, on repeat (r56: the five-checks     #}
+   181→   181→{#    ticker lives on /checks/ and in the footer FAQ; the home     #}
+   182→   182→{#    ribbon sells the feeling of the place).                    #}
+   183→   183→{# ============================================================ #}
+   184→   184→<div class="hv2-marquee" id="checks" data-archetype="edge-strip" aria-label="Coastal living, on repeat">
+   185→   185→  <div class="hv2-marquee__track">
+   186→   186→    {% for i in "x"|ljust:"2" %}
+   187→   187→    <span>Sea views</span><i aria-hidden="true">✦</i>
+   188→   188→    <span>Old Town courtyards</span><i aria-hidden="true">✦</i>
+   189→   189→    <span>Garden mornings</span><i aria-hidden="true">✦</i>
+   190→   190→    <span>Sunset terraces</span><i aria-hidden="true">✦</i>
+   191→   191→    <span>Salt air</span><i aria-hidden="true">✦</i>
+   192→   192→    <span>Nyali</span><i aria-hidden="true">✦</i>
+   193→   193→    <span>Bamburi</span><i aria-hidden="true">✦</i>
+   194→   194→    <span>Shanzu</span><i aria-hidden="true">✦</i>
+   195→   195→    {% endfor %}
+   196→   196→  </div>
+   197→   197→</div>
+   198→   198→
+   199→   199→{# ============================================================ #}
+   200→   200→{# 3. SHOWCASE — real published listings, or the five checks     #}
+   201→   201→{#    while there are none. Same bento component + shape shift. #}
+   202→   202→{# ============================================================ #}
+   203→   203→<section class="section showcase" id="bento" data-archetype="full-bleed">
+   204→   204→  {% comment %}
+   205→   205→    r44: the brand split around the bento — "gabriel" runs down the left
+   206→   206→    gutter from the top, "homes" down the right gutter to the bottom.
+   207→   207→    Book-spine vertical setting (fits the gutters at display size);
+   208→   208→    js/bento-flank.js lags them behind the scroll ("stagnant parallax").
+   209→   209→    Decorative only: aria-hidden + pointer-events none, hidden under
+   210→   210→    1440px where the gutters vanish. The bento itself keeps its exact
+   211→   211→    size. (Multi-line note: {# #} renders literally — use this block.)
+   212→   212→  {% endcomment %}
+   213→   213→  <div class="bento-flank bento-flank--gabriel" aria-hidden="true"><span class="bento-flank__word">gabriel</span></div>
+   214→   214→  <span class="visually-hidden">{% if showcase_listings %}HOMES · A small, chosen collection of coastal homes.{% else %}HOW WE CHECK · Five checks before anything goes live. We check who has the right to let or sell.{% endif %}</span>
+   215→   215→  <div class="container">
+   216→   216→    <div class="featured__header">
+   217→   217→      <div>
+   218→   218→        <p class="section-tag">[ {% if showcase_listings %}HOMES{% else %}HOW WE CHECK{% endif %} ]</p>
+   219→   219→        {# r47: bubbly title reveal — replays whenever the title re-enters #}
+   220→   220→        {# view (scroll down or back up). Container reveals removed so #}
+   221→   221→        {# the letter pop is never masked by a parent fade. #}
+   222→   222→        <h2 class="featured__title" data-bubble-title>
+   223→   223→          {% if showcase_listings %}Featured homes, ready to view.{% else %}Five checks before anything goes live.{% endif %}
+   224→   224→        </h2>
+   225→   225→      </div>
+   226→   226→      {% if showcase_listings %}
+   227→   227→      <a class="btn btn--outline" href="/properties/">
+   228→   228→        View all
+   229→   229→        <span class="btn__arrow" aria-hidden="true">&rarr;</span>
+   230→   230→      </a>
+   231→   231→      {% endif %}
+   232→   232→    </div>
+   233→   233→
+   234→   234→    <div class="bento-grid bento-grid--shift">
+   235→   235→      {% if showcase_listings %}
+   236→   236→        {% for property in showcase_listings %}
+   237→   237→          {% comment %}
+   238→   238→            r44: the card unpacks — flag chip, and a drawer that opens
+   239→   239→            inside the card when it expands (spotlight promotion, hover
+   240→   240→            fallback when the shift grid is not live, keyboard focus).
+   241→   241→          {% endcomment %}
+   242→   242→          <a class="bento-card bento-card--home{% if forloop.first %} bento-card--spotlight{% endif %}"
+   243→   243→             href="{{ property.get_absolute_url }}" data-reveal>
+   244→   244→            <div class="bento-card__bg" aria-hidden="true"
+   245→   245→                 {% if property.images.all.0.image %}style="background-image: url('{{ property.images.all.0.image.url }}');"{% endif %}></div>
+   246→   246→            <div class="bento-card__scrim" aria-hidden="true"></div>
+   247→   247→            <span class="bento-card__flag" aria-hidden="true">{{ property.get_listing_type_display }}</span>
+   248→   248→            <div class="bento-card__body">
+   249→   249→              <p class="bento-card__index">[ {{ forloop.counter|stringformat:"03d" }} ]{% if property.is_demo %} &middot; DEMO{% elif property.is_featured %} &middot; FEATURED{% endif %}</p>
+   250→   250→              <h3 class="bento-card__name">{{ property.title }}</h3>
+   251→   251→              <p class="bento-card__meta">
+   252→   252→                <span class="bento-card__price">{{ property.price|kes }}</span>
+   253→   253→                {% if property.price_period == "monthly" %}<span class="bento-card__period"> / month</span>{% endif %}
+   254→   254→                <span class="bento-card__loc">{{ property.location.name }}{% if property.location.parent %}, {{ property.location.parent.name }}{% endif %}</span>
+   255→   255→                {% if property.bedrooms %}<span class="bento-card__fact">{{ property.bedrooms }} bed</span>{% endif %}
+   256→   256→                {% if property.bathrooms %}<span class="bento-card__fact">{{ property.bathrooms }} bath</span>{% endif %}
+   257→   257→              </p>
+   258→   258→              {% if property.amenities.all or property.size_sqm or property.parking_spaces or property.furnishing != "unfurnished" %}
+   259→   259→              <div class="bento-card__drawer">
+   260→   260→                <div class="bento-card__drawer-inner">
+   261→   261→                  <p class="bento-card__drawer-label">Inside this home</p>
+   262→   262→                  <ul class="bento-card__drawer-items">
+   263→   263→                    {% if property.is_verified %}<li class="bento-card__drawer-item--checked"><span aria-hidden="true">&#10003;</span> Seen in person</li>{% endif %}
+   264→   264→                    {% for amenity in property.amenities.all|slice:":6" %}
+   265→   265→                      <li>{{ amenity.name }}</li>
+   266→   266→                    {% endfor %}
+   267→   267→                    {% if property.size_sqm %}<li>{{ property.size_sqm }} m&sup2;</li>{% endif %}
+   268→   268→                    {% if property.parking_spaces %}<li>{{ property.parking_spaces }} parking</li>{% endif %}
+   269→   269→                    {% if property.furnishing != "unfurnished" %}<li>{{ property.get_furnishing_display }}</li>{% endif %}
+   270→   270→                  </ul>
+   271→   271→                  <p class="bento-card__drawer-cta">View this home <span aria-hidden="true">&rarr;</span></p>
+   272→   272→                </div>
+   273→   273→              </div>
+   274→   274→              <span class="bento-card__more" aria-hidden="true"></span>
+   275→   275→              {% endif %}
+   276→   276→            </div>
+   277→   277→          </a>
+   278→   278→        {% endfor %}
+   279→   279→      {% else %}
+   280→   280→        <a class="bento-card bento-card--home bento-card--spotlight" href="#checks" data-reveal>
+   281→   281→          <div class="bento-card__bg" aria-hidden="true" style="background-image: url('{% staticv 'img/real/real-02-living.jpg' %}');"></div>
+   282→   282→          <div class="bento-card__scrim" aria-hidden="true"></div>
+   283→   283→          <div class="bento-card__body">
+   284→   284→            <p class="bento-card__index">[ 01 ] · OWNERSHIP</p>
+   285→   285→            <h3 class="bento-card__name">We check who has the right to let or sell.</h3>
+   286→   286→            <p class="bento-card__meta"><span class="bento-card__loc">For lettings, ownership is checked against the rental contract.</span></p>
+   287→   287→          </div>
+   288→   288→        </a>
+   289→   289→        <a class="bento-card bento-card--home" href="#checks" data-reveal>
+   290→   290→          <div class="bento-card__bg" aria-hidden="true" style="background-image: url('{% staticv 'img/real/real-05-dining.jpg' %}');"></div>
+   291→   291→          <div class="bento-card__scrim" aria-hidden="true"></div>
+   292→   292→          <div class="bento-card__body">
+   293→   293→            <p class="bento-card__index">[ 02 ] · MANDATE</p>
+   294→   294→            <h3 class="bento-card__name">Written authority first.</h3>
+   295→   295→            <p class="bento-card__meta"><span class="bento-card__loc">A written mandate from the owner or agent to sell or let.</span></p>
+   296→   296→          </div>
+   297→   297→        </a>
+   298→   298→        <a class="bento-card bento-card--home" href="#checks" data-reveal>
+   299→   299→          <div class="bento-card__bg" aria-hidden="true" style="background-image: url('{% staticv 'img/real/real-06-living-terrace.jpg' %}');"></div>
+   300→   300→          <div class="bento-card__scrim" aria-hidden="true"></div>
+   301→   301→          <div class="bento-card__body">
+   302→   302→            <p class="bento-card__index">[ 03 ] · SITE VISIT</p>
+   303→   303→            <h3 class="bento-card__name">Seen in person, where possible.</h3>
+   304→   304→            <p class="bento-card__meta"><span class="bento-card__loc">Gabriel or a team member visits and takes on-site photographs.</span></p>
+   305→   305→          </div>
+   306→   306→        </a>
+   307→   307→        <a class="bento-card bento-card--home" href="#checks" data-reveal>
+   308→   308→          <div class="bento-card__bg" aria-hidden="true" style="background-image: url('{% staticv 'img/real/real-08-aerial.jpg' %}');"></div>
+   309→   309→          <div class="bento-card__scrim" aria-hidden="true"></div>
+   310→   310→          <div class="bento-card__body">
+   311→   311→            <p class="bento-card__index">[ 04 ] · PRICE &amp; DETAILS</p>
+   312→   312→            <h3 class="bento-card__name">Confirmed in writing.</h3>
+   313→   313→            <p class="bento-card__meta"><span class="bento-card__loc">Price, size, bedrooms and bathrooms, agreed with the owner or agent.</span></p>
+   314→   314→          </div>
+   315→   315→        </a>
+   316→   316→        <a class="bento-card bento-card--home" href="#checks" data-reveal>
+   317→   317→          <div class="bento-card__bg" aria-hidden="true" style="background-image: url('{% staticv 'img/real/real-07-balcony.jpg' %}');"></div>
+   318→   318→          <div class="bento-card__scrim" aria-hidden="true"></div>
+   319→   319→          <div class="bento-card__body">
+   320→   320→            <p class="bento-card__index">[ 05 ] · ENCUMBRANCES</p>
+   321→   321→            <h3 class="bento-card__name">Nothing hidden underneath.</h3>
+   322→   322→            <p class="bento-card__meta"><span class="bento-card__loc">Caveats, outstanding rates or service charge, and any disputes.</span></p>
+   323→   323→          </div>
+   324→   324→        </a>
+   325→   325→      {% endif %}
+   326→   326→
+   327→   327→      <a class="bento-card bento-card--cta" href="{% if showcase_listings %}/properties/{% else %}/contact/{% endif %}" data-reveal>
+   328→   328→        <div class="bento-card__scrim" aria-hidden="true"></div>
+   329→   329→        <div class="bento-card__body">
+   330→   330→          <p class="bento-card__index">[ {% if showcase_listings %}BROWSE ALL{% else %}ASK US{% endif %} ]</p>
+   331→   331→          <h3 class="bento-card__name">{% if showcase_listings %}Every home, chosen for character.{% else %}Ask about any property.{% endif %}</h3>
+   332→   332→          <p class="bento-card__meta">
+   333→   333→            {% if showcase_listings %}From first flat to family villa — browse them all&nbsp;&rarr;{% else %}Tell us what you are looking for. A person replies.&nbsp;&rarr;{% endif %}
+   334→   334→          </p>
+   335→   335→        </div>
+   336→   336→      </a>
+   337→   337→    </div>
+   338→   338→  </div>
+   339→   339→  <div class="bento-flank bento-flank--homes" aria-hidden="true"><span class="bento-flank__word">homes</span></div>
+   340→   340→</section>
+   341→   341→
+   342→   342→{% comment %} Curated Mombasa presentation listings. Owner-replaceable demo data. r13: each market gets its own editorial layout — sale = feature + rail, rent = wide banners, short stays = staggered portraits — instead of twin side-by-side cards. {% endcomment %}
+   343→   343→{% if sale_listings or rent_listings or short_stay_listings %}
+   344→   344→<section class="section home-market" id="recommended" data-archetype="type-led">
+   345→   345→  <div class="container">
+   346→   346→    <div class="home-market__head">
+   347→   347→      <div class="home-market__head-main">
+   348→   348→        <p class="section-tag section-tag--rule" data-reveal>[ RECOMMENDED IN MOMBASA ]</p>
+   349→   349→        <h2 class="home-market__title" data-bubble-title>Homes for the way you want to move.</h2>
+   350→   350→      </div>
+   351→   351→      <div class="home-market__aside" data-reveal>
+   352→   352→        {# r55: taste-led rewrite (owner: less checked-listings language) — #}
+   353→   353→        {# the walked-through promise stays, the check-jargon goes.        #}
+   354→   354→        <p>A small, slowly chosen set of homes for sale, long-term rent and short stays across Mombasa — picked for how they feel to live in: the light, the street, the walk to the water.</p>
+   355→   355→        <a class="home-market__aside-cta" href="/properties/">Browse every home <span aria-hidden="true">→</span></a>
+   356→   356→      </div>
+   357→   357→    </div>
+   358→   358→
+   359→   359→    {% if sale_listings %}
+   360→   360→    <div class="home-market__group home-market__group--sale">
+   361→   361→      <div class="home-market__heading">
+   362→   362→        <div><span>01</span><h3 data-bubble-title>Homes for sale</h3></div>
+   363→   363→        <a class="home-market__more" href="/properties/?market=sale">See all for sale →</a>
+   364→   364→      </div>
+   365→   365→      {% comment %} r18: feature card left, the compact cards + closing tile in a real rail wrapper right — before this the cards auto-placed into a 2x2 grid and left the right column mostly empty. {% endcomment %}
+   366→   366→      <div class="market-sale">
+   367→   367→        {% for property in sale_listings %}
+   368→   368→          {% if forloop.first %}{% include "includes/_home_card_feature.html" %}{% endif %}
+   369→   369→        {% endfor %}
+   370→   370→        <div class="market-rail">
+   371→   371→          {% for property in sale_listings %}
+   372→   372→            {% if not forloop.first %}{% include "includes/_home_card_rail.html" %}{% endif %}
+   373→   373→          {% endfor %}
+   374→   374→          <a class="market-rail__more" href="/properties/?market=sale" data-reveal>
+   375→   375→            <small>Full sale list</small>
+   376→   376→            Every home for sale
+   377→   377→            <span aria-hidden="true">→</span>
+   378→   378→          </a>
+   379→   379→        </div>
+   380→   380→      </div>
+   381→   381→    </div>
+   382→   382→    {% endif %}
+   383→   383→
+   384→   384→    {% if rent_listings %}
+   385→   385→    <div class="home-market__group home-market__group--rent">
+   386→   386→      <div class="home-market__heading">
+   387→   387→        <div><span>02</span><h3 data-bubble-title>Long-term rentals</h3></div>
+   388→   388→        <a class="home-market__more" href="/properties/?market=rent">See all rentals →</a>
+   389→   389→      </div>
+   390→   390→      <div class="market-rent">
+   391→   391→        {% for property in rent_listings %}{% include "includes/_home_card_banner.html" %}{% endfor %}
+   392→   392→      </div>
+   393→   393→    </div>
+   394→   394→    {% endif %}
+   395→   395→
+   396→   396→    {% if short_stay_listings %}
+   397→   397→    <div class="home-market__group home-market__group--stay">
+   398→   398→      <div class="home-market__heading">
+   399→   399→        <div><span>03</span><h3 data-bubble-title>Short stays &amp; BnB</h3></div>
+   400→   400→        <a class="home-market__more" href="/properties/?market=bnb">See all short stays →</a>
+   401→   401→      </div>
+   402→   402→      <div class="market-stagger">
+   403→   403→        {% for property in short_stay_listings %}{% include "includes/_home_card_stay.html" %}{% endfor %}
+   404→   404→        <a class="market-stay market-stay--more" href="/properties/?market=bnb" data-reveal>
+   405→   405→          <div class="market-stay__more-inner">
+   406→   406→            <p class="market-stay__eyebrow">Nightly rates · coast-wide</p>
+   407→   407→            <h3>More short stays around Mombasa.</h3>
+   408→   408→            <span class="market-stay__more-link">Browse all stays <span aria-hidden="true">→</span></span>
+   409→   409→          </div>
+   410→   410→        </a>
+   411→   411→      </div>
+   412→   412→    </div>
+   413→   413→    {% endif %}
+   414→   414→
+   415→   415→    {% if brand.whatsapp or brand.phone or brand.email %}
+   416→   416→    <div class="home-market__talk">
+   417→   417→      <p class="section-tag section-tag--rule">[ TALK TO US ]</p>
+   418→   418→      <h2 class="home-social__title" data-bubble-title>One message, three ways to send it.</h2>
+   419→   419→      <p class="home-social__sub">Ask about any home above — a person replies, whatever the channel.</p>
+   420→   420→      <div class="home-social__links">
+   421→   421→        {% if brand.whatsapp %}
+   422→   422→        <a class="home-social__link" href="https://wa.me/{{ brand.whatsapp_digits }}" rel="noopener">
+   423→   423→          <strong>WhatsApp</strong><span>Message us any time</span>
+   424→   424→        </a>
+   425→   425→        {% endif %}
+   426→   426→        {% if brand.phone %}
+   427→   427→        <a class="home-social__link" href="tel:{{ brand.phone }}">
+   428→   428→          <strong>Call</strong><span>{{ brand.phone }}</span>
+   429→   429→        </a>
+   430→   430→        {% endif %}
+   431→   431→        {% if brand.email %}
+   432→   432→        <a class="home-social__link" href="mailto:{{ brand.email }}">
+   433→   433→          <strong>Email</strong><span>{{ brand.email }}</span>
+   434→   434→        </a>
+   435→   435→        {% endif %}
+   436→   436→      </div>
+   437→   437→    </div>
+   438→   438→    {% endif %}
+   439→   439→  </div>
+   440→   440→</section>
+   441→   441→{% endif %}
+   442→   442→
+   443→   443→{# 3b. NEARBY — homes around amenities (mall, beach, schools). The   #}
+   444→   444→{# owner asked for this as the closing listings section of the page. #}
+   445→   445→{% if amenity_listings %}
+   446→   446→<section class="section home-nearby" id="nearby" data-archetype="type-led">
+   447→   447→  <div class="container">
+   448→   448→    <div class="home-market__heading">
+   449→   449→      <div><span>04</span><h2 data-bubble-title>Homes close to what matters.</h2><p>Malls, beaches, schools, parks and daily connections around Mombasa.</p></div>
+   450→   450→      <a href="/properties/">Explore the map →</a>
+   451→   451→    </div>
+   452→   452→    <div class="home-nearby__grid">
+   453→   453→      {% for property in amenity_listings %}
+   454→   454→      <a class="nearby-card" href="{{ property.get_absolute_url }}" data-reveal data-cursor-view>
+   455→   455→        {% if property.images.all.0.image %}<img src="{{ property.images.all.0.image.url }}" alt="{{ property.title }}" loading="lazy" width="600" height="460">{% endif %}
+   456→   456→        <span>{% if property.is_demo %}Demo · {% endif %}{{ property.address_text }}</span>
+   457→   457→        <h3>{{ property.title }}</h3>
+   458→   458→        <p>{{ property.price|kes }}{% if property.price_period == "monthly" %} / month{% elif property.price_period == "nightly" %} / night{% endif %}</p>
+   459→   459→      </a>
+   460→   460→      {% endfor %}
+   461→   461→    </div>
+   462→   462→  </div>
+   463→   463→</section>
+   464→   464→{% endif %}
+   465→   465→
+   466→   466→{% endblock %}
+   467→   467→
+   468→   468→{% block scripts %}
+   469→   469→  {{ block.super }}
+   470→   470→  <script src="{% staticv 'js/bento-shift.js' %}" defer></script>
+   471→   471→  <script src="{% staticv 'js/bento-flank.js' %}" defer></script>
+   472→   472→  <script src="{% staticv 'js/hero-card.js' %}" defer></script>
+   473→   473→{% endblock %}
+   474→   474→

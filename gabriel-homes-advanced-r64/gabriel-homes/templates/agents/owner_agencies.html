@@ -1,0 +1,159 @@
+{% extends "base.html" %}
+{% load core_tags static %}
+
+{% block title %}Agencies — Owner dashboard{% endblock %}
+{% block meta_description %}Agency and agent-account management.{% endblock %}
+{% block body_class %}page-dashboard{% endblock %}
+
+{% block styles %}
+  <link rel="stylesheet" href="{% staticv 'css/dashboard.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<div class="dashboard-layout">
+
+  {# Sidebar (owner) #}
+  <aside class="dashboard-sidebar">
+    <div class="dashboard-sidebar__brand">Gabriel Homes</div>
+    <nav class="dashboard-sidebar__nav" aria-label="Dashboard">
+      <a class="dashboard-sidebar__link" href="{% url 'agents:dashboard_home' %}">Overview</a>
+      <a class="dashboard-sidebar__link" href="{% url 'agents:owner_listings' %}">All listings</a>
+      <a class="dashboard-sidebar__link" href="{% url 'agents:dashboard_inquiries' %}">Inquiries</a>
+      <a class="dashboard-sidebar__link is-active" href="{% url 'agents:owner_agencies' %}">Agencies</a>
+      <a class="dashboard-sidebar__link" href="{% url 'agents:owner_import' %}">Import listings</a>
+      <a class="dashboard-sidebar__link" href="/admin/">Advanced</a>
+      <a class="dashboard-sidebar__link" href="/">View site</a>
+    </nav>
+  </aside>
+
+  <main class="dashboard-main">
+    <div class="dashboard-header">
+      <div>
+        <h1 class="dashboard-header__title">Agencies &amp; accounts</h1>
+        <p class="dashboard-header__subtitle">[ VERIFY &middot; DEACTIVATE &middot; ADD ]</p>
+      </div>
+    </div>
+
+    {% if agencies %}
+    <div class="table-scroll" role="region" aria-label="Agencies and accounts table" tabindex="0">
+    <table class="listing-table">
+      <thead>
+        <tr>
+          <th>Agency</th>
+          <th>Login account</th>
+          <th>Listings</th>
+          <th>Data</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for agency in agencies %}
+        <tr>
+          <td class="listing-table__title">
+            <a href="{% url 'agents:agent_detail' agency.slug %}" target="_blank" rel="noopener">{{ agency.name }}</a><br>
+            <span style="font-size: var(--text-xs); color: var(--taupe);">
+              {% if agency.is_verified %}Checked{% else %}Not checked{% endif %}
+              {% if agency.is_demo %} &middot; demo data{% endif %}
+            </span>
+          </td>
+          <td>
+            {{ agency.user.email }}<br>
+            <span style="font-size: var(--text-xs); color: var(--taupe);">
+              {% if agency.user.is_active %}Active{% else %}Deactivated — cannot sign in{% endif %}
+            </span>
+          </td>
+          <td>{{ agency.n_props }}</td>
+          <td>
+            {% if agency.is_demo %}
+            <span class="status-badge status-badge--demo">Demo</span>
+            {% else %}
+            <span class="status-badge status-badge--real">Real</span>
+            {% endif %}
+          </td>
+          <td>
+            <div class="owner-cell-actions">
+              <form method="post">
+                {% csrf_token %}
+                <input type="hidden" name="agency" value="{{ agency.pk }}">
+                <input type="hidden" name="action" value="toggle_verified">
+                <button class="listing-table__action" type="submit">{% if agency.is_verified %}Mark unchecked{% else %}Mark checked{% endif %}</button>
+              </form>
+              <form method="post">
+                {% csrf_token %}
+                <input type="hidden" name="agency" value="{{ agency.pk }}">
+                <input type="hidden" name="action" value="toggle_active">
+                <button class="listing-table__action" type="submit">{% if agency.user.is_active %}Deactivate{% else %}Reactivate{% endif %}</button>
+              </form>
+              <form method="post">
+                {% csrf_token %}
+                <input type="hidden" name="agency" value="{{ agency.pk }}">
+                <input type="hidden" name="action" value="toggle_demo">
+                <button class="listing-table__action" type="submit">{% if agency.is_demo %}Mark real{% else %}Mark demo{% endif %}</button>
+              </form>
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    </div><!-- /.table-scroll -->
+    <p class="owner-table-note">
+      Deactivating an account blocks sign-in but keeps the agency's listings intact.
+      "Mark demo" hides the agency (and can hide its listings individually) from the public site when the demo switch is on.
+      Deeper edits (logos, bios, locations) live in <a href="/admin/" style="color: var(--burnt);">Advanced</a>.
+    </p>
+    {% else %}
+    <div class="dashboard-empty">
+      <p class="dashboard-empty__title">No agencies yet.</p>
+      <p class="dashboard-empty__body">Add your first agency below.</p>
+    </div>
+    {% endif %}
+
+    {# Add agency #}
+    <div class="dashboard-header" style="margin-top: 2.5rem;">
+      <div>
+        <h2 class="dashboard-header__title" style="font-size: var(--text-xl);">Add an agency</h2>
+        <p class="dashboard-header__subtitle">[ CREATES THE AGENCY + ITS LOGIN ]</p>
+      </div>
+    </div>
+
+    <form class="dashboard-form" method="post">
+      {% csrf_token %}
+      <input type="hidden" name="action" value="add_agency">
+      <div class="dashboard-form__row dashboard-form__row--2">
+        <div class="dashboard-form__field">
+          <label class="dashboard-form__label" for="a-agency">Agency name</label>
+          <input class="dashboard-form__input" type="text" id="a-agency" name="agency_name" required maxlength="160">
+        </div>
+        <div class="dashboard-form__field">
+          <label class="dashboard-form__label" for="a-email">Login email (agent)</label>
+          <input class="dashboard-form__input" type="email" id="a-email" name="email" required>
+        </div>
+      </div>
+      <div class="dashboard-form__row dashboard-form__row--2">
+        <div class="dashboard-form__field">
+          <label class="dashboard-form__label" for="a-name">Agent full name</label>
+          <input class="dashboard-form__input" type="text" id="a-name" name="full_name" maxlength="180">
+        </div>
+        <div class="dashboard-form__field">
+          <label class="dashboard-form__label" for="a-phone">Phone (optional)</label>
+          <input class="dashboard-form__input" type="text" id="a-phone" name="phone" maxlength="32">
+        </div>
+      </div>
+      <div class="dashboard-form__row">
+        <div class="dashboard-form__field">
+          <label class="dashboard-form__label" for="a-password">Initial password (optional)</label>
+          <input class="dashboard-form__input" type="text" id="a-password" name="password" autocomplete="off">
+          <p class="owner-table-note">Leave blank to create the account without a password — set one later via Advanced &rarr; Users, then hand it to the agent.</p>
+        </div>
+      </div>
+      <div class="dashboard-form__actions">
+        <button class="btn btn--primary" type="submit">Create agency</button>
+      </div>
+    </form>
+  </main>
+
+</div>
+
+{% endblock %}

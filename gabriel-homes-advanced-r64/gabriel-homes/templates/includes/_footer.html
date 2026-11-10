@@ -1,0 +1,132 @@
+{% load core_tags static %}
+<footer class="site-footer" id="contact" role="contentinfo">
+  <div class="container site-footer__inner">
+
+    {# Closing CTA — moved from the home page band (H1, r18). #}
+    <div class="site-footer__cta" id="footer-cta" data-reveal>
+      <div>
+        <p class="section-tag section-tag--light">[ GET IN TOUCH ]</p>
+        <h2 class="site-footer__cta-title">{{ brand.cta_heading }}</h2>
+        <p class="site-footer__cta-sub">{{ brand.cta_intro }}</p>
+      </div>
+      <a class="btn btn--primary btn--lg" href="/contact/">
+        Contact Gabriel Homes
+        <span class="btn__arrow" aria-hidden="true">&rarr;</span>
+      </a>
+    </div>
+
+    <div class="site-footer__top">
+      <div>
+        {# r55: "[ FOOTER ]" read as dev scaffolding (vision pass) — the #}
+        {# band now carries a real place line instead.                          #}
+        <p class="section-tag section-tag--light">[ MOMBASA · KENYA ]</p>
+        <p class="site-footer__lead">{{ brand.footer_lead }}</p>
+      </div>
+
+      <nav class="footer-cols" aria-label="Footer">
+        <div class="footer-cols__col">
+          <h4>Explore</h4>
+          <a href="/">Home</a>
+          <a href="/properties/">Listings</a>
+          <a href="/checks/">How we choose homes</a>
+          <a href="/about/">About</a>
+        </div>
+        <div class="footer-cols__col">
+          <h4>Legal</h4>
+          <a href="/privacy/">Privacy</a>
+          <a href="/terms/">Terms</a>
+        </div>
+        <div class="footer-cols__col">
+          <h4>Company</h4>
+          <a href="/about/">About us</a>
+          <a href="/contact/">Contact</a>
+
+        </div>
+        <div class="footer-cols__col">
+          <h4>Talk to us</h4>
+          {# r12: social links the owner asked for — hidden until the brand row carries each channel. #}
+          {% if brand.whatsapp %}<a href="https://wa.me/{{ brand.whatsapp_digits }}" rel="noopener">WhatsApp</a>{% endif %}
+          {% if brand.phone %}<a href="tel:{{ brand.phone }}">Call {{ brand.phone }}</a>{% endif %}
+          {% if brand.email %}<a href="mailto:{{ brand.email }}">{{ brand.email }}</a>{% endif %}
+          <a href="/contact/">Contact page</a>
+        </div>
+        {# Browse — moved from home (H1 r18); curated hubs, query-free (D-LOOP-18b). #}
+        <div class="footer-cols__col footer-cols__col--browse">
+          <h4>Browse</h4>
+          <p class="footer-cols__subhead">By location</p>
+          <a href="/property-for-sale/mombasa/">Mombasa</a>
+          <a href="/property-for-sale/nairobi/">Nairobi</a>
+          <a href="/property-for-sale/kilifi/">Kilifi</a>
+          <a href="/property-for-sale/kwale/">Kwale (Diani)</a>
+          <a href="/property-for-sale/kiambu/">Kiambu</a>
+          <a href="/property-for-sale/kajiado/">Kajiado</a>
+          <p class="footer-cols__subhead">By property type</p>
+          <a href="/houses-for-sale/">Houses</a>
+          <a href="/flats-apartments-for-sale/">Flats &amp; Apartments</a>
+          <a href="/villas-for-sale/">Villas</a>
+          <a href="/land-for-sale/">Land</a>
+        </div>
+
+      </nav>
+    </div>
+
+    {# Newsletter — moved from home (H1 r18); same form, anchor now here. #}
+    <div class="site-footer__row site-footer__newsletter" id="newsletter" data-reveal>
+      <div>
+        <h2 class="featured__title">New listings, by email.</h2>
+        {# r55: microcopy rewritten — the vision pass caught the old line #}
+        {# breaking mid-clause and confusing ("once ten new listings…").  #}
+        <p class="site-footer__newsletter-note">A short note whenever ten new homes have gone up — no schedule, no noise. Opt in and confirm by email; unsubscribe with one click.</p>
+      </div>
+      <form class="newsletter-form" method="post" action="{% url 'newsletter_subscribe' %}">
+        {% csrf_token %}
+        <input type="hidden" name="next" value="/#newsletter">
+        <label class="newsletter-form__label" for="nl-email">Email</label>
+        <input class="newsletter-form__input" id="nl-email" type="email" name="email" required autocomplete="email" placeholder="you@example.com">
+        <label class="newsletter-form__consent">
+          <input type="checkbox" name="consent" value="yes" required>
+          <span>I agree to receive the Gabriel Homes newsletter. I can unsubscribe at any time.</span>
+        </label>
+        <button class="btn btn--primary" type="submit">Sign up</button>
+      </form>
+    </div>
+
+    {# FAQ — moved from home (H1 r18); details/summary needs no JS. #}
+    <div class="site-footer__row footer-faq" data-reveal>
+      <h2 class="footer-faq__title">Things people ask us.</h2>
+      <div class="footer-faq__list">
+        <details>
+          <summary>Where are you based?</summary>
+          <p>Gabriel Homes is centred in Kenya.</p>
+        </details>
+        <details>
+          <summary>Who pays your fee?</summary>
+          <p>Buyers pay Gabriel Homes a fee. We tell you the exact amount before you commit.</p>
+        </details>
+        <details>
+          <summary>How do you choose which homes to list?</summary>
+          <p>We pick homes for how they feel — the light, the air, the street. Then, before anything goes live, we run five checks: ownership, written mandate, site visit where possible, price and details in writing, and encumbrances.</p>
+        </details>
+        <details>
+          <summary>Do you rent as well as sell?</summary>
+          <p>Yes. Rental listings are checked against the rental contract, as well as the other checks.</p>
+        </details>
+      </div>
+    </div>
+
+    {# r64 (owner round twelve): the giant "Homes" wordmark is BACK — #}
+    {# the owner asked for its return one round after r63 removed it.  #}
+    {# Markup restored exactly as r62 shipped it (per-letter spans for #}
+    {# the CSS letter hover). Kenya + copyright ride alongside.        #}
+    <div class="site-footer__wordmark-row">
+      <p class="wordmark wordmark--footer" aria-label="Homes">
+        <span class="wordmark__letter">H</span><span class="wordmark__letter">o</span><span class="wordmark__letter">m</span><span class="wordmark__letter">e</span><span class="wordmark__letter">s</span>
+      </p>
+      <div style="display: flex; justify-content: space-between; align-items: center; gap: 1rem; flex-wrap: wrap;">
+        <span class="site-footer__meta">Kenya</span>
+        <span class="site-footer__copyright">&copy; {% now "Y" %} Gabriel Homes. All rights reserved.</span>
+      </div>
+    </div>
+
+  </div>
+</footer>

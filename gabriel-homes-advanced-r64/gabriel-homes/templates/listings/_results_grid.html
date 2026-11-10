@@ -1,0 +1,111 @@
+{% load core_tags %}
+{% comment %}
+  Results grid + pagination — returned alone for HTMX requests, or
+  embedded in the full search.html for the initial page load.
+  The wrapping <div id="results-grid"> is the HTMX target.
+{% endcomment %}
+<div id="results-grid">
+  {% if page_obj.object_list %}
+    <div class="results-grid">
+      {% for property in page_obj %}
+        <article class="listing-row listing-card-row{% if forloop.counter|divisibleby:2 %} listing-row--reverse{% endif %}" id="listing-row-{{ property.pk }}" data-listing-pk="{{ property.pk }}" data-cursor-view data-slide-row>
+          <a class="listing-row__media" href="{{ property.get_absolute_url }}">
+            {% if property.images.all.0.image %}<img src="{{ property.images.all.0.image.url }}" alt="{{ property.title }}" loading="lazy" width="760" height="520" style="view-transition-name: prop-{{ property.pk }};">{% endif %}
+            <span class="listing-row__index">[ {{ forloop.counter|stringformat:"03d" }} ]</span>
+            {% if property.is_demo %}<span class="listing-row__demo">Demo listing</span>{% endif %}
+          </a>
+          <div class="listing-row__content">
+            <p class="listing-row__type">{% if property.is_short_stay %}Short stay / BnB{% else %}{{ property.get_listing_type_display }}{% endif %}</p>
+            <h2><a href="{{ property.get_absolute_url }}">{{ property.title }}</a></h2>
+            <p class="listing-row__price">{{ property.price|kes }}{% if property.price_period == "monthly" %}<small>/ month</small>{% elif property.price_period == "nightly" %}<small>/ night</small>{% endif %}</p>
+            <p class="listing-row__location">⌖ {{ property.location.full_path }}{% if property.address_text %} · {{ property.address_text }}{% endif %}</p>
+            <p class="listing-row__description">{{ property.description|truncatewords:28 }}</p>
+            <div class="listing-row__facts">
+              {% if property.bedrooms %}<span>{{ property.bedrooms }} beds</span>{% endif %}
+              {% if property.bathrooms %}<span>{{ property.bathrooms }} baths</span>{% endif %}
+              {% if property.size_sqm %}<span>{{ property.size_sqm }}m²</span>{% endif %}
+              <span>{{ property.get_furnishing_display }}</span>
+            </div>
+            {% if property.is_verified %}<div class="listing-card__verified" title="This listing has been checked">Checked</div>{% endif %}
+            <div class="listing-row__actions">
+              {# L3: WhatsApp is the primary action (icon); Call and Email are secondary outlines; "View property" drops to a quiet link (the title and image already link to the detail page). Brand channel first, agent fallback — hidden when unfilled. #}
+              {% if brand.whatsapp %}<a class="listing-row__whatsapp" href="https://wa.me/{{ brand.whatsapp_digits }}?text={{ property.title|urlencode }}" rel="noopener" aria-label="WhatsApp about {{ property.title }}"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 2.5A9.4 9.4 0 0 0 3.9 16.8L2.5 21.5l4.8-1.4A9.4 9.4 0 1 0 12 2.5Zm0 1.8a7.6 7.6 0 1 1-3.9 14.1l-.5-.3-2.5.7.7-2.4-.3-.5A7.6 7.6 0 0 1 12 4.3Zm-3 3.4c-.2 0-.5 0-.7.3-.2.3-.9.9-.9 2.1s.9 2.4 1 2.6c.1.2 1.7 2.7 4.2 3.7 2.1.8 2.5.7 2.9.6.5-.1 1.4-.6 1.6-1.2.2-.6.2-1 .1-1.1-.1-.2-.3-.2-.6-.4l-1.6-.8c-.2-.1-.4-.1-.6.1l-.7.9c-.1.2-.3.2-.5.1a6.2 6.2 0 0 1-3.1-2.7c-.1-.2 0-.4.1-.5l.5-.6c.1-.2.2-.3.3-.5v-.5L11 8c-.1-.3-.3-.3-.5-.3h-.5Z"/></svg>WhatsApp</a>{% elif property.agent.display_whatsapp %}<a class="listing-row__whatsapp" href="https://wa.me/{{ property.agent.display_whatsapp }}?text={{ property.title|urlencode }}" rel="noopener" aria-label="WhatsApp about {{ property.title }}"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 2.5A9.4 9.4 0 0 0 3.9 16.8L2.5 21.5l4.8-1.4A9.4 9.4 0 1 0 12 2.5Zm0 1.8a7.6 7.6 0 1 1-3.9 14.1l-.5-.3-2.5.7.7-2.4-.3-.5A7.6 7.6 0 0 1 12 4.3Zm-3 3.4c-.2 0-.5 0-.7.3-.2.3-.9.9-.9 2.1s.9 2.4 1 2.6c.1.2 1.7 2.7 4.2 3.7 2.1.8 2.5.7 2.9.6.5-.1 1.4-.6 1.6-1.2.2-.6.2-1 .1-1.1-.1-.2-.3-.2-.6-.4l-1.6-.8c-.2-.1-.4-.1-.6.1l-.7.9c-.1.2-.3.2-.5.1a6.2 6.2 0 0 1-3.1-2.7c-.1-.2 0-.4.1-.5l.5-.6c.1-.2.2-.3.3-.5v-.5L11 8c-.1-.3-.3-.3-.5-.3h-.5Z"/></svg>WhatsApp</a>{% endif %}
+              {% if brand.phone %}<a href="tel:{{ brand.phone }}">Call {{ brand.phone }}</a>{% elif property.agent.display_phone %}<a href="tel:{{ property.agent.display_phone }}">Call {{ property.agent.display_phone }}</a>{% endif %}
+              {% if brand.email %}<a href="mailto:{{ brand.email }}?subject={{ property.title|urlencode }}">Email</a>{% elif property.agent.display_email %}<a href="mailto:{{ property.agent.display_email }}?subject={{ property.title|urlencode }}">Email</a>{% endif %}
+              <a class="listing-row__view" href="{{ property.get_absolute_url }}">View property →</a>
+            </div>
+          </div>
+        </article>
+      {% endfor %}
+    </div>
+
+    {# Pagination #}
+    {% if page_obj.has_other_pages %}
+    <nav class="pagination" aria-label="Pagination">
+      {% if page_obj.has_previous %}
+        <a class="pagination__link"
+           href="?page={{ page_obj.previous_page_number }}"
+           {% if is_htmx %}hx-get="?page={{ page_obj.previous_page_number }}&sort={{ current_sort }}" hx-target="#results-grid" hx-push-url="true"{% endif %}>
+          <span aria-hidden="true">‹</span> <span class="visually-hidden">Previous</span>
+        </a>
+      {% else %}
+        <span class="pagination__link pagination__disabled" aria-disabled="true">‹</span>
+      {% endif %}
+
+      {% for num in page_obj.paginator.page_range %}
+        {% if page_obj.number == num %}
+          <span class="pagination__current" aria-current="page">{{ num }}</span>
+        {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+          <a class="pagination__link"
+             href="?page={{ num }}"
+             {% if is_htmx %}hx-get="?page={{ num }}&sort={{ current_sort }}" hx-target="#results-grid" hx-push-url="true"{% endif %}>
+            {{ num }}
+          </a>
+        {% elif num == 1 or num == page_obj.paginator.num_pages %}
+          <a class="pagination__link"
+             href="?page={{ num }}"
+             {% if is_htmx %}hx-get="?page={{ num }}&sort={{ current_sort }}" hx-target="#results-grid" hx-push-url="true"{% endif %}>
+            {{ num }}
+          </a>
+        {% elif num == 2 or num == page_obj.paginator.num_pages|add:'-1' %}
+          <span class="pagination__ellipsis">…</span>
+        {% endif %}
+      {% endfor %}
+
+      {% if page_obj.has_next %}
+        <a class="pagination__link"
+           href="?page={{ page_obj.next_page_number }}"
+           {% if is_htmx %}hx-get="?page={{ page_obj.next_page_number }}&sort={{ current_sort }}" hx-target="#results-grid" hx-push-url="true"{% endif %}>
+          <span class="visually-hidden">Next</span> <span aria-hidden="true">›</span>
+        </a>
+      {% else %}
+        <span class="pagination__link pagination__disabled" aria-disabled="true">›</span>
+      {% endif %}
+    </nav>
+    {% endif %}
+
+  {% else %}
+    {# Empty state #}
+    <div class="empty-state">
+      <p class="empty-state__tag">[ NO RESULTS ]</p>
+      <h2 class="empty-state__title">No properties match your filters.</h2>
+      <p class="empty-state__body">
+        Try widening your price range, removing the bedroom count, or
+        clearing all filters to see everything in this area.
+      </p>
+      <div class="empty-state__suggestions">
+        {% if active_filters %}
+          <a class="empty-state__suggestion" href="{{ canonical_url }}">Clear all filters</a>
+        {% endif %}
+        {% if related_searches %}
+          {% for rs in related_searches|slice:":3" %}
+            <a class="empty-state__suggestion" href="{{ rs.url }}">{{ rs.name }}</a>
+          {% endfor %}
+        {% endif %}
+      </div>
+    </div>
+  {% endif %}
+</div>
+{% if is_htmx %}{# L1: keep the aria-live result count in sync after HTMX swaps #}
+<span class="results-header__count" id="results-count" aria-live="polite" hx-swap-oob="true"><strong>{{ total_count }}</strong> propert{{ total_count|pluralize:"y,ies" }} found</span>
+{% endif %}

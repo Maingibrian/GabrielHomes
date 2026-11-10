@@ -1,0 +1,83 @@
+{% load core_tags static %}<!doctype html>
+<html lang="en-GB">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}{{ SITE_NAME }} — Real estate with a human point of view{% endblock %}</title>
+  <meta name="description" content="{% block meta_description %}{{ DEFAULT_META_DESCRIPTION }}{% endblock %}">
+  <meta name="theme-color" content="#2a211c">
+  <link rel="icon" type="image/svg+xml" href="{% static 'img/favicon.svg' %}">
+
+  {# Canonical URL — every page should set this via the block #}
+  {% block canonical %}{% endblock %}
+
+  {# Open Graph (Facebook, LinkedIn, etc.) #}
+  <meta property="og:type" content="{% block og_type %}website{% endblock %}">
+  <meta property="og:site_name" content="{{ SITE_NAME }}">
+  <meta property="og:title" content="{% block og_title %}{{ SITE_NAME }} — Real estate with a human point of view{% endblock %}">
+  <meta property="og:description" content="{% block og_description %}{{ DEFAULT_META_DESCRIPTION }}{% endblock %}">
+  {# r63: og:url follows the canonical contract — the production origin from #}
+  {# settings (SITE_DOMAIN), never the host that happens to serve the page. #}
+  <meta property="og:url" content="{{ SITE_DOMAIN }}{{ request.path }}">
+  {% block og_image %}
+  <meta property="og:image" content="{% static 'img/real/page-hero.jpg' %}">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  {% endblock %}
+
+  {# Twitter Card #}
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="{% block twitter_title %}{{ SITE_NAME }} — Real estate with a human point of view{% endblock %}">
+  <meta name="twitter:description" content="{% block twitter_description %}{{ DEFAULT_META_DESCRIPTION }}{% endblock %}">
+  {% block twitter_image %}
+  <meta name="twitter:image" content="{% static 'img/real/page-hero.jpg' %}">
+  {% endblock %}
+
+  <link rel="preconnect" href="{% static 'fonts/' %}" crossorigin>
+  {% comment %} r42: tokens + base + components as flat <link>s with mtime
+     cache-busters — replaces base.css's @import chain (which double-shipped
+     components.css and left tokens.css uncache-busted). {% endcomment %}
+  <link rel="stylesheet" href="{% staticv 'css/tokens.css' %}">
+  <link rel="stylesheet" href="{% staticv 'css/base.css' %}">
+  <link rel="stylesheet" href="{% staticv 'css/components.css' %}">
+  {% block styles %}{% endblock %}
+  {% block head_extra %}{% endblock %}
+</head>
+<body class="{% block body_class %}{% endblock %}">
+
+  {# Skip-to-content link for keyboard / screen-reader users (a11y) #}
+  <a href="#main" class="skip-link">Skip to content</a>
+
+  {% block header %}
+    {% include "includes/_header.html" %}
+  {% endblock %}
+
+  <main id="main">
+    {# Django messages — action feedback (dashboard toggles, forms, import) #}
+    {% if messages %}
+    <div class="flash-stack" role="status">
+      {% for message in messages %}
+      <div class="flash flash--{{ message.level_tag }}">
+        <p class="flash__text">{{ message }}</p>
+        <button class="flash__close" type="button" aria-label="Dismiss" data-flash-close>&times;</button>
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+    {% block content %}{% endblock %}
+  </main>
+
+  {% block footer %}
+    {% include "includes/_footer.html" %}
+  {% endblock %}
+
+  {# F2 capability gate — outside the scripts block so child overrides can never drop it #}
+  <script src="{% staticv 'js/fx-gate.js' %}" defer></script>
+  {% block scripts %}
+    <script src="{% staticv 'js/motion.js' %}" defer></script>
+    {# F5 — vendored Lenis (HYG: self-hosted, SRI pinned, no sourceMappingURL; D-LOOP-29a) #}
+    <script src="{% staticv 'vendor/lenis/lenis.min.js' %}" integrity="sha384-v5v9TZe0Qv8TraZzfqnGlZgHEUpkRhdqVkaWUkI6+BIsJOU0WxUuNx4/f6KcSCUK" crossorigin="anonymous" defer></script>
+    <script src="{% staticv 'js/smooth-scroll.js' %}" defer></script>
+  {% endblock %}
+</body>
+</html>

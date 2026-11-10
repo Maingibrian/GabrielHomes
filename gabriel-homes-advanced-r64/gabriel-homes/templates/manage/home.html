@@ -1,0 +1,105 @@
+{% extends "manage/base.html" %}
+{% load static %}
+
+{% block title %}Owner portal — {{ SITE_NAME }}{% endblock %}
+
+{% block manage_content %}
+
+  {# ---------- Greeting + today's numbers (all from the database) ---------- #}
+  <section class="manage-card">
+    <p class="manage-card__tag">[ OWNER PORTAL ]</p>
+    <h1 class="manage-card__title">Welcome back{% if request.user.full_name %}, {{ request.user.full_name }}{% endif %}.</h1>
+    <p class="manage-card__body">Here is where your site stands today.</p>
+
+    <dl class="manage-stats">
+      <div class="manage-stat">
+        <dt>New enquiries</dt>
+        <dd>{{ counts.new_enquiries }}</dd>
+      </div>
+      <div class="manage-stat">
+        <dt>Live listings</dt>
+        <dd>{{ counts.live_listings }}</dd>
+      </div>
+      <div class="manage-stat">
+        <dt>Drafts</dt>
+        <dd>{{ counts.drafts }}</dd>
+      </div>
+    </dl>
+  </section>
+
+  {# ---------- Setup checklist: % done + the exact next step ---------- #}
+  <section class="manage-card manage-check" aria-label="Setup checklist">
+    <h2 class="manage-check__title">Setup checklist</h2>
+
+    <div class="manage-check__progress">
+      <div class="manage-check__bar" role="progressbar"
+           aria-valuenow="{{ checklist.percent }}" aria-valuemin="0" aria-valuemax="100"
+           aria-label="Setup progress">
+        <div class="manage-check__fill" style="width: {{ checklist.percent }}%;"></div>
+      </div>
+      <p class="manage-check__count">{{ checklist.done_count }} of {{ checklist.total }} done · {{ checklist.percent }}%</p>
+    </div>
+
+    {% if checklist.all_done %}
+      <div class="manage-next manage-next--done">
+        <p class="manage-next__label">You're all set.</p>
+        <p class="manage-next__text">
+          New items will appear here as your portal grows — check back after
+          each update.
+        </p>
+      </div>
+    {% else %}
+      <div class="manage-next">
+        <p class="manage-next__label">Start here</p>
+        <p class="manage-next__text">{{ checklist.next.spec.action }}</p>
+        {% if checklist.next.spec.url %}
+          <a class="btn btn--primary manage-next__btn" href="{{ checklist.next.spec.url }}">
+            Open the page
+          </a>
+        {% endif %}
+      </div>
+    {% endif %}
+
+    <ul class="manage-check__items">
+      {% for item in checklist.items %}
+        <li class="manage-check__item {% if item.done %}is-done{% endif %}">
+          <div class="manage-check__state" aria-hidden="true">
+            {% if item.done %}✓{% else %}·{% endif %}
+          </div>
+          <div class="manage-check__detail">
+            <h3 class="manage-check__label">
+              {{ item.spec.label }}
+              <span class="manage-check__pill {% if item.done %}is-done{% endif %}">
+                {% if item.done %}Done{% else %}To do{% endif %}
+              </span>
+            </h3>
+            <p class="manage-check__help">{{ item.spec.help }}</p>
+            {% if item.manual %}
+              <form method="post" action="{% url 'manage:checklist_toggle' item.spec.key %}"
+                    class="manage-check__form">
+                {% csrf_token %}
+                <button type="submit" class="btn {% if item.done %}btn--outline{% else %}btn--primary{% endif %} manage-check__btn">
+                  {% if item.done %}Mark as not done{% else %}Mark as done{% endif %}
+                </button>
+              </form>
+            {% else %}
+              <p class="manage-check__auto">Updates automatically</p>
+            {% endif %}
+          </div>
+        </li>
+      {% endfor %}
+    </ul>
+  </section>
+
+  <section class="manage-card manage-module">
+    <p class="manage-card__tag">[ SITE CONTENT ]</p>
+    <h2 class="manage-check__title">Update the public website.</h2>
+    <p class="manage-card__body">Edit contact details and the main homepage wording without touching the website code.</p>
+    <a class="btn btn--primary" href="{% url 'manage:site_content' %}">Edit site content</a>
+  </section>
+
+  <p class="manage-foot">
+    <a class="manage-foot__link" href="/">View your live site</a>
+  </p>
+
+{% endblock %}
