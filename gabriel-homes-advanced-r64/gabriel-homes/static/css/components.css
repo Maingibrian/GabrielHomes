@@ -922,6 +922,28 @@ html.motion-ready:has(.page-hero) .site-header:not(.site-header--scrolled) {
   border-bottom-color: transparent;
   box-shadow: none;
 }
+/* r76 (owner round fourteen — the mobile poster hero): on phones the
+   HOME hero is no longer a dark full-bleed photo — it re-lays as a
+   mounted poster on the CREAM page (home.css). A transparent bar over
+   cream would strand cream nav text on a cream ground, so below 810px
+   the home page gives up the melt-into-hero overlay: the bar returns
+   to the solid in-flow espresso strip (exactly the no-JS fallback
+   state — fail-open). Content pages (.page-hero) keep the overlay:
+   their heroes stay dark full-bleed at every width. */
+@media (max-width: 809px) {
+  html.motion-ready:has(.hero) .site-header {
+    position: sticky;
+    left: auto;
+    right: auto;
+  }
+  html.motion-ready:has(.hero) .site-header:not(.site-header--scrolled) {
+    background: color-mix(in srgb, var(--espresso) 94%, transparent);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom-color: color-mix(in srgb, var(--sand) 22%, transparent);
+    box-shadow: 0 10px 30px -18px rgba(15, 9, 6, 0.7);
+  }
+}
 /* G1: floating pill nav — JS adds this on scroll-down under fx lite/rich
    only; without JS (or under fx=none) the class never appears and the
    header stays visible (D-MOTION-SAFE). Focus entering the header also

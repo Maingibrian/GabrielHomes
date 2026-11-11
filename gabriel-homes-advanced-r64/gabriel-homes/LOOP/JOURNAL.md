@@ -1,3 +1,93 @@
+Run 76 | BUILDER (owner round, off-loop) | 2026-11-11 ~19:30-22:00 +03:00 | items:
+(1) **OWNER ASK — the mobile audit + poster hero + THE PUSH.**
+"ensure you audit the mobile view … one should not scroll to view
+data on the page", "the mobile view if too complex to layer you can
+form a new one but it should not be so different… the mobile hero
+should be different only — make it look like a poster by a graphics
+design person", "when finished push and stop when done". The PAT
+arrived IN-MESSAGE this time (no gabriel txt existed — r75's third
+search was right): GitHub user Maingibrian, repo GabrielHomes
+(private, default main, remote head 727a1f4b "r65 follow-up").
+(2) **THE RECONCILIATION** — local repo (fresh 18-commit history
+from the r64 rar) vs remote (74-commit round history incl. a
+committed .venv, ~507MB). Trees compared: local is a STRICT SUPERSET
+of remote content (687 files changed, +80,045 insertions, ZERO real
+deletions; remote-only files are .venv + two stray upload pngs).
+Merged with `git merge -s ours --allow-unrelated-histories` — local
+tree kept byte-identical, remote history recorded as a parent, push
+fast-forwarded 727a1f4b..4ba13cd9. `git remote add origin` (clean
+URL, NO token in config); pushes used one-shot tokenized URLs. PAT
+leak check before every push: `git grep github_pat HEAD` = clean.
+(3) **THE MOBILE AUDIT (390x844, agent-browser + DOM metrics +
+VLM)** — public: home, properties, location page, detail, about,
+agents(→about), contact, services, checks, privacy, login, signup;
+owner: all 12 /manage/ screens + /dashboard/. VERDICT: manage portal
+fully clean already (dashboard tables properly inside .table-scroll
+wrappers); public had NO real pannable overflow (Chrome blocks the
+pan) but scrollWidth over-reports everywhere (home +23 market-veil
+pseudo inset -8rem; about +111 same veil pattern; properties +466 =
+armed-row slide translations + the 82vw market carousel's negative
+margins) — and the REAL data-flow failures: /properties/ first
+listing card at 986px (past the 844px fold) behind a 250px map + a
+235px carousel + roomy headers; the hero tried to do everything
+above the fold (VLM 6.5/10: dense, muddy photo, cramped chips, grey
+subhead contrast).
+(4) **THE FIXES (all CSS/template, zero migrations)** — (a) GLOBAL
+GUARD: the page-level `overflow-x: clip` (+hidden fallback) promoted
+from search.css to base.css html — the over-reports are now
+provably inert in every engine; (b) THE MOBILE POSTER HERO ≤809px
+(home.css r76 block + one aria-hidden plate line in home.html):
+same DOM re-layered — .hero__bg becomes the framed print (in-flow,
+16px margins, card radius, hairline border, shadow-card-hover, slides
++ video graded saturate(1.08) contrast(1.05), lighter foot scrim),
+gallery plate rule BELOW the frame (MOMBASA ——— KENYAN COAST,
+taupe caps flanked by sand hairlines), headline as the print's
+caption (espresso Fraunces clamp(2.2rem,10.5vw,2.9rem), burnt italic
+accent 5.1:1 on cream, text-wrap balance), subtitle brown 18px
+text-wrap pretty, chip bar display:none, search pill re-laid as a
+THREE-ROW control plate (segment centered / location full-width /
+type + inset burnt Search pill with margin 9px + shadow-btn; labels
+clip-path-hidden not font-shrunk); smallest phones ≤359px drop chip
+thumbs; (c) HEADER EXCEPTION (components.css): the r41 transparent
+melt-into-hero overlay retires ≤809px on HOME ONLY — the header had
+gone cream-text-on-cream-ground the moment the hero turned cream
+(measured: 93px fixed transparent bar over the 84px poster top);
+it returns to the solid in-flow espresso bar (= the no-JS fallback
+state, fail-open); content pages keep the overlay; (d) RESULTS
+COMPACTION ≤809px (search.css r76 block): market cards → three-up
+photo tiles (grid-auto-flow row, no negative margins, no snap, 118px
+tall, 2-line clamped titles, arrows display:none — they collided
+with titles), map 250→205px, shell/heading/results-header paddings
+tightened, listing-tools margin 12px. RESULT: first listing card
+986px → 719px (INSIDE the fold; [ 001 ] chip at 748px); scrollW
+exactly 390 on properties.
+(5) **THE DESIGN LOOP (VLM, three passes)** — v1 6.5/10 → critiques
+landed: placeholder truncation (loc column too narrow), Enquire
+denting the photo, plate ON the photo read as a scrim bar, two-tone
+submit seam; v2 7.5/10 (plate below print, framed hairline, inset
+submit pill, header solid) → last crowded moment = side-by-side
+toggle; v3 = three-row plate → **SHIP** (both the fold pass and the
+scrolled pass verified: placeholder fully readable, chips tidy 2×2,
+marquee + featured section intact below). Desktop 1440 + tablet 768
+regressed-checked via DOM metrics: hero espresso/cream, bg absolute
+828px, plate display:none, header fixed transparent — untouched.
+Live flows walked at 390px: hamburger open/close ✓, poster search
+"Nyali" → 10 properties found, first card 719px ✓.
+(6) **GATES** — check 0 · makemigrations clean · **1049 passed**
+(1038 → 1049, +11: test_r76_mobile_poster.py pins the guard, the
+plate markup + scoping, the poster relayer, desktop-survival, the
+header exception, the control plate, the compaction, the 810+
+carousel survival, zero-hex in the four touched blocks, no sub-13px
+in the new blocks). F1 hex ratchet clean (rgba + tokens only).
+Deliverables: download/r76-{mobile-poster-hero,mobile-poster-search,
+mobile-properties-fold,desktop-regression,tablet-768}.png. Preview
+owner password reset BACK to the documented owner-preview-123.
+FOR THE NEXT RUN: Phase 4 per BACKEND-PLAN (4A activity log, 4B
+one-click backup, 4C saved-search alerts UI, 4D in-portal help);
+push with a one-shot tokenized URL when a fresh PAT arrives (origin
+is configured, no token stored). OWNER STOPPED AS ASKED — push done,
+run closed.
+
 Run 75 | BUILDER (owner round, off-loop) | 2026-11-11 ~22:30-01:30 +03:00 | items:
 (1) **OWNER ASK — "did you finish" (after context loss).** Status
 recovered first: Runs 73 + 74 were already committed (Owner Hub

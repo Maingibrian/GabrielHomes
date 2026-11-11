@@ -328,6 +328,54 @@
 }
 .listing-tools .filter-toggle { display: inline-flex; }
 
+/* r76 — the mobile compaction (owner round fourteen, the mobile
+   audit: "one should not scroll to view data on the page").
+
+   At phone widths the page above the results used to cost a full
+   screen and a half — the 250px map, the 235px carousel cards, the
+   roomy header — so the FIRST LISTING CARD sat at ~986px, past the
+   844px fold. The map keeps its stage but sheds height, and the
+   three market cards stop being an 82vw photo carousel and become
+   a tight row of three photo tiles: number + two-line title + the
+   arrow, sub-copy dropped. Data-first: the first card now lands
+   inside the first phone screen. */
+@media (max-width: 809px) {
+  .search-map-shell { padding: 4px 0 22px; }
+  .search-map-heading { margin: 0 0 12px; }
+  .search-map-heading h1 { font-size: 1.8rem; }
+  .search-map { height: 205px; min-height: 205px; }
+  .market-filters {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-auto-flow: row;
+    grid-auto-columns: auto;
+    gap: 10px;
+    margin: 14px 0 0;
+    padding: 0;
+    overflow-x: visible;
+    scroll-snap-type: none;
+  }
+  .market-filter {
+    min-height: 0;
+    height: 118px;
+    padding: 12px;
+    border-radius: 16px;
+    scroll-snap-align: auto;
+  }
+  .market-filter__copy { padding-right: 4px; }
+  .market-filter__copy strong {
+    font-size: 1rem; line-height: 1.12; letter-spacing: -.01em;
+    display: -webkit-box; -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2; overflow: hidden;
+  }
+  .market-filter__copy small { display: none; }
+  /* the corner arrow collides with the two-line titles at tile
+     width — the tiles keep photo, number and title; the ↗ goes */
+  .market-filter__arrow { display: none; }
+  .market-filter.is-active::after { top: 10px; right: 10px; padding: 5px 8px; }
+  .results-header { padding-block: .55rem 1.1rem; }
+  .listing-tools { margin-bottom: 12px; }
+}
+
 
 /* ---------- Empty state ---------- */
 .empty-state {
