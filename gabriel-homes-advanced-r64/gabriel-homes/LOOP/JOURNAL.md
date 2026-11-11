@@ -1,3 +1,54 @@
+Run 72 | BUILDER (owner round, off-loop) | 2026-11-11 ~13:40-14:30 +03:00 | items:
+(1) **OWNER ASK — "Now lets deal with the backend ..how complete is
+it and what may be missing also push the data from the last run."**
+Sandbox had recycled again (venv survived; .env/db/server gone) —
+start_preview.sh re-healed everything (migrate, seed 80, runserver,
+gateway 200; /, /properties/, /about/, /contact/, /account/login/,
+/sitemap.xml, /healthz/ all 200; /manage/ 302→login as designed).
+(2) **BACKEND AUDIT, measured against the CODE not the stale
+BACKLOG.** Complete & production-grade: domain models with real
+constraints (one-cover unique index, per-type price-period
+validation, S12 input caps, upload whitelists), published() demo
+chokepoint, SEO URL scheme + filters/sort/pagination/autocomplete +
+MapLibre-OSM map, enquiry pipeline (honeypot + per-IP rate limit +
+S9 email tracking + OWNER_EMAIL routing), double-opt-in newsletter
+(tokens + send_newsletter + purge), allauth email login with
+rate-limited auth endpoints, custom CSP middleware, prod.py hardened
+(HSTS, secure cookies, mandatory email verification, DatabaseCache
+for cross-worker rate limits, stdout logging, manifest staticfiles),
+Postgres+MariaDB+SQLite settings, DEPLOY.md (nginx/gunicorn/certbot/
+backup/restore-drill), dashboard CRUD (24 fields) + image formset +
+CSV import (dry-run + sample) + inquiries list, /manage/ portal v1
+(home counts + checklist + 15-field brand/copy editor), 881 tests.
+GAPS: the whole P3 owner-operations module set is open (enquiry
+status workflow/notes/CSV/spam-folder UI, listing wizard + map pin
+picker + duplicate/bulk tools, brand ASSETS (logo/favicon/socials —
+no image fields on BrandSettings), taxonomy editor, media library,
+SEO editor + analytics fields (ZERO analytics tags in templates —
+grep-proven), testimonials, login/activity log, in-portal backup),
+P2-6 partially covered by BrandSettings (hero/about/services/CTA/
+footer editable; values/philosophy/FAQ/founder hardcoded),
+SavedSearch is model+admin only (no UI, alerts "Later"), no REST API
+(no DRF — fine for server-rendered), newsletter compose UI absent,
+P4-3/P4-4/P4-6 + P5-2/P5-3 open, STATE.md/BACKLOG.md stale at
+run-38 era (flagged), HYG-2 dead include still present.
+Verdict given to owner: visitor-facing backend ~production-ready;
+owner tooling ~40% — that is the remaining work, recommended order
+P3-6 enquiries workflow first.
+(3) **PUSH**: `git remote -v` is EMPTY and the owner PAT is still
+"Later" — a remote push is impossible without them (asked again,
+use-and-delete promise stands). What was done instead: everything
+committed locally (4d91b99) and the run-71 data packaged as
+download/gabriel-homes-run71-data.zip (2.5 MB: both r71 screenshots,
+r70 after-fix screenshot, both trace analysers, full JOURNAL, README).
+(4) GATES — check 0 issues · makemigrations --check clean · **pytest
+881 passed** (118s) · pages/gateway verified live · working tree
+clean after commit 4d91b99.
+FOR THE NEXT RUN: LOOP/STATE.md + BACKLOG.md are 33 runs stale —
+refresh them (mark P2-3..P2-6 as superseded-by-BrandSettings,
+record actual P3 state) before starting any P3 build so the loop
+docs stop lying. Owner cloud PAT still pending.
+
 Run 71 | BUILDER (owner round, off-loop) | 2026-11-11 ~17:30-18:50 +03:00 | items:
 (1) **OWNER ASK — "ensure the movements are smooth...."** Full
 movement audit on /properties/ first: row glides (transform+opacity —
