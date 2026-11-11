@@ -844,3 +844,420 @@ class ListingWizardView(OwnerRequiredMixin, PortalNavMixin, View):
         return TemplateResponse(
             request, "manage/listing_wizard.html", ctx
         )
+
+
+# ---------------------------------------------------------------------------
+# r75 (BACKEND-PLAN Phase 3) — categories, media library, testimonials,
+# newsletter compose. All live under /manage/site-content/… so the five
+# section nav stays five (rule 3); these are the Site content section's
+# tabs, exactly like the enquiries tabs.
+# ---------------------------------------------------------------------------
+from django.core.paginator import Paginator  # noqa: E402
+from django.utils.text import slugify as _slugify  # noqa: E402
+
+from .forms import (  # noqa: E402
+    MediaCaptionForm,
+    NewsletterComposeForm,
+    TaxonomyAddForm,
+    TaxonomyRenameForm,
+    TestimonialForm,
+)
+from apps.core.models import NewsletterIssue, NewsletterSubscriber, Testimonial  # noqa: E402
+from apps.core.newsletter import compose_issue  # noqa: E402
+from apps.listings.models import Amenity, PropertyImage, PropertyType  # noqa: E402
+from apps.locations.models import Location  # noqa: E402
+
+TAXONOMY_KINDS = {"location": Location, "type": PropertyType, "amenity": Amenity}
+
+
+def _taxonomy_model(kind: str):
+    model = TAXONOMY_KINDS.get(kind)
+    if model is None:
+        raise Http404("No such category kind.")
+    return model
+
+
+class CategoriesView(OwnerRequiredMixin, PortalNavMixin, TemplateView):
+    """Locations, property types, amenities — add, rename, show/hide.
+
+    No deletes, ever (BACKEND-PLAN 3A): a category with listings on it
+    must not be deletable, and hiding is reversible — so the only
+    destructive-looking button is "Hide", and it isn't destructive.
+    """
+
+    template_name = "manage/categories.html"
+
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+        ctx["body_class"] = "page-manage"
+
+        locations = []
+        for loc in Location.objects.order_by("level", "name"):
+            loc.listing_count = Property.objects.filter(
+                location__in=loc.get_descendants(include_self=True)
+            ).count()
+            locations.append(loc)
+
+        ctx["locations"] = locations
+        ctx["property_types"] = PropertyType.objects.annotate(
+            listing_count=Count("properties")
+        ).order_by("position", "name")
+        ctx["amenities"] = Amenity.objects.annotate(
+            listing_count=Count("properties")
+        ).order_by("category", "name")
+        ctx["add_form"] = TaxonomyAddForm()
+        return ctx
+
+    def post(self, request):
+        action = request.POST.get("action", "")
+
+        if action == "add":
+            form = TaxonomyAddForm(request.POST)
+            if form.is_valid():
+                self._add(request, form)
+            else:
+                messages.error(request, "That name didn't work — check it and try again.")
+            return redirect("manage:categories")
+
+        if action == "rename":
+            form = TaxonomyRenameForm(request.POST)
+            model = _taxonomy_model(request.POST.get("kind", ""))
+            obj = get_object_or_404(model, pk=request.POST.get("pk"))
+            if form.is_valid():
+                new_name = form.cleaned_data["name"].strip()
+                # Pre-check (no IntegrityError games): renaming to a name
+                # another row already has is refused, everything else saves.
+                if model.objects.exclude(pk=obj.pk).filter(name__iexact=new_name).exists():
+                    messages.error(request, f"“{new_name}” already exists.")
+                else:
+                    obj.name = new_name
+                    obj.save(update_fields=["name"])
+                    messages.success(request, f"Renamed to “{obj.name}”. Web addresses stay as they were.")
+            return redirect("manage:categories")
+
+        if action == "toggle":
+            model = _taxonomy_model(request.POST.get("kind", ""))
+            obj = get_object_or_404(model, pk=request.POST.get("pk"))
+            obj.is_active = not obj.is_active
+            obj.save(update_fields=["is_active"])
+            if obj.is_active:
+                messages.success(request, f"“{obj.name}” is back in the public menus.")
+            else:
+                messages.info(
+                    request,
+                    f"“{obj.name}” is hidden from the menus. Existing pages keep working.",
+                )
+            return redirect("manage:categories")
+
+        raise Http404("Unknown categories action.")
+
+    def _add(self, request, form):
+        """Create one category — duplicates refused BEFORE the save.
+
+        No try/except IntegrityError: a constraint error would poison
+        the surrounding transaction, so the honest check happens first
+        (name or derived web address already in use → refuse).
+        """
+        kind = form.cleaned_data["kind"]
+        name = form.cleaned_data["name"].strip()
+
+        if kind == "location":
+            parent = form.cleaned_data.get("parent")
+            slug = _slugify(name)
+            if Location.objects.filter(parent=parent, name__iexact=name).exists() or (
+                parent and Location.objects.filter(parent=parent, slug=slug).exists()
+            ):
+                messages.error(
+                    request,
+                    f"“{name}” already exists there"
+                    + (f" (under {parent})" if parent else " as a county") + ".",
+                )
+                return
+            Location(name=name, slug=slug, parent=parent).save()
+            messages.success(
+                request,
+                f"Added “{name}” " + (f"under {parent}." if parent else "as a county."),
+            )
+        elif kind == "type":
+            plural = _slugify(name if name.lower().endswith("s") else f"{name}s")
+            single = _slugify(name)
+            clash = (
+                PropertyType.objects.filter(name__iexact=name).exists()
+                or PropertyType.objects.filter(slug_plural=plural).exists()
+                or PropertyType.objects.filter(slug_single=single).exists()
+            )
+            if clash:
+                messages.error(
+                    request,
+                    f"“{name}” (or a type with the same web address) already exists.",
+                )
+                return
+            PropertyType(name=name, slug_plural=plural, slug_single=single).save()
+            messages.success(request, f"Added the “{name}” type.")
+        else:
+            slug = _slugify(name)
+            if Amenity.objects.filter(name__iexact=name).exists() or Amenity.objects.filter(slug=slug).exists():
+                messages.error(request, f"“{name}” already exists.")
+                return
+            Amenity(name=name).save()
+            messages.success(request, f"Added the “{name}” amenity.")
+
+
+class MediaLibraryView(OwnerRequiredMixin, PortalNavMixin, TemplateView):
+    """Every photo on the site, where it's used, and its caption.
+
+    Cleanup is guarded: a live listing's cover or last photo can never
+    be deleted from here — the public site can't be left photo-less.
+    """
+
+    template_name = "manage/media.html"
+    per_page = 24
+
+    MEDIA_FILTERS = {
+        "all": ("All photos", None),
+        "covers": ("Cover photos", lambda qs: qs.filter(is_cover=True)),
+        "live": ("On live listings", lambda qs: qs.filter(property__status=Property.Status.PUBLISHED)),
+        "draft": ("On drafts", lambda qs: qs.filter(property__status=Property.Status.DRAFT)),
+        "archived": (
+            "On archived & sold",
+            lambda qs: qs.filter(
+                property__status__in=(Property.Status.ARCHIVED, Property.Status.SOLD_LET)
+            ),
+        ),
+    }
+
+    def _base_qs(self):
+        return (
+            PropertyImage.objects.select_related("property", "property__location")
+            .order_by("-created_at", "-pk")
+        )
+
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+        ctx["body_class"] = "page-manage"
+
+        key = self.request.GET.get("filter", "all")
+        if key not in self.MEDIA_FILTERS:
+            key = "all"
+        qs = self._base_qs()
+        narrow = self.MEDIA_FILTERS[key][1]
+        if narrow:
+            qs = narrow(qs)
+
+        q = self.request.GET.get("q", "").strip()
+        if q:
+            qs = qs.filter(property__title__icontains=q)
+
+        page = Paginator(qs, self.per_page).get_page(self.request.GET.get("page"))
+        ctx.update(
+            page_obj=page,
+            media=page.object_list,
+            current_filter=key,
+            q=q,
+        )
+        # Filter chips with honest counts (computed pre-search so the
+        # chips stay stable while typing).
+        chips = []
+        for k, (label, narrow_fn) in self.MEDIA_FILTERS.items():
+            base = self._base_qs()
+            chips.append(
+                {"key": k, "label": label, "count": narrow_fn(base).count() if narrow_fn else base.count()}
+            )
+        ctx["tab_items"] = chips
+        return ctx
+
+
+class MediaImageActionView(OwnerRequiredMixin, View):
+    """Caption edit + guarded delete for one library photo (POST only)."""
+
+    def post(self, request, pk: int):
+        image = get_object_or_404(
+            PropertyImage.objects.select_related("property"), pk=pk
+        )
+        action = request.POST.get("action", "")
+
+        if action == "caption":
+            form = MediaCaptionForm(request.POST)
+            if form.is_valid():
+                image.caption = form.cleaned_data["caption"]
+                image.save(update_fields=["caption"])
+                messages.success(request, "Caption saved.")
+            else:
+                messages.error(request, "That caption is too long — keep it under 200 letters.")
+            return redirect("manage:media")
+
+        if action == "delete":
+            prop = image.property
+            if prop.status == Property.Status.PUBLISHED:
+                if image.is_cover:
+                    messages.error(
+                        request,
+                        f"“{image.image.name.split('/')[-1]}” is the cover photo of the live listing "
+                        f"“{prop.title}” — choose a different cover there first.",
+                    )
+                    return redirect("manage:media")
+                if prop.images.count() <= 1:
+                    messages.error(
+                        request,
+                        f"“{prop.title}” is live and needs at least one photo — "
+                        "add a new one before deleting this.",
+                    )
+                    return redirect("manage:media")
+            image.image.delete(save=False)
+            image.delete()
+            messages.success(request, "Photo deleted.")
+            return redirect("manage:media")
+
+        raise Http404("Unknown media action.")
+
+
+class TestimonialsView(OwnerRequiredMixin, PortalNavMixin, TemplateView):
+    """The owner's client quotes — entered here, shown on the home page.
+
+    The consent box is the whole game: no permission, no publication
+    (the screen says so, and the public template enforces it).
+    """
+
+    template_name = "manage/testimonials.html"
+
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+        ctx["body_class"] = "page-manage"
+        rows = list(Testimonial.objects.order_by("position", "-created_at"))
+        ctx["testimonials"] = rows
+        ctx["add_form"] = TestimonialForm()
+        ctx["on_site"] = sum(1 for t in rows if t.publishable and not t.is_demo)
+        return ctx
+
+    def post(self, request):
+        form = TestimonialForm(request.POST)
+        if form.is_valid():
+            row = form.save()
+            if row.consent_given:
+                messages.success(request, f"“{row.name}” is now on the website.")
+            else:
+                messages.info(
+                    request,
+                    f"Saved “{row.name}”. It stays hidden until you have their permission.",
+                )
+        else:
+            messages.error(request, "A name and their words are needed — check the form and try again.")
+        return redirect("manage:testimonials")
+
+
+class TestimonialActionView(OwnerRequiredMixin, View):
+    """Show/hide, edit, delete one testimonial (POST only)."""
+
+    def post(self, request, pk: int):
+        row = get_object_or_404(Testimonial, pk=pk)
+        action = request.POST.get("action", "")
+
+        if action == "toggle":
+            row.shown = not row.shown
+            row.save(update_fields=["shown"])
+            if row.shown:
+                messages.success(request, f"“{row.name}” is on the website again.")
+            else:
+                messages.info(request, f"“{row.name}” is hidden — the words stay saved.")
+            return redirect("manage:testimonials")
+
+        if action == "delete":
+            row.delete()
+            messages.success(request, f"Deleted “{row.name}”.")
+            return redirect("manage:testimonials")
+
+        if action == "edit":
+            form = TestimonialForm(request.POST, instance=row)
+            if form.is_valid():
+                form.save()
+                messages.success(request, f"Updated “{row.name}”.")
+            else:
+                messages.error(request, "That didn't save — a name and their words are needed.")
+            return redirect("manage:testimonials")
+
+        raise Http404("Unknown testimonial action.")
+
+
+class NewsletterComposeView(OwnerRequiredMixin, PortalNavMixin, TemplateView):
+    """Write a newsletter: pick live listings, preview, send.
+
+    Plain rules: only confirmed subscribers receive it, every email
+    carries its own unsubscribe link, and the send is recorded in the
+    past-issues list on the same screen.
+    """
+
+    template_name = "manage/newsletter_compose.html"
+
+    def _numbers(self) -> dict:
+        subs = NewsletterSubscriber.objects.all()
+        confirmed = [s for s in subs if s.is_active]
+        pending = [s for s in subs if s.confirmed_at is None and s.unsubscribed_at is None]
+        gone = [s for s in subs if s.unsubscribed_at is not None]
+        biggest = max(len(confirmed), len(pending), len(gone), 1)
+        return {
+            "confirmed": len(confirmed),
+            "pending": len(pending),
+            "gone": len(gone),
+            # CSS bar widths for the subscriber graph (never zero-width).
+            "confirmed_pct": max(round(len(confirmed) * 100 / biggest), 2 if confirmed else 0),
+            "pending_pct": max(round(len(pending) * 100 / biggest), 2 if pending else 0),
+            "gone_pct": max(round(len(gone) * 100 / biggest), 2 if gone else 0),
+        }
+
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+        ctx["body_class"] = "page-manage"
+        ctx["form"] = NewsletterComposeForm()
+        ctx["numbers"] = self._numbers()
+        ctx["issues"] = NewsletterIssue.objects.all()[:10]
+        return ctx
+
+    def post(self, request):
+        action = request.POST.get("action", "")
+        form = NewsletterComposeForm(request.POST)
+        valid = form.is_valid()
+        picks = form.cleaned_data.get("listings", []) if valid else []
+        too_many = valid and len(picks) > NewsletterComposeForm.MAX_PICKS
+
+        if action == "preview" and valid and picks and not too_many:
+            listings = list(
+                Property.objects.published()
+                .filter(pk__in=[int(p) for p in picks])
+                .order_by("-published_at")
+            )
+            ctx = self.get_context_data()
+            ctx.update(preview_listings=listings, form=form, picks=picks)
+            return TemplateResponse(request, self.template_name, ctx)
+
+        if action == "send" and valid and picks and not too_many:
+            listings = list(
+                Property.objects.published()
+                .filter(pk__in=[int(p) for p in picks])
+                .order_by("-published_at")
+            )
+            summary = compose_issue(listings)
+            if summary["sent"]:
+                messages.success(
+                    request,
+                    f"Newsletter sent to {summary['recipients']} "
+                    f"subscriber{'s' if summary['recipients'] != 1 else ''}.",
+                )
+            elif not summary["recipients"]:
+                messages.error(
+                    request,
+                    "Nobody to send to yet — subscribers must confirm by email first.",
+                )
+            else:
+                messages.error(request, "Nothing was picked — choose at least one listing.")
+            return redirect("manage:newsletter")
+
+        # Anything else lands back on the form with an honest message.
+        if too_many:
+            messages.error(
+                request, f"Up to {NewsletterComposeForm.MAX_PICKS} listings per newsletter."
+            )
+        elif not picks:
+            messages.error(request, "Pick at least one listing first.")
+        else:
+            messages.error(request, "That didn't work — check the picks and try again.")
+        return redirect("manage:newsletter")

@@ -367,12 +367,16 @@ class Command(BaseCommand):
         agency_count = self._seed_agencies()
         listing_count = self._seed_listings(target=target, with_images=not no_images)
         enquiry_count = 0
+        testimonial_count = 0
         if with_enquiries:
             # r73: opt-in — the portal-preview database wants sample
             # enquiries + view counts so the graphs demonstrate
             # themselves; test fixtures stay byte-identical without it.
             self._seed_listing_views()
             enquiry_count = self._seed_enquiries()
+            # r75: sample testimonials (demo-badged) so the Site content
+            # screen and the home-page quote band demonstrate themselves.
+            testimonial_count = self._seed_testimonials()
 
         self.stdout.write(self.style.SUCCESS(
             f"\nDone.\n"
@@ -382,6 +386,7 @@ class Command(BaseCommand):
             f"  Agencies:       {agency_count}\n"
             f"  Listings:       {listing_count}\n"
             f"  Sample enquiries: {enquiry_count}\n"
+            f"  Sample testimonials: {testimonial_count}\n"
             f"  Images:         {'skipped' if no_images else 'generated'}"
         ))
 
@@ -475,6 +480,32 @@ class Command(BaseCommand):
                 created_at=now - timedelta(days=3 - spam_i, hours=2)
             )
         return made + 2
+
+    # ------------------------------------------------------------------
+    # Sample testimonials (r75 BACKEND-PLAN 3C) — clearly fictional,
+    # demo-stamped, consented. The home-page band hides them the moment
+    # "hide demo data" is on, same contract as listings.
+    # ------------------------------------------------------------------
+    def _seed_testimonials(self) -> int:
+        from apps.core.models import Testimonial
+
+        Testimonial.objects.filter(is_demo=True).delete()
+        samples = [
+            ("Amina K. (sample)", "Bought an apartment in Nyali",
+             "Gabriel found us the sea-view flat we had given up on — and talked the price down.", 5),
+            ("David & Ruth M. (sample)", "Rented a townhouse, Bamburi",
+             "Every question answered the same day. Moving in felt like the easiest part.", 5),
+            ("Kevin O. (sample)", "Short-stay host, Shanzu",
+             "They listed our villa on a Monday; the first booking came before the weekend.", 4),
+        ]
+        made = 0
+        for name, role, quote, rating in samples:
+            Testimonial.objects.create(
+                name=name, role=role, quote=quote, rating=rating,
+                consent_given=True, shown=True, is_demo=True, position=made,
+            )
+            made += 1
+        return made
 
     # ------------------------------------------------------------------
     # Clear

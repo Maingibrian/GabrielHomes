@@ -16,6 +16,7 @@ from __future__ import annotations
 import os
 
 from django.core.exceptions import ValidationError
+from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from django.db.utils import OperationalError, ProgrammingError
 
@@ -320,3 +321,49 @@ class NewsletterIssue(models.Model):
 
     def __str__(self):
         return f"Issue {self.pk} · {self.listing_count} listings · {self.sent_at:%Y-%m-%d}"
+
+
+class Testimonial(models.Model):
+    """A client's published words — entered by the owner, never scraped.
+
+    r75 (BACKEND-PLAN 3C). Display contract: a testimonial appears on
+    the public site only when ``shown`` AND ``consent_given`` are both
+    True (and demo rows respect the demo switch, same as listings).
+    No consent means no publication — the consent flag is the honest
+    gate, not a decoration.
+    """
+
+    name = models.CharField(max_length=120, help_text="e.g. Amina K.")
+    role = models.CharField(
+        max_length=120,
+        blank=True,
+        help_text="Optional — e.g. 'Bought an apartment in Nyali'.",
+    )
+    quote = models.TextField(help_text="The client's words, exactly as agreed.")
+    # 1-5 stars, optional: an unprompted thank-you text is enough.
+    rating = models.PositiveSmallIntegerField(
+        null=True, blank=True, validators=[MinValueValidator(1), MaxValueValidator(5)],
+    )
+    shown = models.BooleanField(
+        default=True, help_text="Hidden testimonials stay stored, just not shown.",
+    )
+    consent_given = models.BooleanField(
+        default=False,
+        help_text="Only testimonials with permission are ever published.",
+    )
+    is_demo = models.BooleanField(default=False)
+    position = models.PositiveIntegerField(default=0)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name = "testimonial"
+        verbose_name_plural = "testimonials"
+        ordering = ("position", "-created_at")
+
+    def __str__(self):
+        return f"{self.name} — {self.quote[:40]}"
+
+    @property
+    def publishable(self) -> bool:
+        """The single rule: shown + consent."""
+        return self.shown and self.consent_given

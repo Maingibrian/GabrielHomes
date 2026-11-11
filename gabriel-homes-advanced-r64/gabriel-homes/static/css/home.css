@@ -2007,3 +2007,53 @@ html.motion-ready .hero__w-in {
 @media (prefers-reduced-motion: reduce) {
   .bt-armed .bt-l { opacity: 1; transform: none; animation: none !important; }
 }
+
+/* ==========================================================================
+   5. CLIENT QUOTES (r75 BACKEND-PLAN 3C) — owner testimonials on the home
+   page. Whole band hides when there is nothing consented to show.
+   Tokens only; grid collapses 3 -> 2 -> 1.
+   ========================================================================== */
+.home-quotes { background: var(--paper); }
+.home-quotes__grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+}
+.quote-card {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 22px 22px 20px;
+  background: var(--cream);
+  border: 1px solid var(--sand);
+  border-radius: 16px;
+}
+.quote-card__stars {
+  position: relative;
+  display: inline-block;
+  font-size: var(--text-sm);
+  line-height: 1;
+  letter-spacing: 2px;
+}
+.quote-card__stars-base { color: var(--sand); }
+.quote-card__stars-fill {
+  position: absolute;
+  inset: 0 auto 0 0;
+  overflow: hidden;
+  white-space: nowrap;
+  color: var(--burnt);
+}
+.quote-card__quote {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: var(--text-md);
+  line-height: 1.5;
+  color: var(--ink);
+  flex: 1;
+}
+.quote-card__who { font-size: var(--text-sm); color: var(--taupe); }
+.quote-card__who strong { color: var(--espresso); }
+
+@media (max-width: 900px) { .home-quotes__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 620px) { .home-quotes__grid { grid-template-columns: minmax(0, 1fr); } }

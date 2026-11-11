@@ -48,6 +48,14 @@ class Location(models.Model):
     # Friendly description used in SEO H1s ("Flats for sale in Mombasa")
     description = models.TextField(blank=True)
 
+    # r75 (BACKEND-PLAN 3A): hidden locations drop out of the public menus
+    # (home county block, search dropdowns, suggestions, related searches).
+    # Direct browse URLs keep working so existing pages never break.
+    is_active = models.BooleanField(
+        default=True,
+        help_text="Hidden locations stay out of the public menus.",
+    )
+
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

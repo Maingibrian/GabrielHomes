@@ -46,7 +46,7 @@ def _hero_popular_areas(mombasa_ids: list[int]) -> list[dict]:
     }
     areas = []
     for area in Location.objects.filter(
-        level=Location.Level.AREA, pk__in=mombasa_ids,
+        level=Location.Level.AREA, pk__in=mombasa_ids, is_active=True,
     ).order_by("name"):
         area_ids = [area.pk, *area.get_descendants().values_list("pk", flat=True)]
         count = Property.objects.published().filter(
@@ -118,7 +118,11 @@ def home(request):
     )[:4])
 
     # Browse-by-location: top counties by listing count.
-    counties = list(Location.objects.filter(level=Location.Level.COUNTY).order_by("name"))
+    # (r75: hidden locations stay out of the public menus — the is_active
+    # filter is the menu chokepoint; direct browse URLs keep working.)
+    counties = list(
+        Location.objects.filter(level=Location.Level.COUNTY, is_active=True).order_by("name")
+    )
     for county in counties:
         # Count listings whose leaf location is a descendant of this county.
         county.listing_count = Property.objects.published().filter(
@@ -127,7 +131,7 @@ def home(request):
 
     # Browse-by-type: every type, with its live published-listing count.
     types_with_counts = []
-    for pt in PropertyType.objects.order_by("position", "name"):
+    for pt in PropertyType.objects.filter(is_active=True).order_by("position", "name"):
         types_with_counts.append({
             "type": pt,
             "count": Property.objects.published().filter(property_type=pt).count(),
@@ -160,6 +164,9 @@ def home(request):
         "amenity_listings": amenity_listings,
         "counties": counties,
         "types_with_counts": types_with_counts,
+        # r75 (BACKEND-PLAN 3C): client quotes — shown + consent-given rows
+        # only, demo-switch aware, capped at 6 so the band stays a band.
+        "testimonials": _public_testimonials(),
         # Browse lists show only places and types with real published listings
         "live_counties": [c for c in counties if c.listing_count],
         "live_types": [e for e in types_with_counts if e["count"]],
@@ -170,6 +177,20 @@ def home(request):
         "number_neighbourhoods": active_neighbourhoods,
     }
     return render(request, "core/home.html", context)
+
+
+def _public_testimonials():
+    """The home page's client-quote band (r75 BACKEND-PLAN 3C).
+
+    The display contract in one place: shown AND consent-given, and
+    demo rows respect the demo switch exactly like listings do.
+    """
+    from apps.core.models import SiteSetting, Testimonial
+
+    qs = Testimonial.objects.filter(shown=True, consent_given=True)
+    if SiteSetting.demo_hidden():
+        qs = qs.exclude(is_demo=True)
+    return list(qs.order_by("position", "-created_at")[:6])
 
 
 def _static_ctx(**extra):

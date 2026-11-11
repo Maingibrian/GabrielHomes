@@ -1,0 +1,98 @@
+{% extends "manage/base.html" %}
+
+{% block title %}Testimonials — {{ SITE_NAME }} owner portal{% endblock %}
+
+{% block manage_content %}
+  <div class="manage-page-head">
+    <p class="manage-card__tag">[ TESTIMONIALS ]</p>
+    <h1 class="manage-card__title">What clients say.</h1>
+    <p class="manage-card__body">Quotes you add here show on the home page — but only with permission ticked. No permission, no publication; hidden quotes stay saved.</p>
+  </div>
+
+  {% include "manage/_site_content_tabs.html" %}
+
+  <section class="manage-card manage-form-section">
+    <h2>Add a testimonial</h2>
+    <p>{% if on_site %}{{ on_site }} on the website right now.{% else %}Nothing on the website yet — the first one appears on the home page as soon as it has permission.{% endif %}</p>
+    <form method="post" class="manage-testimonial-form">
+      {% csrf_token %}
+      <div class="manage-field{% if add_form.name.errors %} has-error{% endif %}">
+        <label for="{{ add_form.name.id_for_label }}">Client's name</label>
+        {{ add_form.name }}{{ add_form.name.errors }}
+      </div>
+      <div class="manage-field">
+        <label for="{{ add_form.role.id_for_label }}">What they did (optional)</label>
+        {{ add_form.role }}{{ add_form.role.errors }}
+      </div>
+      <div class="manage-field{% if add_form.quote.errors %} has-error{% endif %}">
+        <label for="{{ add_form.quote.id_for_label }}">Their words</label>
+        {{ add_form.quote }}{{ add_form.quote.errors }}
+      </div>
+      <div class="manage-testimonial-form__row">
+        <div class="manage-field">
+          <label for="{{ add_form.rating.id_for_label }}">Stars (optional)</label>
+          {{ add_form.rating }}{{ add_form.rating.errors }}
+        </div>
+        <div class="manage-field manage-field--check">
+          <label for="{{ add_form.consent_given.id_for_label }}">{{ add_form.consent_given.label }}</label>
+          {{ add_form.consent_given }}
+        </div>
+        <button type="submit" class="btn btn--primary">Save testimonial</button>
+      </div>
+    </form>
+  </section>
+
+  <section class="manage-card manage-form-section">
+    <h2>All testimonials <span class="manage-card__count">{{ testimonials|length }}</span></h2>
+    {% if testimonials %}
+      <ul class="manage-rows manage-rows--stack">
+        {% for t in testimonials %}
+          <li class="manage-row">
+            <span class="manage-row__link manage-row__link--static">
+              <span class="manage-row__who">
+                {{ t.name }}{% if t.role %} — {{ t.role }}{% endif %}
+                {% if t.is_demo %} <span class="manage-pill manage-pill--sample">Sample</span>{% endif %}
+                {% if t.publishable %} <span class="manage-pill manage-pill--live">On the site</span>
+                {% elif not t.consent_given %} <span class="manage-pill manage-pill--hidden">Waiting for permission</span>
+                {% else %} <span class="manage-pill manage-pill--hidden">Hidden</span>{% endif %}
+              </span>
+              <span class="manage-row__meta">
+                {% if t.rating %}{{ t.rating }} star{{ t.rating|pluralize }} · {% endif %}“{{ t.quote|truncatechars:90 }}”
+              </span>
+            </span>
+            <span class="manage-row__side">
+              <details class="manage-inline-edit">
+                <summary class="manage-row__mini">Edit</summary>
+                <form method="post" action="{% url 'manage:testimonial_action' t.pk %}" class="manage-inline-edit__form manage-inline-edit__form--wide">
+                  {% csrf_token %}
+                  <input type="hidden" name="action" value="edit">
+                  <input type="text" name="name" value="{{ t.name }}" maxlength="120" required aria-label="Name">
+                  <input type="text" name="role" value="{{ t.role }}" maxlength="120" aria-label="What they did">
+                  <textarea name="quote" rows="2" required aria-label="Their words">{{ t.quote }}</textarea>
+                  <input type="number" name="rating" min="1" max="5" value="{{ t.rating|default_if_none:'' }}" aria-label="Stars">
+                  <label class="manage-inline-edit__check">
+                    <input type="checkbox" name="consent_given" {% if t.consent_given %}checked{% endif %}>
+                    Permission given
+                  </label>
+                  <button type="submit" class="manage-row__mini manage-row__mini--primary">Save</button>
+                </form>
+              </details>
+              <form method="post" action="{% url 'manage:testimonial_action' t.pk %}">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="toggle">
+                <button type="submit" class="manage-row__mini">{% if t.shown %}Hide{% else %}Show{% endif %}</button>
+              </form>
+              <form method="post" action="{% url 'manage:testimonial_action' t.pk %}">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="delete">
+                <button type="submit" class="manage-row__mini manage-row__mini--danger">Delete</button>
+              </form>
+            </span>
+          </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p class="manage-card__body">None yet — add the first one above.</p>
+    {% endif %}
+  </section>
+{% endblock %}

@@ -12,7 +12,7 @@ Per WORK.md §7-§9:
 from __future__ import annotations
 
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
-from django.db.models import Q
+from django.db.models import Prefetch, Q
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
@@ -20,7 +20,15 @@ from django.urls import reverse
 from apps.locations.models import Location
 
 from .filters import PropertyFilter, SORT_OPTIONS
-from .models import Property, PropertyType
+from .models import Amenity, Property, PropertyType
+
+
+def _active_amenities_prefetch() -> Prefetch:
+    """r75 (BACKEND-PLAN 3A): hidden amenities stay off public pages.
+
+    One helper for every public prefetch so the rule lives in one place.
+    """
+    return Prefetch("amenities", queryset=Amenity.objects.filter(is_active=True))
 
 # 24 per page — per WORK.md §8 (Search results).
 PAGE_SIZE = 24
@@ -120,7 +128,7 @@ def _build_related_searches(listing_type: str, ptype: PropertyType | None, locat
             {"name": "Property for Rent", "url": "/property-for-rent/"},
         ]
         top_counties = Location.objects.filter(
-            level=Location.Level.COUNTY
+            level=Location.Level.COUNTY, is_active=True,
         ).order_by("name")[:6]
         for county in top_counties:
             related.append({
@@ -134,7 +142,9 @@ def _build_related_searches(listing_type: str, ptype: PropertyType | None, locat
 
     if location:
         # Other types in the same location
-        other_types = PropertyType.objects.exclude(pk=ptype.pk if ptype else None).order_by("position")[:5]
+        other_types = PropertyType.objects.exclude(
+            pk=ptype.pk if ptype else None
+        ).filter(is_active=True).order_by("position")[:5]
         for ot in other_types:
             related.append({
                 "name": f"{ot.name} {action_label} in {location.name}",
@@ -142,7 +152,9 @@ def _build_related_searches(listing_type: str, ptype: PropertyType | None, locat
             })
         # Same type (or all-types) in sibling locations
         if location.parent:
-            siblings = Location.objects.filter(parent=location.parent).exclude(pk=location.pk)[:4]
+            siblings = Location.objects.filter(
+                parent=location.parent, is_active=True,
+            ).exclude(pk=location.pk)[:4]
             for sib in siblings:
                 if ptype:
                     url = f"/{ptype.slug_plural}-{action_suffix}/{sib.slug}/"
@@ -155,7 +167,9 @@ def _build_related_searches(listing_type: str, ptype: PropertyType | None, locat
                 })
     else:
         # No location — show top locations for this type
-        top_counties = Location.objects.filter(level=Location.Level.COUNTY).order_by("name")[:5]
+        top_counties = Location.objects.filter(
+            level=Location.Level.COUNTY, is_active=True,
+        ).order_by("name")[:5]
         for county in top_counties:
             if ptype:
                 url = f"/{ptype.slug_plural}-{action_suffix}/{county.slug}/"
@@ -234,7 +248,7 @@ def search(request, type_slug: str | None = None, location_slug: str | None = No
     # Eager-load everything the listing card needs (avoid N+1).
     qs = qs.select_related(
         "property_type", "location__parent__parent", "agent__user",
-    ).prefetch_related("images", "amenities")
+    ).prefetch_related("images", _active_amenities_prefetch())
 
     # ------------------------------------------------------------------
     # Apply query-param filters via the FilterSet
@@ -323,8 +337,8 @@ def search(request, type_slug: str | None = None, location_slug: str | None = No
         "related_searches": related_searches,
         "is_htmx": request.headers.get("HX-Request") == "true",
         # For the filter sidebar — pass all property types and top locations
-        "all_property_types": PropertyType.objects.order_by("position", "name"),
-        "all_counties": Location.objects.filter(level=Location.Level.COUNTY).order_by("name"),
+        "all_property_types": PropertyType.objects.filter(is_active=True).order_by("position", "name"),
+        "all_counties": Location.objects.filter(level=Location.Level.COUNTY, is_active=True).order_by("name"),
     }
 
     # If HTMX request, return just the results partial
@@ -349,7 +363,7 @@ def location_autocomplete(request):
         return JsonResponse({"results": []})
 
     # Match by name (case-insensitive icontains) — shallowest first.
-    qs = Location.objects.filter(name__icontains=q).order_by("level", "name")[:8]
+    qs = Location.objects.filter(name__icontains=q, is_active=True).order_by("level", "name")[:8]
     results = [
         {
             "slug": loc.slug,
@@ -442,7 +456,7 @@ def listing_detail(request, slug: str, pk: int):
             "property_type",
             "location__parent__parent",
             "agent__user",
-        ).prefetch_related("images", "amenities"),
+        ).prefetch_related("images", _active_amenities_prefetch()),
         slug=slug, pk=pk,
     )
 

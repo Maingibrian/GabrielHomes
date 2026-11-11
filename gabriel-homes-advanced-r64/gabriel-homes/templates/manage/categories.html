@@ -1,0 +1,149 @@
+{% extends "manage/base.html" %}
+
+{% block title %}Categories — {{ SITE_NAME }} owner portal{% endblock %}
+
+{% block manage_content %}
+  <div class="manage-page-head">
+    <p class="manage-card__tag">[ CATEGORIES ]</p>
+    <h1 class="manage-card__title">Places, property types &amp; features.</h1>
+    <p class="manage-card__body">The lists behind the site's menus and filters. Add or rename freely; hide anything you don't use — hiding never deletes, and existing pages keep working.</p>
+  </div>
+
+  {% include "manage/_site_content_tabs.html" %}
+
+  <section class="manage-card manage-form-section">
+    <h2>Add one</h2>
+    <p>Name only — the site works out the rest. For a place, pick what it sits inside.</p>
+    <form method="post" class="manage-add-form">
+      {% csrf_token %}
+      <input type="hidden" name="action" value="add">
+      <div class="manage-add-form__row">
+        <div class="manage-field">
+          <label for="{{ add_form.kind.id_for_label }}">What is it?</label>
+          {{ add_form.kind }}
+        </div>
+        <div class="manage-field">
+          <label for="{{ add_form.name.id_for_label }}">Name</label>
+          {{ add_form.name }}
+        </div>
+        <div class="manage-field">
+          <label for="{{ add_form.parent.id_for_label }}">Sits inside (places only)</label>
+          {{ add_form.parent }}
+        </div>
+        <button type="submit" class="btn btn--primary manage-add-form__btn">Add</button>
+      </div>
+      {{ add_form.non_field_errors }}
+    </form>
+  </section>
+
+  <section class="manage-card manage-form-section">
+    <h2>Places <span class="manage-card__count">{{ locations|length }}</span></h2>
+    <p>Counties, areas and neighbourhoods. The number is how many listings hang under each place.</p>
+    <ul class="manage-rows manage-rows--stack">
+      {% for loc in locations %}
+        <li class="manage-row">
+          <span class="manage-row__link manage-row__link--static">
+            <span class="manage-row__who">{{ loc.full_path }}{% if not loc.is_active %} <span class="manage-pill manage-pill--hidden">Hidden</span>{% endif %}</span>
+            <span class="manage-row__meta">{{ loc.get_level_display }} · {{ loc.listing_count }} listing{{ loc.listing_count|pluralize }}</span>
+          </span>
+          <span class="manage-row__side">
+            <details class="manage-inline-edit">
+              <summary class="manage-row__mini">Rename</summary>
+              <form method="post" class="manage-inline-edit__form">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="rename">
+                <input type="hidden" name="kind" value="location">
+                <input type="hidden" name="pk" value="{{ loc.pk }}">
+                <input type="text" name="name" value="{{ loc.name }}" maxlength="120" required>
+                <button type="submit" class="manage-row__mini manage-row__mini--primary">Save</button>
+              </form>
+            </details>
+            <form method="post">
+              {% csrf_token %}
+              <input type="hidden" name="action" value="toggle">
+              <input type="hidden" name="kind" value="location">
+              <input type="hidden" name="pk" value="{{ loc.pk }}">
+              <button type="submit" class="manage-row__mini">{% if loc.is_active %}Hide{% else %}Show{% endif %}</button>
+            </form>
+          </span>
+        </li>
+      {% empty %}
+        <li class="manage-row"><span class="manage-row__meta">No places yet.</span></li>
+      {% endfor %}
+    </ul>
+  </section>
+
+  <section class="manage-card manage-form-section">
+    <h2>Property types <span class="manage-card__count">{{ property_types|length }}</span></h2>
+    <p>Used in the menus and the “Browse by type” block on the home page.</p>
+    <ul class="manage-rows manage-rows--stack">
+      {% for pt in property_types %}
+        <li class="manage-row">
+          <span class="manage-row__link manage-row__link--static">
+            <span class="manage-row__who">{{ pt.name }}{% if not pt.is_active %} <span class="manage-pill manage-pill--hidden">Hidden</span>{% endif %}</span>
+            <span class="manage-row__meta">{{ pt.listing_count }} listing{{ pt.listing_count|pluralize }}</span>
+          </span>
+          <span class="manage-row__side">
+            <details class="manage-inline-edit">
+              <summary class="manage-row__mini">Rename</summary>
+              <form method="post" class="manage-inline-edit__form">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="rename">
+                <input type="hidden" name="kind" value="type">
+                <input type="hidden" name="pk" value="{{ pt.pk }}">
+                <input type="text" name="name" value="{{ pt.name }}" maxlength="120" required>
+                <button type="submit" class="manage-row__mini manage-row__mini--primary">Save</button>
+              </form>
+            </details>
+            <form method="post">
+              {% csrf_token %}
+              <input type="hidden" name="action" value="toggle">
+              <input type="hidden" name="kind" value="type">
+              <input type="hidden" name="pk" value="{{ pt.pk }}">
+              <button type="submit" class="manage-row__mini">{% if pt.is_active %}Hide{% else %}Show{% endif %}</button>
+            </form>
+          </span>
+        </li>
+      {% empty %}
+        <li class="manage-row"><span class="manage-row__meta">No property types yet.</span></li>
+      {% endfor %}
+    </ul>
+  </section>
+
+  <section class="manage-card manage-form-section">
+    <h2>Features (amenities) <span class="manage-card__count">{{ amenities|length }}</span></h2>
+    <p>The tick-boxes on a listing — pool, gym, borehole. Hidden features stay on their listings, just off the public pages.</p>
+    <ul class="manage-rows manage-rows--stack">
+      {% for am in amenities %}
+        <li class="manage-row">
+          <span class="manage-row__link manage-row__link--static">
+            <span class="manage-row__who">{{ am.name }}{% if not am.is_active %} <span class="manage-pill manage-pill--hidden">Hidden</span>{% endif %}</span>
+            <span class="manage-row__meta">{{ am.get_category_display }} · {{ am.listing_count }} listing{{ am.listing_count|pluralize }}</span>
+          </span>
+          <span class="manage-row__side">
+            <details class="manage-inline-edit">
+              <summary class="manage-row__mini">Rename</summary>
+              <form method="post" class="manage-inline-edit__form">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="rename">
+                <input type="hidden" name="kind" value="amenity">
+                <input type="hidden" name="pk" value="{{ am.pk }}">
+                <input type="text" name="name" value="{{ am.name }}" maxlength="120" required>
+                <button type="submit" class="manage-row__mini manage-row__mini--primary">Save</button>
+              </form>
+            </details>
+            <form method="post">
+              {% csrf_token %}
+              <input type="hidden" name="action" value="toggle">
+              <input type="hidden" name="kind" value="amenity">
+              <input type="hidden" name="pk" value="{{ am.pk }}">
+              <button type="submit" class="manage-row__mini">{% if am.is_active %}Hide{% else %}Show{% endif %}</button>
+            </form>
+          </span>
+        </li>
+      {% empty %}
+        <li class="manage-row"><span class="manage-row__meta">No amenities yet.</span></li>
+      {% endfor %}
+    </ul>
+  </section>
+{% endblock %}

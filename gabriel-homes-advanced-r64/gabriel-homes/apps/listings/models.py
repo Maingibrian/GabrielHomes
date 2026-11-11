@@ -76,6 +76,14 @@ class PropertyType(models.Model):
     is_commercial = models.BooleanField(default=False)
     is_land = models.BooleanField(default=False)
 
+    # r75 (BACKEND-PLAN 3A): hidden types drop out of the public menus
+    # (home "Browse by type", search dropdown, related searches). Existing
+    # listing pages and browse URLs keep working.
+    is_active = models.BooleanField(
+        default=True,
+        help_text="Hidden types stay out of the public menus.",
+    )
+
     # Display ordering for the home page's "Browse by type" block.
     position = models.PositiveIntegerField(default=0)
 
@@ -115,6 +123,13 @@ class Amenity(models.Model):
         help_text="Phosphor icon key, e.g. 'ph-swimming-pool'.",
     )
     category = models.CharField(max_length=16, choices=Category.choices, default=Category.LIFESTYLE)
+
+    # r75 (BACKEND-PLAN 3A): hidden amenities stop appearing on the public
+    # listing pages. The amenity stays on the property, ready to show again.
+    is_active = models.BooleanField(
+        default=True,
+        help_text="Hidden amenities stay off the public listing pages.",
+    )
 
     class Meta:
         verbose_name = "amenity"

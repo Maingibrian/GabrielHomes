@@ -89,10 +89,11 @@ class BubblyTitleTests(SimpleTestCase):
     """data-bubble-title: every home topic pops, replays both ways."""
 
     def test_every_home_topic_title_carries_the_hook(self):
-        """Featured, recommended, the three market groups, talk and
-        nearby — all seven topics."""
+        """Featured, recommended, the three market groups, talk,
+        nearby and the quotes band — all eight topics (r75 grew it
+        from seven when testimonials landed on the home page)."""
         html = HOME_HTML.read_text(encoding="utf-8")
-        self.assertEqual(html.count("data-bubble-title"), 7,
+        self.assertEqual(html.count("data-bubble-title"), 8,
                          "every topic title must carry data-bubble-title")
         for anchor in ('class="featured__title" data-bubble-title',
                        'class="home-market__title" data-bubble-title',
@@ -100,7 +101,8 @@ class BubblyTitleTests(SimpleTestCase):
                        "<h3 data-bubble-title>Long-term rentals</h3>",
                        "<h3 data-bubble-title>Short stays",
                        'class="home-social__title" data-bubble-title',
-                       "<h2 data-bubble-title>Homes close to what matters."):
+                       "<h2 data-bubble-title>Homes close to what matters.",
+                       "<h2 data-bubble-title>What clients say."):
             self.assertIn(anchor, html, f"missing bubbly topic: {anchor}")
 
     def test_bubbly_titles_are_never_masked_by_a_parent_fade(self):

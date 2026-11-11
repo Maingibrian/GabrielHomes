@@ -1,3 +1,97 @@
+Run 75 | BUILDER (owner round, off-loop) | 2026-11-11 ~22:30-01:30 +03:00 | items:
+(1) **OWNER ASK — "did you finish" (after context loss).** Status
+recovered first: Runs 73 + 74 were already committed (Owner Hub
+Phase 1 + Phase 2, 990 tests green); what remained was Phase 3
+(content & taxonomy) + Phase 4 of BACKEND-PLAN and the still-blocked
+cloud push. Sandbox had recycled again (.env/db gone) — healed via
+scripts/start_preview.sh (80 listings + 34 sample enquiries + 3
+sample testimonials, gateway 200). The gabriel cloud PAT txt: NOT
+FOUND anywhere (upload/, download/, repo, /home/z, /mnt, /media) —
+third full search; zip fallback from run 71-72 still stands, and
+the owner still needs to paste/upload the PAT or point at the file.
+(2) **PHASE 3 BUILT (all four sub-items, all under
+/manage/site-content/ so the five section nav stays five — new
+sub-tab row: Brand & copy · Categories · Media library ·
+Testimonials · Newsletter):**
+(3A) CATEGORIES at /manage/site-content/categories/ — add-by-name
+for all three kinds (Location / PropertyType / Amenity): slugs and
+tree level derived server-side, owner never types a slug; rename
+in place keeps every web address; hide/show with plain messages
+("hidden from the menus. Existing pages keep working."); NO
+deletes, pinned by test (action=delete → 404). Public chokepoints
+wired + pinned: hidden type leaves the home hero dropdown (exact
+<option> asserted), hidden county leaves related searches AND the
+/search/locations/ autocomplete while /property-for-sale/mombasa/
+keeps 200, hidden amenity stays off the detail page (Prefetch
+helper in one place) while staying attached to the property.
+Migrations: locations.0002 + listings.0011 (is_active flags).
+(3B) MEDIA LIBRARY at /manage/site-content/media/ — every photo
+with where-used (title links to the public page when live, plain
+text when not), filter chips with honest pre-search counts (All /
+Covers / On live / On drafts / On archived & sold), title search,
+24/page pager, caption editor; delete GUARDED — cover of a live
+listing refused, last photo of a live listing refused, both
+messages name the listing; allowed deletes remove the row AND the
+file from disk (asserted on disk).
+(3C) TESTIMONIALS at /manage/site-content/testimonials/ + public
+band — new core.Testimonial model (migration core.0016): name,
+role, quote, 1-5 stars, shown, consent_given, is_demo, position.
+The consent box is the whole game: shown AND consent or it never
+reaches the public site (test pins add-without-consent staying off
+/home and the "Waiting for permission" pill). Home page grew the
+"What clients say." band (paper background, cream cards, widthratio
+star fill, 3→2→1 grid) as the 8th data-bubble-title topic — the
+r47 pin grew from 7 to 8 with the new anchor, demo-switch aware
+(same contract as listings), hidden-when-none pinned. seed_demo
+--with-enquiries now also seeds 3 clearly-fictional sample
+testimonials ("(sample)" in the name, is_demo stamped).
+(3D) NEWSLETTER COMPOSE at /manage/site-content/newsletter/ —
+subscriber numbers as CSS bars (Confirmed / Waiting / Unsubscribed),
+pick-list of the 30 newest live listings (≤10 picks, enforced in
+the form), EXACT preview (the email's subject + body rendered in a
+box, "each email gets its own unsubscribe link" said honestly),
+then one primary "Send to N people" button. compose_issue() shares
+the delivery path (_deliver_issue) with the threshold trigger —
+List-Unsubscribe headers can never drift. Confirmed-only recipients
+pinned by test (pending + unsubscribed excluded, locmem outbox == 1
+with the right token in the body), every send recorded in past
+issues, honest refusals for nothing-picked / no-subscribers /
+not-live picks.
+(3) **ONE LESSON WORTH KEEPING: pre-check duplicates, never catch
+IntegrityError** — the first categories add caught sqlite
+IntegrityError inside the test's atomic block and poisoned the
+transaction (the 500 leaked through the except). All adds/renames
+now pre-check (name__iexact / derived slug) and refuse with a
+plain message before any save. Live-proven twice: "Kilifi" already
+exists as a county; "Takaungu" added as a county; "Bamburi" hidden
+→ "hidden from the menus" → shown → "back in the public menus".
+(4) GATES — check 0 · makemigrations clean · **1038 passed**
+(990 → 1038, +48 across test_taxonomy_editor.py 17,
+test_media_library.py 12, test_testimonials.py 14,
+test_newsletter_compose.py 5; plus the bubble pin grown 7→8). F1
+hex ratchet clean (all new CSS on tokens; two invented token names
+caught and fixed pre-commit: --cream-deep → --burnt-12,
+--sand-deep → --taupe-35).
+(5) E3 LIVE (agent-browser as the preview owner, viewport 1440 +
+390): all four screens 200 with the sub-tab row; flows walked —
+add place (duplicate refused honestly, new one added), hide/show
+a location with the exact messages, media caption saved ("Caption
+saved."), testimonial added WITH consent → ""Sarah W." is now on
+the website." → home shows the band with the sample rows, stars
+rendering; newsletter: two picks → preview "Gabriel Homes: 2 new
+listings" → Send with 0 subscribers → "Nobody to send to yet —
+subscribers must confirm by email first."; mobile 390px zero
+horizontal overflow on categories + media; zero console errors;
+VLM verdicts pass on all five screenshots (one minor note: the
+categories add-row alignment — acceptable). Deliverables:
+download/r75-{categories,media,testimonials,newsletter,
+home-quotes,categories-mobile,media-mobile}.png.
+FOR THE NEXT RUN: Phase 4 per BACKEND-PLAN (4A activity log, 4B
+one-click backup, 4C saved-search alerts UI, 4D in-portal help
+page); parked: P3-5 CSV import into /manage/, P3-11 SEO per-page
+overrides + share image. Owner cloud PAT STILL pending — nothing
+named gabriel exists to read it from; ask again.
+
 Run 74 | BUILDER (owner round, off-loop) | 2026-11-11 ~20:45-22:00 +03:00 | items:
 (1) **OWNER ASK — "kindly re access and ensure the back end is
 fully functional …thorough."** Re-audit first, measured live: the

@@ -106,14 +106,27 @@ def send_issue_if_due(dry_run: bool = False) -> dict:
     if total_new < NEWSLETTER_THRESHOLD or not recipients or dry_run:
         return summary
 
+    _deliver_issue(listings, recipients)
+    summary["sent"] = True
+    return summary
+
+
+def _deliver_issue(listings, recipients) -> None:
+    """Render and send one issue to every confirmed subscriber.
+
+    Shared by the threshold trigger (send_issue_if_due) and the owner's
+    manual compose screen (r75 BACKEND-PLAN 3D) — one delivery path, so
+    the unsubscribe headers can never drift between the two.
+    """
+    count = len(listings)
     for sub in recipients:
         unsub = _absolute(reverse("newsletter_unsubscribe", args=[sub.token]))
-        ctx = {"listings": listings, "unsubscribe_link": unsub, "total_new": total_new,
+        ctx = {"listings": listings, "unsubscribe_link": unsub, "total_new": count,
                "SITE_DOMAIN": settings.SITE_DOMAIN.rstrip("/")}
         text = render_to_string("core/email/newsletter_issue.txt", ctx)
         html = render_to_string("core/email/newsletter_issue.html", ctx)
         msg = EmailMultiAlternatives(
-            subject=f"Gabriel Homes: {total_new} new listings",
+            subject=f"Gabriel Homes: {count} new listings",
             body=text,
             from_email=settings.DEFAULT_FROM_EMAIL,
             to=[sub.email],
@@ -125,6 +138,27 @@ def send_issue_if_due(dry_run: bool = False) -> dict:
         msg.attach_alternative(html, "text/html")
         msg.send()
 
-    NewsletterIssue.objects.create(listing_count=total_new, recipient_count=len(recipients))
+    NewsletterIssue.objects.create(listing_count=count, recipient_count=len(recipients))
+
+
+def compose_issue(listings) -> dict:
+    """Owner-composed issue (r75 BACKEND-PLAN 3D): send the chosen
+    listings to every confirmed subscriber, right now, threshold aside.
+
+    Returns a summary dict for the portal screen. Refuses honestly —
+    empty selection or no confirmed subscribers sends nothing.
+    """
+    recipients = list(NewsletterSubscriber.objects.filter(
+        confirmed_at__isnull=False, unsubscribed_at__isnull=True,
+    ).order_by("email"))
+    summary = {
+        "listings": len(listings),
+        "recipients": len(recipients),
+        "sent": False,
+    }
+    if not listings or not recipients:
+        return summary
+
+    _deliver_issue(listings, recipients)
     summary["sent"] = True
     return summary

@@ -463,6 +463,34 @@
 </section>
 {% endif %}
 
+{# 5. CLIENT QUOTES (r75 BACKEND-PLAN 3C) — the owner's testimonials,  #}
+{# shown only with consent; the whole band vanishes when there are none.#}
+{% if testimonials %}
+<section class="section home-quotes" id="quotes" data-archetype="type-led">
+  <div class="container">
+    <div class="home-market__heading">
+      <div><span>05</span><h2 data-bubble-title>What clients say.</h2><p>Words from people who found their home with Gabriel Homes.</p></div>
+    </div>
+    <div class="home-quotes__grid">
+      {% for t in testimonials %}
+      <figure class="quote-card" data-reveal>
+        {% if t.rating %}
+        <span class="quote-card__stars" role="img" aria-label="Rated {{ t.rating }} out of 5">
+          <span class="quote-card__stars-base" aria-hidden="true">★★★★★</span>
+          <span class="quote-card__stars-fill" aria-hidden="true" style="width: {% widthratio t.rating 5 100 %}%">★★★★★</span>
+        </span>
+        {% endif %}
+        <blockquote class="quote-card__quote">&ldquo;{{ t.quote }}&rdquo;</blockquote>
+        <figcaption class="quote-card__who">
+          <strong>{{ t.name }}</strong>{% if t.role %} · {{ t.role }}{% endif %}
+        </figcaption>
+      </figure>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
+
 {% endblock %}
 
 {% block scripts %}

@@ -19,6 +19,17 @@ app_name = "manage"
 urlpatterns = [
     path("", views.PortalHomeView.as_view(), name="home"),
     path("site-content/", views.SiteContentView.as_view(), name="site_content"),
+    # r75 (BACKEND-PLAN Phase 3) — Site content's tabs
+    path("site-content/categories/", views.CategoriesView.as_view(), name="categories"),
+    path("site-content/media/", views.MediaLibraryView.as_view(), name="media"),
+    path("site-content/media/<int:pk>/action/", views.MediaImageActionView.as_view(), name="media_action"),
+    path("site-content/testimonials/", views.TestimonialsView.as_view(), name="testimonials"),
+    path(
+        "site-content/testimonials/<int:pk>/action/",
+        views.TestimonialActionView.as_view(),
+        name="testimonial_action",
+    ),
+    path("site-content/newsletter/", views.NewsletterComposeView.as_view(), name="newsletter"),
     path("seo/", views.SeoSettingsView.as_view(), name="seo"),
     path(
         "checklist/<slug:key>/toggle/",

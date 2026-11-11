@@ -276,3 +276,122 @@ class ListingPinForm(forms.Form):
         if (lat is None) != (lng is None):
             raise forms.ValidationError("Set the pin on the map — it needs both a latitude and a longitude.")
         return cleaned
+
+
+# ---------------------------------------------------------------------------
+# r75 (BACKEND-PLAN Phase 3) — categories, media, testimonials, newsletter.
+# ---------------------------------------------------------------------------
+from apps.core.models import Testimonial  # noqa: E402
+from apps.locations.models import Location  # noqa: E402
+
+
+class TaxonomyAddForm(forms.Form):
+    """Add one location / type / amenity by name alone.
+
+    Slugs and levels are derived server-side (the owner never sees a
+    slug field), and locations derive their level from the chosen parent
+    so the county > area > neighbourhood tree can't get mangled.
+    """
+
+    KINDS = ("location", "type", "amenity")
+    KIND_LABELS = (
+        ("location", "A place (county, area, neighbourhood)"),
+        ("type", "A property type"),
+        ("amenity", "A feature (amenity)"),
+    )
+
+    kind = forms.ChoiceField(choices=KIND_LABELS)
+    name = forms.CharField(max_length=120, widget=forms.TextInput(
+        attrs={"placeholder": "e.g. Bamburi"}
+    ))
+    parent = forms.ModelChoiceField(
+        queryset=Location.objects.none(), required=False,
+        empty_label="Top level (a county)",
+    )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Parents: counties and areas only — neighbourhoods are leaves.
+        self.fields["parent"].queryset = Location.objects.filter(
+            level__in=(Location.Level.COUNTY, Location.Level.AREA),
+            is_active=True,
+        ).order_by("level", "name")
+
+    def clean(self):
+        cleaned = super().clean()
+        if cleaned.get("kind") not in self.KINDS:
+            raise forms.ValidationError("Unknown category kind.")
+        return cleaned
+
+
+class TaxonomyRenameForm(forms.Form):
+    """Rename in place — slugs/URLs stay untouched (no link ever breaks)."""
+
+    name = forms.CharField(max_length=120)
+
+
+class MediaCaptionForm(forms.Form):
+    """Caption / alt text for one library image."""
+
+    caption = forms.CharField(max_length=200, required=False)
+
+
+class TestimonialForm(forms.ModelForm):
+    """Owner-entered testimonial. The consent box is the publish gate."""
+
+    class Meta:
+        model = Testimonial
+        fields = ("name", "role", "quote", "rating", "consent_given")
+        widgets = {
+            "role": forms.TextInput(attrs={"placeholder": "e.g. Bought an apartment in Nyali"}),
+            "quote": forms.Textarea(attrs={"rows": 3, "placeholder": "The client's words, exactly as agreed."}),
+        }
+        labels = {
+            "consent_given": "I have this person's permission to publish their words",
+        }
+
+    def clean_rating(self):
+        value = self.cleaned_data.get("rating")
+        if value in ("", None):
+            return None
+        try:
+            value = int(value)
+        except (TypeError, ValueError):
+            raise forms.ValidationError("Rating is 1 to 5 stars, or left empty.")
+        if not 1 <= value <= 5:
+            raise forms.ValidationError("Rating is 1 to 5 stars, or left empty.")
+        return value
+
+
+class NewsletterComposeForm(forms.Form):
+    """Pick listings for a manual issue (r75 BACKEND-PLAN 3D).
+
+    Choices are the live published listings, newest first, capped at 30
+    so the screen stays scannable; up to 10 may be picked per issue.
+    """
+
+    MAX_PICKS = 10
+
+    listings = forms.MultipleChoiceField(
+        choices=(), widget=forms.CheckboxSelectMultiple, required=False,
+    )
+
+    def __init__(self, *args, **kwargs):
+        from apps.listings.models import Property
+
+        super().__init__(*args, **kwargs)
+        live = list(
+            Property.objects.published().order_by("-published_at")[:30]
+        )
+        self.fields["listings"].choices = [
+            (p.pk, p.title) for p in live
+        ]
+        self.live = live
+
+    def clean_listings(self):
+        picks = self.cleaned_data.get("listings") or []
+        if len(picks) > self.MAX_PICKS:
+            raise forms.ValidationError(
+                f"Up to {self.MAX_PICKS} listings per newsletter — pick the best ones."
+            )
+        return picks

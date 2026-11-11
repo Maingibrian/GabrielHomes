@@ -123,14 +123,28 @@ on this same screen.
   draft row; Save & finish later / Discard from any step; Publish
   gated on photo + price (honest refusal names what's missing).
 
-## Phase 3 — Content & taxonomy
+## Phase 3 — Content & taxonomy `[x run 75]`
 
 * **3A. Taxonomy editor** — locations, property types, amenities
-  (add / rename / hide; no deletes).
+  (add / rename / hide; no deletes). — /manage/site-content/categories/;
+  add is name-only (slugs + tree level derived server-side, duplicates
+  refused by pre-check); rename keeps every web address; hide leaves
+  the public menus (home dropdown, related searches, autocomplete,
+  detail-page amenities) while existing pages keep working.
 * **3B. Media library** — uploads, alt text, where-used, unused cleanup.
+  — /manage/site-content/media/: where-used grid + filter chips +
+  title search; caption editor; delete guarded (never a live listing's
+  cover or last photo), file deleted with the row.
 * **3C. Testimonials** — owner-entered, consent flag, hidden when none.
+  — /manage/site-content/testimonials/; consent = the publish gate;
+  home-page "What clients say" band (8th bubbly topic), demo-switch
+  aware, hidden-when-none pinned by test.
 * **3D. Newsletter compose** — pick listings, preview, send to confirmed
-  subscribers (model + double opt-in already exist).
+  subscribers (model + double opt-in already exist). —
+  /manage/site-content/newsletter/; ≤10 picks, exact preview,
+  confirmed-only recipients, per-recipient unsubscribe, every send
+  recorded; compose_issue() shares the delivery path with the
+  threshold trigger.
 
 ## Phase 4 — Trust & housekeeping
 

@@ -1,0 +1,92 @@
+{% extends "manage/base.html" %}
+{% load core_tags %}
+
+{% block title %}Newsletter — {{ SITE_NAME }} owner portal{% endblock %}
+
+{% block manage_content %}
+  <div class="manage-page-head">
+    <p class="manage-card__tag">[ NEWSLETTER ]</p>
+    <h1 class="manage-card__title">Write a newsletter.</h1>
+    <p class="manage-card__body">Pick live listings, preview exactly what goes out, then send. Only subscribers who confirmed by email receive it, and every email carries its own unsubscribe link.</p>
+  </div>
+
+  {% include "manage/_site_content_tabs.html" %}
+
+  <section class="manage-card manage-form-section">
+    <h2>Subscribers</h2>
+    <ul class="manage-hbars">
+      <li class="manage-hbar">
+        <span class="manage-hbar__label">Confirmed (get the newsletter)</span>
+        <span class="manage-hbar__track"><span class="manage-hbar__fill" style="width: {{ numbers.confirmed_pct }}%"></span></span>
+        <span class="manage-hbar__count">{{ numbers.confirmed }}</span>
+      </li>
+      <li class="manage-hbar">
+        <span class="manage-hbar__label">Waiting to confirm</span>
+        <span class="manage-hbar__track"><span class="manage-hbar__fill manage-hbar__fill--muted" style="width: {{ numbers.pending_pct }}%"></span></span>
+        <span class="manage-hbar__count">{{ numbers.pending }}</span>
+      </li>
+      <li class="manage-hbar">
+        <span class="manage-hbar__label">Unsubscribed</span>
+        <span class="manage-hbar__track"><span class="manage-hbar__fill manage-hbar__fill--muted" style="width: {{ numbers.gone_pct }}%"></span></span>
+        <span class="manage-hbar__count">{{ numbers.gone }}</span>
+      </li>
+    </ul>
+  </section>
+
+  {% if preview_listings %}
+    {# The preview step: what subscribers will receive, then one honest send button. #}
+    <section class="manage-card manage-form-section manage-preview">
+      <h2>Preview</h2>
+      <p>This is the email {{ numbers.confirmed }} confirmed subscriber{{ numbers.confirmed|pluralize }} will receive:</p>
+      <div class="manage-preview__box">
+        <p class="manage-preview__subject">Gabriel Homes: {{ preview_listings|length }} new listings</p>
+        <p>Every listing is checked by Gabriel and the team before it goes live.</p>
+        <ul class="manage-preview__list">
+          {% for p in preview_listings %}
+            <li>{{ p.title }} · {{ p.price|kes:p.price_period }} · {{ p.location.full_path }}</li>
+          {% endfor %}
+        </ul>
+        <p class="manage-preview__fine">You are receiving this because you asked to hear from Gabriel Homes and confirmed your sign-up. Unsubscribe: (each email gets its own link)</p>
+      </div>
+      <form method="post" class="manage-preview__send">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="send">
+        {% for pk in picks %}
+          <input type="hidden" name="listings" value="{{ pk }}">
+        {% endfor %}
+        <a class="btn btn--outline" href="{% url 'manage:newsletter' %}">Back — change picks</a>
+        <button type="submit" class="btn btn--primary">Send to {{ numbers.confirmed }} people</button>
+      </form>
+    </section>
+  {% else %}
+    <section class="manage-card manage-form-section">
+      <h2>Pick listings</h2>
+      <p>The 30 newest live listings. Pick up to 10 — the best ones, not all of them.</p>
+      <form method="post" class="manage-picklist">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="preview">
+        {{ form.listings }}
+        {{ form.non_field_errors }}
+        <button type="submit" class="btn btn--primary">Preview the newsletter</button>
+      </form>
+    </section>
+  {% endif %}
+
+  <section class="manage-card manage-form-section">
+    <h2>Past issues</h2>
+    {% if issues %}
+      <ul class="manage-rows manage-rows--stack">
+        {% for issue in issues %}
+          <li class="manage-row">
+            <span class="manage-row__link manage-row__link--static">
+              <span class="manage-row__who">{{ issue.sent_at|date:'j M Y, g:ia' }}</span>
+              <span class="manage-row__meta">{{ issue.listing_count }} listing{{ issue.listing_count|pluralize }} · sent to {{ issue.recipient_count }} people</span>
+            </span>
+          </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p class="manage-card__body">Nothing sent yet. The first issue will appear here after you send it.</p>
+    {% endif %}
+  </section>
+{% endblock %}

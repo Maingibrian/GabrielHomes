@@ -24,18 +24,18 @@ Tick items `[x]` when done, with run number. Never start a slice you cannot fini
 - [ ] P2-6 Wire `site_content` into hero, subtitle, buttons, stats, story, founder (name spelling becomes editable — site says "Gabriel Omulu", DESIGN.md says "Omulu/Omulu" vs reference "Omulu"; owner confirms), values, philosophy cards, CTA band, footer, about, services, FAQ.
 
 ## P3 — Portal modules (protocol §5 order)
-- [ ] P3-1 Listings wizard: step flow Basics → Price → Details → Photos → Map pin → Review & publish; draft autosave (Basics + Price steps first). Tests.
-- [ ] P3-2 Wizard Photos step: multi-upload, drag-reorder, cover pick, auto WebP via easy-thumbnails, upload validation. Tests.
-- [ ] P3-3 Wizard Map pin + Review/publish steps (Leaflet picker; approximate-pin privacy). Tests.
-- [ ] P3-4 Listings tools: duplicate, bulk status change, Sold / Let / Under offer, featured toggle, inline price edit. Tests.
+- [x] P3-1 Listings wizard — **BUILT r74** (one URL /manage/listings/new/, Basics→Price→Details→Photos→Review, every POST persists the draft = server-side autosave, finish-later + discard, publish gated on photo+price with honest refusals). Tests in test_listing_tools.py.
+- [x] P3-2 Wizard Photos step — **BUILT r74** inside the wizard (multi-upload formset, cover pick; upload validation reused from the model). Drag-reorder nicety parked.
+- [x] P3-3 Wizard Map pin — **BUILT r74** as /manage/listings/<pk>/pin/ on the vendored MapLibre stack (click-to-set, remove-pin, no-JS number-field fallback, approximate-pin promise kept in the save message).
+- [x] P3-4 Listings tools — **BUILT r74** (duplicate with real image FILE copies, bulk status bar with publish refusals naming the rows, featured toggle, inline price with DERIVED period).
 - [ ] P3-5 CSV import ported from `/dashboard/import/` into `/manage/` (validated, idempotent, sample CSV). Tests.
 - [~] P3-6 Enquiries inbox — **BUILT r73** (statuses+auto-seen, notes, WhatsApp/call/email reply templates, CSV export, spam folder with delete; tests test_enquiries_portal.py). One-tap WhatsApp templates = prefilled wa.me links. Remaining nicety: none blocking. Was: statuses New / Contacted / Viewing booked / Closed, notes, one-tap call & WhatsApp reply templates, CSV export, spam folder. Tests.
 - [ ] P3-7 Homepage layout editor: toggle + reorder sections, featured pick or auto, hero image/video, neighbourhood tiles from locations that have listings. Tests.
 - [~] P3-8 Brand & contact editor — **MOSTLY BUILT r73** (logo, favicon, phone, WhatsApp, email, address, hours, 4 socials; palette presets rejected — design stays token-locked). Remaining: map pin + favicon generation niceties. Was: logo, favicon, phone, WhatsApp, email, address, hours, socials, map pin; palette presets only (design cannot be broken). Tests.
-- [ ] P3-9 Taxonomy editor: locations, property types, amenities — add, rename, hide (no deletes). Tests.
-- [ ] P3-10 Media library: upload, alt text, where-used, unused cleanup. Tests.
+- [x] P3-9 Taxonomy editor — **BUILT r75** (/manage/site-content/categories/: add-by-name with derived slugs/levels, rename keeps URLs, hide/show; no deletes; hidden rows leave home menu, related searches, autocomplete and detail-page amenities while their pages keep working). Tests in test_taxonomy_editor.py.
+- [x] P3-10 Media library — **BUILT r75** (/manage/site-content/media/: where-used grid with filter chips + title search, caption/alt editor, guarded delete — a live listing never loses its cover or last photo; file deleted with the row). Tests in test_media_library.py. Bulk unused-cleanup parked (guarded per-row delete covers the need).
 - [~] P3-11 SEO editor — **PARTIAL r73** (analytics ID, Search Console token, default meta description — /manage/seo/; gtag loads via local static loader, zero inline scripts). Remaining: per-page meta overrides, share image upload. Was: per-page and per-listing title/description, share image, Analytics + Search Console ID fields wired into base template. Tests.
-- [ ] P3-12 Testimonials (owner-entered, consent flag, hidden when none), market notes, newsletter view. Tests.
+- [x] P3-12 Testimonials + newsletter — **BUILT r75**: testimonials (owner-entered, consent gate = no permission no publication, hidden-when-none, demo-switch aware, star ratings; home-page "What clients say" band = the 8th bubbly topic) + newsletter compose (pick ≤10 live listings, preview, send to confirmed-only subscribers, every send recorded in past issues; one delivery path shared with the threshold trigger). Market notes not built (no data source). Tests in test_testimonials.py + test_newsletter_compose.py.
 - [ ] P3-13 Users & security: owner password change, optional limited staff role, login log (no new packages without logged reason). Tests.
 - [ ] P3-14 Backup & export: one-click DB + media export, activity log, short in-portal help guide. Tests.
 

@@ -1,0 +1,17 @@
+{% comment %}
+  r75 (BACKEND-PLAN Phase 3): the Site content section's tabs. The five
+  section nav stays five — these screens are all "things the public site
+  is made of", collected in one place. Current tab highlighted by path.
+{% endcomment %}
+<nav class="manage-tabs manage-tabs--sub" aria-label="Site content screens">
+  <a class="manage-tabs__tab {% if request.path == '/manage/site-content/' %}is-current{% endif %}"
+     href="{% url 'manage:site_content' %}">Brand &amp; copy</a>
+  <a class="manage-tabs__tab {% if '/categories' in request.path %}is-current{% endif %}"
+     href="{% url 'manage:categories' %}">Categories</a>
+  <a class="manage-tabs__tab {% if '/media' in request.path %}is-current{% endif %}"
+     href="{% url 'manage:media' %}">Media library</a>
+  <a class="manage-tabs__tab {% if '/testimonials' in request.path %}is-current{% endif %}"
+     href="{% url 'manage:testimonials' %}">Testimonials</a>
+  <a class="manage-tabs__tab {% if '/newsletter' in request.path %}is-current{% endif %}"
+     href="{% url 'manage:newsletter' %}">Newsletter</a>
+</nav>
