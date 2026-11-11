@@ -663,11 +663,22 @@ html:not([data-fx]) .listing-row.row-armed {
   background-image: url("../img/palm-field-even.svg");
   background-repeat: repeat;
   background-size: 1400px 1600px;
-  /* r69: scroll stays the declared SAFE DEFAULT — and the Y position
-     rides the drift var, which motion.js writes under a gate tier
-     only. Every other visitor (scripts blocked, fx=none,
+  /* r69/r71: scroll stays the declared SAFE DEFAULT — and the Y
+     position rides the drift var, which motion.js writes under a
+     gate tier only. Every other visitor (scripts blocked, fx=none,
      prefers-reduced-motion) falls back to 0px and scrolls the tile
-     exactly like r65. */
+     exactly like r65.
+
+     r71 REJECTED a compositor-transform drift here, measured live:
+     translate3d + will-change on this ROOT-NEGATIVE pseudo hoists
+     the whole composited layer OVER the static footer in Chrome (the
+     footer vanished behind the field; the mask's out-of-bounds
+     extension also leaked faint fronds below the band). The
+     background-position drift repaints on the main thread, yes — but
+     the r70 trace measured it at a FLAT 59fps through the row
+     animations, so it is the smooth option that does not break the
+     r62 paint contract. Do NOT retry transform/will-change on this
+     ::before without reading LOOP/JOURNAL.md r71. */
   background-attachment: scroll;
   background-position: 0 var(--palms-y, 0px);
   -webkit-mask-image: linear-gradient(to bottom, black 0%, black 84%, transparent 100%);
@@ -679,23 +690,39 @@ html:not([data-fx]) .listing-row.row-armed {
 @media (max-width: 1020px) {
   .listings-band::before { background-size: 860px 985px; }
 }
-/* r69 (owner round thirteen): "the palms are stagnant they need to
-   move ...but not to slow they look stagnant and not to fast they
-   move together with the listings." The r68 pass pinned the field to
-   the viewport (fixed attachment — speed 0, which reads stagnant) and
-   a plain scrolling background runs 1:1 with the rows. HALF SPEED is
-   the middle the owner described: the field climbs visibly as the
-   page scrolls while the rows, chips and pagination slide past twice
-   as fast. It works on every device — the old fixed attachment
-   silently dies on iOS/Android, which is part of why that pass read
-   as stagnant on phones.
+/* r69/r70/r71 (owner rounds thirteen-fifteen): "the palms are
+   stagnant they need to move ...but not to slow they look stagnant
+   and not to fast they move together with the listings" (r69);
+   "when the listing animation occurs the parallax effect drops down
+   and up" (r70); "ensure the movements are smooth" (r71). The r68
+   pass pinned the field to the viewport (fixed attachment — speed 0,
+   which reads stagnant) and a plain scrolling background runs 1:1
+   with the rows. HALF SPEED is the middle the owner described: the
+   field climbs visibly as the page scrolls while the rows, chips and
+   pagination slide past twice as fast. It works on every device —
+   the old fixed attachment silently dies on iOS/Android, which is
+   part of why that pass read as stagnant on phones.
 
-   motion.js owns the drift: it writes --palms-y on the band (a lerped
-   chase, so the field carries weight instead of snapping) and the
+   motion.js owns the drift: it writes --palms-y on the band (the
+   r70 time-constant chase, so the field carries weight instead of
+   snapping, settling in the same ~200ms at any frame rate) and the
    ::before above reads that var as its background-position Y. The
-   tile repeats, so the drift can run forever without a seam, and the
-   box-relative mask stays anchored to the band: the 84% dissolve
-   still lands exactly at the band's end wherever the scroll is.
+   tile repeats, so the drift can run forever without a seam, and
+   the box-relative mask stays anchored to the band: the 84%
+   dissolve still lands exactly at the band's end wherever the
+   scroll is.
+
+   r71 (owner round fifteen, "ensure the movements are smooth") BUILT
+   the compositor-transform variant of this drift — translate3d +
+   will-change on the ::before, box extended one tile, mask
+   re-anchored — proved it pixel-identical in-band, and REJECTED it
+   on live evidence: Chrome hoists the composited root-negative
+   layer OVER the static footer, and the extended masked box leaked
+   faint fronds below the band. The background-position drift stays:
+   it repaints on the main thread, but the r70 trace measured it at
+   a FLAT 59fps through the row animations. Pinned by test
+   (test_parallax_compositor_transform_is_banned) so it is not
+   retried blind.
 
    Gating follows the D-FX-GATE contract exactly like the row slides
    above: the drift runs only when the gate set a tier (rich, and

@@ -21,7 +21,7 @@ still stands):
    stagnant and not to fast they move together with the listings."
    The r68 fixed-attachment pin (speed 0 — stagnant, and ignored by
    iOS/Android anyway) is gone; motion.js now advances the field at
-   HALF the scroll rate via --palms-y. Fail-closed: scripts blocked
+   HALF the scroll rate. Fail-closed: scripts blocked
    (no attribute) and fx=none (prefers-reduced-motion, WCAG 2.3.3)
    never write the var — the 0px fallback scrolls the tile exactly
    like r65.
@@ -35,6 +35,17 @@ still stands):
    (1 - exp(-dt/TAU)) — same ~200ms settle at any frame rate — with
    live measure() per frame and a clamped dt; the rows' images gained
    decoding="async" to keep decode off the main thread. Pinned here.
+
+   r71 (owner round fifteen): "ensure the movements are smooth." A
+   compositor-transform drift (translate3d + will-change on the
+   ::before) was built, proven pixel-identical in-band — and then
+   REJECTED on live evidence: Chrome hoists the composited
+   ROOT-NEGATIVE layer over the static footer (the footer vanished
+   behind the field) and the extended masked box leaked faint fronds
+   below the band. The r62 paint contract wins; the drift stays on
+   background-position (repaint cost measured at a FLAT 59fps in the
+   r70 trace). The rejection is PINNED — transform/will-change on
+   the ::before is banned by test — so it can't be retried blind.
 
 Home keeps the r46 tile — pinned here so the "spread them out" ask
 can never leak into the home market section unnoticed.
@@ -346,6 +357,51 @@ def test_results_grid_images_decode_async():
         "the reserved aspect-ratio box stays — image load must never "
         "shift the band geometry the parallax anchors to"
     )
+
+
+def test_parallax_compositor_transform_is_banned():
+    """r71 (owner round fifteen): "ensure the movements are smooth."
+    A compositor-transform drift was BUILT and measured live — pixel-
+    identical to the background-position drift in-band (same-session
+    A/B diff 0.012%, and one-tile-period wrap verified seamless) —
+    but REJECTED on two live defects no refactor can dodge:
+
+      1. Chrome HOISTS a composited ROOT-NEGATIVE layer over later
+         in-flow content: with translate3d + will-change on the
+         ::before, the static footer vanished behind the field
+         (measured: hiding the ::before revealed the dark footer;
+         showing it painted cream fronds across the footer's rows).
+         The r62 paint contract (field + sentinels root-negative so
+         the footer scrolls over them) only holds while the ::before
+         is NOT layerized by a transform.
+      2. The extended masked box (the translation needs one tile of
+         slack) leaked faint fronds below the band end — the mask's
+         out-of-bounds region does not render fully transparent under
+         compositing.
+
+    The drift therefore STAYS on background-position: it repaints on
+    the main thread, but the r70 trace measured a FLAT 59fps through
+    the row animations — smooth, and contract-safe. This pin BANS
+    transform/will-change on the ::before so the experiment cannot
+    be retried without reading LOOP/JOURNAL.md r71 first."""
+    rule = re.search(r"\.listings-band::before \{[^}]*\}", SEARCH_CSS)
+    assert rule, ".listings-band::before rule missing"
+    # comments are documentation; ban the PROPERTIES, not the words
+    body = re.sub(r"/\*.*?\*/", "", rule.group(0), flags=re.S)
+    assert "inset: 0" in body, (
+        "the ::before must stay exactly the band box — any extension "
+        "exists only to feed a transform drift (banned, see r71)"
+    )
+    for banned in ("translate3d", "will-change", "mask-size",
+                   "mask-position", "mask-repeat", "transform:"):
+        assert banned not in body, (
+            f"'{banned}' on .listings-band::before is the r71 "
+            "compositor drift — REJECTED live: Chrome hoists the "
+            "composited root-negative layer over the static footer "
+            "and the extended masked box leaks below the band "
+            "(LOOP/JOURNAL.md r71). The drift belongs on "
+            "background-position."
+        )
 
 
 def test_parallax_keeps_the_r65_field_contract():

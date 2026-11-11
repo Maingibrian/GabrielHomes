@@ -1,3 +1,69 @@
+Run 71 | BUILDER (owner round, off-loop) | 2026-11-11 ~17:30-18:50 +03:00 | items:
+(1) **OWNER ASK — "ensure the movements are smooth...."** Full
+movement audit on /properties/ first: row glides (transform+opacity —
+compositor), header auto-hide (transform translateY), header
+scrolled state (background/box-shadow — small paint), market-filter
+hover (transform) — ALL safe; the single main-thread cost per frame
+was the palm field's background-position repaint in the r69/r70
+drift.
+(2) **THE COMPOSITOR EXPERIMENT (built, proven, REJECTED).** Built:
+search.css ::before box extended one tile period (±1600px),
+transform: translate3d riding a NEW --palms-t var (the r70 chase
+value WRAPPED to the tile period — identical pixels, the tile is
+periodic), mask re-anchored inside the taller box (mask-size 100%
+calc(100%-3200px), mask-position calc(1600px - --palms-t), mask-
+repeat no-repeat); motion.js read the period from the live
+background-size (1600 desktop / 985 mobile) and wrote the wrapped
+value. Proven live: pixel-identical to the background-position drift
+in a SAME-SESSION A/B (r70-anatomy style override vs the transform
+anatomy at the same chase value: 0.012% of pixels, noise); the
+period wrap seamless (t vs t+1600: 0.02%); fail-closed var-absent =
+exact static field; mobile 985px grain wraps correctly; continuity
+trace through smooth scrolls — the chase tracks every frame,
+crosses wraps without a tear, settles in ~200-300ms, no oscillation.
+REJECTED on two live defects no refactor can dodge: (a) Chrome
+HOISTS the composited ROOT-NEGATIVE ::before layer over later
+in-flow content — with the transform active, the static site-footer
+VANISHED behind the cream field (measured: hiding the ::before
+revealed the dark footer; showing it painted cream across the
+footer's rows); (b) the extended masked box leaked faint fronds
+below the band end (mask out-of-bounds does not render fully
+transparent under compositing). The r62 paint contract (field +
+sentinels root-negative so the footer scrolls over them) only holds
+while the ::before is NOT layerized. Reverted the same session.
+(3) FINAL STATE = r70 mechanism, now with the rejection PINNED:
+background-position: 0 var(--palms-y, 0px) on the inset:0 ::before;
+motion.js writes --palms-y (time-constant chase, in-frame measure,
+clamped dt, snap). NEW test_parallax_compositor_transform_is_banned
+bans translate3d/will-change/transform:/mask-size/mask-position/
+mask-repeat on the ::before (comments stripped first — the warning
+text in the CSS mentions them) so the experiment cannot be retried
+blind; r69/r70 pins re-asserted (background-position var, --palms-y
+engine write). Smoothness evidence for the shipped state: the r70
+trace measured a FLAT 59fps through the row animations with this
+exact application; every other movement is compositor-driven; the
+chase is frame-rate-independent (r70 pins); row images decode async.
+(4) GATES — check 0 · makemigrations 0 · **881 passed** (net +1:
+the ban pin; the r71-attempt pins replaced in place during the
+experiment were reverted to their r70 form).
+(5) E3 (agent-browser, live, settled): drift ratio 0.497× over a
+1997px scroll (settled readings 1015.16@2000 -> 2007.78@3997);
+transform: none on the ::before; footer dark from the band end
+(rgb(42,33,28) from screen ~716 at scroll 12600); the dissolve
+tapers to zero before the footer; no console errors; gateway 200.
+Deliverable: download/r71-listings-smooth-verified.png. Tooling
+footnotes for the next run: (i) pixel checks must sum over CHANNELS
+(axis=2), not width — an axis-1 bug produced a false "footer
+missing" alarm; (ii) html uses smooth scrolling, so a programmatic
+scrollTo is ANIMATED — in throttled headless a screenshot right
+after "wait 900" can still catch it mid-flight (verify scrollY at
+screenshot time, or wait longer); (iii) headless rAF throttles to
+~10fps without frame-pumping — don't read raw fps there; the r70
+stepped trace (59fps flat) remains the pacing evidence.
+FOR THE NEXT RUN: preview bootstrap is scripts/start_preview.sh
+(self-healing after sandbox recycles). Owner's cloud PAT still
+"Later" — push when provided, delete after use.
+
 Run 70 | BUILDER (owner round, off-loop) | 2026-11-11 ~16:20-17:10 +03:00 | items:
 (1) **OWNER ASK — "Asses the animations and resolve the glitches ...
 when the listing animation occurs ..the parralax effect drops down and

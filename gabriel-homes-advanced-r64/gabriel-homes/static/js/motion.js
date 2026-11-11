@@ -582,12 +582,36 @@
     document.addEventListener("htmx:afterSwap", function () { arm(document); });
   }
 
-  // ---------- r69/r70 (owner rounds thirteen/fourteen): palm drift ----------
+  // ---------- r69/r70/r71 (owner rounds 13-15): palm drift ----------
   // Owner r69: "the palms are stagnant they need to move ...but not to
   // slow they look stagnant and not to fast they move together with
   // the listings." Owner r70: "when the listing animation occurs the
-  // parallax effect drops down and up." Half speed stays (DRIFT 0.5);
-  // what changed is the CHASE.
+  // parallax effect drops down and up." Owner r71: "ensure the
+  // movements are smooth." Half speed stays (DRIFT 0.5); the chase
+  // stays the r70 time-constant exponential.
+  //
+  // r71 EXPERIMENT REJECTED, measured live: applying the drift as a
+  // compositor transform (translate3d + will-change on the band's
+  // ::before) was pixel-equivalent in-band — but Chrome HOISTS the
+  // composited ROOT-NEGATIVE layer over the static footer (the
+  // footer vanished behind the field) and the extended masked box
+  // leaked faint fronds below the band. The r62 paint contract
+  // (field and sentinels root-negative, footer scrolls over them)
+  // beats the compositor; the background-position application stays.
+  // It repaints on the main thread, but the r70 trace measured a
+  // FLAT 59fps through the row animations — smooth, and safe.
+  //
+  // Mechanism: this writes --palms-y on .listings-band; search.css
+  // points the ::before's background-position at var(--palms-y, 0px).
+  // The tile repeats, so the drift can run forever without a seam,
+  // and the box-relative 84% mask stays anchored to the band — the
+  // dissolve still lands exactly at the footer line wherever the
+  // scroll is.
+  //
+  // D-MOTION-SAFE / D-FX-GATE: fxNone (fx=none OR the attribute
+  // missing — scripts blocked, fails closed) returns before anything
+  // moves; with JS blocked the var keeps its 0px fallback: the
+  // exact static field. Decorative only.
   //
   // r70 diagnosis (measured, 12s per-frame trace on /properties/):
   // the r69 chase stepped a fixed fraction PER FRAME (EASE 0.14/rAF
@@ -606,14 +630,6 @@
   // background-tab stall can't produce one giant step, and a SNAP
   // threshold ends the loop instead of chasing sub-pixel deltas.
   //
-  // Mechanism (unchanged): this writes --palms-y on .listings-band;
-  // search.css points the ::before's background-position at
-  // var(--palms-y, 0px). The tile repeats, so the drift can run
-  // forever without a seam, and the box-relative 84% mask stays
-  // anchored to the band. D-MOTION-SAFE / D-FX-GATE: fxNone (fx=none
-  // OR the attribute missing — scripts blocked, fails closed) returns
-  // before anything moves; with JS blocked the var keeps its 0px
-  // fallback: the exact static field. Decorative only.
   function setupPalmParallax() {
     if (fxNone) return;
     var band = document.querySelector(".listings-band");
