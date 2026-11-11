@@ -1,6 +1,6 @@
 {% extends "manage/base.html" %}
 
-{% block title %}Site content — {{ SITE_NAME }}{% endblock %}
+{% block title %}Site content — {{ SITE_NAME }} owner portal{% endblock %}
 
 {% block manage_content %}
   <div class="manage-page-head">
@@ -10,7 +10,7 @@
     <p class="manage-card__body">Changes appear immediately. Use plain text only; formatting and accessibility are handled by the site design.</p>
   </div>
 
-  <form method="post" class="manage-content-form" novalidate>
+  <form method="post" enctype="multipart/form-data" class="manage-content-form" novalidate>
     {% csrf_token %}
 
     {% if form.non_field_errors %}
@@ -50,6 +50,44 @@
       <h2>Homepage sections</h2>
       {% for field in form %}
         {% if field.name == 'about_heading' or field.name == 'about_intro' or field.name == 'services_heading' or field.name == 'services_intro' or field.name == 'cta_heading' or field.name == 'cta_intro' or field.name == 'footer_lead' %}
+          <div class="manage-field{% if field.errors %} has-error{% endif %}">
+            <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+            {{ field }}
+            {{ field.errors }}
+          </div>
+        {% endif %}
+      {% endfor %}
+    </section>
+
+    <section class="manage-card manage-form-section">
+      <h2>Logo, address &amp; socials</h2>
+      <p>Everything here is optional — leave a field empty and the site keeps its current look.</p>
+
+      {% for field in form %}
+        {% if field.name == 'logo' or field.name == 'favicon' %}
+          <div class="manage-field manage-field--upload{% if field.errors %} has-error{% endif %}">
+            <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+            {% if field.value %}<p class="manage-field__current">Currently set — upload a new file to replace it.</p>{% endif %}
+            {{ field }}
+            {% if field.help_text %}<p class="manage-field__help">{{ field.help_text }}</p>{% endif %}
+            {{ field.errors }}
+          </div>
+        {% endif %}
+      {% endfor %}
+
+      {% for field in form %}
+        {% if field.name == 'address_line' or field.name == 'opening_hours' %}
+          <div class="manage-field{% if field.errors %} has-error{% endif %}">
+            <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+            {{ field }}
+            {% if field.help_text %}<p class="manage-field__help">{{ field.help_text }}</p>{% endif %}
+            {{ field.errors }}
+          </div>
+        {% endif %}
+      {% endfor %}
+
+      {% for field in form %}
+        {% if field.name == 'instagram_url' or field.name == 'facebook_url' or field.name == 'x_url' or field.name == 'tiktok_url' %}
           <div class="manage-field{% if field.errors %} has-error{% endif %}">
             <label for="{{ field.id_for_label }}">{{ field.label }}</label>
             {{ field }}

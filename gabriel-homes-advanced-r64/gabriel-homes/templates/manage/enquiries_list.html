@@ -1,0 +1,73 @@
+{% extends "manage/base.html" %}
+
+{% block title %}Enquiries — {{ SITE_NAME }} owner portal{% endblock %}
+
+{% block manage_content %}
+  <div class="manage-page-head">
+    <p class="manage-card__tag">[ ENQUIRIES ]</p>
+    <h1 class="manage-card__title">Enquiries.</h1>
+    <p class="manage-card__body">Every message from the site, newest first. Open one to reply and move it along.</p>
+  </div>
+
+  {# Tabs with counts — the inbox's five states plus spam #}
+  <nav class="manage-tabs" aria-label="Enquiry status filters">
+    {% for item in tab_items %}
+      <a class="manage-tabs__tab {% if item.is_current %}is-current{% endif %}"
+         href="{% url 'manage:enquiries' %}{% if item.key != 'all' %}?tab={{ item.key }}{% endif %}">
+        {{ item.label }} <span class="manage-tabs__count">{{ item.count }}</span>
+      </a>
+    {% endfor %}
+  </nav>
+
+  {% if enquiries %}
+    <ul class="manage-rows manage-rows--stack">
+      {% for inquiry in enquiries %}
+        <li class="manage-row {% if tab == 'spam' %}manage-row--spam{% endif %}">
+          {% if tab == 'spam' %}
+            <span class="manage-row__link manage-row__link--static">
+              <span class="manage-row__who">{{ inquiry.name }}{% if inquiry.is_demo %} <span class="manage-pill manage-pill--sample">Sample</span>{% endif %}</span>
+              <span class="manage-row__meta">Caught by the spam filter · {{ inquiry.created_at|date:'j M Y' }}</span>
+            </span>
+            <form method="post" action="{% url 'manage:enquiry_delete' inquiry.pk %}" class="manage-row__side">
+              {% csrf_token %}
+              <button type="submit" class="btn btn--outline manage-row__btn">Delete</button>
+            </form>
+          {% else %}
+            <a class="manage-row__link" href="{% url 'manage:enquiry_detail' inquiry.pk %}">
+              <span class="manage-row__who">{{ inquiry.name }}{% if inquiry.is_demo %} <span class="manage-pill manage-pill--sample">Sample</span>{% endif %}</span>
+              <span class="manage-row__meta">{{ inquiry.property_ref.title|truncatechars:44 }} · {{ inquiry.created_at|date:'j M' }}</span>
+            </a>
+            <span class="manage-pill">{{ inquiry.get_status_display }}</span>
+          {% endif %}
+        </li>
+      {% endfor %}
+    </ul>
+
+    {% if pages > 1 %}
+      <nav class="manage-pager" aria-label="Pages">
+        {% if page > 1 %}
+          <a class="manage-pager__link" href="?tab={{ tab }}&amp;page={{ page|add:'-1' }}">&larr; Newer</a>
+        {% endif %}
+        <span class="manage-pager__where">Page {{ page }} of {{ pages }}</span>
+        {% if page < pages %}
+          <a class="manage-pager__link" href="?tab={{ tab }}&amp;page={{ page|add:'1' }}">Older &rarr;</a>
+        {% endif %}
+      </nav>
+    {% endif %}
+  {% else %}
+    <div class="manage-card manage-empty">
+      {% if tab == 'spam' %}
+        <p class="manage-empty__title">No spam.</p>
+        <p class="manage-empty__body">The filter catches bots quietly — anything it catches shows up here.</p>
+      {% else %}
+        <p class="manage-empty__title">Nothing here.</p>
+        <p class="manage-empty__body">No enquiries with this status right now. Try the All tab.</p>
+      {% endif %}
+    </div>
+  {% endif %}
+
+  <p class="manage-foot">
+    <a class="btn btn--outline" href="{% url 'manage:enquiries_export' %}">Download all as CSV</a>
+  </p>
+
+{% endblock %}

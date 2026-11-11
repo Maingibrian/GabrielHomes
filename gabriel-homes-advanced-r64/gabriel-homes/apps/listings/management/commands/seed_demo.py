@@ -28,6 +28,7 @@ from PIL import Image, ImageDraw
 
 from apps.accounts.models import User
 from apps.agents.models import AgencyProfile
+from apps.inquiries.models import Inquiry
 from apps.listings.models import Amenity, Property, PropertyImage, PropertyType
 from apps.locations.models import Location
 
@@ -332,6 +333,12 @@ class Command(BaseCommand):
             help="Explicit override required when DEBUG=False (C2: "
                  "production must never be seeded with fictional data).",
         )
+        parser.add_argument(
+            "--with-enquiries",
+            action="store_true",
+            help="Also seed sample enquiries + view counts so the owner "
+                 "portal's graphs have data (r73; is_demo-stamped).",
+        )
 
     @transaction.atomic
     def handle(self, *args, **opts):
@@ -348,6 +355,7 @@ class Command(BaseCommand):
         do_clear = opts["clear"]
         no_images = opts["no_images"]
         target = opts["target"]
+        with_enquiries = opts["with_enquiries"]
 
         if do_clear:
             self._clear_all()
@@ -358,6 +366,13 @@ class Command(BaseCommand):
         amenity_count = self._seed_amenities()
         agency_count = self._seed_agencies()
         listing_count = self._seed_listings(target=target, with_images=not no_images)
+        enquiry_count = 0
+        if with_enquiries:
+            # r73: opt-in — the portal-preview database wants sample
+            # enquiries + view counts so the graphs demonstrate
+            # themselves; test fixtures stay byte-identical without it.
+            self._seed_listing_views()
+            enquiry_count = self._seed_enquiries()
 
         self.stdout.write(self.style.SUCCESS(
             f"\nDone.\n"
@@ -366,13 +381,106 @@ class Command(BaseCommand):
             f"  Amenities:      {amenity_count}\n"
             f"  Agencies:       {agency_count}\n"
             f"  Listings:       {listing_count}\n"
+            f"  Sample enquiries: {enquiry_count}\n"
             f"  Images:         {'skipped' if no_images else 'generated'}"
         ))
+
+    # ------------------------------------------------------------------
+    # Sample enquiries + listing views (r73 BACKEND-PLAN 1B/1C)
+    # ------------------------------------------------------------------
+    # Clearly fictional people ("(sample)" in the name) stamped
+    # is_demo=True: the portal graphs and inbox have data to show, and
+    # the owner's demo switch hides them exactly like sample listings.
+    # Nothing here ever looks like a real customer.
+    SAMPLE_NAMES = (
+        "Amina S. (sample)", "David K. (sample)", "Wanjiru M. (sample)",
+        "Hassan A. (sample)", "Njeri P. (sample)", "Omar J. (sample)",
+        "Fatuma B. (sample)", "Peter M. (sample)", "Salma Y. (sample)",
+        "Kevin O. (sample)", "Zainab W. (sample)", "Brian T. (sample)",
+    )
+    SAMPLE_MESSAGES = (
+        "Hi, is this home still available? I would love to arrange a viewing this week if possible.",
+        "Good afternoon. Please send me more photos and the exact location. Thank you.",
+        "I am relocating to Mombasa next month. Is the price negotiable?",
+        "Hello, we are a family of four. Are there schools nearby?",
+        "Please let me know the monthly service charge and deposit requirements.",
+        "Is short stay possible for two weeks over the holidays?",
+    )
+
+    def _seed_listing_views(self) -> None:
+        """Give every demo listing a plausible views_count so the
+        most-viewed graph has data (purely fictional, is_demo rows)."""
+        for property_obj in Property.objects.filter(is_demo=True).iterator():
+            Property.objects.filter(pk=property_obj.pk).update(
+                views_count=random.randint(12, 480)
+            )
+
+    def _seed_enquiries(self) -> int:
+        if Inquiry.objects.exists():
+            return Inquiry.objects.count()
+        listings = list(Property.objects.filter(is_demo=True))
+        if not listings:
+            return 0
+        # A gentle month: 0-2 most days. Recent enquiries lean New/Seen
+        # (a realistic inbox); older ones have progressed along the pipeline.
+        now = timezone.now()
+        fresh_statuses = [
+            Inquiry.Status.NEW, Inquiry.Status.NEW, Inquiry.Status.NEW,
+            Inquiry.Status.READ, Inquiry.Status.READ,
+        ]
+        progressed_statuses = [
+            Inquiry.Status.READ, Inquiry.Status.CONTACTED, Inquiry.Status.CONTACTED,
+            Inquiry.Status.VIEWING, Inquiry.Status.CLOSED, Inquiry.Status.CLOSED,
+        ]
+        made = 0
+        for day_offset in range(29, -1, -1):
+            count = random.choices([0, 1, 2], weights=[3, 5, 2])[0]
+            for _ in range(count):
+                listing = random.choice(listings)
+                if day_offset <= 7:
+                    status = fresh_statuses[(made + day_offset) % len(fresh_statuses)]
+                else:
+                    status = progressed_statuses[(made + day_offset) % len(progressed_statuses)]
+                created = now - timedelta(
+                    days=day_offset,
+                    hours=random.randint(8, 20),
+                    minutes=random.randint(0, 59),
+                )
+                name = self.SAMPLE_NAMES[(day_offset + made) % len(self.SAMPLE_NAMES)]
+                inquiry = Inquiry.objects.create(
+                    property_ref=listing,
+                    name=name,
+                    email=f"sample{made + 1}@example.com",
+                    phone=f"07{random.randint(10, 99)} {random.randint(100, 999)} {random.randint(100, 999)}",
+                    message=self.SAMPLE_MESSAGES[(day_offset + made) % len(self.SAMPLE_MESSAGES)],
+                    status=status,
+                    is_demo=True,
+                )
+                # created_at is auto_now_add — a plain .update() is the only
+                # way to backdate it (same trick as the listing stagger).
+                Inquiry.objects.filter(pk=inquiry.pk).update(created_at=created)
+                made += 1
+        # Two spam rows so the spam folder demonstrates itself.
+        for spam_i in range(2):
+            spam = Inquiry.objects.create(
+                property_ref=random.choice(listings),
+                name="best-seo-ranks (spam)",
+                email="spam{0}@example.com".format(spam_i),
+                phone="",
+                message="I can rank your website #1...",
+                honeypot="http://spam.example",
+                is_demo=True,
+            )
+            Inquiry.objects.filter(pk=spam.pk).update(
+                created_at=now - timedelta(days=3 - spam_i, hours=2)
+            )
+        return made + 2
 
     # ------------------------------------------------------------------
     # Clear
     # ------------------------------------------------------------------
     def _clear_all(self) -> None:
+        Inquiry.objects.all().delete()
         PropertyImage.objects.all().delete()
         Property.objects.all().delete()
         Amenity.objects.all().delete()

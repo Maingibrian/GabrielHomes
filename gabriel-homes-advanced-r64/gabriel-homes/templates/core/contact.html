@@ -56,6 +56,27 @@
 </section>
 {% endif %}
 
+{% comment %} r73 (BACKEND-PLAN 1D): the office address + hours, owner-editable in
+manage > Site content. Renders nothing until the owner fills the address —
+honest blank, never an invented office. {% endcomment %}
+{% if brand.address_line %}
+<section class="section contact-channels contact-visit">
+  <div class="container">
+    <p class="section-tag" data-reveal>[ VISIT ]</p>
+    <h2 class="contact-channels__title" data-reveal>Where to find us.</h2>
+    <div class="contact-channels__grid">
+      <div class="contact-channel contact-channel--static" data-reveal>
+        <span class="contact-channel__label">Address</span>
+        <span class="contact-channel__value">{{ brand.address_line }}</span>
+        {% if brand.opening_hours %}
+          <span class="contact-channel__hint">{{ brand.opening_hours }}</span>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</section>
+{% endif %}
+
 {% comment %} r13: the two audience paths as separate bordered cards — clear separation instead of two thin text columns running together. {% endcomment %}
 <section class="section contact-paths">
   <div class="container">

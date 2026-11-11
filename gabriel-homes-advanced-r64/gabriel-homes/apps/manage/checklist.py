@@ -93,9 +93,10 @@ REGISTRY: tuple[ChecklistItem, ...] = (
             "Add at least one so no enquiry goes cold."
         ),
         action=(
-            "Send Brian the phone / WhatsApp / email you want published — "
-            "the Brand editor inside this portal is coming soon."
+            "Open Site content in this portal and add your phone, "
+            "WhatsApp or email."
         ),
+        url="/manage/site-content/",
     ),
     ChecklistItem(
         key="hide_demo",
@@ -192,17 +193,18 @@ def build_checklist() -> dict:
 def counts() -> dict:
     """Owner-facing numbers, all computed from the database.
 
-    * new_enquiries — status New, spam-flagged rows excluded (the spam
-      folder arrives with P3-6; until then flagged rows are not shown
-      as enquiries anywhere).
+    * new_enquiries — status New, spam-flagged rows excluded (spam lives
+      in its own tab, r73), sample enquiries excluded while the demo
+      switch is on (same contract as sample listings).
     * live_listings — exactly what the public site can see right now
       (the published() chokepoint, demo switch included).
     * drafts — the owner's unfinished work (dashboards see everything).
     """
+    enquiries = Inquiry.objects.filter(status=Inquiry.Status.NEW, honeypot="")
+    if SiteSetting.demo_hidden():
+        enquiries = enquiries.exclude(is_demo=True)
     return {
-        "new_enquiries": Inquiry.objects.filter(
-            status=Inquiry.Status.NEW, honeypot=""
-        ).count(),
+        "new_enquiries": enquiries.count(),
         "live_listings": Property.objects.published().count(),
         "drafts": Property.objects.filter(status=Property.Status.DRAFT).count(),
     }

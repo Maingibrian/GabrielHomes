@@ -134,7 +134,9 @@ def test_fresh_site_state_and_next_step():
     assert cl["next"]["spec"].key == "contact"
     html = r.content.decode()
     assert "1 of 6 done" in html
-    assert "Send Brian the phone" in html  # exact next step shown in banner
+    # r73: the next step now points at the portal's own brand editor
+    # (it said "Send Brian…" back when the editor was still "coming soon").
+    assert "Open Site content in this portal" in html  # exact next step shown in banner
 
 
 def test_contact_item_flips_with_brand_settings():

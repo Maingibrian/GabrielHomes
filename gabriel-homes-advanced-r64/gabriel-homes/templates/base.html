@@ -6,7 +6,24 @@
   <title>{% block title %}{{ SITE_NAME }} — Real estate with a human point of view{% endblock %}</title>
   <meta name="description" content="{% block meta_description %}{{ DEFAULT_META_DESCRIPTION }}{% endblock %}">
   <meta name="theme-color" content="#2a211c">
-  <link rel="icon" type="image/svg+xml" href="{% static 'img/favicon.svg' %}">
+  {% if brand.favicon %}
+    <link rel="icon" type="image/png" href="{{ brand.favicon.url }}">
+  {% else %}
+    <link rel="icon" type="image/svg+xml" href="{% static 'img/favicon.svg' %}">
+  {% endif %}
+
+  {% comment %}
+    r73 (BACKEND-PLAN 1E): optional Google Analytics — only when the owner
+    sets an ID in /manage/seo/. The loader is a LOCAL static file that reads
+    the ID from its data attribute: zero inline scripts, so the strict CSP
+    (test_csp pin) holds. Nothing renders when the ID is empty.
+  {% endcomment %}
+  {% if brand.analytics_id %}
+    <script src="{% staticv 'js/ga-init.js' %}" data-ga-id="{{ brand.analytics_id }}" defer></script>
+  {% endif %}
+  {% if brand.search_console_token %}
+    <meta name="google-site-verification" content="{{ brand.search_console_token }}">
+  {% endif %}
 
   {# Canonical URL — every page should set this via the block #}
   {% block canonical %}{% endblock %}

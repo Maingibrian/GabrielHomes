@@ -111,3 +111,20 @@ ul, ol { margin: 0; padding: 0; list-style: none; }
     view-transition-name: none !important;
   }
 }
+
+/* r73 (BACKEND-PLAN 1D): the owner's logo replaces the house mark when set
+   (manage > Site content). Same 27px box as the SVG mark it stands in for. */
+.brand-logo {
+  display: inline-block;
+  width: 27px;
+  height: 27px;
+  object-fit: contain;
+}
+
+/* r73: the address card on /contact/ — the channel card pattern, but not a link. */
+.contact-channel--static {
+  cursor: default;
+}
+.contact-channel--static:hover {
+  transform: none;
+}

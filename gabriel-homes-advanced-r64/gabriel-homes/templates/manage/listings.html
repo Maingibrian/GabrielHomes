@@ -1,0 +1,66 @@
+{% extends "manage/base.html" %}
+{% load core_tags %}
+
+{% block title %}Listings — {{ SITE_NAME }} owner portal{% endblock %}
+
+{% block manage_content %}
+  <div class="manage-page-head">
+    <p class="manage-card__tag">[ LISTINGS ]</p>
+    <h1 class="manage-card__title">Your listings.</h1>
+    <p class="manage-card__body">Every property, at a glance. Use Edit for the full editor — the step-by-step tools are being added to this screen next.</p>
+  </div>
+
+  <nav class="manage-tabs" aria-label="Listing status filters">
+    {% for item in tab_items %}
+      <a class="manage-tabs__tab {% if item.is_current %}is-current{% endif %}"
+         href="{% url 'manage:listings' %}{% if item.key != 'all' %}?tab={{ item.key }}{% endif %}">
+        {{ item.label }} <span class="manage-tabs__count">{{ item.count }}</span>
+      </a>
+    {% endfor %}
+  </nav>
+
+  {% if listings %}
+    <ul class="manage-rows manage-rows--stack">
+      {% for property in listings %}
+        <li class="manage-row">
+          <span class="manage-row__link manage-row__link--static">
+            <span class="manage-row__who">{{ property.title }}{% if property.is_demo %} <span class="manage-pill manage-pill--sample">Sample</span>{% endif %}</span>
+            <span class="manage-row__meta">
+              {{ property.location.name }} · {{ property.get_status_display }} ·
+              {{ property.price|kes }} · {{ property.views_count }} view{{ property.views_count|pluralize }} ·
+              updated {{ property.updated_at|date:'j M' }}
+            </span>
+          </span>
+          <span class="manage-row__side manage-row__side--links">
+            {% if property.is_published %}
+              <a class="manage-row__mini" href="{{ property.get_absolute_url }}" target="_blank" rel="noopener">View</a>
+            {% endif %}
+            <a class="manage-row__mini manage-row__mini--primary" href="{% url 'agents:dashboard_listing_edit' property.pk %}">Edit</a>
+          </span>
+        </li>
+      {% endfor %}
+    </ul>
+
+    {% if is_paginated %}
+      <nav class="manage-pager" aria-label="Pages">
+        {% if page_obj.has_previous %}
+          <a class="manage-pager__link" href="?tab={{ tab }}&amp;page={{ page_obj.previous_page_number }}">&larr; Newer</a>
+        {% endif %}
+        <span class="manage-pager__where">Page {{ page_obj.number }} of {{ paginator.num_pages }}</span>
+        {% if page_obj.has_next %}
+          <a class="manage-pager__link" href="?tab={{ tab }}&amp;page={{ page_obj.next_page_number }}">Older &rarr;</a>
+        {% endif %}
+      </nav>
+    {% endif %}
+  {% else %}
+    <div class="manage-card manage-empty">
+      <p class="manage-empty__title">No listings here.</p>
+      <p class="manage-empty__body">Nothing with this status right now.</p>
+    </div>
+  {% endif %}
+
+  <p class="manage-foot">
+    <a class="btn btn--primary" href="{% url 'agents:dashboard_listing_create' %}">Add a listing</a>
+  </p>
+
+{% endblock %}

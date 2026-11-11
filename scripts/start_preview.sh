@@ -55,8 +55,8 @@ $PY manage.py migrate --noinput | tail -2
 echo "=== 4. Seed (only if DB is empty) ==="
 LISTINGS=$($PY manage.py shell -c "from apps.listings.models import Property; print(Property.objects.count())" 2>/dev/null | tail -1)
 if [ "${LISTINGS:-0}" = "0" ]; then
-    echo "empty DB — seeding 80 demo listings with photos"
-    $PY manage.py seed_demo --target 80
+    echo "empty DB — seeding 80 demo listings + sample enquiries"
+    $PY manage.py seed_demo --target 80 --with-enquiries
     echo "replacing any gradient cards with real pool photos"
     $PY scripts/replace_gradient_cards.py || true
 else

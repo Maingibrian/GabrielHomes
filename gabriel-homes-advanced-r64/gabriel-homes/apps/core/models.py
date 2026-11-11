@@ -4,11 +4,43 @@ r11: the owner controls "placeholder data" visibility from the branded
 dashboard (never the Django admin). SiteSetting is a single-row (pk=1)
 table of those switches; it is created lazily so first boot needs no
 extra setup step.
+
+r73 (BACKEND-PLAN 1D/1E): BrandSettings also carries the owner's
+brand ASSETS (logo, favicon, socials, address, hours — everything the
+public chrome renders) and the SEO & tracking knobs (analytics ID,
+Search Console token, default meta description). All blank by default:
+empty field = hidden UI (honest blank), never an invented value.
 """
 from __future__ import annotations
 
+import os
+
+from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.utils import OperationalError, ProgrammingError
+
+# Brand asset uploads (r73): small images only, web-safe formats.
+MAX_BRAND_IMAGE_SIZE = 2 * 1024 * 1024  # 2 MB
+ALLOWED_BRAND_IMAGE_EXTENSIONS = {".png", ".jpg", ".jpeg", ".webp"}
+
+
+def validate_brand_image(image):
+    """Brand logo/favicon uploads: type + size (BACKEND-PLAN 1D).
+
+    Deliberately stricter than listing photos (2 MB, no SVG): these
+    render on every page load and inside the <head>, so they must be
+    tiny and raster. Plain-language errors — the owner sees them.
+    """
+    if image.size > MAX_BRAND_IMAGE_SIZE:
+        raise ValidationError(
+            f"That image is {image.size // (1024*1024)} MB — please keep it "
+            f"under 2 MB (it shows on every page)."
+        )
+    ext = os.path.splitext(image.name)[1].lower()
+    if ext not in ALLOWED_BRAND_IMAGE_EXTENSIONS:
+        raise ValidationError(
+            f"'{ext or 'no'}' files aren't supported — use a PNG, JPG or WebP image."
+        )
 
 
 class SiteSetting(models.Model):
@@ -154,6 +186,64 @@ class BrandSettings(models.Model):
             "for character, from Nyali sea views to Old Town courtyards."
         ),
     )
+
+    # ------------------------------------------------------------------
+    # Brand assets + contact places (r73, BACKEND-PLAN 1D)
+    # ------------------------------------------------------------------
+    logo = models.ImageField(
+        upload_to="brand/",
+        blank=True,
+        validators=[validate_brand_image],
+        help_text="Your logo, shown in the site header instead of the house mark. PNG with a transparent background works best. Leave empty to keep the house mark.",
+    )
+    favicon = models.ImageField(
+        upload_to="brand/",
+        blank=True,
+        validators=[validate_brand_image],
+        help_text="The little icon in the browser tab. A small square PNG (64×64 or 128×128). Leave empty to keep the current icon.",
+    )
+    address_line = models.CharField(
+        max_length=200, blank=True,
+        help_text="Shown on the Contact page when filled — e.g. 'Links Road, Nyali, Mombasa'.",
+    )
+    opening_hours = models.CharField(
+        max_length=200, blank=True,
+        help_text="One line, e.g. 'Mon–Sat 8am–6pm'. Shown under the address when filled.",
+    )
+    instagram_url = models.URLField(
+        max_length=200, blank=True,
+        help_text="Full link — shown in the footer when filled.",
+    )
+    facebook_url = models.URLField(
+        max_length=200, blank=True,
+        help_text="Full link — shown in the footer when filled.",
+    )
+    x_url = models.URLField(
+        max_length=200, blank=True,
+        verbose_name="X (Twitter) URL",
+        help_text="Full link — shown in the footer when filled.",
+    )
+    tiktok_url = models.URLField(
+        max_length=200, blank=True,
+        help_text="Full link — shown in the footer when filled.",
+    )
+
+    # ------------------------------------------------------------------
+    # SEO & tracking (r73, BACKEND-PLAN 1E)
+    # ------------------------------------------------------------------
+    analytics_id = models.CharField(
+        max_length=40, blank=True,
+        help_text="Google Analytics 4 ID (starts with G-). Leave empty to keep the site tracker-free.",
+    )
+    search_console_token = models.CharField(
+        max_length=120, blank=True,
+        help_text="The long code Google Search Console gives you to verify the site.",
+    )
+    meta_description = models.TextField(
+        max_length=300, blank=True,
+        help_text="One or two sentences describing the site for search results. Leave empty to keep the current wording.",
+    )
+
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:

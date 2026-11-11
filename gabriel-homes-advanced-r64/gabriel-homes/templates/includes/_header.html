@@ -2,11 +2,15 @@
 <header class="site-header" role="banner" data-site-header>
   <div class="container site-header__inner">
     <a class="site-header__brand" href="/" aria-label="Gabriel Homes — home">
-      <svg class="brand-mark" viewBox="0 0 34 34" width="27" height="27" aria-hidden="true" focusable="false">
-        <path class="brand-mark__roof" d="M4.5 17.5 17 6l12.5 11.5"/>
-        <path class="brand-mark__body" d="M8 16.2v9.9c0 .9.7 1.7 1.7 1.7h14.6c.9 0 1.7-.8 1.7-1.7v-9.9"/>
-        <path class="brand-mark__door" d="M13.9 27.8v-5.9a3.1 3.1 0 0 1 6.2 0v5.9"/>
-      </svg>
+      {% if brand.logo %}
+        <img class="brand-logo" src="{{ brand.logo.url }}" alt="Gabriel Homes" width="27" height="27">
+      {% else %}
+        <svg class="brand-mark" viewBox="0 0 34 34" width="27" height="27" aria-hidden="true" focusable="false">
+          <path class="brand-mark__roof" d="M4.5 17.5 17 6l12.5 11.5"/>
+          <path class="brand-mark__body" d="M8 16.2v9.9c0 .9.7 1.7 1.7 1.7h14.6c.9 0 1.7-.8 1.7-1.7v-9.9"/>
+          <path class="brand-mark__door" d="M13.9 27.8v-5.9a3.1 3.1 0 0 1 6.2 0v5.9"/>
+        </svg>
+      {% endif %}
       <span class="brand-word">Gabriel&nbsp;<span class="brand-accent">Homes</span></span>
     </a>
 
@@ -59,11 +63,15 @@
 <div class="mobile-menu" id="mobile-menu" data-mobile-menu aria-hidden="true">
   <div class="mobile-menu__header">
     <a class="site-header__brand" href="/" aria-label="Gabriel Homes — home">
-      <svg class="brand-mark" viewBox="0 0 34 34" width="27" height="27" aria-hidden="true" focusable="false">
-        <path class="brand-mark__roof" d="M4.5 17.5 17 6l12.5 11.5"/>
-        <path class="brand-mark__body" d="M8 16.2v9.9c0 .9.7 1.7 1.7 1.7h14.6c.9 0 1.7-.8 1.7-1.7v-9.9"/>
-        <path class="brand-mark__door" d="M13.9 27.8v-5.9a3.1 3.1 0 0 1 6.2 0v5.9"/>
-      </svg>
+      {% if brand.logo %}
+        <img class="brand-logo" src="{{ brand.logo.url }}" alt="Gabriel Homes" width="27" height="27">
+      {% else %}
+        <svg class="brand-mark" viewBox="0 0 34 34" width="27" height="27" aria-hidden="true" focusable="false">
+          <path class="brand-mark__roof" d="M4.5 17.5 17 6l12.5 11.5"/>
+          <path class="brand-mark__body" d="M8 16.2v9.9c0 .9.7 1.7 1.7 1.7h14.6c.9 0 1.7-.8 1.7-1.7v-9.9"/>
+          <path class="brand-mark__door" d="M13.9 27.8v-5.9a3.1 3.1 0 0 1 6.2 0v5.9"/>
+        </svg>
+      {% endif %}
       <span class="brand-word">Gabriel&nbsp;<span class="brand-accent">Homes</span></span>
     </a>
     <button class="mobile-menu__close" type="button"

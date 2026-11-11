@@ -1,8 +1,16 @@
-"""Core middleware — CSP (S10) and small cross-cutting helpers."""
+"""Core middleware — CSP (S10) and small cross-cutting helpers.
+
+r73 (BACKEND-PLAN 1E): the policy carries a per-request nonce and the
+Google Analytics origins so the OPTIONAL gtag snippet (only rendered
+when the owner sets an Analytics ID in /manage/seo/) can load — the
+policy stays strict for everything else: no 'unsafe-inline' scripts,
+once unknown = blocked.
+"""
 from __future__ import annotations
 
 import os
 import sys
+import uuid
 
 # Content-Security-Policy per docs/PLAN.md S10. OpenFreeMap serves both the
 # search-page map and the property-detail map (self-hosted MapLibre GL; the
@@ -32,11 +40,15 @@ import sys
 #                               enquiry)
 CSP_POLICY = (
     "default-src 'self'; "
-    "img-src 'self' data: blob: https://tiles.openfreemap.org; "
+    "img-src 'self' data: blob: https://tiles.openfreemap.org "
+    "https://www.google-analytics.com https://*.google-analytics.com; "
     "style-src 'self' 'unsafe-inline'; "
-    "script-src 'self'; "
+    # r73: per-request nonce + the optional GA4 loader origins (no unsafe-inline)
+    "script-src 'self' {nonce} https://www.googletagmanager.com "
+    "https://www.google-analytics.com; "
     "font-src 'self'; "
-    "connect-src 'self' https://tiles.openfreemap.org; "
+    "connect-src 'self' https://tiles.openfreemap.org "
+    "https://www.google-analytics.com https://*.google-analytics.com; "
     "worker-src 'self' blob:; "
     "frame-ancestors 'none'; "
     "base-uri 'self'; "
@@ -85,15 +97,22 @@ class ContentSecurityPolicyMiddleware:
         self.get_response = get_response
 
     def __call__(self, request):
+        # r73: mint the nonce BEFORE the response is built so templates
+        # can stamp <script nonce="…"> for the optional GA4 config.
+        # (Plain-object test doubles can't hold attributes — the nonce
+        # still goes into the policy below; only the handoff is skipped.)
+        nonce = uuid.uuid4().hex
+        try:
+            request.csp_nonce = nonce
+        except AttributeError:
+            pass
         response = self.get_response(request)
+        policy = CSP_POLICY_PREVIEW if _preview_framing_allowed() else CSP_POLICY
+        policy = policy.format(nonce=f"'nonce-{nonce}'")
+        response.headers.setdefault("Content-Security-Policy", policy)
         if _preview_framing_allowed():
-            response.headers.setdefault(
-                "Content-Security-Policy", CSP_POLICY_PREVIEW
-            )
             # Django's XFrameOptionsMiddleware (listed before us, so it
             # runs after us on the response path) honours this attribute
             # and skips the X-Frame-Options header.
             response.xframe_options_exempt = True
-        else:
-            response.headers.setdefault("Content-Security-Policy", CSP_POLICY)
         return response

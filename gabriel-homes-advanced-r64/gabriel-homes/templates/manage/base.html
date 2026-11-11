@@ -6,28 +6,57 @@
   <title>{% block title %}Owner portal — {{ SITE_NAME }}{% endblock %}</title>
   <meta name="robots" content="noindex, nofollow">
   <meta name="theme-color" content="#2a211c">
-  <link rel="icon" type="image/svg+xml" href="{% static 'img/favicon.svg' %}">
+  {% if brand.favicon %}
+    <link rel="icon" type="image/png" href="{{ brand.favicon.url }}">
+  {% else %}
+    <link rel="icon" type="image/svg+xml" href="{% static 'img/favicon.svg' %}">
+  {% endif %}
+  {% comment %}
+    r73 FIX (latent since P2-1): the portal never linked tokens.css or
+    components.css — every var(--token) computed invalid, so the portal
+    rendered unstyled (transparent topbar, fallback colors). Same load
+    order as the public base.html: tokens → base → components → page.
+  {% endcomment %}
+  <link rel="stylesheet" href="{% staticv 'css/tokens.css' %}">
   <link rel="stylesheet" href="{% staticv 'css/base.css' %}">
+  <link rel="stylesheet" href="{% staticv 'css/components.css' %}">
   <link rel="stylesheet" href="{% staticv 'css/manage.css' %}">
 </head>
 <body class="{% block body_class %}page-manage{% endblock %}">
 
   <header class="manage-topbar">
     <a class="manage-topbar__brand" href="{% url 'manage:home' %}">
-      <span class="manage-topbar__mark" aria-hidden="true">{{ SITE_NAME|initials }}</span>
+      {% if brand.logo %}
+        <img class="manage-topbar__logo" src="{{ brand.logo.url }}" alt="" width="40" height="40">
+      {% else %}
+        <span class="manage-topbar__mark" aria-hidden="true">{{ SITE_NAME|initials }}</span>
+      {% endif %}
       <span class="manage-topbar__name">
         {{ SITE_NAME }}
         <small>Owner portal</small>
       </span>
     </a>
-    <div class="manage-topbar__actions">
-      <a class="manage-topbar__link" href="{% url 'manage:site_content' %}">Site content</a>
-      <form method="post" action="{% url 'account_logout' %}" class="manage-topbar__signout">
-        {% csrf_token %}
-        <button type="submit" class="btn btn--light-outline manage-topbar__signout-btn">Sign out</button>
-      </form>
-    </div>
+    <form method="post" action="{% url 'account_logout' %}" class="manage-topbar__signout">
+      {% csrf_token %}
+      <button type="submit" class="btn btn--light-outline manage-topbar__signout-btn">Sign out</button>
+    </form>
   </header>
+
+  {# Five sections, one nav (r73 BACKEND-PLAN rule 3) — the badge whispers, never shouts. #}
+  <nav class="manage-nav" aria-label="Portal sections">
+    <a class="manage-nav__link {% if request.path == '/manage/' %}is-current{% endif %}"
+       href="{% url 'manage:home' %}">Home</a>
+    <a class="manage-nav__link {% if '/enquiries' in request.path %}is-current{% endif %}"
+       href="{% url 'manage:enquiries' %}">Enquiries
+       {% if nav_new_enquiries %}<span class="manage-nav__badge">{{ nav_new_enquiries }}</span>{% endif %}
+    </a>
+    <a class="manage-nav__link {% if '/listings' in request.path %}is-current{% endif %}"
+       href="{% url 'manage:listings' %}">Listings</a>
+    <a class="manage-nav__link {% if '/site-content' in request.path %}is-current{% endif %}"
+       href="{% url 'manage:site_content' %}">Site content</a>
+    <a class="manage-nav__link {% if '/seo' in request.path %}is-current{% endif %}"
+       href="{% url 'manage:seo' %}">SEO</a>
+  </nav>
 
   <main class="manage-main">
     {% if messages %}

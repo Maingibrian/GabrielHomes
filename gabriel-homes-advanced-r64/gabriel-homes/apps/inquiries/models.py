@@ -1,12 +1,17 @@
-"""Inquiries models — Inquiry.
+"""Inquiries models — Inquiry + InquiryNote.
 
 WORK.md §6 spec:
     Inquiry: property FK, name, email, phone, message, status
     (new | read | replied), created_at, user FK (nullable).
     Spam control: honeypot field + per-IP rate limit.
 
-The honeypot field and per-IP rate limiting are wired up in Phase 4
-when the enquiry form view is built; the model just holds the columns.
+r73 (BACKEND-PLAN 1C): the status column becomes the owner's simple
+pipeline — new → seen → contacted → viewing → done. The old "replied"
+value was data-migrated to "contacted" (inquiries.0004); "read" kept
+its value but its label is now "Seen" (plain language, BACKEND-PLAN
+rule 1). InquiryNote is the owner's private timeline on an enquiry;
+is_demo stamps seeded sample enquiries so the demo switch hides them
+from the portal exactly like sample listings.
 """
 from __future__ import annotations
 
@@ -19,8 +24,10 @@ class Inquiry(models.Model):
 
     class Status(models.TextChoices):
         NEW = "new", "New"
-        READ = "read", "Read"
-        REPLIED = "replied", "Replied"
+        READ = "read", "Seen"
+        CONTACTED = "contacted", "Contacted"
+        VIEWING = "viewing", "Viewing booked"
+        CLOSED = "closed", "Done"
 
     property_ref = models.ForeignKey(
         "listings.Property",
@@ -44,7 +51,7 @@ class Inquiry(models.Model):
     message = models.TextField(max_length=5000)
 
     status = models.CharField(
-        max_length=8, choices=Status.choices, default=Status.NEW, db_index=True
+        max_length=16, choices=Status.choices, default=Status.NEW, db_index=True
     )
 
     # Spam-control: honeypot value (any non-empty value flags the row as spam),
@@ -54,6 +61,18 @@ class Inquiry(models.Model):
         help_text="Honeypot: must stay empty. Any value flags the row as spam.",
     )
     submitter_ip = models.GenericIPAddressField(null=True, blank=True)
+
+    # r73: seeded sample enquiries carry is_demo=True; while the owner's
+    # demo switch is on, the portal hides them (same contract as sample
+    # listings — one switch, honest data everywhere).
+    is_demo = models.BooleanField(
+        default=False,
+        db_index=True,
+        help_text=(
+            "Seeded sample enquiry. Hidden from the owner portal while the "
+            "demo switch (hide demo data) is on."
+        ),
+    )
 
     # Delivery tracking for the agent notification email (S9). Both stay
     # null/blank when the agent has no email address on file.
@@ -84,3 +103,28 @@ class Inquiry(models.Model):
     @property
     def is_spam(self) -> bool:
         return bool(self.honeypot)
+
+
+class InquiryNote(models.Model):
+    """The owner's private note on an enquiry — a dated timeline.
+
+    BACKEND-PLAN 1C: "Called back, viewing Saturday 10am" style notes.
+    Notes are portal-only; nothing here is ever shown on the public site.
+    """
+
+    inquiry = models.ForeignKey(
+        Inquiry, on_delete=models.CASCADE, related_name="notes"
+    )
+    body = models.TextField(
+        max_length=2000,
+        help_text="What happened — e.g. \"Called back, viewing Saturday 10am\".",
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name = "enquiry note"
+        verbose_name_plural = "enquiry notes"
+        ordering = ("-created_at",)
+
+    def __str__(self) -> str:
+        return f"Note on inquiry #{self.inquiry_id} ({self.created_at:%Y-%m-%d})"

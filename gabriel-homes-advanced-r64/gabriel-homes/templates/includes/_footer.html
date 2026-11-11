@@ -48,6 +48,11 @@
           {% if brand.whatsapp %}<a href="https://wa.me/{{ brand.whatsapp_digits }}" rel="noopener">WhatsApp</a>{% endif %}
           {% if brand.phone %}<a href="tel:{{ brand.phone }}">Call {{ brand.phone }}</a>{% endif %}
           {% if brand.email %}<a href="mailto:{{ brand.email }}">{{ brand.email }}</a>{% endif %}
+          {# r73: the owner's social channels (manage > Site content) — each appears only when filled. #}
+          {% if brand.instagram_url %}<a href="{{ brand.instagram_url }}" rel="noopener">Instagram</a>{% endif %}
+          {% if brand.facebook_url %}<a href="{{ brand.facebook_url }}" rel="noopener">Facebook</a>{% endif %}
+          {% if brand.x_url %}<a href="{{ brand.x_url }}" rel="noopener">X (Twitter)</a>{% endif %}
+          {% if brand.tiktok_url %}<a href="{{ brand.tiktok_url }}" rel="noopener">TikTok</a>{% endif %}
           <a href="/contact/">Contact page</a>
         </div>
         {# Browse — moved from home (H1 r18); curated hubs, query-free (D-LOOP-18b). #}

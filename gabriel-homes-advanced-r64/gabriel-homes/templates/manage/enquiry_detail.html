@@ -1,0 +1,103 @@
+{% extends "manage/base.html" %}
+
+{% block title %}{{ inquiry.name }} — Enquiries — {{ SITE_NAME }} owner portal{% endblock %}
+
+{% block manage_content %}
+  <div class="manage-page-head">
+    <a class="manage-back" href="{% url 'manage:enquiries' %}">&larr; All enquiries</a>
+    <p class="manage-card__tag">[ ENQUIRY ]</p>
+    <h1 class="manage-card__title">{{ inquiry.name }}
+      {% if inquiry.is_demo %}<span class="manage-pill manage-pill--sample">Sample</span>{% endif %}
+    </h1>
+    <p class="manage-card__body manage-card__body--tight">
+      {{ inquiry.created_at|date:'l j F Y, g:iA' }} ·
+      <span class="manage-pill">{{ inquiry.get_status_display }}</span>
+      {% if inquiry.email_sent_at %} · notification emailed{% elif inquiry.email_error %} · <strong>email failed to send</strong>{% endif %}
+    </p>
+  </div>
+
+  {# ---------- The message ---------- #}
+  <section class="manage-card">
+    <h2 class="manage-check__title">Their message</h2>
+    <blockquote class="manage-quote">{{ inquiry.message|linebreaksbr }}</blockquote>
+
+    <dl class="manage-facts">
+      <div class="manage-fact"><dt>Email</dt><dd><a href="mailto:{{ inquiry.email }}">{{ inquiry.email }}</a></dd></div>
+      {% if inquiry.phone %}<div class="manage-fact"><dt>Phone</dt><dd>{{ inquiry.phone }}</dd></div>{% endif %}
+      <div class="manage-fact">
+        <dt>Listing</dt>
+        <dd>
+          <a href="{{ inquiry.property_ref.get_absolute_url }}" target="_blank" rel="noopener">
+            {{ inquiry.property_ref.title }}
+          </a>
+          <small>{{ inquiry.property_ref.location.name }} · {{ inquiry.property_ref.property_type.name }}</small>
+        </dd>
+      </div>
+    </dl>
+
+    {# Reply actions — prefilled, one tap #}
+    <div class="manage-card__actions manage-card__actions--reply">
+      {% if wa_link %}
+        <a class="btn btn--primary" href="{{ wa_link }}" rel="noopener" target="_blank">Reply on WhatsApp</a>
+      {% endif %}
+      {% if inquiry.phone %}
+        <a class="btn btn--outline" href="tel:{{ inquiry.phone }}">Call {{ inquiry.phone }}</a>
+      {% endif %}
+      <a class="btn btn--outline" href="mailto:{{ inquiry.email }}?subject={{ inquiry.property_ref.title|urlencode }}">Email back</a>
+    </div>
+    {% if not inquiry.phone and not wa_link %}
+      <p class="manage-field__help">No phone number given — reply by email.</p>
+    {% endif %}
+  </section>
+
+  {# ---------- One-tap status: the five states ---------- #}
+  <section class="manage-card manage-module">
+    <h2 class="manage-check__title">Move it along</h2>
+    <p class="manage-card__body manage-card__body--tight">One tap — it's saved instantly.</p>
+    <div class="manage-status-actions">
+      {% for value, label in status_choices %}
+        {% if value != inquiry.status %}
+          <form method="post" action="{% url 'manage:enquiry_status' inquiry.pk %}">
+            {% csrf_token %}
+            <input type="hidden" name="status" value="{{ value }}">
+            <button type="submit" class="btn btn--outline manage-status-btn">Mark as {{ label|lower }}</button>
+          </form>
+        {% else %}
+          <span class="manage-pill manage-pill--current">{{ label }} ✓</span>
+        {% endif %}
+      {% endfor %}
+    </div>
+  </section>
+
+  {# ---------- Notes timeline ---------- #}
+  <section class="manage-card manage-module">
+    <h2 class="manage-check__title">Notes</h2>
+    <p class="manage-card__body manage-card__body--tight">Just for you — never shown on the site.</p>
+
+    {% if notes %}
+      <ul class="manage-notes">
+        {% for note in notes %}
+          <li class="manage-note">
+            <span class="manage-note__when">{{ note.created_at|date:'j M Y, g:iA' }}</span>
+            <p class="manage-note__body">{{ note.body|linebreaksbr }}</p>
+          </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p class="manage-card__body manage-card__body--tight">No notes yet.</p>
+    {% endif %}
+
+    <form method="post" action="{% url 'manage:enquiry_note' inquiry.pk %}" class="manage-note-form">
+      {% csrf_token %}
+      <div class="manage-field{% if note_form.body.errors %} has-error{% endif %}">
+        <label for="{{ note_form.body.id_for_label }}">Add a note</label>
+        {{ note_form.body }}
+        {{ note_form.body.errors }}
+      </div>
+      <div class="manage-card__actions">
+        <button type="submit" class="btn btn--primary">Add note</button>
+      </div>
+    </form>
+  </section>
+
+{% endblock %}

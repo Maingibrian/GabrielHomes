@@ -1,5 +1,5 @@
 {% extends "manage/base.html" %}
-{% load static %}
+{% load core_tags %}
 
 {% block title %}Owner portal — {{ SITE_NAME }}{% endblock %}
 
@@ -7,24 +7,127 @@
 
   {# ---------- Greeting + today's numbers (all from the database) ---------- #}
   <section class="manage-card">
-    <p class="manage-card__tag">[ OWNER PORTAL ]</p>
+    <p class="manage-card__tag">[ HOME ]</p>
     <h1 class="manage-card__title">Welcome back{% if request.user.full_name %}, {{ request.user.full_name }}{% endif %}.</h1>
     <p class="manage-card__body">Here is where your site stands today.</p>
 
-    <dl class="manage-stats">
+    <dl class="manage-stats manage-stats--four">
       <div class="manage-stat">
         <dt>New enquiries</dt>
-        <dd>{{ counts.new_enquiries }}</dd>
+        <dd><a href="{% url 'manage:enquiries' %}?tab=new">{{ counts.new_enquiries }}</a></dd>
       </div>
       <div class="manage-stat">
         <dt>Live listings</dt>
-        <dd>{{ counts.live_listings }}</dd>
+        <dd><a href="{% url 'manage:listings' %}?tab=live">{{ counts.live_listings }}</a></dd>
       </div>
       <div class="manage-stat">
         <dt>Drafts</dt>
-        <dd>{{ counts.drafts }}</dd>
+        <dd><a href="{% url 'manage:listings' %}?tab=draft">{{ counts.drafts }}</a></dd>
+      </div>
+      <div class="manage-stat">
+        <dt>Listing views</dt>
+        <dd>{{ stats.totals.views }}</dd>
       </div>
     </dl>
+  </section>
+
+  {# ---------- Graph: enquiries, last 30 days (CSS bars, no chart library) ---------- #}
+  <section class="manage-card manage-module" aria-label="Enquiries over the last 30 days">
+    <div class="manage-card__head">
+      <h2 class="manage-check__title">Enquiries, last 30 days</h2>
+      <p class="manage-card__body manage-card__body--tight">
+        {{ stats.totals.enquiries_30d }} in total{% if nav_new_enquiries %} · <a href="{% url 'manage:enquiries' %}?tab=new">{{ nav_new_enquiries }} new waiting for you</a>{% endif %}
+      </p>
+    </div>
+
+    {% if stats.totals.enquiries_30d %}
+      <div class="manage-chart" role="img"
+           aria-label="Bar chart of enquiries per day over the last 30 days. {{ stats.totals.enquiries_30d }} enquiries in total.">
+        {% for day in stats.per_day %}
+          <div class="manage-chart__col" title="{{ day.date|date:'j M' }} — {{ day.count }} enquir{{ day.count|pluralize:'y,ies' }}">
+            <span class="manage-chart__bar" style="height: {{ day.pct }}%"></span>
+          </div>
+        {% endfor %}
+      </div>
+      <div class="manage-chart__axis" aria-hidden="true">
+        <span>{{ stats.per_day.0.date|date:'j M' }}</span>
+        <span>Today</span>
+      </div>
+    {% else %}
+      <div class="manage-empty">
+        <p class="manage-empty__title">No enquiries yet.</p>
+        <p class="manage-empty__body">They'll appear here the moment someone contacts you through a listing.</p>
+      </div>
+    {% endif %}
+  </section>
+
+  {# ---------- Two-up: status breakdown + most viewed ---------- #}
+  <div class="manage-duo">
+    <section class="manage-card" aria-label="Enquiries by status">
+      <h2 class="manage-check__title">Where enquiries stand</h2>
+      {% if stats.totals.enquiries %}
+        <ul class="manage-hbars">
+          {% for row in stats.by_status %}
+            <li class="manage-hbar">
+              <a class="manage-hbar__label" href="{% url 'manage:enquiries' %}?tab={{ row.key }}">{{ row.label }}</a>
+              <span class="manage-hbar__track"><span class="manage-hbar__fill" style="width: {{ row.pct }}%"></span></span>
+              <span class="manage-hbar__count">{{ row.count }}</span>
+            </li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <div class="manage-empty">
+          <p class="manage-empty__title">Nothing yet.</p>
+          <p class="manage-empty__body">Statuses fill in as enquiries move along: new → seen → contacted → viewing → done.</p>
+        </div>
+      {% endif %}
+    </section>
+
+    <section class="manage-card" aria-label="Most viewed listings">
+      <h2 class="manage-check__title">Most-viewed listings</h2>
+      {% if stats.top_viewed %}
+        <ul class="manage-hbars">
+          {% for row in stats.top_viewed %}
+            <li class="manage-hbar">
+              <a class="manage-hbar__label" href="{{ row.url }}">{{ row.title|truncatechars:34 }}</a>
+              <span class="manage-hbar__track"><span class="manage-hbar__fill manage-hbar__fill--alt" style="width: {{ row.pct }}%"></span></span>
+              <span class="manage-hbar__count">{{ row.views }}</span>
+            </li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <div class="manage-empty">
+          <p class="manage-empty__title">No views counted yet.</p>
+          <p class="manage-empty__body">Every listing page view is counted — the busiest homes show up here.</p>
+        </div>
+      {% endif %}
+    </section>
+  </div>
+
+  {# ---------- Latest enquiries ---------- #}
+  <section class="manage-card manage-module" aria-label="Latest enquiries">
+    <div class="manage-card__head">
+      <h2 class="manage-check__title">Latest enquiries</h2>
+      <a class="manage-card__see-all" href="{% url 'manage:enquiries' %}">See all</a>
+    </div>
+    {% if stats.recent %}
+      <ul class="manage-rows">
+        {% for inquiry in stats.recent %}
+          <li class="manage-row">
+            <a class="manage-row__link" href="{% url 'manage:enquiry_detail' inquiry.pk %}">
+              <span class="manage-row__who">{{ inquiry.name }}{% if inquiry.is_demo %} <span class="manage-pill manage-pill--sample">Sample</span>{% endif %}</span>
+              <span class="manage-row__meta">{{ inquiry.property_ref.title|truncatechars:40 }} · {{ inquiry.created_at|date:'j M' }}</span>
+            </a>
+            <span class="manage-pill">{{ inquiry.get_status_display }}</span>
+          </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <div class="manage-empty">
+        <p class="manage-empty__title">No enquiries yet.</p>
+        <p class="manage-empty__body">When someone enquires on a listing, you'll see it here first.</p>
+      </div>
+    {% endif %}
   </section>
 
   {# ---------- Setup checklist: % done + the exact next step ---------- #}
@@ -91,12 +194,25 @@
     </ul>
   </section>
 
-  <section class="manage-card manage-module">
-    <p class="manage-card__tag">[ SITE CONTENT ]</p>
-    <h2 class="manage-check__title">Update the public website.</h2>
-    <p class="manage-card__body">Edit contact details and the main homepage wording without touching the website code.</p>
-    <a class="btn btn--primary" href="{% url 'manage:site_content' %}">Edit site content</a>
-  </section>
+  {# ---------- Quick actions ---------- #}
+  <div class="manage-duo">
+    <section class="manage-card manage-module">
+      <p class="manage-card__tag">[ SITE CONTENT ]</p>
+      <h2 class="manage-check__title">Update the public website.</h2>
+      <p class="manage-card__body">Wording, contact details, your logo and socials — one screen, no code.</p>
+      <div class="manage-card__actions">
+        <a class="btn btn--primary" href="{% url 'manage:site_content' %}">Edit site content</a>
+      </div>
+    </section>
+    <section class="manage-card manage-module">
+      <p class="manage-card__tag">[ SEO ]</p>
+      <h2 class="manage-check__title">Search &amp; tracking.</h2>
+      <p class="manage-card__body">The Google Analytics ID, Search Console code and the site's search description.</p>
+      <div class="manage-card__actions">
+        <a class="btn btn--outline" href="{% url 'manage:seo' %}">Open SEO settings</a>
+      </div>
+    </section>
+  </div>
 
   <p class="manage-foot">
     <a class="manage-foot__link" href="/">View your live site</a>

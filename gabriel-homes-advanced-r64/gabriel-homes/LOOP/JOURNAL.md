@@ -1,3 +1,77 @@
+Run 73 | BUILDER (owner round, off-loop) | 2026-11-11 ~15:00-20:30 +03:00 | items:
+(1) **OWNER ASK — "plan extensively … backend SIMPLE TO USE … graphs
+sections … dont look too complex."** Plan first:
+docs/BACKEND-PLAN.md — four phases with design rules (plain language,
+one primary action, five nav sections, CSS-only graphs, honest demo
+data, owner gate + noindex on every screen, tests only grow). Owner
+PAT for the cloud push: NO txt file exists anywhere (searched upload/,
+download/, repo, /tmp) — asked the owner to paste or upload it.
+(2) **PHASE 1 BUILT (the Owner Hub):** (1A) five-section nav (Home ·
+Enquiries · Listings · Site content · SEO) with a new-enquiries badge;
+(1B) home dashboard: quick numbers (linked to their tabs) + enquiries
+30-day CSS bar chart + status breakdown bars + most-viewed listings +
+latest enquiries, all with designed empty states (stats.py, zero
+JS, tokens only); (1C) enquiries workflow: status pipeline
+new→seen→contacted→viewing→done (data migration replied→contacted;
+admin actions renamed), opening a New enquiry auto-marks Seen, one-tap
+status buttons, InquiryNote timeline, prefilled WhatsApp reply with
+07xx→254 normalisation, call/email links, CSV export (UTF-8 BOM,
+Excel-friendly, spam excluded), spam folder (honeypot rows, delete-
+only — real enquiries can never be deleted), is_demo stamps; (1D)
+brand assets: logo/favicon (validated ≤2MB PNG/JPG/WebP, raster-only)
++ address + hours + 4 socials on the Site content screen; public
+wiring: header logo swap (desktop+mobile menu), favicon link swap,
+footer social channels, contact page "Where to find us" band; (1E) SEO
+& tracking screen: meta description (overrides the coded default via
+site_meta), GA4 Analytics ID, Search Console token — gtag loads via
+LOCAL static/js/ga-init.js reading a data attribute (ZERO inline
+scripts — the test_csp pin bans them, so even a nonce'd inline config
+was out; CSP extended with GTM/GA origins + per-request nonce minted
+for future use); (1F) read-first /manage/listings/ (status chips with
+counts, Sample badges, Edit deep-links to the existing dashboard
+editor, View to public page).
+(3) **THE LATENT BUG THE GRAPHS EXPOSED — the portal had never worn
+its design.** Live eval: .manage-chart__bar computed rgba(0,0,0,0) —
+manage/base.html linked ONLY base.css+manage.css, and r42 had moved
+tokens/components out of base.css's @import chain, so every var
+(--espresso, --burnt…) computed invalid since P2-1 (run 10!): the
+portal rendered in naked fallback styles and nobody noticed because
+layout doesn't read tokens. Fixed: tokens→base→components→manage
+(same order as public base.html). PINNED: test_portal_design_stack
+(stylesheet set+order; every fallback-less var in manage.css must
+exist in tokens.css).
+(4) **Two multi-line {# #} comment leaks in one run** (public
+base.html — caught by the phase2 pin; portal base.html — caught by the
+VLM live): Django's {# #} is SINGLE-line; both now {% comment %}.
+New portal-wide leak guard sweeps all six portal screens.
+(5) **Seed:** --with-enquiries opt-in flag (existing fixtures stay
+byte-identical) — sample enquiries (clearly "(sample)"-named,
+is_demo=True, spread over 30 days — created_at is auto_now_add so
+backdating needs a post-insert .update(), the listing-stagger trick;
+statuses age-weighted: fresh=new/seen, older=progressed) + random
+views_count on demo listings + 2 spam rows. start_preview.sh passes
+the flag.
+(6) GATES — check 0 · makemigrations clean · **954 passed** (881 →
+954, +73: 40 enquiries-portal, 13 dashboard-graphs, 20 brand-seo,
+4 design-stack, minus rewrites). E3 LIVE (agent-browser, logged in as
+the preview owner): graphs render (15+ bars with real heights, VLM
+confirmed "17 rust bars, all fills visible, no issues" after the
+token fix), tabs carry counts (All 18 · New 4 · Seen 3 · Contacted 7 ·
+Viewing 2 · Done 2 · Spam 2), auto-seen works, "Mark as contacted"
++ "Add note" clicked live and verified, CSV fetched in-session (19
+lines, BOM bytes EF BB BF), SEO E2E: saved G-PREVIEWTEST1 → public
+home shows the ga-init loader + verification meta → reset to empty,
+console clean, mobile 390px stacks + scrollable nav chip row.
+Deliverables: download/r73-portal-{home-desktop,enquiries-desktop,
+enquiry-detail,spam,site-content,seo,listings,home-mobile,
+enquiries-mobile}.png.
+(7) STATE.md + BACKLOG.md refreshed to r73 truth (they were 35 runs
+stale): P2-3..P2-6 marked SUPERSEDED by BrandSettings, P3-6/P3-8
+partial, Phase 2 = listing tools next.
+FOR THE NEXT RUN: Phase 2 per BACKEND-PLAN (duplicate / bulk status /
+featured / inline price / MapLibre pin picker / wizard+autosave) —
+all on /manage/listings/. Owner cloud PAT still pending.
+
 Run 72 | BUILDER (owner round, off-loop) | 2026-11-11 ~13:40-14:30 +03:00 | items:
 (1) **OWNER ASK — "Now lets deal with the backend ..how complete is
 it and what may be missing also push the data from the last run."**

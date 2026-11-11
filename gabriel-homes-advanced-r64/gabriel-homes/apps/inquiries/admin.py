@@ -27,18 +27,18 @@ class InquiryAdmin(admin.ModelAdmin):
         ("Timestamps", {"classes": ("collapse",), "fields": ("created_at", "updated_at")}),
     )
 
-    actions = ["mark_read", "mark_replied"]
+    actions = ["mark_read", "mark_contacted"]
 
     @admin.display(boolean=True, description="Spam?")
     def is_spam_display(self, obj: Inquiry) -> bool:
         return obj.is_spam
 
-    @admin.action(description="Mark selected as read")
+    @admin.action(description="Mark selected as seen")
     def mark_read(self, request, queryset):
         updated = queryset.filter(status="new").update(status="read")
-        self.message_user(request, f"Marked {updated} inquiry/inquiries as read.")
+        self.message_user(request, f"Marked {updated} inquiry/inquiries as seen.")
 
-    @admin.action(description="Mark selected as replied")
-    def mark_replied(self, request, queryset):
-        updated = queryset.exclude(status="replied").update(status="replied")
-        self.message_user(request, f"Marked {updated} inquiry/inquiries as replied.")
+    @admin.action(description="Mark selected as contacted")
+    def mark_contacted(self, request, queryset):
+        updated = queryset.exclude(status="contacted").update(status="contacted")
+        self.message_user(request, f"Marked {updated} inquiry/inquiries as contacted.")
