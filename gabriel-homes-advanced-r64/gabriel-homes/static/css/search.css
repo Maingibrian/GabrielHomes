@@ -625,13 +625,22 @@ html:not([data-fx]) .listing-row.row-armed {
 .listings-band { position: relative; }
 /* r65 (owner request): the palm field on the results band — "add the
    pine background image seen in the home page to the listings page to
-   add some depth". Same treatment as the home market section
-   (.home-market::before, home.css r46 lineage): the seamless
-   arching-frond tile (static/img/palm-field.svg, generator seed 46)
-   repeats across the whole band and a bottom mask dissolves it over
-   the last stretch so the related-searches chips and the footer sit
-   on clean cream — coverage runs from the results header down to the
+   add some depth". A seamless arching-frond tile (r46 lineage) repeats
+   across the whole band and a bottom mask dissolves it over the last
+   stretch so the related-searches chips and the footer sit on clean
+   cream — coverage runs from the results header down to the
    pagination, exactly where the sentinels stand.
+
+   r68 (owner round twelve): "the palms need to be spread out evenly to
+   look less bushy in some areas than others." Measured, the r46
+   hand-tuned tile clumps badly — sand-composited per-cell wash
+   coverage ran 1.2% to 9.9% (an 8.06× spread): heavy frond clumps
+   with near-bare gaps between. The band now ships its own EVEN tile
+   (static/img/palm-field-even.svg, generator seed 868): one frond per
+   cell of a jittered 5×5 grid, centroid-anchored, golden-angle aim,
+   checkerboard layers — even by construction (4.6%–6.6% per cell,
+   1.43×). Same frond art, same two clay washes, same tile size; home
+   keeps the r46 tile untouched (the owner asked about listings).
 
    Stacking (the one deliberate difference from home): the band must
    NOT become its own stacking context — the palm sentinels rely on
@@ -652,9 +661,13 @@ html:not([data-fx]) .listing-row.row-armed {
    not even consulted — there is no motion to gate). */
 .listings-band::before {
   content: ""; position: absolute; inset: 0; z-index: -1;
-  background-image: url("../img/palm-field.svg");
+  background-image: url("../img/palm-field-even.svg");
   background-repeat: repeat;
   background-size: 1400px 1600px;
+  /* r68: scroll is the SAFE DEFAULT the parallax opts out of (below):
+     JS blocked, prefers-reduced-motion, and every mobile browser that
+     ignores fixed-attachment all land here — the exact r65 look. */
+  background-attachment: scroll;
   -webkit-mask-image: linear-gradient(to bottom, black 0%, black 84%, transparent 100%);
   mask-image: linear-gradient(to bottom, black 0%, black 84%, transparent 100%);
   pointer-events: none;
@@ -663,6 +676,29 @@ html:not([data-fx]) .listing-row.row-armed {
    drops to under 1020px, so phones see whole fronds, not slivers */
 @media (max-width: 1020px) {
   .listings-band::before { background-size: 860px 985px; }
+}
+/* r68 (owner round twelve): "maximise the parallax effect they give
+   out." background-attachment: fixed anchors the field to the VIEWPORT
+   instead of the band: the rows, chips and pagination slide over a
+   perfectly still palm field — the deepest parallax a background
+   layer can give (the sentinels already hold the "stagnant" tier,
+   r62; content scrolls at 1:1; the field now sits at infinity). It is
+   a compositing mode, not a keyframed effect — no JS, no extra data,
+   so it costs nothing in the lite tier.
+
+   Gating follows the D-FX-GATE contract exactly like the row slides
+   above: only html[data-fx] tiers that opted in get it. The default
+   (no attribute — scripts blocked, fails closed), fx=none
+   (prefers-reduced-motion: scroll-linked parallax is precisely the
+   motion WCAG 2.3.3 asks sites to spare vestibular-sensitive
+   visitors), and every engine that ignores fixed (iOS Safari, most
+   Android Chrome) all keep the scroll default — nobody loses the
+   field, they just don't get the depth cue. The bottom mask is
+   box-relative and unaffected: the dissolve still lands exactly at
+   the band's end, wherever the scroll is. */
+html[data-fx="rich"] .listings-band::before,
+html[data-fx="lite"] .listings-band::before {
+  background-attachment: fixed;
 }
 .palm-sentinel {
   position: absolute;

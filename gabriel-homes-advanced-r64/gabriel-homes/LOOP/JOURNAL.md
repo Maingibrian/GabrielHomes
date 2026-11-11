@@ -1,3 +1,84 @@
+Run 68 | BUILDER (owner round, off-loop) | 2026-11-11 ~11:40-12:40 +03:00 | items:
+(1) **OWNER ASK — "the listings page palms need to be spread out
+evenly to look less bushy in some areas than others and maximise the
+parallax effect they give out."** Diagnosis first, measured: the r46
+hand-tuned tile (12 fronds, seed 46) clumps — sand-composited per-cell
+wash coverage ran 1.2%–9.9% across a 4×4 grid, an 8.06× spread (top
+band arches into a heavy clump, mid-right nearly bare). EVEN TILE:
+static/img/palm-field-even.svg (NEW asset, scripts/
+r68_palm_field_even.py, deterministic seed 868 — best of a 12-seed
+sweep measured on the shipped pipeline): one frond per cell of a
+jittered 5×5 grid (±0.16 cell), ink CENTROID anchored on each cell
+centre (base offset opposite the aim — without this the arch bleeds
+all its ink into the aimed neighbour and the grid comes back as
+stripes), golden-angle aim (i×137.508° ± 12° — consecutive fronds
+never push ink the same way), checkerboard layers (13 back 14% /
+12 front 26% — the strong wash never shares an edge), scales back
+0.66–0.82 / front 0.60–0.76. Measured result: 4.6%–6.6% per cell,
+1.43× spread, 16/16 cells within ±30% of the mean; mean coverage
+4.5%→5.6% (same total ink now reaching everywhere instead of stacking
+in clumps; busiest even cell 6.6% still under the old clump peak
+9.9%). Frond art, washes, tile size, wrap pass: r46 lineage verbatim.
+VLM tile bake-off (old vs 2 candidates): old = "heavy dark clumps
+with large bare gaps"; winner = "uniformly distributed… subtlest,
+most professional backdrop". Home keeps palm-field.svg untouched (the
+ask was listings; test_r46/r66 pins green).
+(2) **PARALLAX — background-attachment: fixed** on .listings-band::
+before, gated html[data-fx="rich"] + [data-fx="lite"]: the field
+anchors to the VIEWPORT, rows/chips/pagination slide over a still
+palm field — the deepest tier a background layer can give (sentinels
+already hold the stagnant tier r62, content 1:1, field now at
+infinity). A compositing mode, not a keyframed effect: no JS, no
+data cost. Scroll stays the default (fails closed): scripts blocked
+(no attribute), fx=none (prefers-reduced-motion — scroll-linked
+parallax is what WCAG 2.3.3 asks sites to spare vestibular-sensitive
+visitors), and every engine that ignores fixed (iOS Safari, most
+Android Chrome) all keep the exact r65 look. Box-relative mask
+unaffected — the 84% dissolve still lands at the band's end. No
+stacking changes (r62 root-negative-layer contract intact).
+(3) Measurement lesson for future vision passes: cairosvg renders
+SVG backgrounds TRANSPARENT; PIL convert('L') maps alpha-transparent
+pixels to BLACK — an un-composited "ink" heat-map silently inverts
+(watermark reads as bare, bare reads as ink). Always pass
+background_color=<sand> (or composite) before measuring tone-on-tone
+tiles. First heatmap also mis-read the old clump's LOCATION (inverted)
+— the evenness conclusion held, the map did not.
+GATES: check 0 · makemigrations 0 · **878 passed** (r67 baseline
+868; +10 — NEW test_r68_even_palm_field.py: dimensions/washes, one-
+centroid-per-cell (reconstructed from the SVG by inverting the
+centroid anchor — bases wander cells by design), checkerboard-front-
+never-adjacent, scale band, wrapped-copies-exist, generator==
+asset byte-pin, fixed-gated-rich+lite, scroll-default-fails-closed,
+r65-contract-carried, home-keeps-r46; 1 obsolete r65 pin rewritten in
+place: "same asset as home" → the even tile + scroll default; comment
+prose gotcha — the word "animation:" inside a CSS comment tripped
+test_c1's ungated-animation regex, reworded to "keyframed effect").
+test_r46/r66/c1 green untouched. E3 (agent-browser 1920x1080,
+data-fx=rich verified live): computed backgroundAttachment = fixed
+under rich AND lite, scroll under fx=none AND attribute-removed
+(fails closed) — all four tiers exercised browser-side. PARALLAX
+PIXEL PROOF: screenshots 1300px apart in the band — field regions
+(both gutters) mean|diff| = 0.00/max 0 (pixel-identical, the deepest
+parallax a background can show) while the card grid moved
+(mean|diff| 82). Evenness on-page: gutter wash coverage by vertical
+third 56.7/53.8/47.8 (left) and 58.3/42.7/47.1 (right) — 1.2-1.4x
+swing, matching the tile's intrinsic spread; a leading-question VLM
+read ("mid gutters bare") was disproved by measurement (42-54% wash
+coverage there) — neutral re-asks + crop reads came back "denser
+toward the middle and lower half… purely decorative tropical
+background" and mobile 390px "subtle, evenly distributed without
+striping, cards readable". Footer dissolve measured in 120px slices:
+22.5% -> 2.1% -> 0.1% at the footer line (84% mask lands exactly);
+sentinel handoff at the footer is the known r62 design (footer
+scrolls up over the still trees), sentinel CSS untouched. Home
+market re-shot: "tone-on-tone… subtle and unaltered", r46 tile kept.
+Deliverables in download/: r68-tile-before-after.png,
+r68-parallax-proof.png, r68-listings-even-field.png,
+r68-listings-mobile.png, r68-home-market-unchanged.png.
+FOR THE NEXT RUN: preview bootstrap is scripts/start_preview.sh
+(self-healing after sandbox recycles). Owner's cloud PAT still
+"Later" — push when provided, delete after use.
+
 Run 67 | BUILDER (owner round, off-loop) | 2026-11-10 ~21:00-22:30 +03:00 | items:
 (1) **OWNER ASK — "looks bad"** (on the delivered r66 values redesign,
 both the white-panel accordion and its stripped collapsed pose).

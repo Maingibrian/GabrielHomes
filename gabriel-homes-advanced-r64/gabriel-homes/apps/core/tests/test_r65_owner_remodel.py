@@ -4,10 +4,13 @@ Two owner asks drive this round:
 
 1. "Add the pine background image seen in the home page to the
    listings page to add some depth — don't remove any other thing
-   from that page."  →  .listings-band::before: the same seamless
-   arching-frond tile (palm-field.svg, r46 lineage) that backs the
-   home market section, repeating across the results band with the
-   home bottom-fade mask. Nothing else on the page changed.
+   from that page."  →  .listings-band::before: the seamless
+   arching-frond tile (r46 lineage) that backs the home market
+   section, repeating across the results band with the home
+   bottom-fade mask. Nothing else on the page changed. r68 (owner
+   round twelve) swapped the band to its own EVEN tile
+   (palm-field-even.svg) — pinned in test_r68_even_palm_field.py;
+   the pin below follows the asset.
 
 2. "Study why the about page is boring and remodel it to be more
    interesting"  →  four additive moves, none touching pinned copy or
@@ -60,10 +63,15 @@ def _band_before_rule():
 
 def test_listings_band_carries_the_palm_field():
     rule = _band_before_rule()
-    assert 'url("../img/palm-field.svg")' in rule, "same asset as home"
+    # r68: the band ships the EVEN tile (test_r68_even_palm_field.py
+    # pins the evenness); the r46 hand-tuned tile stays home's.
+    assert 'url("../img/palm-field-even.svg")' in rule, "the even r68 tile"
     assert "background-repeat: repeat" in rule, "seamless tile, like home"
     assert "z-index: -1" in rule, "paints under every in-flow block"
     assert "pointer-events: none" in rule, "decorative — never steals a click"
+    assert "background-attachment: scroll" in rule, (
+        "scroll is the safe default; only fx tiers opt into fixed (r68)"
+    )
     # the home treatment's fade: solid to 84%, dissolved by 100%
     for mask in ("-webkit-mask-image", "mask-image"):
         m = re.search(rf"{mask}:\s*linear-gradient\([^)]*\)", rule)
