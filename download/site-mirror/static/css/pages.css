@@ -1,0 +1,1304 @@
+/* pages.css — shared styles for static pages (about/contact/privacy/terms)
+   and the public agent directory/profile.
+   Uses only tokens from tokens.css (WORK.md §10). No new colours. */
+
+/* Page hero — full-bleed photo header matching the home hero treatment,
+   so every inner page (about/contact/terms/privacy/agents) opens with the
+   same visual language as the home page.
+
+   Legibility contract (the "washed-out hero" fix):
+   1. Photo focus shifted right (72%) so the bright villa never sits
+      behind the headline column.
+   2. Two graded scrims — a left-anchored column gradient that keeps the
+      text zone near-black, plus a vertical grade that grounds the bottom.
+   3. The [ TAG ] becomes a frosted pill chip and the eyebrow warms to
+      cream, so both survive even a sky-bright patch of photo. */
+.page-hero {
+  position: relative;
+  background: var(--espresso);
+  color: var(--cream);
+  min-height: clamp(430px, 58vh, 640px);
+  display: flex;
+  align-items: flex-end;
+  padding: calc(var(--section-pad-y-lg) * 0.9) 0 calc(var(--section-pad-y-lg) * 0.85);
+  overflow: hidden;
+}
+.page-hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  /* r52: left band deepened (0.85/0.62 -> 0.92/0.72, held to 46%) so the
+     headline + subtitle always sit on a near-dark column — the vision
+     pass flagged the old scrim as the page's weakest contrast.
+     r55 pass-2: left edge eased 0.92 -> 0.90 (still >= the pinned 0.9)
+     so the photo breathes a little more at the top-left. */
+  background:
+    linear-gradient(90deg, rgba(28,21,17,0.90) 0%, rgba(28,21,17,0.72) 46%, rgba(28,21,17,0.18) 100%),
+    url("../img/real/page-hero.jpg") 72% 50% / cover no-repeat,
+    var(--espresso);
+  z-index: 0;
+}
+.page-hero::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  /* r55 pass-2: top veil 0.42 -> 0.34 — the vision pass read the
+     top-left quadrant as a void. */
+  background: linear-gradient(180deg, rgba(28,21,17,0.34) 0%, rgba(42,33,28,0.08) 42%, rgba(28,21,17,0.68) 100%);
+  z-index: 0;
+  pointer-events: none;
+}
+.page-hero .container { position: relative; z-index: 1; width: 100%; }
+.page-hero .section-tag {
+  color: var(--cream);
+  background: var(--espresso-70);
+  border: 1px solid color-mix(in srgb, var(--sand) 38%, transparent);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  padding: 0.45rem 0.95rem;
+  border-radius: var(--radius-pill);
+  margin-bottom: 1.1rem;
+}
+.page-hero .eyebrow {
+  color: color-mix(in srgb, var(--cream) 76%, var(--sand));
+  margin-top: 0.75rem;
+}
+.page-hero__title {
+  font-size: var(--text-display-2);
+  font-weight: 520;
+  font-variation-settings: "opsz" 100;
+  letter-spacing: -0.015em;
+  line-height: 1.08;
+  max-width: 18ch;
+  margin-top: 0.75rem;
+  text-wrap: balance;
+  text-shadow: 0 2px 28px rgba(28,21,17,0.45);
+}
+.page-hero__subtitle {
+  color: color-mix(in srgb, var(--cream) 88%, transparent);
+  font-size: var(--text-md);
+  line-height: var(--leading-body);
+  max-width: 52ch;
+  margin-top: 1rem;
+  letter-spacing: var(--track-tight);
+  text-shadow: 0 1px 16px rgba(28,21,17,0.4);
+}
+/* r52: mono place-and-year line — replaces the retired "Our story"
+   eyebrow (two labels said the same thing). Same facts as the copy. */
+.page-hero__meta {
+  margin: 1.7rem 0 0;
+  font-family: var(--font-mono);
+  font-weight: 600;
+  font-size: var(--text-xs);
+  letter-spacing: var(--track-mono);
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--cream) 68%, var(--sand));
+}
+/* Search pill living INSIDE the page hero (agent directory). Mirrors the
+   home search-bar language: white pill, icon slot, dark submit. */
+.page-hero .directory-search {
+  margin-top: 2rem;
+  max-width: 620px;
+  background: var(--white);
+  border-radius: var(--radius-pill);
+  padding: 0.4rem 0.5rem 0.4rem 1.35rem;
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  box-shadow: var(--shadow-card-hover);
+}
+.page-hero .directory-search input[type="search"] {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  background: transparent;
+  padding: 0.65rem 0;
+  font-size: var(--text-sm);
+  font-family: var(--font-sans);
+  color: var(--ink);
+}
+.page-hero .directory-search input[type="search"]::placeholder { color: var(--taupe); }
+.page-hero .directory-search input[type="search"]:focus { outline: none; }
+.directory-search__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--taupe);
+  flex-shrink: 0;
+}
+.directory-search__icon svg { width: 18px; height: 18px; }
+@media (max-width: 560px) {
+  .page-hero .directory-search { flex-wrap: nowrap; padding-left: 1rem; }
+  .page-hero .directory-search .btn--sm { padding: 0.6rem 1rem; }
+}
+
+/* Prose blocks — privacy / terms / about body copy.
+   The container keeps the page grid; each child is capped at 72ch and
+   left-aligned so text edges line up with the hero above (no floating
+   centered block). */
+.prose {
+  max-width: none;
+}
+.prose > * {
+  max-width: 72ch;
+}
+.prose h2 {
+  font-size: var(--text-2xl);
+  font-weight: 500;
+  letter-spacing: var(--track-tighter);
+  margin: var(--section-pad-y) 0 1rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--sand-60);
+}
+.prose h3 {
+  font-size: var(--text-lg);
+  font-weight: 500;
+  letter-spacing: var(--track-tight);
+  margin: 2rem 0 0.6rem;
+}
+.prose p, .prose li {
+  color: color-mix(in srgb, var(--ink) 82%, var(--cream));
+  font-size: var(--text-base);
+  line-height: var(--leading-body);
+  letter-spacing: var(--track-tight);
+}
+.prose p + p { margin-top: 0.6rem; }
+.prose ul, .prose ol { padding-left: 1.4rem; margin-top: 0.6rem; }
+.prose li + li { margin-top: 0.4rem; }
+.prose strong { font-weight: 500; color: var(--ink); }
+.prose a { color: var(--burnt); text-decoration: underline; text-underline-offset: 3px; }
+.prose a:hover { color: var(--brown); }
+.prose__updated {
+  font-family: var(--font-mono);
+  font-weight: 500;
+  font-size: var(--text-xs);
+  color: var(--taupe);
+  letter-spacing: var(--track-tight);
+}
+
+/* Contact channel cards — same icon-chip language as the home value
+   cards, a clay hairline on hover, and a gentle lift. */
+.contact-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1.5rem;
+  margin-top: 2rem;
+}
+.contact-card {
+  background: var(--white);
+  border-radius: var(--radius-card);
+  padding: 2rem;
+  box-shadow: var(--shadow-card);
+  border: 1px solid var(--sand-60);
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  transition: transform var(--t-med) var(--ease), box-shadow var(--t-med) var(--ease), border-color var(--t-med) var(--ease);
+}
+.contact-card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-card-hover);
+  border-color: color-mix(in srgb, var(--clay) 45%, var(--sand-60));
+}
+.contact-card__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  background: var(--burnt-12);
+  color: var(--burnt);
+  margin-bottom: 0.9rem;
+}
+.contact-card__icon svg { width: 22px; height: 22px; }
+.contact-card__tag {
+  font-family: var(--font-mono);
+  font-weight: 600;
+  font-size: var(--text-xs);
+  color: var(--burnt);
+  letter-spacing: var(--track-tight);
+  text-transform: uppercase;
+}
+.contact-card__title {
+  font-size: var(--text-xl);
+  font-weight: 500;
+  letter-spacing: var(--track-tighter);
+}
+.contact-card__body { color: var(--taupe); font-size: var(--text-sm); line-height: var(--leading-body); }
+.contact-card .btn { align-self: flex-start; margin-top: 0.4rem; }
+
+/* Bento mosaic (.bento-*) lives in components.css now so the home
+   showcase and this directory share the exact same component. */
+
+
+.directory-search {
+  margin-top: 2rem;
+  display: flex;
+  gap: 0.75rem;
+  max-width: 560px;
+}
+.directory-search input[type="search"] {
+  flex: 1;
+  border-radius: 100px;
+  border: 1px solid var(--sand-60);
+  background: var(--white);
+  padding: 0.85rem 1.4rem;
+  font-size: var(--text-sm);
+  font-family: var(--font-sans);
+  color: var(--ink);
+}
+.directory-search input[type="search"]:focus {
+  outline: 2px solid var(--burnt);
+  outline-offset: 2px;
+  border-color: transparent;
+}
+
+/* Agent profile page. */
+.profile-header {
+  display: flex;
+  gap: 2rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.profile-header__portrait {
+  width: 132px;
+  height: 132px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--clay), var(--brown));
+  background-size: cover;
+  background-position: center;
+  flex-shrink: 0;
+}
+.profile-header__name {
+  font-size: var(--text-3xl);
+  font-weight: 500;
+  letter-spacing: var(--track-tighter);
+  margin-top: 0.5rem;
+}
+.profile-header__meta { color: var(--taupe); font-size: var(--text-sm); margin-top: 0.35rem; letter-spacing: var(--track-tight); }
+.profile-actions { display: flex; gap: 0.75rem; flex-wrap: wrap; margin-top: 1.5rem; }
+.profile-bio { max-width: 68ch; color: color-mix(in srgb, var(--ink) 82%, var(--cream)); line-height: var(--leading-body); letter-spacing: var(--track-tight); margin-top: 1.5rem; }
+
+/* Responsive: shrink hero type on small screens. */
+@media (max-width: 809px) {
+  .page-hero { padding: var(--section-pad-y) 0; }
+  .page-hero__title { font-size: var(--text-3xl); }
+  .profile-header { flex-direction: column; align-items: flex-start; }
+}
+
+/* ============================================================
+   SERVICES page (/services/) — numbered alternating rows.
+   Editorial: photo panel + body column, mirroring the home
+   story collage (cream borders, mono kickers).
+   ============================================================ */
+.svc { row-gap: 0; }
+.svc .section-tag { margin-bottom: 1.25rem; }
+.svc-row {
+  display: grid;
+  grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+  gap: clamp(2rem, 5vw, 4.5rem);
+  align-items: center;
+  padding-bottom: var(--section-pad-y);
+}
+.svc-row--flip .svc-row__media { order: 2; }
+.svc-row--flip .svc-row__body { order: 1; }
+.svc-row__media {
+  aspect-ratio: 16 / 11;
+  border-radius: var(--radius-card);
+  background-size: cover;
+  background-position: center;
+  box-shadow: var(--shadow-outline);
+  /* cream print border, echoing the story collage */
+  border: 10px solid var(--cream);
+  outline: 1px solid var(--sand-60);
+}
+.svc-row__body { max-width: 56ch; }
+.svc-row__body .eyebrow { display: block; margin-bottom: 0.9rem; }
+.svc-row__title {
+  font-family: var(--font-display);
+  font-size: var(--text-3xl);
+  font-weight: 500;
+  letter-spacing: var(--track-tighter);
+  line-height: var(--leading-tight, 1.1);
+  margin-bottom: 1.1rem;
+  text-wrap: balance;
+}
+.svc-row__body p {
+  color: color-mix(in srgb, var(--ink) 82%, var(--cream));
+  line-height: var(--leading-body);
+  letter-spacing: var(--track-tight);
+}
+.svc-row__body p + p { margin-top: 0.85rem; }
+.svc-row__link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 1.4rem;
+  font-family: var(--font-mono);
+  font-weight: 600;
+  font-size: var(--text-sm);
+  letter-spacing: var(--track-mono);
+  text-transform: uppercase;
+  color: var(--burnt);
+  border-bottom: 1px solid var(--burnt-30);
+  padding-bottom: 0.2rem;
+  transition: border-color 0.18s ease, color 0.18s ease;
+}
+.svc-row__link:hover { color: var(--espresso); border-color: var(--espresso); }
+
+@media (max-width: 900px) {
+  .svc-row,
+  .svc-row--flip .svc-row__media,
+  .svc-row--flip .svc-row__body { order: initial; }
+  .svc-row { grid-template-columns: 1fr; gap: 1.75rem; padding-bottom: 4.5rem; }
+  .svc-row__media { aspect-ratio: 16 / 10; border-width: 7px; }
+  .svc-row__title { font-size: var(--text-2xl); }
+}
+
+/* ============================================================
+   r13 — Contact page: channels, audience paths, How-we-check band
+   Fixes the "smudged together" layout: each block is a visually
+   distinct unit (cards / bordered paths / tinted band) with clear
+   breathing room, reusing existing tokens only.
+   ============================================================ */
+.contact-channels__title {
+  font-family: var(--font-display);
+  font-size: var(--text-3xl);
+  font-weight: 500;
+  letter-spacing: var(--track-tighter);
+  margin: 0.4rem 0 2rem;
+}
+.contact-channels__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr));
+  gap: 1.25rem;
+}
+.contact-channel {
+  display: grid;
+  gap: 0.45rem;
+  justify-items: start;
+  padding: 1.75rem 1.75rem 1.9rem;
+  background: var(--cream);
+  border: 1px solid var(--sand-60);
+  border-radius: var(--radius-card, 18px);
+  text-decoration: none;
+  color: var(--ink);
+  transition: transform 0.25s var(--ease), border-color 0.25s var(--ease), box-shadow 0.25s var(--ease);
+}
+.contact-channel:hover {
+  transform: translateY(-4px);
+  border-color: var(--burnt);
+  box-shadow: 0 18px 45px rgba(45, 31, 23, 0.12);
+}
+.contact-channel__label {font-family: var(--font-mono); font-weight: 600;
+  font-size: var(--text-xs);
+  letter-spacing: var(--track-mono);
+  text-transform: uppercase;
+  color: var(--burnt);}
+.contact-channel__value {
+  font-family: var(--font-display);
+  font-size: var(--text-xl);
+  font-weight: 500;
+  letter-spacing: var(--track-tight);
+}
+.contact-channel__hint {
+  font-size: var(--text-sm);
+  color: var(--taupe);
+}
+.contact-channel__hint span { color: var(--burnt); }
+
+.contact-paths__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr));
+  gap: 1.5rem;
+}
+.contact-path {
+  display: grid;
+  gap: 0.9rem;
+  justify-items: start;
+  align-content: start;
+  padding: 2.2rem 2.2rem 2.4rem;
+  background: #fff;
+  border: 1px solid var(--sand-60);
+  border-radius: var(--radius-card, 18px);
+  box-shadow: 0 10px 35px rgba(45, 31, 23, 0.06);
+}
+.contact-path__tag {margin: 0;
+  font-family: var(--font-mono); font-weight: 600;
+  font-size: var(--text-xs);
+  letter-spacing: var(--track-mono);
+  text-transform: uppercase;
+  color: var(--burnt);}
+.contact-path__title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: var(--text-2xl);
+  font-weight: 500;
+  letter-spacing: var(--track-tighter);
+  line-height: var(--leading-tight, 1.12);
+}
+.contact-path__body {
+  margin: 0;
+  color: color-mix(in srgb, var(--ink) 82%, var(--cream));
+  line-height: var(--leading-body);
+  letter-spacing: var(--track-tight);
+}
+.contact-path .btn { margin-top: 0.6rem; }
+
+.contact-checks {
+  background: color-mix(in srgb, var(--sand) 30%, var(--cream));
+}
+.contact-checks__inner {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) auto;
+  gap: 2.5rem;
+  align-items: center;
+}
+.contact-checks__title {
+  font-family: var(--font-display);
+  font-size: var(--text-3xl);
+  font-weight: 500;
+  letter-spacing: var(--track-tighter);
+  margin: 0.4rem 0 0.8rem;
+}
+.contact-checks__body {
+  margin: 0;
+  max-width: 62ch;
+  color: color-mix(in srgb, var(--ink) 82%, var(--cream));
+  line-height: var(--leading-body);
+  letter-spacing: var(--track-tight);
+}
+.contact-checks__link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 1.05em 1.7em;
+  background: var(--espresso);
+  color: var(--cream);
+  border-radius: 999px;
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: background 0.2s var(--ease), transform 0.2s var(--ease);
+}
+.contact-checks__link:hover { background: var(--burnt); transform: translateY(-2px); }
+@media (max-width: 900px) {
+  .contact-checks__inner { grid-template-columns: 1fr; }
+  .contact-checks__link { justify-self: start; }
+}
+
+/* ============================================================
+   r13 — About page story split: paragraphs left, real house photo
+   right (fills the white space beside the 72ch prose column).
+   ============================================================ */
+.about-story {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
+  gap: clamp(2.5rem, 5vw, 4.5rem);
+  align-items: start;
+}
+.about-story__copy > * { max-width: 62ch; }
+.about-story__copy h2 {
+  font-size: var(--text-2xl);
+  font-weight: 500;
+  letter-spacing: var(--track-tighter);
+  margin: var(--section-pad-y) 0 1rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--sand-60);
+}
+.about-story__copy p {
+  /* r53: near-espresso on cream (was 82% ink — the vision pass read the
+     story body as muddy grey); measure stays the same. */
+  color: var(--ink);
+  font-size: var(--text-base);
+  line-height: var(--leading-body);
+  letter-spacing: var(--track-tight);
+}
+.about-story__copy p + p { margin-top: 0.6rem; }
+/* r53 pass-2 (vision verification): the first paragraph becomes the lede —
+   one step up the scale so the column opens with hierarchy instead of
+   three same-weight blocks. */
+.about-story__copy p:first-of-type {
+  font-size: 1.12rem;
+  line-height: 1.62;
+}
+.about-story__figure {
+  position: sticky;
+  top: 96px;
+  margin: 0;
+}
+.about-story__figure img {
+  display: block;
+  width: 100%;
+  /* r52: 4/5 portrait with a hard height cap — the old 4/4.4 column
+     could run away into wallpaper next to short copy. The quiet warm
+     grade (saturate .92 / sepia .08) pulls the sea-blue bedding toward
+     the sand palette without touching the honest subject. */
+  aspect-ratio: 4 / 5;
+  /* r53: cap tightened 62vh→52vh — with the pull-quote gone to its own
+     band the story section no longer needs a wallpaper-height photo. */
+  max-height: clamp(380px, 52vh, 520px);
+  object-fit: cover;
+  border-radius: var(--radius-card, 18px);
+  box-shadow: 0 20px 55px rgba(45, 31, 23, 0.16);
+  filter: saturate(0.92) sepia(0.08);
+}
+.about-story__figure figcaption {
+  display: flex;
+  gap: 0.6rem;
+  align-items: baseline;
+  margin-top: 0.9rem;
+  font-family: var(--font-mono);
+  font-weight: 600;
+  font-size: var(--text-xs);
+  letter-spacing: var(--track-mono);
+  text-transform: uppercase;
+  color: var(--taupe);
+}
+.about-story__figure figcaption span { color: var(--burnt); }
+/* r55: mono "what we look for" list — fills the dead zone the vision
+   pass found under the story paragraphs. r63 (owner round eleven): the
+   bracketed label is a real eyebrow element ABOVE the list — never the
+   first bullet (semantics + screen readers). The three points keep the
+   Fraunces display-list treatment with hairline rules between items. */
+.about-story__taste {
+  margin: 2.2rem 0 0;
+  /* r64 (owner round twelve, vision critic): 54ch → 62ch — the story
+     paragraphs render 62ch (≈658px) and the list hairlines stopped
+     85px short of their rag, reading as arbitrarily truncated. Same
+     measure as the copy now. */
+  max-width: 62ch;
+}
+.about-story__taste-tag { margin-bottom: 0.35rem; }
+.about-story__taste-list li {
+  padding-block: 0.95rem;
+  border-top: 1px solid var(--sand-60);
+  /* r56: elevated — the r56 vision pass called this list "the best
+     copy on the page, visually the most de-emphasised element". It
+     now reads as a display list: Fraunces at text-lg, full ink, the
+     hairline rules kept. */
+  font-family: var(--font-display);
+  font-size: var(--text-lg);
+  font-weight: 480;
+  line-height: 1.45;
+  letter-spacing: var(--track-tight);
+  color: var(--ink);
+}
+@media (max-width: 900px) {
+  .about-story { grid-template-columns: 1fr; }
+  .about-story__figure { position: static; }
+  .about-story__figure img { aspect-ratio: 16 / 11; }
+}
+
+/* r13 — small mono crumb for the How-we-check sub-page under Contact. */
+.page-hero__crumb {
+  margin: 1.4rem 0 0;
+  font-family: var(--font-mono);
+  font-weight: 600;
+  font-size: var(--text-xs);
+  letter-spacing: var(--track-mono);
+  text-transform: uppercase;
+}
+.page-hero__crumb a { color: inherit; text-decoration: none; border-bottom: 1px solid currentColor; padding-bottom: 0.15rem; }
+.page-hero__crumb a:hover { color: var(--ember, var(--burnt)); }
+
+/* r13 completion — band the process and audience-path interludes so the
+   white cards sit on the warm sand band (same language as the home page). */
+.hv2-process { background: #f4eee6; }
+.contact-paths { background: #f4eee6; }
+
+/* H1 r18: commitments list on /checks/ (moved from the home band) */
+.commit-list {
+  list-style: none;
+  margin: 2rem 0 0;
+  padding: 0;
+  display: grid;
+  gap: 1.25rem;
+  max-width: 62rem;
+}
+.commit-list li {
+  background: var(--white, #fff);
+  border: 1px solid var(--sand);
+  border-radius: var(--radius-md, 14px);
+  padding: 1.25rem 1.5rem;
+  color: var(--brown);
+  line-height: 1.55;
+}
+.commit-list strong { display: block; color: var(--ink); margin-bottom: 0.3rem; }
+
+/* ============================================================
+   r52 — About page polish (vision-critique pass). Tokens only,
+   motion gated per the M-doctrine: hidden/animated states live
+   under html.motion-ready, fx=none and prefers-reduced-motion
+   both kill the stagger (the longhand transition-delay needs its
+   own explicit kill — the reduced-motion `transition: none`
+   shorthand loses the cascade to a more specific selector).
+   ============================================================ */
+
+/* Story pull-quote — the philosophy line pulled out of the body so the
+   copy column carries weight beside the photo (the old band left a dead
+   zone under three short paragraphs). */
+.about-story__copy .section-tag { margin-bottom: 1.4rem; }
+.about-story__pull {
+  margin: 2.4rem 0 2rem;
+  padding-left: 1.5rem;
+  border-left: 3px solid var(--burnt);
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 400;
+  font-variation-settings: "opsz" 40;
+  font-size: clamp(1.5rem, 1.25rem + 1vw, 2rem);
+  line-height: 1.32;
+  letter-spacing: var(--track-tighter);
+  color: var(--ink);
+  max-width: 26ch;
+}
+
+/* Values band header — "What we stand for" no longer dangles at the
+   bottom of the story copy; the grid follows the head, not 3rem below.
+   r63 (owner round eleven): the heading steps up to the display scale
+   (Fraunces, opsz 90) so the section reads editorial, matching the
+   founder and closing bands' hierarchy. */
+.values-head { max-width: 64ch; }
+.values-head__title {
+  font-size: clamp(1.9rem, 1.5rem + 1.7vw, 2.6rem);
+  font-weight: 520;
+  font-variation-settings: "opsz" 90;
+  letter-spacing: var(--track-tighter);
+  margin: 0.9rem 0 0.7rem;
+}
+.values-head__intro {
+  color: var(--taupe);
+  font-size: var(--text-md);
+  line-height: var(--leading-body);
+  text-wrap: balance;            /* pass-2 (E3): no one-word orphan rag */
+}
+.values-head + .story__values { margin-top: 1.75rem; }
+
+/* Value cards reveal in a short stagger (cards 2 and 3 trail card 1).
+   The base [data-reveal] transition (components.css §12) owns the
+   rise; only the delay is added here. r66: the delay lists grew to
+   five values — the about cards' expander transition (below) layers
+   flex-grow/border/shadow after the reveal pair, and the stagger must
+   delay ONLY the reveal (a delayed hover expand would read as lag).
+   Extra values are ignored where the shorter transition applies. */
+html.motion-ready:not([data-fx="none"]) .story__values .value-card:nth-child(2) { transition-delay: 110ms, 110ms, 0s, 0s, 0s; }
+html.motion-ready:not([data-fx="none"]) .story__values .value-card:nth-child(3) { transition-delay: 220ms, 220ms, 0s, 0s, 0s; }
+@media (prefers-reduced-motion: reduce) {
+  html.motion-ready .story__values .value-card { transition-delay: 0s; }
+}
+.story__values .value-card { display: flex; flex-direction: column; }
+.story__values .value-card .value-card__body { flex: 1; }
+
+/* Founder band — the human moment. Editorial portrait at 160px inside
+   an offset sand frame (the 240px WebP source carries it), first-person
+   quote in the house pull style, signature block on a hairline rule.
+   The old 120px floating chip (.hv2-founder) is retired from this page;
+   the photo keeps its class + F3 attrs (test_founder_portrait). */
+.about-founder {
+  display: grid;
+  /* r63 (owner round eleven): a deliberate two-column lockup —
+     portrait | quote + name. The fact rail moved out into its own
+     bento strip below (see .about-founder__rail). Align START so the
+     quote tops out with the portrait. */
+  grid-template-columns: auto minmax(0, 1.35fr);
+  gap: clamp(2.5rem, 5vw, 4.5rem);
+  align-items: start;
+}
+.about-founder__portrait {
+  position: relative;
+  margin: 0 16px 16px 0;
+}
+.about-founder__portrait::before {
+  content: "";
+  position: absolute;
+  inset: 16px -16px -16px 16px;
+  border: 1.5px solid var(--sand-60);
+  border-radius: var(--radius-card, 18px);
+}
+.about-founder__portrait .hv2-founder__photo {
+  position: relative;
+  /* r53: 160→200px display (240px source, 1.2x density — noted in
+     test_founder_portrait). The portrait leads the band now. */
+  width: 200px;
+  height: 200px;
+  border-radius: var(--radius-card, 18px);
+  object-fit: cover;
+  display: block;
+  box-shadow: 0 18px 45px rgba(45, 31, 23, 0.18);
+  /* r56: a stronger warm grade + a burnt ring — the r56 vision pass
+     read the studio headshot as "tonally at war" with the sunlit page.
+     The frame now pulls the placeholder toward the palette until the
+     owner drops in a real golden-hour portrait (asset swap only). */
+  filter: saturate(0.86) sepia(0.17) contrast(0.97);
+  border: 3px solid color-mix(in srgb, var(--burnt) 42%, var(--cream));
+}
+.about-founder__quote {
+  margin: 1.5rem 0;
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 380;
+  font-variation-settings: "opsz" 40;
+  font-size: clamp(1.4rem, 1.15rem + 1.1vw, 1.9rem);
+  line-height: 1.38;
+  color: var(--burnt);
+  max-width: 32ch;
+  /* r64 (owner round twelve, vision critic): the quote ended on a
+     two-word orphan ("that feeling."). Balance spreads the rag
+     evenly across the 3–4 lines at every viewport; copy untouched. */
+  text-wrap: balance;
+}
+.about-founder__lede {
+  color: color-mix(in srgb, var(--ink) 78%, var(--taupe));
+  font-size: var(--text-base);
+  line-height: var(--leading-body);
+  max-width: 56ch;
+}
+.about-founder__sig {
+  display: flex;
+  align-items: baseline;
+  gap: 0.9rem;
+  margin-top: 1.9rem;
+  padding-top: 1.4rem;
+  border-top: 1px solid var(--sand-60);
+}
+@media (max-width: 900px) {
+  .about-founder { grid-template-columns: 1fr; align-items: start; gap: 2.25rem; }
+  /* r63: the rail's own responsive rules now live WITH the rail, after
+     its 4-column rule (source order matters — see the r63 fix note). */
+}
+/* r63 (owner round eleven): phones STACK — portrait above, copy full
+   width below (the owner's brief asks for stacking mobile). The old
+   r52 side-by-side squeezed the copy into a 212px column: the 48px
+   heading wrapped to four lines and the quote ran nine. 160px portrait
+   keeps the founder moment; the caption clears the 10px frame offset.
+   The story-photo caption rule below is unchanged r52. */
+@media (max-width: 560px) {
+  .about-founder { grid-template-columns: 1fr; gap: 1.8rem; }
+  .about-founder__portrait { margin: 0 10px 10px 0; }
+  .about-founder__portrait::before { inset: 10px -10px -10px 10px; }
+  .about-founder__portrait .hv2-founder__photo { width: 160px; height: 160px; }
+  .about-founder__caption { margin-top: calc(10px + 0.6rem); }
+  .about-founder__quote { font-size: 1.15rem; margin: 1rem 0 0.9rem; }
+  .about-founder__sig { margin-top: 1.2rem; padding-top: 1rem; }
+  .about-story__figure figcaption { display: block; }
+  .about-story__figure figcaption span { display: inline; }
+}
+
+
+/* ============================================================
+   r53 — About styling round two (owner: "still deserves more
+   styling"; vision critique pass two). Every rule here is new
+   or page-scoped (.about-*); the r52-pinned blocks above are
+   untouched.
+   ============================================================ */
+
+/* 1. The philosophy line becomes the page's mid-point espresso band —
+   the one dark breath between two cream halves. The blockquote keeps
+   its r52 class (pinned by test_r52_about_polish); the band owns the
+   restyle: display-scale Fraunces italic in cream, a short burnt rule
+   above (the accent reads on espresso; burnt text itself would not
+   clear contrast at this size), generous block padding. */
+.about-quote {
+  background: var(--espresso);
+  color: var(--cream);
+  /* r55: padding pulled in — the vision pass read the band as stretched
+     with the eyebrow orphaned above the quote. */
+  padding-block: clamp(3.6rem, 2.8rem + 3.2vw, 6rem);
+  /* r65 (about remodel): the band hosts the ghost "10" numeral —
+     relative anchors it, hidden crops its bleed at the band edge. */
+  position: relative;
+  overflow: hidden;
+}
+/* r65 (about remodel, "Editorial+"): the ghost numeral. The r64 vision
+   pass read this band as "the strongest typographic moment on the page
+   and yet completely empty". The quote promises TEN homes — a single
+   oversized cropped Fraunces italic "10" now fills the dead right
+   half, the same ghost-numeral grammar the home market groups and the
+   001-003 value numerals established. Cream at 8% over espresso: a
+   texture, never a competitor to the quote (the copy column keeps its
+   own stacking layer above it). Pure decoration — aria-hidden in the
+   markup, pointer-events none here, and it inherits the band's flat
+   background so reduced-motion / JS-blocked render it identically. */
+.about-quote .container { position: relative; z-index: 1; }
+.about-quote__ghost {
+  position: absolute;
+  right: -0.06em;
+  bottom: -0.34em;
+  z-index: 0;
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 400;
+  font-variation-settings: "opsz" 144;
+  /* VLM r65 pass-1: 8% cream read as "a smudge, not a gesture" — 13%
+     keeps it a texture while the crop reads deliberate. Size up so
+     the numeral owns the band's dead right half outright. */
+  font-size: clamp(15rem, 30vw, 27rem);
+  line-height: 0.78;
+  letter-spacing: var(--track-display);
+  color: color-mix(in srgb, var(--cream) 13%, transparent);
+  pointer-events: none;
+  user-select: none;
+}
+/* phones: the numeral caps smaller so it never crowds the stacked
+   quote (the band crops it tighter at narrow widths anyway) */
+@media (max-width: 560px) {
+  .about-quote__ghost { font-size: 11.5rem; right: -0.12em; }
+}
+.about-quote .about-story__pull {
+  margin: 0;
+  padding-left: 0;
+  border-left: 0;
+  max-width: 30ch;
+  font-size: clamp(2rem, 1.5rem + 2.4vw, 3.4rem);
+  line-height: 1.22;
+  color: var(--cream);
+}
+.about-quote .about-story__pull::before {
+  content: "";
+  display: block;
+  width: 56px;
+  height: 3px;
+  background: var(--burnt);
+  margin-bottom: 1.6rem;
+}
+.about-quote .section-tag--light { margin-bottom: 1.6rem; }
+/* r55: taste kicker under the display quote — anchors the band's lower
+   half (vision pass: blank area below the quote) and reframes the
+   checked-homes line as the floor, not the point. */
+.about-quote__kicker {
+  /* r55 pass-2: 1.7→2rem — the vision pass read the kicker as cramped
+     under the display quote. */
+  margin: 2rem 0 0;
+  font-family: var(--font-mono);
+  font-weight: 600;
+  font-size: var(--text-xs);
+  letter-spacing: var(--track-mono);
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--cream) 62%, var(--sand));
+  max-width: 46ch;
+  /* r64 (owner round twelve, vision critic): "OURSELVES." orphaned
+     alone on line two of the letterspaced caps. Balance evens the
+     two lines; copy untouched. */
+  text-wrap: balance;
+}
+
+/* r65 (owner round — about remodel, "Editorial+"): the coast strip.
+   A full-bleed dhow band between the espresso quote and the values
+   row — the location storytelling the r64 critic called missing
+   ("'Nyali to Shanzu' is just a text chip"). Left-aligned editorial
+   lockup over a left-heavy espresso scrim (color-mix of the token
+   only — no new palette entries; the shared .cta band established
+   the photo+scrim grammar): the copy column reads on near-solid
+   espresso while the dhow sails clear of text on the right. The
+   neighbourhood chips are real links into the location pages
+   (verified live listings at seed); pill grammar reuses the
+   related-search chips, inverted for the dark band. */
+.about-coast {
+  position: relative;
+  color: var(--cream);
+  background:
+    linear-gradient(90deg,
+      color-mix(in srgb, var(--espresso) 94%, transparent) 0%,
+      color-mix(in srgb, var(--espresso) 82%, transparent) 34%,
+      color-mix(in srgb, var(--espresso) 42%, transparent) 68%,
+      color-mix(in srgb, var(--espresso) 16%, transparent) 100%),
+    url("../img/real/coast-dhow.jpg") center 58%/cover no-repeat,
+    var(--espresso);
+  padding-block: clamp(4rem, 3rem + 4.5vw, 6.8rem);
+}
+.about-coast__copy { max-width: 62ch; }
+.about-coast__title {
+  margin: 0.9rem 0 0.8rem;
+  font-family: var(--font-display);
+  font-size: clamp(2.2rem, 1.7rem + 2.6vw, 3.6rem);
+  font-weight: 500;
+  font-variation-settings: "opsz" 90;
+  line-height: 1.04;
+  letter-spacing: var(--track-tighter);
+  color: var(--cream);
+  text-wrap: balance;
+}
+.about-coast__lede {
+  margin: 0;
+  max-width: 52ch;
+  color: color-mix(in srgb, var(--cream) 82%, var(--sand));
+  font-size: var(--text-md);
+  line-height: var(--leading-body);
+}
+.about-coast__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 1.9rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+.about-coast__chips a {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 15px;
+  border: 1px solid color-mix(in srgb, var(--cream) 36%, transparent);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--cream) 9%, transparent);
+  color: var(--cream);
+  font-weight: 600;
+  font-size: var(--text-sm);
+  text-decoration: none;
+  transition: background var(--t-fast) var(--ease), color var(--t-fast) var(--ease),
+    border-color var(--t-fast) var(--ease);
+}
+.about-coast__chips a span { font-size: 0.85em; }
+.about-coast__chips a:hover,
+.about-coast__chips a:focus-visible {
+  background: var(--cream);
+  border-color: var(--cream);
+  color: var(--espresso);
+  outline: none;
+}
+/* phones: the scrim deepens right across so the photo stays a hint,
+   not a competitor with the stacked copy */
+@media (max-width: 810px) {
+  .about-coast {
+    background:
+      linear-gradient(180deg,
+        color-mix(in srgb, var(--espresso) 88%, transparent) 0%,
+        color-mix(in srgb, var(--espresso) 72%, transparent) 55%,
+        color-mix(in srgb, var(--espresso) 90%, transparent) 100%),
+      url("../img/real/coast-dhow.jpg") center 58%/cover no-repeat,
+      var(--espresso);
+  }
+  .about-coast__chips a { padding: 9px 13px; }
+}
+
+/* r65 pass-2 (VLM critique): the about ticker finds its own voice.
+   The home ribbon is all mono caps (its words are one kind of thing);
+   this one alternates — mood phrases in Fraunces italic at reading
+   size, town names in the strip's mono caps — so the band carries the
+   page's serif/sans editorial contrast instead of reading mechanical.
+   Scoped here (pages.css owns the about page); the home marquee is
+   untouched. */
+.hv2-marquee .hv2-marquee__mood {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 400;
+  font-size: 1.1rem;
+  text-transform: none;
+  letter-spacing: var(--track-tight);
+}
+
+/* 2. Values row. r63 (owner round eleven): one editorial row, large
+   Fraunces numerals, hairline dividers. r65: the palm field behind it
+   (traded for the wave field in r66). r66: white-panel accordion.
+   r67 (owner round): "looks bad" — the E3 pass read the white boxes
+   as floating on a void with "no real-estate warmth", and the
+   accordion's collapsed strips hid the photography the site sells
+   with. The principles are now PHOTO EXPANDER COLUMNS over the wave
+   field: tall coast photographs (object-fit cover, NO shading filter
+   — the owner's carousel complaint was the scrim crushing the
+   pictures; the only veil is the bottom gradient the copy sits on)
+   with numeral + tag + title + body on a bottom-anchored panel. On
+   hover-capable pointers the row tightens and the hovered/focused
+   card blooms open (flex-grow), the detail fading in after the panel
+   is most of the way there. Every other context — phones, touch
+   tablets, no-JS, print — renders the same cards fully open in the
+   equal grid: the reveal is a nicety, never a gate (D-MOTION-SAFE
+   spirit; reduced-motion drops the transition, keeps the state). */
+.about-values { position: relative; }
+/* r67 pass-2 (E3): the cards grew tall; the default section padding
+   left a ~100px waves-only dead zone before the founder band — the
+   values band now halves its own bottom padding. */
+.about-values { padding-bottom: calc(var(--section-pad-y) * 0.5); }
+.about-values::before {
+  content: ""; position: absolute; inset: 0; z-index: -1;
+  background-image: url("../img/wave-field.svg");
+  background-repeat: repeat;
+  background-size: 1000px 700px;
+  -webkit-mask-image: linear-gradient(to bottom, black 0%, black 78%, transparent 100%);
+  mask-image: linear-gradient(to bottom, black 0%, black 78%, transparent 100%);
+  pointer-events: none;
+}
+/* the head veil stays — the same translucent cream radial the home
+   market head uses, keeping the intro copy off the wave crests
+   (widened to the home geometry in r65 pass-2). */
+.values-head { position: relative; }
+.values-head::before {
+  content: ""; position: absolute; z-index: -1;
+  inset: -4rem -8rem -2.5rem;
+  background: radial-gradient(closest-side,
+    color-mix(in srgb, var(--cream) 80%, transparent), transparent);
+  pointer-events: none;
+}
+/* base — three tall photo panels, all copy riding the floor; this is
+   what phones, touch tablets, no-JS and print render. padding 0 and
+   transform none kill the shared components.css value-card frame
+   (2.25rem inset + hover lift) — the panel owns the inset, and a
+   photo column that bounces on hover would read as a bug. */
+.about-values .story__values {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+  margin-top: 2.4rem;
+  align-items: stretch;
+}
+.about-values .value-card {
+  position: relative;            /* the photo + scrim anchor to the card */
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;     /* the panel rides the photo floor */
+  min-height: 30rem;
+  overflow: hidden;
+  padding: 0;
+  transform: none;
+  border: 1px solid var(--sand-60);
+  border-radius: var(--radius-card);
+  background: var(--espresso);   /* the frame while the photo loads */
+  box-shadow: var(--shadow-card);
+}
+/* pass-3 (E3): the copy stacks share one baseline system — the
+   detail block is a bottom-anchored flex column with a min-height
+   that fits the tallest card's title+body, so numeral, tag, title
+   and body start at the same height on all three cards (the ragged
+   pass-2 tops read as misalignment). The spare space sits between
+   tag and title, over empty photo. */
+.about-values .value-card__detail {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  min-height: 11rem;
+}
+.about-values .value-card__photo {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  /* deliberately UNSHADED (E3 r67): the owner's carousel complaint
+     was the dark scrim crushing the images — the upper photo stays
+     at full brightness; only the copy zone gets a gradient. */
+}
+.about-values .value-card__scrim {
+  position: absolute;
+  inset: 0;
+  /* r67 pass-2 (E3): the first gradient (88%→16%, gone by 80%) left
+     the numerals fighting bright pool water and ceilings — the copy
+     stack owns the lower ~60% of the card, so the gradient now runs
+     strong to 60% and only dissolves in the top fifth. The photo
+     still breathes: above 82% there is no veil at all.
+     pass-3 (E3): the mid-zone deepened again (55% espresso at 66%) —
+     pass-2 still left the 002 numeral thin over bright foliage.
+     pass-5 (E3): deepened once more (62% at 55%) — the sea-light
+     floor under 003's body copy stayed bright through pass-4. The
+     measured text zone is the bottom 6%-62% of the card; that band
+     now sits under 84%-62% espresso while the top fifth stays clean. */
+  background: linear-gradient(to top,
+    color-mix(in srgb, var(--espresso) 92%, transparent) 0%,
+    color-mix(in srgb, var(--espresso) 84%, transparent) 30%,
+    color-mix(in srgb, var(--espresso) 62%, transparent) 55%,
+    color-mix(in srgb, var(--espresso) 20%, transparent) 80%,
+    transparent 93%);
+  pointer-events: none;
+}
+.about-values .value-card__panel {
+  position: relative;            /* above photo + scrim */
+  padding: 1.9rem 1.75rem 1.75rem;
+}
+.about-values .value-card__num {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-variation-settings: "opsz" 144;
+  font-size: clamp(2.6rem, 2rem + 2.2vw, 3.4rem);
+  line-height: 0.9;
+  letter-spacing: var(--track-display);
+  color: var(--ember);           /* r67: burnt-on-white → ember-on-photo */
+  margin: 0 0 0.95rem;           /* pass-2: breathing room before the tag */
+}
+/* pass-3 (E3): the golden-hour source centres its tree at the top —
+   weighting the crop downward favours the arches and the pool (the
+   actual "character") over the foliage. */
+.about-values .story__values .value-card:nth-child(2) .value-card__photo {
+  object-position: center 62%;
+}
+/* pass-4 (E3): the sea-light source is bright at the top (sky through
+   the sliders) — weighting downward keeps the calmer interior band in
+   frame behind the copy. */
+.about-values .story__values .value-card:nth-child(3) .value-card__photo {
+  object-position: center 60%;
+}
+/* the expander — fine pointers with room to breathe only */
+@media (hover: hover) and (pointer: fine) and (min-width: 811px) {
+  .about-values .story__values {
+    display: flex;
+    min-height: 32rem;
+  }
+  /* (0,3,0) — must outrank the reveal rule html.motion-ready
+     [data-reveal] (0,2,1) so the expander owns the transition list;
+     the reveal pair leads it so the rise keeps animating. */
+  .about-values .story__values .value-card {
+    flex: 1 1 0;
+    min-width: 0;
+    transition: opacity var(--t-slow) var(--ease-out),
+                transform var(--t-slow) var(--ease-out),
+                flex-grow 0.55s var(--ease-out),
+                border-color var(--t-med) var(--ease),
+                box-shadow var(--t-med) var(--ease);
+  }
+  .about-values .story__values .value-card:hover,
+  .about-values .story__values .value-card:focus-within {
+    flex-grow: 2.8;
+    border-color: color-mix(in srgb, var(--clay) 45%, var(--sand-60));
+    box-shadow: var(--shadow-card-hover);
+  }
+  /* the detail — hidden in the collapsed pose, blooming in after the
+     panel leads. Never display:none: the copy stays in the a11y tree
+     and rides the same floor in the base grid. */
+  .about-values .value-card__detail {
+    width: 24rem;                 /* fixed — no mid-expand reflow */
+    opacity: 0;
+    transform: translateY(10px);
+    transition: opacity 0.3s var(--ease-out),
+                transform 0.3s var(--ease-out);
+  }
+  .about-values .story__values .value-card:hover .value-card__detail,
+  .about-values .story__values .value-card:focus-within .value-card__detail {
+    opacity: 1;
+    transform: none;
+    transition-delay: 0.16s;      /* the panel leads, the text follows */
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .about-values .value-card { transition: none; }
+  .about-values .value-card__detail { transition: none; }
+}
+/* the panel text — cream on the espresso scrim (the shared
+   components.css values are the ink-on-white set; these scoped
+   overrides carry the photo context) */
+.about-values .value-card__tag {
+  color: color-mix(in srgb, var(--cream) 82%, transparent);
+  margin-bottom: 0.9rem;
+}
+.about-values .value-card__title {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-variation-settings: "opsz" 60;
+  font-size: clamp(1.3rem, 1.1rem + 0.9vw, 1.65rem);
+  letter-spacing: var(--track-tighter);
+  color: var(--white);
+  margin-bottom: 0.55rem;
+  text-wrap: balance;            /* r64: no two-word orphans in titles */
+}
+.about-values .value-card__body {
+  color: color-mix(in srgb, var(--cream) 92%, transparent);
+  font-size: var(--text-base);   /* r67: sm grey → base cream (E3) */
+  line-height: 1.5;
+  max-width: 34ch;
+}
+@media (max-width: 810px) {
+  .about-values .story__values { grid-template-columns: 1fr; }
+  .about-values .value-card { min-height: 26rem; }
+}
+
+/* 3. Founder band — caption under the photo, larger quote (the page's
+   strongest moment per the pass), and the mono fact rail that fills
+   the dead right half. Rail values set in Fraunces so the facts read
+   editorial, not dashboard. */
+.about-founder__caption {
+  /* r63 fix: the offset sand frame extends 16px below the photo — the
+     caption must clear that line, not sit on it (was 0.85rem = 13.6px,
+     a 17px collision). calc clears the line and keeps air beneath it. */
+  margin-top: calc(16px + 1.05rem);
+  font-family: var(--font-mono);
+  font-weight: 600;
+  font-size: var(--text-xs);
+  letter-spacing: var(--track-mono);
+  text-transform: uppercase;
+  color: var(--taupe);
+}
+.about-founder__quote {
+  font-size: clamp(1.5rem, 1.15rem + 1.5vw, 2.2rem);
+  line-height: 1.34;
+  max-width: 34ch;
+}
+.about-founder__lede { max-width: 52ch; }
+/* r63 (owner round eleven): the four facts are a compact bento strip
+   under the founder lockup — one squircle cell per fact, mono eyebrow
+   label over a Fraunces value (clear label/value hierarchy, per the
+   owner's goal). 4-across on desktop, 2×2 on small screens. */
+.about-founder__rail {
+  list-style: none;
+  margin: 3rem 0 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+.about-founder__rail-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  background: var(--white);
+  border: 1px solid var(--sand-60);
+  border-radius: var(--radius-card);
+  padding: 1.15rem 1.3rem 1.25rem;
+}
+.about-founder__rail-k {
+  font-family: var(--font-mono);
+  font-weight: 600;
+  font-size: var(--text-xs);
+  letter-spacing: var(--track-mono);
+  text-transform: uppercase;
+  color: var(--taupe);
+}
+.about-founder__rail-v {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: 1.08rem;
+  line-height: 1.3;
+  letter-spacing: var(--track-tight);
+  color: var(--ink);
+}
+/* r63 fix: these responsive rules MUST sit after the 4-column rule
+   above — the r52-era ≤900 rule further up the file lost the source-
+   order race and phones rendered four 76px slivers with clipped
+   labels. Declared here, 2×2 wins below 900px. */
+@media (max-width: 900px) {
+  .about-founder__rail {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    margin-top: 2.25rem;
+  }
+}
+@media (max-width: 560px) {
+  .about-founder__rail-cell { padding: 0.95rem 1.05rem 1.05rem; }
+}
+
+/* 4. Closing band. r63 (owner round eleven): the three sunlit rooms
+   sat here in an asymmetric bento strip (cta__proof / about-tile).
+   r66 (owner round): "remove the carousel — Homes worth crossing town
+   for — it doesn't look good, the background and images are shaded."
+   The photo strip and every about-tile rule are gone; the shared .cta
+   band (components.css §15) carries the close alone — tag, taste-led
+   headline, one Explore button. Nothing orphaned behind. */
+
+/* 5. Mobile refinements (vision pass item 8): the fixed header overlays
+   this hero, so the H1 needs real clearance below it; the quote band
+   and values row breathe at phone widths. (r63: the rail's responsive
+   rules live with the rail itself — see the r63 fix note there; the
+   proof filmstrip is gone with the bento.) */
+@media (max-width: 560px) {
+  .page-hero { padding-top: calc(var(--section-pad-y) + 3rem); }
+  .about-quote { padding-block: clamp(3rem, 2.4rem + 4vw, 3.8rem); }
+  .about-quote .about-story__pull { font-size: 1.85rem; line-height: 1.28; }
+  .about-quote .about-story__pull::before { margin-bottom: 1.25rem; }
+  /* r63: the founder band stacks at phone width — the caption follows
+     the 160px portrait (was pinned to the old 96px side-by-side) and
+     clears the 10px frame offset (r55 pass-2 kept the line-height). */
+  .about-founder__caption {
+    width: 160px;
+    white-space: normal;
+    overflow-wrap: anywhere;
+    line-height: 1.55;
+    margin-top: calc(10px + 0.6rem);
+  }
+}

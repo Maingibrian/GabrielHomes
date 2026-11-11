@@ -1,0 +1,2214 @@
+/* =============================================================
+   Gabriel Homes — home page section rhythm
+   All 10 sections from WORK.md §8, styled with the components.
+   Imported after base.css + components.css.
+   ============================================================= */
+
+.page-home { background: var(--cream); }
+
+
+/* ============================================================
+   1. Hero — full-bleed SLIDESHOW of the real home photos.
+   Pure-CSS crossfade + Ken Burns drift; no JS required (slides
+   are plain divs, images referenced from this stylesheet only).
+   4 slides x 6s = 24s loop; 0.96s crossfade overlaps so the
+   sum of visible opacity never dips. Reduced-motion: static
+   first frame. Images built by scripts/make_hero_slides.py.
+   ============================================================ */
+.hero {
+  position: relative;
+  background: var(--espresso);
+  color: var(--cream);
+  min-height: min(92vh, 880px);
+  display: flex;
+  align-items: center;
+  /* Clip the Ken Burns drift (slides scale to 1.06) so it never
+     widens the page at tablet widths. */
+  overflow: hidden;
+  padding-block: clamp(4.5rem, 3rem + 7vw, 8rem);
+}
+.hero__bg {
+  position: absolute;
+  inset: 0;
+  background: var(--espresso);
+  z-index: 0;
+}
+.hero__slide {
+  position: absolute;
+  inset: 0;
+  background-image: var(--slide-img, none);
+  background-size: cover;
+  background-position: center;
+  opacity: 0;
+  animation: hero-fade 24s linear infinite,
+             hero-drift 24s linear infinite;
+  will-change: opacity, transform;
+}
+/* Slide order + animation offsets. The IMAGE itself comes from the
+   inline --slide-img custom property (staticv-versioned per file). */
+.hero__slide:nth-child(1) { animation-delay: 0s; }
+.hero__slide:nth-child(2) { animation-delay: 6s; }
+.hero__slide:nth-child(3) { animation-delay: 12s; }
+.hero__slide:nth-child(4) { animation-delay: 18s; }
+/* Fade in 0-4%, hold to 25%, fade out by 29% — the 1s overlap with
+   the next slide's fade-in makes a seamless crossfade. */
+@keyframes hero-fade {
+  0%   { opacity: 0; }
+  4%   { opacity: 1; }
+  25%  { opacity: 1; }
+  29%  { opacity: 0; }
+  100% { opacity: 0; }
+}
+/* Slow zoom runs only across the visible quarter; the snap-back to
+   1.02 happens while the slide is fully transparent. */
+@keyframes hero-drift {
+  0%   { transform: scale(1.02); }
+  25%  { transform: scale(1.085); }
+  100% { transform: scale(1.085); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hero__slide { animation: none; opacity: 0; }
+  .hero__slide:nth-child(1) { opacity: 1; }
+}
+.hero__bg::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    /* r56: lighter for the sunlit r56 slide set (white Swahili villa,
+       sunlit arches, sea-view rooms). The old r49 weights were tuned
+       for dark interiors and made the new bright photos read as dusk;
+       the text-side pool keeps its strength for the headline, the
+       right side opens further to the light. Headline contrast
+       re-verified by pixel probe after the change. */
+    radial-gradient(ellipse 62% 55% at 30% 42%, rgba(28,21,17,.54), rgba(28,21,17,0) 72%),
+    linear-gradient(90deg, rgba(28,21,17,.48) 0%, rgba(28,21,17,.22) 44%, rgba(28,21,17,.04) 82%),
+    linear-gradient(180deg, rgba(28,21,17,.42) 0%, rgba(42,33,28,.16) 42%, rgba(42,33,28,.16) 60%, rgba(42,33,28,.66) 100%);
+}
+.hero .container { position: relative; z-index: 1; width: 100%; }
+/* r50: the eyebrow tag rule is gone with its template line — the reference
+   headline opens the page (owner: "much cleaner"). */
+.hero__title {
+  font-size: var(--text-display-1);
+  font-weight: 520;
+  font-variation-settings: "opsz" 144;
+  line-height: 1.06;
+  letter-spacing: -0.015em;
+  margin: 0 0 1.5rem;
+  max-width: 16ch;
+  text-wrap: balance;
+}
+.hero__title .hero__accent {
+  font-style: italic;
+  font-weight: 480;
+  /* r12: was clay 55% — dipped under 3:1 over bright photo regions
+     even with the scrim; clay 30% keeps the warm tint at 4.3:1 worst case */
+  color: color-mix(in srgb, var(--clay) 30%, var(--cream));
+}
+.hero__subtitle {
+  font-size: var(--text-md);
+  line-height: var(--leading-body);
+  max-width: 56ch;
+  color: color-mix(in srgb, var(--cream) 95%, transparent); /* r12: was 85% */
+  margin: 0 0 2.5rem;
+}
+/* r24 H2.a: .hero__stats rules removed with the template block — one
+   gesture per hero; "Kenya" was filler (see D-LOOP-24a). The r50
+   search-zone below owns the pill's rhythm now. */
+
+/* ============================================================
+   r50 — HERO, SECOND PASS (owner request, against the reference);
+   r51 third-pass notes inline. The reference's three bands,
+   restored: the featured-listing card sits TOP-RIGHT as a
+   horizontal pane (photo left, details right) and cycles through
+   up to five showcase listings (hero-card.js); the search pill
+   drops to a lower band that spans the container with the
+   popular-area chips under it; the eyebrow tag is gone.
+   r51: the bottom-left market stat is REMOVED (owner request)
+   and the assurance pill now hugs its content. Zero new hex
+   (F1 ratchet): tokens, color-mix and rgba() only.
+   ============================================================ */
+.hero__grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 2.5rem; }
+/* r56: the reference's orange accent bar is GONE — the r56 vision pass
+   read the 4px bar beside the headline as "a CSS placeholder, not a
+   design decision". The headline opens clean; the photo does the
+   talking behind it. */
+.hero__subtitle { margin: 0 0 1.6rem; }
+
+/* frosted service-tags strip, reworded r50; SHRUNK r51: the owner
+   called the old full-column pill "too large" — it stretched across
+   the whole text column with ~250px of dead glass after the last
+   label. inline-flex now sizes the pill to its CONTENT; paddings,
+   icons and metrics are tightened with it (~56px tall -> ~40px). */
+.hero__assurances {
+  display: inline-flex; flex-wrap: wrap; align-items: center;
+  max-width: 100%;
+  margin: 0 0 1.6rem; padding: 4px 6px;
+  border-radius: 999px;
+  background: rgba(28,21,17,.38);
+  border: 1px solid rgba(245,239,227,.14);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+}
+.hero__assurances li {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 4px 14px;
+  font-size: var(--text-sm);
+  font-weight: 500;
+  color: color-mix(in srgb, var(--cream) 94%, transparent);
+}
+.hero__assurances li + li { border-left: 1px solid rgba(245,239,227,.14); }
+.hero__assurances svg {
+  width: 15px; height: 15px; flex: none;
+  color: color-mix(in srgb, var(--clay) 78%, var(--cream));
+}
+
+/* r51: the three items pop in one by one — rise, tiny overshoot,
+   settle (the r47 bubbly language, at pill scale). Pure CSS like
+   hv2-rise: it runs with or without JS, and the reduced-motion
+   block kills it (animation: none leaves the base state visible —
+   there is NO hidden state without the animation, so it fails
+   open). Delays continue the r50 sequence: the strip was --d:2
+   (0.36s), so the items run .36/.45/.54. */
+@keyframes ha-pop {
+  from { opacity: 0; transform: translateY(12px) scale(.92); }
+  70%  { opacity: 1; transform: translateY(-2px) scale(1.02); }
+  to   { opacity: 1; transform: none; }
+}
+.hero__assurances li { animation: ha-pop .7s var(--ease-out, cubic-bezier(.16,1,.3,1)) both; }
+.hero__assurances li:nth-child(1) { animation-delay: .36s; }
+.hero__assurances li:nth-child(2) { animation-delay: .45s; }
+.hero__assurances li:nth-child(3) { animation-delay: .54s; }
+
+/* lower band: the search pill spans the container (the reference's
+   wide lower pill), capped near the reference's ~74% proportion; the
+   chips sit under it on the same left axis */
+.hero__search-zone {
+  display: grid;
+  gap: 1.15rem;
+  margin-top: clamp(1.7rem, 4vh, 3rem);
+  max-width: 1080px;
+}
+
+/* popular-area chips (live top-4 from the view). r51: each chip
+   rises in on its own after the pill settles — the r50 block-level
+   hv2-rise (--d:4 = 0.62s) is retired; the label leads, then the
+   chips at 70ms intervals. Same fail-open pattern as ha-pop. */
+@keyframes ha-chip {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: none; }
+}
+.hero__locations-label { animation: ha-chip .6s var(--ease-out, cubic-bezier(.16,1,.3,1)) both; animation-delay: .62s; }
+.hero__loc { animation: ha-chip .6s var(--ease-out, cubic-bezier(.16,1,.3,1)) both; }
+.hero__loc:nth-of-type(1) { animation-delay: .69s; }
+.hero__loc:nth-of-type(2) { animation-delay: .76s; }
+.hero__loc:nth-of-type(3) { animation-delay: .83s; }
+.hero__loc:nth-of-type(4) { animation-delay: .90s; }
+.hero__locations {
+  display: flex; align-items: center; flex-wrap: wrap; gap: 10px;
+  margin-top: 0;
+}
+.hero__locations-label {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  text-transform: uppercase;
+  letter-spacing: var(--track-mono);
+  color: color-mix(in srgb, var(--cream) 82%, transparent);
+  margin-right: 2px;
+}
+.hero__loc {
+  display: inline-flex; align-items: center; gap: 9px;
+  padding: 5px 14px 5px 6px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--white) 92%, transparent);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  color: var(--ink);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  transition: transform var(--t-med) var(--ease-out), box-shadow var(--t-med) var(--ease-out);
+}
+.hero__loc:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 24px rgba(45,31,23,.28);
+}
+.hero__loc img { width: 30px; height: 30px; border-radius: 8px; object-fit: cover; } /* r50: the reference's rounded-square thumbs */
+.hero__loc-count {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--taupe);
+}
+
+/* the featured-listing carousel (r50). The wrapper is a plain grid;
+   each PANE is the visual card (white, radius, shadow) so two panes
+   can stack during the crossfade. Photo left ~44% (the reference's
+   horizontal card), details right; the title gets a fixed two-line
+   slot so every pane is the same height and the track never jumps. */
+.hero-card {
+  display: grid;
+  gap: 16px;  /* r50 QA: the dots need breathing room below the card */
+}
+.hero-card__track { position: relative; display: block; }
+.hero-card__pane {
+  display: none;
+  grid-template-columns: 44% minmax(0, 1fr);
+  min-height: 176px;
+  background: var(--white);
+  border-radius: 18px;
+  overflow: hidden;
+  box-shadow: 0 22px 55px rgba(45,31,23,.35);
+}
+/* the outgoing pane fades ON TOP of the incoming one and, r51,
+   DRIFTS left as it dissolves — the swap reads as a slide-through
+   instead of a plain fade. The incoming pane is in-flow (owns the
+   track height) beneath it. */
+.hero-card__pane.is-active {
+  display: grid; position: relative; z-index: 1; opacity: 1;
+}
+.hero-card__pane.is-leaving {
+  display: grid; position: absolute; inset: 0; z-index: 2; opacity: 0;
+  transform: translateX(-16px) scale(.99);
+}
+html.motion-ready .hero-card__pane { transition: opacity .55s var(--ease-out), transform .55s var(--ease-out); }
+/* kill switches — the swap itself is content (hero-card.js keeps
+   rotating in every tier); only the fade is motion, so both switches
+   render it an instant swap (r48 triple, same doctrine) */
+@media (prefers-reduced-motion: reduce) {
+  .hero-card__pane { transition: none !important; }
+}
+html[data-fx="none"] .hero-card__pane,
+html:not([data-fx]) .hero-card__pane { transition: none !important; }
+
+.hero-card__media { position: relative; display: block; height: 100%; overflow: hidden; background: var(--sand); }
+.hero-card__media img { width: 100%; height: 100%; object-fit: cover; }
+.hero-card__badge {
+  position: absolute; top: 10px; left: 10px;  /* the reference's on-photo pill */
+  padding: 5px 11px; border-radius: 999px;
+  background: var(--burnt); color: var(--white);
+  font-family: var(--font-mono); font-size: var(--text-xs);
+  font-weight: 600; text-transform: uppercase; letter-spacing: var(--track-mono);
+}
+.hero-card__body { padding: 16px 18px 18px; display: flex; flex-direction: column; }
+.hero-card__title {
+  margin: 0;
+  min-height: 2.6em;  /* the fixed two-line slot — equal pane heights */
+  color: var(--ink);  /* r50 QA: without this the title inherited the hero's
+                        cream and ghosted on the white card (VLM caught it;
+                        the r49 card carried the same latent flaw) */
+  font-family: var(--font-display);
+  font-size: 1.12rem;
+  font-weight: 500;
+  line-height: 1.18;
+  letter-spacing: var(--track-tight);
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+.hero-card__title a { color: inherit; text-decoration: none; }
+.hero-card__title a:hover { text-decoration: underline; text-underline-offset: 3px; }
+.hero-card__loc {
+  display: flex; align-items: center; gap: 6px;
+  margin: 8px 0 0;
+  color: var(--taupe);
+  font-size: var(--text-sm);
+  font-weight: 500;
+}
+.hero-card__loc svg { flex: none; color: var(--burnt); }
+.hero-card__price { margin: 10px 0 0; font-size: 1.28rem; font-weight: 700; color: var(--ink); }
+.hero-card__link {
+  display: inline-flex; align-items: center; gap: 6px;
+  margin-top: auto; padding-top: 12px;
+  color: var(--burnt);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  text-decoration: none;
+}
+.hero-card__link:hover { text-decoration: underline; text-underline-offset: 3px; }
+.hero-card__link:hover span { transform: translateX(3px); }
+.hero-card__link span { transition: transform var(--t-med) var(--ease-out); }
+
+/* the reference's pagination dots — plain controls (7px, no CTA
+   styling); the label lives in each button's aria-label */
+.hero-card__dots {
+  display: flex; justify-content: center; gap: 7px;
+  margin: 0; padding: 0; list-style: none;
+}
+.hero-card__dot {
+  width: 7px; height: 7px; padding: 0;
+  border: 0; border-radius: 999px;
+  overflow: hidden;
+  background: color-mix(in srgb, var(--cream) 42%, transparent);
+  font-size: 0; line-height: 0;
+  cursor: pointer;
+}
+.hero-card__dot:hover { background: color-mix(in srgb, var(--cream) 70%, transparent); }
+.hero-card__dot.is-active { background: var(--cream); }
+
+/* r51: the bottom-left market stat block ("Mombasa property market
+   / Growing demand +12% YoY") is REMOVED at the owner's request —
+   markup, rules and its 1020px hide all gone. The bottom band
+   keeps only the search pill, the chips and the scroll cue. */
+
+@media (min-width: 1200px) {
+  /* the card pins TOP-RIGHT (the reference's upper band) — no r49
+     margin-top push; the search zone below owns the lower band */
+  .hero__grid { grid-template-columns: minmax(0, 1fr) auto; gap: 3.5rem; align-items: start; }
+  .hero-card { justify-self: end; width: clamp(320px, 30vw, 420px); }
+}
+@media (max-width: 1199px) {
+  /* single column: the bento below already carries the listings */
+  .hero-card { display: none; }
+}
+/* r51: the max-width:1020px block is gone with the market stat —
+   it existed only to hide it. */
+@media (max-width: 640px) {
+  .hero__assurances { gap: 4px; padding: 4px; }
+  .hero__assurances li { padding: 4px 10px; }
+  .hero__assurances li + li { border-left: none; }
+}
+
+/* ============================================================
+   r76 — THE MOBILE POSTER HERO (owner round fourteen, the mobile
+   audit: "the mobile hero should be different only — make it look
+   like a poster by a graphics design person").
+
+   Below 810px the hero stops being the desktop hero squeezed: it
+   re-lays as a MOUNTED POSTER — the slideshow and video keep
+   running, but inside a framed, rounded print with edge margins,
+   a hairline plate rule along its foot, and the headline set as
+   the print's caption in espresso on the cream page. The search
+   pill becomes a compact 2x2 control plate so it (and the popular
+   chips) sit within the first phone screen — the audit's "one
+   should not scroll to view data" rule.
+
+   Same DOM as the desktop hero (one source of truth — no hidden
+   duplicate markup), same tokens, same slides; only the layering
+   changes, and only under 810px. Desktop is untouched above.
+   ============================================================ */
+/* the plate line: mobile-poster only — hidden at desktop sizes */
+.hero__poster-plate { display: none; }
+
+@media (max-width: 809px) {
+  /* the page, not a dark overlay: the hero hands its background
+     back to the cream page; text flips to espresso-on-cream. The
+     header sits IN FLOW above it (components.css r76) — the poster
+     starts right below the solid bar, no clearance hacks. */
+  .hero {
+    display: block;
+    background: var(--cream);
+    color: var(--ink);
+    min-height: 0;
+    padding: 14px 0 30px;
+    overflow: visible;
+  }
+  /* THE PRINT: the slideshow box becomes the poster itself —
+     in-flow, edge-margined, rounded, hairline-framed, shadowed.
+     Slides + video + scrim all live inside it unchanged (they are
+     absolute inset-0, so they follow the frame). */
+  .hero__bg {
+    position: relative;
+    inset: auto;
+    height: clamp(320px, 46vh, 420px);
+    margin: 0 16px;
+    border-radius: var(--radius-card);
+    overflow: hidden;
+    box-shadow: var(--shadow-card-hover);
+    background: var(--espresso);
+    border: 1px solid color-mix(in srgb, var(--espresso) 16%, transparent);
+  }
+  /* a light print grade: the slides get a touch of coastal snap
+     so the photo reads as an art-directed poster, not a backdrop */
+  .hero__slide, .hero__video { filter: saturate(1.08) contrast(1.05); }
+  /* the poster scrim: lighter than the desktop text-side pool —
+     the photo speaks; only the frame's foot needs depth */
+  .hero__bg::after {
+    background:
+      linear-gradient(180deg, rgba(28,21,17,.12) 0%, rgba(28,21,17,0) 26%),
+      linear-gradient(180deg, rgba(28,21,17,0) 52%, rgba(28,21,17,.5) 100%);
+  }
+  /* the plate rule — a mounted print's caption line, set BELOW the
+     frame: two small-caps facts flanked by hairlines, gallery style */
+  .hero__poster-plate {
+    display: flex; align-items: center; gap: 14px;
+    margin: 13px 20px 0;
+    font-family: var(--font-mono); font-size: var(--text-xs); font-weight: 600;
+    text-transform: uppercase; letter-spacing: .18em;
+    color: var(--taupe);
+  }
+  .hero__poster-plate::before,
+  .hero__poster-plate::after {
+    content: ""; flex: 1; border-top: 1px solid var(--sand);
+  }
+  /* the caption: headline + subtitle as the print's typeset label */
+  .hero .container { padding-inline: 20px; }
+  .hero__grid { margin-top: 16px; gap: 0; }
+  .hero__title {
+    font-size: clamp(2.2rem, 10.5vw, 2.9rem);
+    line-height: 1.05;
+    letter-spacing: -.022em;
+    color: var(--espresso);
+    margin: 0 0 12px;
+    max-width: 12ch;
+    text-wrap: balance;
+  }
+  .hero__title .hero__accent { color: var(--burnt); } /* 5.1:1 on cream, AA */
+  .hero__subtitle {
+    font-size: var(--text-md);
+    line-height: 1.45;
+    color: var(--brown);
+    margin: 0 0 4px;
+    max-width: 32ch;
+    text-wrap: pretty;
+  }
+  /* the chip bar is the desktop hero's texture — the poster keeps
+     its surface clean; the marquee two scrolls down carries the
+     coastal voice */
+  .hero__assurances { display: none; }
+
+  /* the control plate: the search pill re-lays as a composed
+     three-row plate — [ Buy|Rent ] / [ Location ] / [ Type | Search ]
+     (v3, the design review: the side-by-side toggle was the last
+     crowded moment; one control per row reads composed and every
+     tap target spans the plate). The submit is an inset burnt pill
+     (a button ON the plate, not a flush cell). */
+  .hero__search-zone { gap: 14px; margin-top: 18px; }
+  .hero .search-bar {
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas:
+      "seg  seg"
+      "loc  loc"
+      "type go";
+    gap: 0;
+    padding: 0;
+    border-radius: var(--radius-card);
+    overflow: hidden;
+  }
+  .hero .search-bar__segment {
+    grid-area: seg; justify-self: center;
+    margin: 9px 0; border-radius: var(--radius-pill);
+  }
+  .hero .search-bar__segment-btn { padding: 9px 20px; }
+  .hero .search-bar__group {
+    border-radius: 0; padding: 13px 16px;
+    justify-content: center; min-width: 0;
+    border-top: 1px solid var(--sand-60);
+  }
+  .hero .search-bar__group:nth-of-type(1) { grid-area: loc; }
+  .hero .search-bar__group:nth-of-type(2) { grid-area: type; }
+  .hero .search-bar__group + .search-bar__group { border-left: 0; }
+  .hero .search-bar__label { position: absolute; width: 1px; height: 1px;
+    overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+  .hero .search-bar__input,
+  .hero .search-bar__select { font-size: var(--text-md); font-weight: 600; }
+  .hero .search-bar__input::placeholder { color: var(--taupe); opacity: 1; }
+  .hero .search-bar__submit {
+    grid-area: go; justify-self: stretch; align-self: stretch;
+    justify-content: center;
+    margin: 9px; border-radius: calc(var(--radius-card) - 9px);
+    padding: 0 16px; box-shadow: var(--shadow-btn);
+  }
+
+  /* popular chips: tighter, thumb-led — the data shortcut row */
+  .hero__locations { gap: 8px; }
+  .hero__locations-label { align-self: center; }
+  .hero__loc { gap: 7px; padding: 4px 12px 4px 5px; font-size: var(--text-xs); }
+  .hero__loc img { width: 26px; height: 26px; border-radius: 7px; }
+  .hero__loc-count { font-size: var(--text-xs); }
+}
+
+@media (max-width: 359px) {
+  /* the smallest phones: chips lose the thumbs, keep the data */
+  .hero__loc img { display: none; }
+  .hero__loc { padding: 6px 12px; }
+}
+
+/* r51: the search pill leans in 2px when engaged — transform-only,
+   gated behind html.motion-ready (JS ran) so no-JS never moves; the
+   reduced-motion parity block below kills the transform and the
+   tokens-level kill takes the transition. M6 invite, pill scale. */
+html.motion-ready .hero__search {
+  transition: transform var(--t-med) var(--ease-out), box-shadow var(--t-med) var(--ease-out);
+}
+html.motion-ready .hero__search:focus-within {
+  transform: translateY(-2px);
+  box-shadow: 0 18px 40px rgba(45,31,23,.35);
+}
+
+
+/* ============================================================
+   3. Featured properties — 40px radius cards, [001] index tags
+   ============================================================ */
+.featured {
+  background: var(--cream);
+}
+.featured__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  margin-bottom: 2.5rem;
+}
+.featured__title {
+  font-size: var(--text-display-2);
+  font-weight: 500;
+  letter-spacing: var(--track-display);
+  line-height: var(--leading-tight);
+  max-width: 20ch;
+}
+.featured__grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+}
+@media (min-width: 810px) {
+  .featured__grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (min-width: 1200px) {
+  .featured__grid { grid-template-columns: repeat(3, 1fr); }
+}
+
+
+/* ============================================================
+   4. Story / Vision — editorial column + layered real-photo
+   collage. The quote's word-by-word reveal is back (motion.js
+   lights .word spans); without JS the quote stays fully lit.
+   ============================================================ */
+.story {
+  background: var(--cream);
+}
+.story__grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 3rem;
+  align-items: center;
+}
+@media (min-width: 1200px) {
+  .story__grid { grid-template-columns: 1.15fr 1fr; gap: 3.5rem; }
+}
+.story__copy { min-width: 0; }
+.story__statement {
+  font-size: clamp(2.25rem, 1.8rem + 2vw, 3rem);
+  font-weight: 500;
+  letter-spacing: var(--track-tighter);
+  line-height: var(--leading-tight);
+  max-width: 18ch;
+  margin-bottom: 1.25rem;
+}
+.story__subline {
+  font-size: var(--text-md);
+  color: var(--burnt);
+  font-weight: 500;
+  letter-spacing: var(--track-tight);
+  margin-bottom: 1.75rem;
+}
+/* Two supporting paragraphs — the "words" the story was missing.
+   Restate the people / transparency / support themes only. */
+.story__body p {
+  font-size: var(--text-base);
+  line-height: 1.65;
+  color: color-mix(in srgb, var(--ink) 78%, var(--taupe));
+  max-width: 58ch;
+}
+.story__body p + p { margin-top: 1rem; }
+.story__quote {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 380;
+  font-variation-settings: "opsz" 40;
+  font-size: var(--text-2xl);
+  letter-spacing: 0;
+  line-height: 1.3;
+  color: var(--burnt);
+  margin: 2.25rem 0 0;
+  max-width: 30ch;
+}
+/* Word-by-word reveal (motion.js builds the .word spans).
+   Without JS no spans exist and the quote simply reads lit.
+   r12: the pre-lit state is now a SOLID readable warm grey (3.3:1 on
+   cream, large-text AA) instead of burnt at opacity 0.14 (1.2:1 —
+   effectively invisible, and what screenshot audits kept catching).
+   Lighting a word transitions it to the burnt ember. */
+.story__quote .word { display: inline; opacity: 1; color: color-mix(in srgb, var(--ink) 50%, var(--cream)); transition: color 0.5s var(--ease); }
+.story__quote .word.is-lit { color: var(--burnt); }
+@media (prefers-reduced-motion: reduce) {
+  .story__quote .word { color: var(--burnt); transition: none; }
+}
+
+/* Layered collage: terrace (main) + garden bedroom (inset print)
+   + the founder as a frosted chip pinned to the bottom corner. */
+.story__media {
+  position: relative;
+  padding: 0 0 2.5rem 2.5rem; /* room for the inset to overhang */
+}
+.story__photo {
+  border-radius: var(--radius-frame);
+  background-size: cover;
+  background-position: center;
+  box-shadow: var(--shadow-card-hover);
+}
+.story__photo--main {
+  width: 100%;
+  aspect-ratio: 4 / 5;
+  background: var(--sand);
+  background-position: center 58%; /* keep the seating, drop the slab edge */
+}
+.story__photo--inset {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 52%;
+  aspect-ratio: 4 / 3;
+  border: 6px solid var(--cream);
+  border-radius: 24px;
+  transform: rotate(-3deg);
+  background: var(--sand);
+  background-position: 68% center; /* bias to the bed, not the wardrobe */
+}
+/* Founder chip — frosted pill, same language as the page-hero tag. */
+.story__founder {
+  position: absolute;
+  right: 1.25rem;
+  bottom: 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.55rem 1.1rem 0.55rem 0.55rem;
+  border-radius: var(--radius-pill);
+  background: var(--espresso-70);
+  border: 1px solid color-mix(in srgb, var(--sand) 45%, transparent);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+.story__founder-portrait {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: var(--sand);
+  background-size: cover;
+  background-position: center top;
+}
+.story__founder-name {
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--cream);
+  letter-spacing: var(--track-tight);
+  margin-bottom: 0.1rem;
+}
+.story__founder-meta {
+  font-family: var(--font-mono);
+  font-weight: 600;
+  font-size: var(--text-xs);
+  letter-spacing: var(--track-mono);
+  text-transform: uppercase;
+  color: var(--sand);
+}
+@media (max-width: 1199px) {
+  .story__media { max-width: 560px; }
+}
+
+/* Three value cards inside the story section */
+.story__values {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.25rem;
+  margin-top: 3rem;
+}
+@media (min-width: 810px) {
+  .story__values { grid-template-columns: repeat(3, 1fr); }
+}
+
+
+/* ============================================================
+   5. Numbers — animated counters separated by thin taupe lines
+   ============================================================ */
+.numbers {
+  background:
+    radial-gradient(1100px 560px at 88% -10%, color-mix(in srgb, var(--clay) 14%, transparent), transparent 60%),
+    radial-gradient(900px 500px at 0% 110%, color-mix(in srgb, var(--brown) 42%, transparent), transparent 55%),
+    var(--espresso);
+  color: var(--cream);
+  border-top: 0;
+  border-bottom: 0;
+}
+.numbers__title { color: var(--cream); }
+.numbers__cell { border-color: color-mix(in srgb, var(--sand) 32%, transparent); }
+.numbers .stat__label { color: var(--sand); }
+.numbers .stat__line { background: var(--sand); opacity: 0.4; }
+.numbers .section-tag { color: color-mix(in srgb, var(--clay) 48%, var(--sand)); }
+.numbers__title {
+  font-size: var(--text-4xl);
+  font-weight: 500;
+  letter-spacing: var(--track-display);
+  line-height: var(--leading-tight);
+  max-width: 18ch;
+  margin-bottom: 3rem;
+}
+.numbers__grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0;
+}
+@media (max-width: 809px) {
+  /* Single file on phones — one counter per row. */
+  .numbers__grid { grid-template-columns: 1fr; }
+}
+@media (min-width: 980px) {
+  /* Four-across only when the viewport can hold the widest
+     unbreakable label ("NEIGHBOURHOODS") without blowing out. */
+  .numbers__grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}
+.numbers__cell {
+  padding: 2rem 1.5rem;
+  border-bottom: 1px solid color-mix(in srgb, var(--sand) 32%, transparent);
+}
+.numbers__cell:nth-child(even) {
+  border-left: 1px solid color-mix(in srgb, var(--sand) 32%, transparent);
+}
+@media (max-width: 809px) {
+  .numbers__cell:nth-child(even) { border-left: 0; }
+}
+@media (min-width: 810px) {
+  .numbers__cell {
+    padding: 2.5rem;
+  }
+  /* 2x2: bottom border stops after row 1, left border only on col 2. */
+  .numbers__cell:nth-child(n + 3) { border-bottom: 0; }
+}
+@media (min-width: 980px) {
+  .numbers__cell {
+    border-bottom: 0;
+    /* 1.5rem side padding keeps "KES 1.3B+" inside the 1/4 track
+       once the stat number scales down (see .numbers .stat__number). */
+    padding: 2.25rem 1.5rem;
+  }
+  .numbers__cell:not(:first-child) {
+    border-left: 1px solid color-mix(in srgb, var(--sand) 32%, transparent);
+  }
+}
+/* The "KES 1.3B+" counter is ~4.4em wide at display sizes — far wider
+   than a 1/4 track when --text-display-2 hits its 4rem cap. Scale the
+   numbers-band figures with the viewport (≈34px @980 → 46px @1440+)
+   so every counter stays inside its cell. Hero stats are untouched
+   (their values are short and their own clamps already fit). */
+.numbers .stat__number {
+  font-size: clamp(1.9rem, -1rem + 5.2vw, 2.9rem);
+}
+
+
+/* 6. (removed) Agents band — homes showcase took this slot; the
+   shared agent-card component lives in components.css. */
+
+
+/* ============================================================
+   7. Philosophy — four numbered principle cards
+   ============================================================ */
+.philosophy {
+  background: var(--cream);
+}
+.philosophy__title {
+  font-size: var(--text-display-2);
+  font-weight: 500;
+  letter-spacing: var(--track-display);
+  line-height: var(--leading-tight);
+  max-width: 22ch;
+  margin-bottom: 3rem;
+}
+.philosophy__grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.25rem;
+}
+@media (min-width: 810px) {
+  .philosophy__grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (min-width: 1200px) {
+  .philosophy__grid { grid-template-columns: repeat(4, 1fr); }
+}
+
+
+/* ============================================================
+   8. Browse by neighbourhood + by property type
+   ============================================================ */
+.browse {
+  background: var(--white);
+}
+.browse__grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 3rem;
+}
+@media (min-width: 1200px) {
+  .browse__grid { grid-template-columns: 1fr 1fr; }
+}
+.browse__title {
+  font-size: var(--text-2xl);
+  font-weight: 500;
+  letter-spacing: var(--track-tighter);
+  margin-bottom: 1.5rem;
+}
+.browse__list {
+  display: flex;
+  flex-direction: column;
+}
+.browse__link {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.95rem 0;
+  border-bottom: 1px solid var(--sand-60);
+  font-size: var(--text-md);
+  font-weight: 500;
+  letter-spacing: var(--track-tight);
+  color: var(--ink);
+  transition: color var(--t-fast) var(--ease), padding var(--t-fast) var(--ease);
+}
+.browse__link:hover {
+  color: var(--burnt);
+  padding-left: 0.5rem;
+}
+.browse__link-count {
+  font-family: var(--font-mono);
+  font-weight: 500;
+  font-size: var(--text-xs);
+  color: color-mix(in srgb, var(--taupe) 55%, var(--ink));
+  letter-spacing: var(--track-mono);
+}
+
+
+/* ============================================================
+   CTA band — moved to components.css so inner pages (about,
+   contact) share the exact same dark photo band as the home page.
+   ============================================================ */
+
+
+/* ============================================================
+   Footer — frame styles moved to components.css so EVERY page
+   renders the same footer (they were trapped here, leaving the
+   footer unstyled on about/contact/terms/privacy/agents).
+   ============================================================ */
+
+
+/* ============================================================
+   3b. Homes showcase (bento) — home-card meta. The grid itself
+   is the shared .bento-* component in components.css.
+   ============================================================ */
+.showcase {
+  background: var(--white);
+  /* r44: positioning context for the flank wordmarks ("gabriel" left /
+     "homes" right) — they span the section and hang in the page gutters. */
+  position: relative;
+}
+.bento-card--home .bento-card__name {
+  text-wrap: balance;
+}
+.bento-card__price {
+  font-weight: 600;
+  color: var(--cream);
+  font-variant-numeric: tabular-nums;
+}
+.bento-card--spotlight .bento-card__price { font-size: var(--text-lg); }
+.bento-card__period {
+  color: var(--cream); /* r12: was cream @62% — unreadable over photos */
+}
+.bento-card__loc {
+  color: var(--cream); /* r12: was cream @70% — unreadable over photos */
+}
+.bento-card__loc::before,
+.bento-card__fact::before {
+  content: "\00b7\00a0\00a0"; /* middot separator inside the meta line */
+  color: var(--sand);
+}
+
+/* ============================================================
+   3c. Homes bento — "shape shift" (home page only)
+   Port of the Framer "Spotlight Bento Grid" card states. The grid
+   opts in with .bento-grid--shift; js/bento-shift.js adds .is-live,
+   .has-spot and .is-spot, sets --spot-row, and runs the FLIP move.
+   Layout only applies at 1021px+ (the 2- and 1-column grids keep
+   their normal tiles).
+   ============================================================ */
+.bento-grid--shift { position: relative; z-index: 1; }   /* js measures offsets against it; r44: above the flank wordmarks */
+
+@media (min-width: 1021px) {
+  .bento-grid--shift .bento-card {
+    grid-column: span 1;
+    grid-row: span 1;
+    border-radius: 16px;
+    transition: border-radius 0.5s cubic-bezier(0.34, 1.2, 0.5, 1);
+  }
+  /* Resting spotlight: the first card. */
+  .bento-grid--shift .bento-card--spotlight {
+    grid-column: span 3;
+    grid-row: span 2;
+  }
+  /* While another card is promoted, the resting spotlight is a tile again. */
+  .bento-grid--shift.has-spot .bento-card--spotlight:not(.is-spot) {
+    grid-column: span 1;
+    grid-row: span 1;
+  }
+  /* The promoted card: full width, two rows, starting on the row the JS
+     picked (--spot-row, 1-based) so it grows AROUND the pointer instead of
+     jumping away from it. It also takes the squircle corner (Framer
+     cornerShape). */
+  .bento-grid--shift .bento-card.is-spot {
+    grid-column: 1 / -1;
+    grid-row: var(--spot-row, 1) / span 2;
+    z-index: 2;
+    border-radius: 32px;
+  }
+  @supports (corner-shape: superellipse(1.6)) {
+    .bento-grid--shift .bento-card.is-spot {
+      corner-shape: superellipse(1.6);
+    }
+  }
+}
+
+/* ============================================================
+   H3 r19 — mobile bento carousel. Under 1021px the shift grid
+   becomes a horizontal scroll-snap rail: native swipe, keyboard
+   focus walks card-by-card (browsers scroll the focused card into
+   view), JS neither required nor added. The centre-card scale-up
+   runs on scroll-driven animations where the browser supports them
+   (@supports guard; D-LOOP-19a) — everywhere else all cards rest
+   at the same scale and the rail still works.
+   ============================================================ */
+@media (max-width: 1020px) {
+  .bento-grid--shift {
+    display: flex;
+    gap: 12px;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    /* edge padding lets the first/last card reach the snap centre */
+    scroll-padding-inline: 9%;
+    padding-inline: 9%;
+    margin-top: 2rem;
+    scrollbar-width: none;
+  }
+  .bento-grid--shift::-webkit-scrollbar { display: none; }
+  .bento-grid--shift .bento-card {
+    flex: 0 0 82%;
+    height: clamp(300px, 58vw, 430px);
+    scroll-snap-align: center;
+  }
+  .bento-grid--shift .bento-card--spotlight { flex-basis: 88%; }
+}
+
+@supports (animation-timeline: view()) {
+  @media (max-width: 1020px) {
+    .bento-grid--shift .bento-card {
+      animation: h3-card-grow linear both;
+      animation-timeline: view(inline);
+      animation-range: entry 40% cover 50%;
+    }
+  }
+  @keyframes h3-card-grow {
+    from { transform: scale(0.92); }
+    to   { transform: scale(1); }
+  }
+}
+
+/* Reveal transition restated for the shift cards so the corner radius
+   animates too. Matches components.css's reveal timing. */
+html.motion-ready .bento-grid--shift .bento-card[data-reveal] {
+  transition: opacity var(--t-slow) var(--ease-out),
+              transform var(--t-slow) var(--ease-out),
+              border-radius 0.5s cubic-bezier(0.34, 1.2, 0.5, 1);
+}
+
+/* Photos rest IN COLOUR and zoomed (r12 redesign: the owner asked for a
+   coloured bento, so the desaturation pass was dropped); the PROMOTED card
+   springs to natural scale. Keyed to .is-spot, never :hover, so a card
+   sliding under a still cursor can't flash. Gated on .is-live (set by the
+   JS), so with JS off every card simply shows its photo at rest. */
+@media (min-width: 1021px) and (hover: hover) and (pointer: fine) {
+  .bento-grid--shift.is-live .bento-card .bento-card__bg {
+    transform: scale(1.2);
+    transition: transform 1.05s cubic-bezier(0.34, 1.2, 0.5, 1);
+  }
+  .bento-grid--shift.is-live .bento-card.is-spot .bento-card__bg {
+    transform: scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bento-grid--shift .bento-card { transition: none; animation: none; /* stops h3-card-grow too */ }
+  .bento-grid--shift.is-live .bento-card .bento-card__bg { transition: none; }
+  html.motion-ready .bento-grid--shift .bento-card[data-reveal] {
+    transition: none;
+  }
+}
+
+/* ============================================================
+   3d. r44 — the bento card UNPACKS (owner request: "the card on
+   expansion should open some items within it").
+   Building on the existing card: a listing-type flag chip and a
+   "+" affordance ride on the photo, and a drawer opens INSIDE the
+   card when it expands —
+     • live shift grid: the spotlight promotion (.is-spot) opens it
+     • resting spotlight: open on load (:not(.has-spot)) — the hero
+       card arrives already unpacked
+     • grid not live (JS off / lite / fx=none): plain :hover and
+       :focus-visible keep the expansion working, CSS-only
+     • ≤1020px (H3 carousel): hidden — cards stay tap-through
+   The drawer reveals bright cream "Inside this home" chips (the
+   real amenities + specs, r43's brighter-card direction) that
+   stagger in one by one. The whole card stays ONE link, so the
+   chips are plain content — no nested interactive elements.
+   ============================================================ */
+/* r44: the price leads the meta line (the spotlight keeps its own
+   larger size from section 3b above — :not() keeps this from
+   overriding it, same specificity class-count aside). */
+.bento-card--home:not(.bento-card--spotlight) .bento-card__price { font-size: var(--text-base); }
+
+/* Listing-type flag — glassy chip, top-left of the photo zone. */
+.bento-card--home .bento-card__flag {
+  position: absolute; top: 1.1rem; left: 1.15rem; z-index: 1;
+  font-size: var(--text-xs); font-weight: 600;
+  letter-spacing: var(--track-mono); text-transform: uppercase;
+  color: var(--cream);
+  padding: 0.42rem 0.8rem; border-radius: 999px;
+  background: color-mix(in srgb, var(--espresso) 72%, transparent);
+  -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
+}
+
+/* The "+" affordance — spins open with the same overshoot curve
+   as the card corner (a pure-CSS plus: two 1.5px cream bars). */
+.bento-card--home .bento-card__more {
+  position: absolute; top: 1.1rem; right: 1.15rem; z-index: 1;
+  width: 2.15rem; height: 2.15rem; border-radius: 50%;
+  border: 1px solid color-mix(in srgb, var(--cream) 45%, transparent);
+  background: color-mix(in srgb, var(--espresso) 55%, transparent);
+  -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
+  transition: transform 0.55s cubic-bezier(0.34, 1.2, 0.5, 1);
+}
+.bento-card--home .bento-card__more::before,
+.bento-card--home .bento-card__more::after {
+  content: ""; position: absolute; top: 50%; left: 50%;
+  width: 0.72rem; height: 1.5px; border-radius: 1px;
+  background: var(--cream);
+  transform: translate(-50%, -50%);
+}
+.bento-card--home .bento-card__more::after {
+  transform: translate(-50%, -50%) rotate(90deg);
+}
+
+/* The drawer — grid-template-rows 0fr→1fr animates the reveal
+   without max-height tricks; the inner pane clips while closed. */
+.bento-card--home .bento-card__drawer {
+  display: grid;
+  grid-template-rows: 0fr;
+  opacity: 0;
+  margin-top: 0;
+  transition: grid-template-rows 0.55s var(--ease-out),
+              margin-top 0.55s var(--ease-out),
+              opacity 0.35s var(--ease-out);
+}
+.bento-card--home .bento-card__drawer-inner { min-height: 0; overflow: hidden; }
+.bento-card--home .bento-card__drawer-label {
+  font-size: var(--text-xs); font-weight: 600;
+  letter-spacing: var(--track-mono); text-transform: uppercase;
+  color: var(--sand);
+  margin-bottom: 0.6rem;
+}
+.bento-card--home .bento-card__drawer-items {
+  display: flex; flex-wrap: wrap; gap: 0.4rem;
+  list-style: none; margin: 0; padding: 0;
+}
+.bento-card--home .bento-card__drawer-items li {
+  flex: 0 0 auto;  /* pills keep their natural width — in the compact row
+                      the fade mask eats the overflow instead of squeezing
+                      the text into tall 3-line chips (r44 E3 catch) */
+  font-size: var(--text-xs); font-weight: 520;
+  letter-spacing: var(--track-tight);
+  color: var(--espresso);
+  background: var(--cream);
+  padding: 0.4rem 0.75rem; border-radius: 999px;
+  opacity: 0; transform: translateY(10px);
+  transition: opacity 0.4s var(--ease-out), transform 0.5s var(--ease-out);
+}
+.bento-card--home .bento-card__drawer-item--checked span { color: var(--burnt); }
+.bento-card--home .bento-card__drawer-cta {
+  margin-top: 0.8rem;
+  font-size: var(--text-sm); font-weight: 500;
+  letter-spacing: var(--track-tight);
+  color: var(--cream);
+}
+/* One rule per chip sets its stagger index; the delay itself only
+   applies while OPEN (see below), so closing snaps back together. */
+.bento-card--home .bento-card__drawer-items li:nth-child(1) { --i: 0; }
+.bento-card--home .bento-card__drawer-items li:nth-child(2) { --i: 1; }
+.bento-card--home .bento-card__drawer-items li:nth-child(3) { --i: 2; }
+.bento-card--home .bento-card__drawer-items li:nth-child(4) { --i: 3; }
+.bento-card--home .bento-card__drawer-items li:nth-child(5) { --i: 4; }
+.bento-card--home .bento-card__drawer-items li:nth-child(6) { --i: 5; }
+.bento-card--home .bento-card__drawer-items li:nth-child(7) { --i: 6; }
+.bento-card--home .bento-card__drawer-items li:nth-child(8) { --i: 7; }
+.bento-card--home .bento-card__drawer-items li:nth-child(9) { --i: 8; }
+.bento-card--home .bento-card__drawer-items li:nth-child(10) { --i: 9; }
+
+/* OPEN — the four expansion states, ≥1021px only. */
+@media (min-width: 1021px) {
+  .bento-grid--shift .bento-card.is-spot .bento-card__drawer,
+  .bento-grid--shift:not(.is-live) .bento-card:hover .bento-card__drawer,
+  .bento-grid--shift:not(.is-live) .bento-card:focus-visible .bento-card__drawer,
+  .bento-grid--shift:not(.has-spot) .bento-card--spotlight .bento-card__drawer {
+    grid-template-rows: 1fr;
+    opacity: 1;
+    margin-top: 0.95rem;
+  }
+  .bento-grid--shift .bento-card.is-spot .bento-card__drawer-items li,
+  .bento-grid--shift:not(.is-live) .bento-card:hover .bento-card__drawer-items li,
+  .bento-grid--shift:not(.is-live) .bento-card:focus-visible .bento-card__drawer-items li,
+  .bento-grid--shift:not(.has-spot) .bento-card--spotlight .bento-card__drawer-items li {
+    opacity: 1;
+    transform: none;
+    transition-delay: calc(80ms + var(--i, 0) * 55ms);
+  }
+  .bento-grid--shift .bento-card.is-spot .bento-card__more,
+  .bento-grid--shift:not(.is-live) .bento-card:hover .bento-card__more,
+  .bento-grid--shift:not(.is-live) .bento-card:focus-visible .bento-card__more,
+  .bento-grid--shift:not(.has-spot) .bento-card--spotlight .bento-card__more {
+    transform: rotate(90deg) scale(1.08);
+  }
+}
+
+/* The fallback opens on PLAIN tiles too (JS off / lite / fx=none), and a
+   tile is only one row tall — a full multi-row chip drawer would climb
+   over the title (caught in r44 browser checks). So on tiles the
+   fallback drawer takes a compact shape: the label plus ONE fading row
+   of chips, no CTA. The full unpack still runs where there is room —
+   the .is-spot promotion and the resting spotlight, both two rows. */
+.bento-grid--shift:not(.is-live) .bento-card:not(.bento-card--spotlight):hover .bento-card__drawer-cta,
+.bento-grid--shift:not(.is-live) .bento-card:not(.bento-card--spotlight):focus-visible .bento-card__drawer-cta {
+  display: none;
+}
+.bento-grid--shift:not(.is-live) .bento-card:not(.bento-card--spotlight):hover .bento-card__drawer-items,
+.bento-grid--shift:not(.is-live) .bento-card:not(.bento-card--spotlight):focus-visible .bento-card__drawer-items {
+  flex-wrap: nowrap;
+  overflow: hidden;
+  -webkit-mask-image: linear-gradient(to right, black 76%, transparent);
+  mask-image: linear-gradient(to right, black 76%, transparent);
+}
+
+/* ≤1020px (the H3 carousel): no drawer and no open affordance —
+   the cards stay exactly the tap-through tiles H3 pinned. */
+@media (max-width: 1020px) {
+  .bento-grid--shift .bento-card--home .bento-card__drawer,
+  .bento-grid--shift .bento-card--home .bento-card__more { display: none; }
+}
+
+/* ============================================================
+   3e. r44 — brand wordmarks flanking the bento: "gabriel" runs
+   down the left gutter from the top, "homes" down the right
+   gutter to the bottom (owner request). Book-spine vertical
+   Fraunces italic. r45: sized to the GUTTER, not the viewport —
+   the owner found the r44 proof too timid. The usable column is
+   50vw − 38.5rem − 16px stand-off (wrapper edge to viewport
+   edge), so the type scales at 40vw − 30rem of it: ~96px at the
+   1440px floor (fills the 120px gutter), ~288px at 1920 (fills
+   80% of the 360px gutter), capped at 20rem on 2k+ displays.
+   Never overflows the viewport edge: 40vw−30rem ≤ 50vw−38.5rem
+   for every vw ≥ 1360px, i.e. everywhere the words are shown.
+   js/bento-flank.js lags them behind the scroll at ~0.14x with
+   heavy damping — the mosaic streams past while the words barely
+   travel ("stagnant parallax"). Purely decorative: aria-hidden,
+   pointer-events none, and hidden below 1440px where the page
+   gutters disappear. The bento keeps its exact size — the words
+   live outside it in the gutters (and would tuck BEHIND the grid
+   on a just-fitting viewport, never pushing it around).
+   ============================================================ */
+.bento-flank { display: none; }
+@media (min-width: 1440px) {
+  .bento-flank {
+    display: block;
+    position: absolute; top: 0; bottom: 0; z-index: 0;
+    pointer-events: none; user-select: none;
+  }
+  /* 38.5rem ≈ half the 1280px container (40rem) minus the .container
+     padding (2.5rem) plus a 16px stand-off — the words hug the GRID
+     edge (the bento), not just the container box. */
+  .bento-flank--gabriel { right: calc(50% + 38.5rem); }
+  .bento-flank--homes { left: calc(50% + 38.5rem); }
+  .bento-flank__word {
+    position: absolute;
+    writing-mode: vertical-rl;
+    font-family: var(--font-display);
+    font-style: italic;
+    font-weight: 400;
+    /* Gutter-scaled (see block comment): 96px @1440 → 288px @1920, cap 320px. */
+    font-size: clamp(3.75rem, 40vw - 30rem, 20rem);
+    line-height: 1;
+    letter-spacing: var(--track-wordmark);
+    color: color-mix(in srgb, var(--clay) 55%, var(--white));
+    white-space: nowrap;
+    will-change: transform;
+  }
+  /* The wrappers are zero-width (the words are position:absolute and
+     out of flow), so each word must be pinned to the wrapper edge that
+     faces the container — gabriel's right, homes's left. */
+  .bento-flank--gabriel .bento-flank__word { top: 7.5rem; right: 0; }
+  .bento-flank--homes .bento-flank__word { bottom: 7.5rem; left: 0; }
+}
+
+/* r44 reduced motion: the drawer/affordance snap instead of
+   gliding, and the flank words never move (belt-and-braces on top
+   of the fx-gate — !important beats the JS inline style too). */
+@media (prefers-reduced-motion: reduce) {
+  .bento-card--home .bento-card__drawer,
+  .bento-card--home .bento-card__drawer-items li,
+  .bento-card--home .bento-card__more { transition: none; }
+  .bento-flank__word { transform: none !important; }
+}
+
+/* ============================================================
+   HOME v2 — images, motion and the confirmed company story.
+   Built on the existing bento, hero and tokens. Prefix: hv2-.
+   ============================================================ */
+
+/* ---- hero entrance -------------------------------------------- */
+@keyframes hv2-rise {
+  from { opacity: 0; transform: translateY(22px); filter: blur(4px); }
+  to   { opacity: 1; transform: none; filter: none; }
+}
+.hv2-rise {
+  animation: hv2-rise 1s var(--ease-out, cubic-bezier(.16,1,.3,1)) both;
+  animation-delay: calc(var(--d, 0) * 0.13s + 0.1s);
+}
+.hv2-hero { position: relative; z-index: 1; }
+.hv2-scroll {
+  position: absolute; left: 50%; bottom: 26px; transform: translateX(-50%);
+  width: 26px; height: 42px; border: 1.5px solid rgba(255,255,255,.55); border-radius: 14px;
+  z-index: 2;
+}
+.hv2-scroll span {
+  position: absolute; left: 50%; top: 8px; width: 3px; height: 8px; margin-left: -1.5px;
+  background: var(--white, #fff); border-radius: 2px; animation: hv2-wheel 1.8s ease-in-out infinite;
+}
+@keyframes hv2-wheel {
+  0% { opacity: 0; transform: translateY(0); }
+  30% { opacity: 1; }
+  100% { opacity: 0; transform: translateY(14px); }
+}
+/* r24: the mouse-wheel cue is meaningless on touch / small screens —
+   hide it there (owner mobile screenshot read it as a stray "0" pill). */
+@media (max-width: 809px), (hover: none) {
+  .hv2-scroll { display: none; }
+}
+
+/* ---- marquee of the five checks ------------------------------- */
+.hv2-marquee {
+  background: var(--burnt, #a0522d); color: var(--white, #fff);
+  overflow: hidden; padding: 18px 0; white-space: nowrap;
+  position: relative;
+  /* r55: the r24 strip-level mask faded the strip's own background too,
+     which the vision pass read as white "caps" clipping the bar at both
+     ends. The strip now stays solid edge to edge; two burnt gradient
+     caps (below) dissolve only the running text at the viewport edges. */
+}
+.hv2-marquee::before,
+.hv2-marquee::after {
+  content: "";
+  position: absolute;
+  top: 0; bottom: 0; width: 64px;
+  z-index: 1;
+  pointer-events: none;
+}
+.hv2-marquee::before {
+  left: 0;
+  background: linear-gradient(90deg, var(--burnt, #a0522d), transparent);
+}
+.hv2-marquee::after {
+  right: 0;
+  background: linear-gradient(270deg, var(--burnt, #a0522d), transparent);
+}
+.hv2-marquee__track {
+  display: inline-flex; gap: 28px; align-items: center;
+  animation: hv2-marquee 38s linear infinite;
+  font-family: var(--font-mono, monospace); font-size: 14px; letter-spacing: var(--track-mono, .02em);
+  font-weight: 600;
+  text-transform: uppercase;
+}
+.hv2-marquee__track i { font-style: normal; opacity: .7; }
+.hv2-marquee:hover .hv2-marquee__track { animation-play-state: paused; }
+@keyframes hv2-marquee {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+.hv2-marquee__track span { flex: none; }
+
+/* ---- shared headings ------------------------------------------- */
+.hv2-h2 {
+  font-family: var(--font-display, Georgia, serif);
+  font-size: clamp(2rem, 3.6vw, 3rem); line-height: 1.12; font-weight: 500;
+  letter-spacing: var(--track-tight, -0.02em); color: var(--ink, #1c1511); margin: 12px 0 18px;
+  max-width: 22ch;
+}
+.hv2-lede { font-size: 1.15rem; color: var(--brown, #5a4032); max-width: 58ch; }
+.hv2-sub { color: var(--taupe, #6b5e53); max-width: 58ch; margin: 0; }
+.hv2-head { margin-bottom: 52px; }
+
+/* ---- founder signature (r52: the r24 chip + hv2-split wrapper left
+   with the about redesign — the portrait is owned by pages.css
+   .about-founder__portrait now; only the role/name type pair,
+   which the about signature block still renders, lives here) ------ */
+.hv2-founder__role {font-family: var(--font-mono, monospace); font-weight: 600; font-size: 13px; text-transform: uppercase; letter-spacing: .08em; color: var(--clay, #b06a3b); margin: 0 0 2px !important;}
+.hv2-founder__name { font-family: var(--font-display, Georgia, serif); font-size: 1.25rem; color: var(--ink, #1c1511) !important; margin: 0 0 2px !important; }
+
+/* ---- process timeline ------------------------------------------ */
+.hv2-steps {
+  list-style: none; margin: 0; padding: 0; position: relative;
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 28px;
+}
+.hv2-steps::before {
+  content: ""; position: absolute; left: 6px; right: 6px; top: 6px; height: 2px;
+  background: var(--sand, #d8c9b8); transform-origin: left; transform: scaleX(0);
+  transition: transform 1.6s var(--ease-out, ease) .2s;
+}
+.hv2-steps.is-visible::before { transform: scaleX(1); }
+.hv2-steps li { position: relative; padding-top: 34px; }
+.hv2-steps__dot {
+  position: absolute; left: 0; top: 0; width: 14px; height: 14px; border-radius: 50%;
+  background: var(--burnt, #a0522d); box-shadow: 0 0 0 5px var(--cream, #faf8f4);
+  transform: scale(0); transition: transform .5s var(--ease-out, ease);
+}
+.hv2-steps.is-visible .hv2-steps__dot { transform: scale(1); }
+.hv2-steps li:nth-child(2) .hv2-steps__dot { transition-delay: .35s; }
+.hv2-steps li:nth-child(3) .hv2-steps__dot { transition-delay: .7s; }
+.hv2-steps li:nth-child(4) .hv2-steps__dot { transition-delay: 1.05s; }
+.hv2-steps h3 { font-family: var(--font-display, Georgia, serif); font-size: 1.4rem; font-weight: 500; margin: 0 0 8px; }
+.hv2-steps p { color: var(--taupe, #6b5e53); margin: 0; }
+.hv2-fee {
+  margin-top: 56px; padding: 26px 30px; border-radius: var(--radius-card, 18px);
+  background: var(--white, #fff); border-left: 4px solid var(--burnt, #a0522d);
+}
+.hv2-fee__label {font-family: var(--font-mono, monospace); font-weight: 600; font-size: 13px; text-transform: uppercase; letter-spacing: .08em; color: var(--clay, #b06a3b); margin: 0 0 6px !important;}
+.hv2-fee p { color: var(--brown, #5a4032); margin: 0; }
+
+/* ---- responsive -------------------------------------------------- */
+@media (max-width: 960px) {
+  .hv2-steps { grid-template-columns: repeat(2, 1fr); row-gap: 40px; }
+}
+@media (max-width: 640px) {
+  .hv2-steps { grid-template-columns: 1fr; }
+}
+
+/* ---- reduced motion: keep layout, drop movement ---------------- */
+@media (prefers-reduced-motion: reduce) {
+  /* r51: ha-pop / ha-chip join the list — animation: none drops the
+     entrance and leaves the base state (fully visible, no hidden
+     state in the base rule) — the fail-open contract. */
+  .hv2-rise, .hv2-marquee__track, .hv2-scroll span,
+  .hero__assurances li, .hero__loc, .hero__locations-label { animation: none !important; }
+  .hv2-steps::before, .hv2-steps__dot { transition: none !important; transform: none !important; }
+  /* r51: the focus-within pill lift renders as a plain 2px jump at
+     worst — kill the transform so the pill stays put. */
+  .hero__search:focus-within { transform: none !important; }
+}
+
+/* ---- checklist used on the services and checks pages ---------- */
+.hv2-checklist { list-style: none; padding: 0; margin: 28px 0 0; display: grid; gap: 14px; max-width: 760px; }
+.hv2-checklist li {
+  position: relative; padding: 18px 22px 18px 52px; border-radius: var(--radius-card, 18px);
+  background: var(--white, #fff); border: 1px solid rgba(90,64,50,.12); color: var(--brown, #5a4032);
+}
+.hv2-checklist li::before {
+  content: "✓"; position: absolute; left: 20px; top: 16px; color: var(--burnt, #a0522d); font-weight: 700;
+}
+
+/* ---- numbered listing checks (checks page) ---------------------- */
+.checks-list { list-style: none; padding: 0; margin: 36px 0 0; display: grid; gap: 16px; }
+.checks-list li {
+  display: grid; grid-template-columns: 74px 1fr; gap: 18px; align-items: start;
+  padding: 24px 28px; border-radius: var(--radius-card, 18px);
+  background: var(--white, #fff); border: 1px solid rgba(90,64,50,.12);
+}
+.checks-list__num {font-family: var(--font-mono, monospace); font-weight: 600; color: var(--burnt, #a0522d); font-size: 15px; padding-top: 4px;}
+.checks-list h3 { font-family: var(--font-display, Georgia, serif); font-size: 1.4rem; font-weight: 500; margin: 0 0 6px; color: var(--ink, #1c1511); }
+.checks-list p { margin: 0; color: var(--taupe, #6b5e53); }
+.band-soft { background: var(--paper); }
+
+/* H1 r18: talk-to-us strip lives inside the recommended section */
+.home-market__talk { margin-top: clamp(3rem, 5vw, 4.5rem); padding-top: 2.5rem; border-top: 1px solid var(--sand-60, rgba(216,201,184,.6)); }
+
+/* ---- curated Mombasa listing sections ------------------------ */
+/* r46: the palm field. A seamless tile of arching palm fronds
+   (static/img/palm-field.svg, drawn by scripts/r46_palm_field.py)
+   covers the section background — owner request: "from RECOMMENDED
+   IN MOMBASA down to the Short stays & BnB". The ::before sits at
+   z-index:-1 inside the section's own stacking context (isolation:
+   isolate), so it paints above the sand background but below every
+   card and heading. The mask holds the field solid through the head
+   and the three market groups and fades it out only across the last
+   stretch (84%→100% — live-measured: the Short stays & BnB group
+   ends at ~97% of the section height at 1600px), so coverage runs
+   exactly from RECOMMENDED IN MOMBASA down to Short stays & BnB and
+   the TALK TO US strip at the very bottom sits on clean sand.
+   Token-only colours (hex ratchet holds); no font sizes touched;
+   decorative, so nothing for screen readers or pointers to find. */
+.home-market { background: #f4eee6; position: relative; isolation: isolate; }
+.home-market::before {
+  content: ""; position: absolute; inset: 0; z-index: -1;
+  background-image: url("../img/palm-field.svg");
+  background-repeat: repeat;
+  background-size: 1400px 1600px;
+  -webkit-mask-image: linear-gradient(to bottom, black 0%, black 84%, transparent 100%);
+  mask-image: linear-gradient(to bottom, black 0%, black 84%, transparent 100%);
+  pointer-events: none;
+}
+/* the soft veil that keeps the head's mid-grey body copy off the
+   densest fronds (design-sheet review): a translucent cream radial
+   behind the head block, painted above the field, below the text. */
+.home-market__head { position: relative; }
+.home-market__head::before {
+  content: ""; position: absolute; z-index: -1;
+  inset: -4rem -8rem -2.5rem;
+  background: radial-gradient(closest-side,
+    color-mix(in srgb, var(--cream) 78%, transparent), transparent);
+  pointer-events: none;
+}
+/* finer grain on small screens — the 1400px tile would show only
+   slivers of two fronds at phone widths */
+@media (max-width: 1020px) {
+  .home-market::before { background-size: 860px 985px; }
+  .home-market__head::before { inset: -2rem -2.5rem -1.5rem; }
+}
+.home-market__title { max-width: 780px; margin: 0 0 64px; font: 500 clamp(2.5rem,6vw,5.5rem)/.96 var(--font-display,Georgia,serif); letter-spacing: -.045em; }
+.home-market__group { padding: 42px 0 70px; border-top: 1px solid rgba(90,64,50,.18); }
+.home-market__heading { display: flex; align-items: end; justify-content: space-between; gap: 24px; margin-bottom: 28px; }
+.home-market__heading > div > span {font: 600  13px var(--font-mono,monospace); color: var(--burnt,#a0522d);}
+.home-market__heading h2,.home-market__heading h3 { margin: 5px 0 0; font: 500 clamp(1.8rem,3vw,3rem)/1 var(--font-display,Georgia,serif); }
+.home-market__heading p { margin: 10px 0 0; max-width: 590px; color: var(--taupe,#6b5e53); }
+.home-market__heading > a { color: var(--burnt,#a0522d); font-weight: 600; white-space: nowrap; }
+.home-property-grid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 28px; }
+.home-property { background: #fff; border-radius: 22px; overflow: hidden; box-shadow: 0 12px 45px rgba(45,31,23,.08); }
+.home-property__media { display: block; position: relative; aspect-ratio: 16/10; overflow: hidden; }
+.home-property__media img { width: 100%; height: 100%; object-fit: cover; transition: transform .65s cubic-bezier(.2,.7,.2,1); }
+.home-property:hover .home-property__media img { transform: scale(1.045); }
+/* r47: the on-media bubble now indicates the listing's LOCATION (pin
+   glyph + area name); demo rows keep their disclosure as the chip's
+   demo flag. Same glass pill grammar as before, now flex so the pin,
+   the name and the flag sit on one line. */
+.loc-chip { position: absolute; top: 16px; left: 16px; display: inline-flex; align-items: center; gap: 6px; padding: 7px 10px; background: #fff6; color: #fff; border: 1px solid #fff9; border-radius: 999px; backdrop-filter: blur(12px); font: 700 13px var(--font-mono,monospace); letter-spacing: .08em; text-transform: uppercase; }
+.home-property__body { padding: 25px; }
+.home-property__eyebrow {margin: 0 0 8px; color: var(--burnt,#a0522d); font: 600  13px var(--font-mono,monospace); text-transform: uppercase; letter-spacing: .08em;}
+.home-property h3 { margin: 0; font: 500 clamp(1.35rem,2vw,2rem)/1.1 var(--font-display,Georgia,serif); }
+.home-property__price { margin: 12px 0; font-weight: 700; }.home-property__price small { font-weight: 500; color: var(--taupe,#6b5e53); }
+.home-property__copy,.home-property__near { color: var(--taupe,#6b5e53); line-height: 1.55; }.home-property__near { color: var(--brown,#5a4032); font-weight: 600; }
+.home-property__facts {font: 600  13px var(--font-mono,monospace); text-transform: uppercase;}
+.home-property__actions { display: flex; flex-wrap: wrap; gap: 9px; margin-top: 20px; }
+.home-property__actions a { padding: 9px 13px; border: 1px solid rgba(90,64,50,.23); border-radius: 999px; font-size: 13px; }
+.home-property__actions a:first-child { background: var(--ink,#1c1511); color: #fff; border-color: var(--ink,#1c1511); }
+
+/* ---- r13: market editorial layouts --------------------------------
+   Each market group gets its own rhythm instead of twin cards:
+   · sale  — one large feature card + a compact rail (with a "see
+     everything" tile closing the rail)
+   · rent  — full-width banners, image beside text, alternating sides
+   · stay  — image-dominant portrait cards, second card offset down
+   All colors/radii reuse the existing card tokens (.home-property). */
+.market-sale { display: grid; grid-template-columns: 1.45fr 1fr; gap: 28px; align-items: start; }
+.market-feature { display: flex; flex-direction: column; background: #fff; border-radius: 22px; overflow: hidden; box-shadow: 0 12px 45px rgba(45,31,23,.08); }
+.market-feature__media { position: relative; display: block; aspect-ratio: 16/11; overflow: hidden; background: #ece4d8; }
+.market-feature__media img { width: 100%; height: 100%; object-fit: cover; transition: transform .65s cubic-bezier(.2,.7,.2,1); }
+.market-feature:hover .market-feature__media img { transform: scale(1.04); }
+.market-feature__price { position: absolute; right: 16px; bottom: 16px; padding: .6em 1.15em; background: #fff; color: var(--ink,#1c1511); border-radius: 999px; font: 700 15px var(--font-sans,sans-serif); box-shadow: 0 10px 30px rgba(20,12,8,.28); }
+.market-feature__price small { font-weight: 500; color: var(--taupe,#6b5e53); }
+.market-feature__body { padding: 26px 28px 30px; display: grid; gap: 12px; justify-items: start; }
+.market-feature__eyebrow {margin: 0; color: var(--burnt,#a0522d); font: 600  13px var(--font-mono,monospace); text-transform: uppercase; letter-spacing: .08em;}
+.market-feature__title { margin: 0; font: 500 clamp(1.5rem,2.4vw,2.2rem)/1.08 var(--font-display,Georgia,serif); letter-spacing: -.02em; }
+.market-feature__title a { color: inherit; text-decoration: none; }
+.market-feature__copy { margin: 0; max-width: 58ch; color: var(--taupe,#6b5e53); line-height: 1.55; }
+.market-card__facts {margin: 0; font: 600  13px var(--font-mono,monospace); text-transform: uppercase; letter-spacing: .06em; color: var(--brown,#5a4032);}
+.market-card__actions { display: flex; flex-wrap: wrap; gap: 9px; margin-top: 6px; }
+.market-card__actions a { padding: 9px 14px; border: 1px solid rgba(90,64,50,.23); border-radius: 999px; font-size: 13px; font-weight: 500; text-decoration: none; color: inherit; }
+.market-card__actions a:hover { border-color: var(--burnt,#a0522d); color: var(--burnt,#a0522d); }
+.market-card__actions .market-card__actions-main { background: var(--ink,#1c1511); color: #fff; border-color: var(--ink,#1c1511); }
+.market-card__actions .market-card__actions-main:hover { background: var(--burnt,#a0522d); border-color: var(--burnt,#a0522d); color: #fff; }
+.market-rail { display: flex; flex-direction: column; gap: 18px; }
+.market-rail__card { display: grid; grid-template-columns: 108px minmax(0,1fr); gap: 16px; align-items: center; padding: 14px; background: #fff; border-radius: 18px; box-shadow: 0 10px 30px rgba(45,31,23,.07); transition: transform .3s cubic-bezier(.2,.7,.2,1), box-shadow .3s; }
+.market-rail__card:hover { transform: translateY(-3px); box-shadow: 0 16px 40px rgba(45,31,23,.12); }
+.market-rail__media { display: block; aspect-ratio: 1; border-radius: 12px; overflow: hidden; background: #ece4d8; }
+.market-rail__media img { width: 100%; height: 100%; object-fit: cover; }
+.market-rail__body { min-width: 0; }
+.market-rail__eyebrow {margin: 0 0 4px; color: var(--burnt,#a0522d); font: 600  13px var(--font-mono,monospace); text-transform: uppercase; letter-spacing: .08em;}
+.market-rail__body h3 { margin: 0; font: 500 1.12rem/1.15 var(--font-display,Georgia,serif); }
+.market-rail__body h3 a { color: inherit; text-decoration: none; }
+.market-rail__meta { margin: 7px 0 0; display: flex; flex-wrap: wrap; align-items: baseline; gap: 10px; }
+.market-rail__price { font-weight: 700; }
+.market-rail__price small { font-weight: 500; color: var(--taupe,#6b5e53); }
+.market-rail__facts {font: 600  13px var(--font-mono,monospace); text-transform: uppercase; color: var(--taupe,#6b5e53);}
+.market-rail__more { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 4px; padding: 22px 24px; border: 1.5px dashed rgba(90,64,50,.35); border-radius: 18px; color: var(--burnt,#a0522d); font-weight: 600; text-decoration: none; transition: background .25s, border-color .25s; }
+.market-rail__more:hover { background: #fff; border-color: var(--burnt,#a0522d); }
+.market-rent { display: flex; flex-direction: column; gap: 24px; }
+.market-banner { display: grid; grid-template-columns: minmax(0,46%) minmax(0,1fr); background: #fff; border-radius: 22px; overflow: hidden; box-shadow: 0 12px 45px rgba(45,31,23,.08); }
+.market-banner__media { position: relative; display: block; min-height: 280px; overflow: hidden; background: #ece4d8; }
+.market-banner__media img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transition: transform .65s cubic-bezier(.2,.7,.2,1); }
+.market-banner:hover .market-banner__media img { transform: scale(1.04); }
+.market-banner:nth-child(even) .market-banner__media { order: 2; }
+.market-banner__body { padding: 30px 34px; display: grid; gap: 12px; align-content: center; justify-items: start; }
+.market-banner__eyebrow {margin: 0; color: var(--burnt,#a0522d); font: 600  13px var(--font-mono,monospace); text-transform: uppercase; letter-spacing: .08em;}
+.market-banner__title { margin: 0; font: 500 clamp(1.35rem,2vw,1.9rem)/1.1 var(--font-display,Georgia,serif); letter-spacing: -.02em; }
+.market-banner__title a { color: inherit; text-decoration: none; }
+.market-banner__copy { margin: 0; max-width: 56ch; color: var(--taupe,#6b5e53); line-height: 1.55; }
+.market-banner__foot { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 14px; width: 100%; margin-top: 8px; padding-top: 16px; border-top: 1px solid rgba(90,64,50,.14); }
+.market-banner__price { font-weight: 700; font-size: 1.15rem; }
+.market-banner__price small { font-weight: 500; color: var(--taupe,#6b5e53); }
+.market-stagger { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); gap: 28px; align-items: start; padding-bottom: 44px; }
+.market-stagger > .market-stay:nth-child(2) { margin-top: 44px; }
+.market-stay { background: #fff; border-radius: 22px; overflow: hidden; box-shadow: 0 12px 45px rgba(45,31,23,.08); transition: transform .35s cubic-bezier(.2,.7,.2,1), box-shadow .35s; }
+.market-stay:hover { transform: translateY(-5px); box-shadow: 0 20px 55px rgba(45,31,23,.14); }
+.market-stay__media { position: relative; display: block; aspect-ratio: 4/4.6; overflow: hidden; background: #ece4d8; }
+.market-stay__media img { width: 100%; height: 100%; object-fit: cover; transition: transform .65s cubic-bezier(.2,.7,.2,1); }
+.market-stay:hover .market-stay__media img { transform: scale(1.05); }
+.market-stay__price { position: absolute; left: 16px; bottom: 16px; padding: .55em 1.05em; background: #fff; color: var(--ink,#1c1511); border-radius: 999px; font: 700 14px var(--font-sans,sans-serif); box-shadow: 0 10px 30px rgba(20,12,8,.25); }
+.market-stay__price small { font-weight: 500; color: var(--taupe,#6b5e53); }
+.market-stay__body { padding: 20px 22px 24px; display: grid; gap: 8px; justify-items: start; }
+.market-stay__eyebrow {margin: 0; color: var(--burnt,#a0522d); font: 600  13px var(--font-mono,monospace); text-transform: uppercase; letter-spacing: .08em;}
+.market-stay__body h3 { margin: 0; font: 500 1.3rem/1.12 var(--font-display,Georgia,serif); }
+.market-stay__body h3 a { color: inherit; text-decoration: none; }
+.market-stay__meta {margin: 0; font: 600  13px var(--font-mono,monospace); text-transform: uppercase; color: var(--taupe,#6b5e53);}
+.market-stay__link { font-size: 14px; font-weight: 600; color: var(--burnt,#a0522d); text-decoration: none; }
+.market-stay__link:hover { text-decoration: underline; }
+.home-market__more { color: var(--burnt,#a0522d); font-weight: 600; white-space: nowrap; }
+/* r59 (owner round nine): the closing "Homes close to what matters."
+   band becomes a full-bleed Swahili-coast scene — a dhow on shallow
+   turquoise water — under a warm-ink scrim tuned to the measured
+   geometry (heading 0-19%, card photos 22-74%, captions 74-90% of the
+   885px section): strong over the heading (.93), breathes at .55
+   through the card band, .80 behind the captions so the photo's
+   turquoise foreground still glows between them. Worst-case contrast
+   (pure-white pixel under the scrim): heading zone >= .75 -> white
+   8:1 / sand 5.2:1; caption zone .80 -> white 10.6:1 / sand 6.9:1 —
+   all WCAG AA. Mobile (<=900px) anchors the photo behind the heading
+   band and fades to ink below. prefers-contrast: more flattens it to
+   .97. The ink base stays as the load-fallback; the 60%-alpha grey
+   whites became solid rgba() whites (hex ratchet 200 -> 198). Card
+   photos get a light ring so they float on the scene. */
+.home-nearby { position: relative; isolation: isolate; background: var(--ink,#1c1511); color: #fff; }
+.home-nearby::before { content: ""; position: absolute; inset: 0; z-index: -2; background-image: url("../img/real/coast-dhow.jpg"); background-size: cover; background-position: center 62%; }
+.home-nearby::after { content: ""; position: absolute; inset: 0; z-index: -1; background: linear-gradient(180deg, rgba(24,17,13,.93) 0%, rgba(24,17,13,.93) 14%, rgba(24,17,13,.55) 24%, rgba(24,17,13,.55) 62%, rgba(24,17,13,.80) 72%, rgba(24,17,13,.80) 94%, rgba(24,17,13,.93) 100%); }
+@media (max-width: 900px) {
+  /* Stacked cards make the section ~2400px tall; cover-scaling a
+     1600x900 landscape into that shows a 9% sliver and the coast dies.
+     Instead the photo anchors behind the heading band (height 46%,
+     position-x on the dhow) and fades into solid ink before the
+     caption zone — the scene reads at the top, captions always sit on
+     near-ink. Heading-band scrim .75 keeps AA even over bright sky
+     (white 8.4:1, sand 5.4:1). */
+  .home-nearby::before { height: 46%; background-position: 32% 58%; }
+  .home-nearby::after { background: linear-gradient(180deg, rgba(24,17,13,.90) 0%, rgba(24,17,13,.75) 12%, rgba(24,17,13,.75) 30%, rgba(24,17,13,.96) 46%, rgba(24,17,13,.96) 100%); }
+}
+@media (prefers-contrast: more) { .home-nearby::after { background: rgba(20,14,10,.97); } }
+.home-nearby .home-market__heading p { color: rgba(255,255,255,.86); }.home-nearby .home-market__heading > a { color: #f2cfae; }
+.home-nearby__grid { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: 18px; }
+.nearby-card { color: #fff; }.nearby-card img { width: 100%; aspect-ratio: 4/3; object-fit: cover; border-radius: 16px; margin-bottom: 16px; outline: 1.5px solid rgba(250,248,244,.4); outline-offset: -1px; transition: transform .4s, outline-color .4s; }.nearby-card:hover img { transform: translateY(-5px); outline-color: rgba(250,248,244,.7); }
+.nearby-card span {color: #f2cfae; font: 700  13px var(--font-mono,monospace); text-transform: uppercase; letter-spacing: .06em;}.nearby-card h3 { margin: 7px 0; min-height: 2.3em; font: 500 1.25rem/1.15 var(--font-display,Georgia,serif); }.nearby-card p { margin: 0; color: rgba(255,255,255,.92); }
+@media (max-width: 900px) {
+  .home-property-grid,.home-nearby__grid { grid-template-columns: repeat(2,minmax(0,1fr)); }
+  /* r13 market layouts collapse to single columns; the stagger offset
+     and the banner side-by-side only make sense on wide screens. */
+  .market-sale { grid-template-columns: 1fr; }
+  .market-banner { grid-template-columns: 1fr; }
+  .market-banner__media { min-height: 220px; }
+  .market-banner:nth-child(even) .market-banner__media { order: 0; }
+  .market-stagger > .market-stay:nth-child(2) { margin-top: 0; }
+  .market-stagger { padding-bottom: 0; }
+}
+@media (max-width: 600px) {
+  /* minmax(0,1fr): a bare 1fr track floors at the cards' image min-content
+     (their natural width), which blew the page out to ~630px on phones. */
+  .home-property-grid,.home-nearby__grid { grid-template-columns: minmax(0,1fr); }
+  .home-market__heading { align-items: start; flex-direction: column; }
+  .home-market__title { margin-bottom: 42px; }
+  .market-banner__body { padding: 24px 22px 28px; }
+  .market-feature__body { padding: 22px 22px 26px; }
+}
+
+/* ---- r12: Talk-to-us band (WhatsApp / Call / Email) -------------
+   Sits between the recommended listings and the nearby-amenities
+   band. Cards reuse existing tokens only — espresso text on cream,
+   burnt accent on hover — so no new palette entries are introduced.
+   The section itself is template-gated: with no brand channel filled
+   it never renders, and this CSS quietly does nothing. */
+.home-social { background: #fff; }
+.home-social__title { margin: 6px 0 10px; max-width: 22ch; font: 500 clamp(2.1rem,4vw,3.6rem)/.98 var(--font-display,Georgia,serif); letter-spacing: -.04em; }
+.home-social__sub { margin: 0 0 30px; color: var(--taupe,#6b5e53); }
+.home-social__links { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 20px; }
+.home-social__link { display: grid; gap: 7px; padding: 26px 26px 30px; border: 1px solid rgba(90,64,50,.16); border-radius: 20px; background: #f8f4ec; color: var(--ink,#1c1511); transition: transform .3s cubic-bezier(.2,.7,.2,1), border-color .3s, background .3s; }
+.home-social__link:hover { transform: translateY(-5px); border-color: var(--burnt,#a0522d); background: #fff; }
+.home-social__link strong { font: 500 clamp(1.3rem,2vw,1.8rem)/1 var(--font-display,Georgia,serif); letter-spacing: -.02em; }
+.home-social__link span { color: var(--taupe,#6b5e53); font-size: 14px; line-height: 1.45; overflow-wrap: anywhere; }
+@media (max-width: 760px) { .home-social__links { grid-template-columns: 1fr; } }
+
+/* Demo chip over bright photography: darker glass than the default. */
+.loc-chip--on-media { background: rgba(28, 21, 17, .58); border-color: rgba(250, 248, 244, .32); }
+
+/* Market groups: one accent family, a shade per market so the 01/02/03
+   indexes are told apart at a glance. */
+.home-market__group--sale .home-market__heading > div > span { color: var(--burnt, #af4715); }
+.home-market__group--rent .home-market__heading > div > span { color: var(--clay, #965634); }
+.home-market__group--stay .home-market__heading > div > span { color: var(--brown, #5a4032); }
+
+/* ============================================================
+   r17 — "RECOMMENDED IN MOMBASA" head + Short stays & BnB group
+   premium redesign. Desktop-first; responsive resets below.
+   ============================================================ */
+
+/* --- Section head: tag + display title left, proof copy + CTA right */
+.home-market__head {
+  display: grid;
+  grid-template-columns: minmax(0, 1.6fr) minmax(260px, .9fr);
+  gap: 24px 56px;
+  align-items: end;
+  margin-bottom: 30px;
+}
+.home-market__head-main { min-width: 0; }
+.home-market__head-main .section-tag { margin-bottom: 16px; }
+.section-tag--rule { display: inline-flex; align-items: center; gap: 14px; }
+.section-tag--rule::after {
+  content: ""; width: 48px; height: 1px; flex: none;
+  background: currentColor; opacity: .45;
+}
+.home-market__title { margin: 0 0 10px; }
+.home-market__aside { min-width: 0; padding-bottom: 6px; }
+.home-market__aside p {
+  margin: 0 0 20px;
+  font: 400 15px/1.7 var(--font-sans, sans-serif);
+  color: var(--taupe, #6b5e53);
+}
+.home-market__aside-cta {
+  display: inline-flex; align-items: center; gap: 10px;
+  padding: 12px 22px;
+  border: 1.5px solid var(--burnt, #af4715); border-radius: 999px;
+  color: var(--burnt, #af4715);
+  font: 600 13px var(--font-sans, sans-serif); text-decoration: none;
+  transition: background .25s, color .25s, gap .25s;
+}
+.home-market__aside-cta:hover { background: var(--burnt, #af4715); color: #fff; gap: 15px; }
+
+/* --- Group headings: number inline with an em rule, link on baseline */
+.home-market__heading { align-items: baseline; }
+.home-market__heading > div { display: flex; align-items: baseline; gap: 13px; min-width: 0; }
+.home-market__heading > div > span { flex: none; font: 700 clamp(1rem, 1.5vw, 1.2rem) var(--font-mono, monospace); letter-spacing: .02em; }
+.home-market__heading > div > span::after { content: "—"; margin-left: 13px; font-weight: 400; color: rgba(90, 64, 50, .38); }
+.home-market__heading > div h3 { margin: 0; }
+
+/* --- Short-stay card: premium BnB treatment */
+.market-stay { box-shadow: 0 10px 34px rgba(45, 31, 23, .07), 0 1px 2px rgba(45, 31, 23, .06); }
+.market-stay__media::after {
+  content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 46%;
+  background: linear-gradient(to top, rgba(20, 12, 8, .52), rgba(20, 12, 8, 0));
+}
+.market-stay__price {
+  left: auto; right: 18px; bottom: 18px; padding: .6em 1.15em;
+  background: rgba(250, 248, 244, .92);
+  -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
+  border: 1px solid rgba(255, 255, 255, .65);
+}
+.market-stay__chip {
+  position: absolute; top: 16px; right: 16px; z-index: 2;
+  padding: .5em .95em; border-radius: 999px;
+  background: rgba(28, 21, 17, .62);
+  -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
+  border: 1px solid rgba(250, 248, 244, .3);
+  color: #faf8f4;
+  font: 600 13px var(--font-mono, monospace); text-transform: uppercase; letter-spacing: .1em;
+}
+.market-stay__chip--loc { right: auto; left: 16px; background: rgba(250, 248, 244, .85); color: var(--brown, #5a4032); border-color: rgba(90, 64, 50, .25); }
+.market-stay__body { padding: 22px 24px 26px; gap: 9px; }
+.market-stay__body h3 { font-size: 1.32rem; }
+.market-stay__link { display: inline-flex; align-items: center; gap: 8px; margin-top: 2px; }
+.market-stay__link span { transition: transform .25s; }
+.market-stay:hover .market-stay__link span { transform: translateX(4px); }
+
+/* --- "More stays" tile: balances the 3rd column, dark espresso */
+.market-stay--more {
+  display: flex; background: linear-gradient(165deg, #261c16, #3a291f);
+  color: #faf8f4;
+}
+.market-stay--more:hover { transform: translateY(-5px); }
+.market-stay__more-inner {
+  width: 100%;
+  display: flex; flex-direction: column; justify-content: flex-end; gap: 14px;
+  padding: clamp(24px, 3vw, 40px);
+}
+.market-stay--more .market-stay__eyebrow { color: #d9a27e; }
+.market-stay--more h3 {
+  margin: 0; color: #faf8f4;
+  font: 500 clamp(1.55rem, 2.3vw, 2.1rem)/1.12 var(--font-display, Georgia, serif);
+  letter-spacing: -.01em;
+}
+.market-stay__more-link {
+  display: inline-flex; align-items: center; gap: 10px;
+  font: 600 13px var(--font-sans, sans-serif); color: #eecfae;
+}
+.market-stay--more:hover .market-stay__more-link span { transform: translateX(4px); }
+.market-stay__more-link span { transition: transform .25s; }
+
+/* --- Subtler location chips across the section (less placeholder noise) */
+.home-market .loc-chip--on-media, .loc-chip--on-media {
+  padding: .5em .8em;
+  background: rgba(28, 21, 17, .48);
+  border: 1px solid rgba(250, 248, 244, .24);
+  opacity: .85;
+}
+
+/* --- Stagger: deliberate editorial offset on wide screens */
+.market-stagger > .market-stay:nth-child(2) { margin-top: 56px; }
+
+/* --- Responsive resets ------------------------------------------------ */
+@media (max-width: 1023px) {
+  .home-market__head { grid-template-columns: 1fr; gap: 18px; }
+  .home-market__aside { padding-bottom: 0; }
+  .home-market__aside p { margin-bottom: 14px; }
+  .market-stagger > .market-stay:nth-child(2) { margin-top: 0; }
+}
+
+/* r17 guard: keep the original ≤600px heading behaviour (stacked,
+   start-aligned) which the baseline rule above would otherwise override. */
+@media (max-width: 600px) {
+  .home-market__heading { align-items: start; }
+  .home-market__title { margin: 0 0 42px; }
+  .home-market__head-main .section-tag { margin-bottom: 10px; }
+}
+
+/* r17.1 — vision-review fixes: equal-height stay row, stretched more-tile,
+   bottom-anchored card links, clearer hairlines, dash breathing room. */
+.market-stagger { align-items: stretch; }
+.market-stagger > .market-stay:nth-child(2) { margin-top: 0; }
+.market-stay { display: flex; flex-direction: column; }
+.market-stay__media { flex: none; }
+.market-stay__body { flex: 1; }
+.market-stay__link { margin-top: auto; padding-top: 10px; }
+.market-stay--more { align-self: stretch; }
+.home-market__group { border-top-color: rgba(90, 64, 50, .26); }
+.home-market__heading > div { gap: 14px; }
+.home-market__heading > div > span::after { margin-left: 15px; }
+
+/* r17.2 — flex mechanics: card body becomes a column so the link
+   bottom-anchors; the more-tile inner stretches to use its height. */
+.market-stay__body { display: flex; flex-direction: column; align-items: flex-start; }
+.market-stay__more-inner { flex: 1; }
+
+/* r17.3 — ghost index numeral fills the more-tile's upper space and
+   echoes the group numbering (01 sale / 02 rent / 03 stay). */
+.market-stay--more { position: relative; overflow: hidden; }
+.market-stay--more::before {
+  content: "03";
+  position: absolute; top: -26px; right: -10px;
+  font: 700 clamp(8rem, 11vw, 10.5rem)/1 var(--font-mono, monospace);
+  color: rgba(250, 248, 244, .07);
+  letter-spacing: -.05em;
+  pointer-events: none;
+}
+
+/* r17.4 — anchor jumps to this section clear the sticky nav. */
+#recommended { scroll-margin-top: 84px; }
+
+/* ==================================================================
+   r18 — [ RECOMMENDED IN MOMBASA ] band redesign
+   One card grammar across the three groups: dark glass chips and
+   price pills, espresso primary pills, matched hover lift, aligned
+   group headers with number chips, and no dead space in the rails.
+   Desktop-first; responsive resets at the bottom.
+   ================================================================== */
+
+/* --- Section head: calmer display scale (hero stays the biggest
+       type on the page), a touch more air under the head. */
+.home-market__head { margin-bottom: 38px; }
+.home-market__title {
+  font-size: clamp(2.25rem, 4.4vw, 3.9rem);
+  letter-spacing: -.03em;
+}
+.home-market__aside { padding-bottom: 10px; }
+
+/* --- Group headings: number in a hairline chip, baseline link */
+.home-market__heading { align-items: end; margin-bottom: 30px; }
+.home-market__heading > div { align-items: center; gap: 15px; }
+.home-market__heading > div > span {
+  display: grid; place-items: center;
+  width: clamp(32px, 3vw, 40px); aspect-ratio: 1;
+  border: 1px solid color-mix(in srgb, currentColor 42%, transparent);
+  background: color-mix(in srgb, currentColor 7%, #fff);
+  border-radius: 11px;
+  font: 700 clamp(13px, 1vw, 14px) var(--font-mono, monospace);
+}
+.home-market__heading > div > span::after { content: none; }
+.home-market__heading h2, .home-market__heading h3 {
+  font-size: clamp(1.65rem, 2.5vw, 2.5rem);
+}
+.home-market__heading > a, .home-market__more {
+  text-underline-offset: 5px;
+  text-decoration-thickness: 1.5px;
+  transition: color .25s;
+}
+.home-market__heading > a:hover, .home-market__more:hover { text-decoration: underline; }
+
+/* --- One chip grammar: dark glass pills, 12px inset, mono caps */
+.home-market .loc-chip, .home-market .loc-chip--on-media,
+.market-stay__chip, .market-stay__chip--loc, .market-stay__chip--furnished {
+  position: absolute; top: 12px; z-index: 2;
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: .52em .95em;
+  background: rgba(28, 21, 17, .58);
+  -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
+  border: 1px solid rgba(250, 248, 244, .26);
+  color: #faf8f4;
+  font: 600 13px var(--font-mono, monospace);
+  text-transform: uppercase; letter-spacing: .1em;
+  border-radius: 999px;
+  opacity: 1;
+}
+.home-market .loc-chip { left: 12px; }
+.market-stay__chip--loc { left: 12px; right: auto; }
+.market-stay__chip--furnished {
+  right: 12px; left: auto;
+  background: rgba(150, 86, 52, .78);
+  border-color: rgba(250, 248, 244, .34);
+}
+
+/* --- One price-pill grammar: espresso glass, cream figures */
+.market-feature__price, .market-stay__price {
+  padding: .62em 1.2em;
+  background: rgba(28, 21, 17, .9);
+  -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
+  border: 1px solid rgba(250, 248, 244, .22);
+  color: #faf8f4;
+  font: 700 15px var(--font-sans, sans-serif);
+  box-shadow: 0 14px 34px rgba(20, 12, 8, .38);
+}
+.market-feature__price small, .market-stay__price small {
+  font-weight: 500; color: #d9c3ac;
+}
+
+/* --- One primary-CTA grammar: espresso pill */
+.market-card__actions .market-card__actions-main,
+.market-stay__link {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 9px 16px;
+  background: var(--ink, #1c1511);
+  color: #faf8f4;
+  border: 1px solid var(--ink, #1c1511);
+  border-radius: 999px;
+  font: 600 13px var(--font-sans, sans-serif);
+  text-decoration: none;
+  transition: background .25s, border-color .25s;
+}
+.market-card__actions .market-card__actions-main:hover,
+.market-stay__link:hover { background: var(--burnt, #af4715); border-color: var(--burnt, #af4715); color: #fff; }
+.market-stay__link { margin-top: auto; }
+.market-stay__link span { transition: transform .25s; }
+.market-stay__link:hover span, .market-stay:hover .market-stay__link span { transform: translateX(4px); }
+
+/* --- Group 01 · sale: feature card + a rail that fills its height */
+.market-sale { grid-template-columns: 1.55fr 1fr; align-items: stretch; }
+.market-feature { transition: transform .35s cubic-bezier(.2,.7,.2,1), box-shadow .35s; }
+.market-feature:hover { transform: translateY(-4px); box-shadow: 0 22px 60px rgba(45,31,23,.13); }
+.market-feature__media { aspect-ratio: 16/10.4; }
+.market-feature__media::after {
+  content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 42%;
+  background: linear-gradient(to top, rgba(20, 12, 8, .5), rgba(20, 12, 8, 0));
+  pointer-events: none;
+}
+.market-feature__price { z-index: 2; }
+.market-feature__title { font-size: clamp(1.55rem, 2.4vw, 2.25rem); }
+.market-feature__copy, .market-banner__copy {
+  display: -webkit-box; -webkit-box-orient: vertical; overflow: hidden;
+}
+.market-feature__copy { -webkit-line-clamp: 3; }
+.market-rail { display: flex; flex-direction: column; gap: 16px; height: 100%; }
+.market-rail__card {
+  align-items: center; padding: 15px 16px;
+  grid-template-columns: 116px minmax(0, 1fr);
+  transition: transform .3s cubic-bezier(.2,.7,.2,1), box-shadow .3s;
+}
+.market-rail__media { border-radius: 14px; }
+.market-rail__meta { margin: 8px 0 0; }
+.market-rail__price { font-size: 1.02rem; }
+.market-rail__facts { margin: 5px 0 0; }
+/* the closing tile: same espresso language as the stay "more" tile */
+.market-rail__more {
+  flex: 1; min-height: 132px;
+  display: flex; flex-direction: column; justify-content: center; gap: 10px;
+  margin-top: 0; padding: 24px 26px;
+  background: linear-gradient(160deg, #261c16, #3a291f);
+  border: 1px solid rgba(250, 248, 244, .07);
+  color: #faf8f4;
+  font: 500 clamp(1.2rem, 1.7vw, 1.5rem)/1.18 var(--font-display, Georgia, serif);
+  letter-spacing: -.01em;
+  transition: transform .3s cubic-bezier(.2,.7,.2,1), box-shadow .3s;
+}
+.market-rail__more small {
+  font: 600 13px var(--font-mono, monospace);
+  text-transform: uppercase; letter-spacing: .12em;
+  color: #d9a27e;
+}
+.market-rail__more span[aria-hidden] { color: #eecfae; transition: transform .25s; }
+.market-rail__more:hover {
+  background: linear-gradient(160deg, #2d2119, #443023);
+  border-color: rgba(250, 248, 244, .16);
+  transform: translateY(-4px);
+  box-shadow: 0 18px 44px rgba(28, 21, 17, .28);
+}
+.market-rail__more:hover span[aria-hidden] { transform: translateX(5px); }
+
+/* --- Group 02 · rent: banners with one shared rhythm */
+.market-rent { gap: 26px; }
+.market-banner {
+  min-height: 330px;
+  grid-template-columns: minmax(0, 44%) minmax(0, 1fr);
+  transition: transform .35s cubic-bezier(.2,.7,.2,1), box-shadow .35s;
+}
+.market-banner:hover { transform: translateY(-4px); box-shadow: 0 20px 55px rgba(45,31,23,.12); }
+.market-banner__media { min-height: 300px; }
+.market-banner__body { padding: 30px 36px; gap: 11px; }
+.market-banner__copy { -webkit-line-clamp: 2; }
+.market-banner__foot { margin-top: 10px; padding-top: 18px; }
+.market-banner__price { font-size: 1.2rem; }
+
+/* --- Group 03 · short stays & BnB: aligned trio */
+.market-stay__media::after { height: 40%; }
+.market-stay__body { padding: 20px 22px 24px; gap: 8px; }
+.market-stay__body h3 { min-height: 2.3em; }
+.market-stay__meta { margin: 0; }
+.market-stay__eyebrow { letter-spacing: .12em; }
+.market-stay--more { border: 1px solid rgba(250, 248, 244, .07); }
+.market-stay--more::before {
+  top: -18px; right: -6px;
+  font-size: clamp(7rem, 9vw, 9rem);
+  color: rgba(250, 248, 244, .085);
+}
+.market-stay__more-inner { gap: 12px; }
+.market-stay__more-inner::after {
+  content: ""; position: absolute; left: 0; right: 0; height: 1px;
+  background: linear-gradient(to right, rgba(217, 162, 126, .5), transparent 70%);
+}
+.market-stay--more:hover { box-shadow: 0 20px 55px rgba(28, 21, 17, .35); }
+
+/* --- Responsive resets --------------------------------------------- */
+@media (max-width: 900px) {
+  .market-sale { grid-template-columns: 1fr; }
+  .market-rail { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .market-rail__more { grid-column: 1 / -1; min-height: 96px; flex: none; }
+  .market-banner { grid-template-columns: 1fr; min-height: 0; }
+  .market-banner__media { min-height: 0; aspect-ratio: 16/9.5; }
+  .market-banner:nth-child(even) .market-banner__media { order: 0; }
+  .market-banner__body { padding: 24px 26px 28px; }
+}
+@media (max-width: 640px) {
+  .market-rail { grid-template-columns: 1fr; }
+  .market-rail__card { grid-template-columns: 104px minmax(0, 1fr); }
+  .market-banner__media { aspect-ratio: 16/10.5; }
+  .market-stay__body h3 { min-height: 0; }
+}
+
+/* ==================================================================
+   r18.1 — vision-review polish pass
+   Self-contained chip contrast on any photo, contained ghost numeral,
+   bottom-locked banner footers, optically aligned "see all" links.
+   ================================================================== */
+
+/* Location chips carry their own background, so they read on any photo
+   (bright day shots and dark night shots alike). */
+.home-market .loc-chip, .home-market .loc-chip--on-media,
+.market-stay__chip--loc {
+  background: rgba(250, 248, 244, .92);
+  -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
+  border: 1px solid rgba(90, 64, 50, .34);
+  color: var(--brown, #5a4032);
+}
+.market-stay__chip--furnished {
+  background: rgba(150, 86, 52, .88);
+  border: 1px solid rgba(250, 248, 244, .38);
+  color: #faf8f4;
+}
+
+/* Price pills: brighter rim so they hold their own on night shots. */
+.market-feature__price, .market-stay__price {
+  background: rgba(32, 24, 19, .92);
+  border-color: rgba(250, 248, 244, .34);
+}
+
+/* Number chips in group headings: a shade more present. */
+.home-market__heading > div > span {
+  border-color: color-mix(in srgb, currentColor 58%, transparent);
+  background: color-mix(in srgb, currentColor 12%, #fff);
+}
+
+/* "See all" links: optically aligned with the serif cap height. */
+.home-market__heading > a { padding-bottom: 8px; }
+
+/* Rail: chip anchors to the thumbnail now. */
+.market-rail__media { position: relative; }
+.market-rail__body { align-self: center; }
+
+/* Banners: lock the price/CTA row to the card bottom so mirrored
+   cards share one rhythm regardless of copy length. */
+.market-banner__body {
+  display: flex; flex-direction: column; justify-content: center;
+  align-items: flex-start; gap: 11px;
+}
+.market-banner__foot { margin-top: auto; padding-top: 18px; }
+
+/* Stay "more" tile: numeral fully contained, content vertically
+   centered so the tile has no dead middle. */
+.market-stay--more::before {
+  top: 10px; right: 14px;
+  font-size: clamp(5rem, 6.5vw, 6.5rem);
+}
+.market-stay__more-inner { justify-content: center; gap: 12px; }
+.market-stay__more-inner::after { content: none; }
+.market-stay--more .market-stay__eyebrow {
+  position: relative; padding-top: 18px;
+  border-top: 1px solid rgba(217, 162, 126, .45);
+}
+
+/* r18.2 — final optical nudges (vision pass 2) */
+.market-rail__card { grid-template-columns: 124px minmax(0, 1fr); gap: 17px; }
+.market-stay__more-inner { padding-bottom: 18px; }
+
+/* ============================================================
+   H2.b — split-text mask headline + rich-gated hero video
+   (r33, D-LOOP-33a; M1 mask variant + M2 video handover).
+   The word spans are built by motion.js ONLY when fx is live
+   (fxNone skips the split): with JS blocked or fx=none the h1
+   stays plain and fully visible — D-MOTION-SAFE by construction.
+   ============================================================ */
+html.motion-ready .hero__w {
+  display: inline-block;
+  overflow: hidden;
+  vertical-align: bottom;
+  /* room for descenders inside the mask (Framer split-text fix) */
+  padding-bottom: 0.12em;
+  margin-bottom: -0.12em;
+}
+html.motion-ready .hero__w-in {
+  display: inline-block;
+  animation: hero-mask-rise 0.7s var(--ease-out) both;
+  animation-delay: calc(140ms + var(--d, 0) * 45ms);
+}
+@keyframes hero-mask-rise {
+  from { transform: translateY(112%); }
+  to   { transform: translateY(0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  html.motion-ready .hero__w-in { animation: none; }
+}
+/* The loop crossfades over the slide stack only when motion.js has
+   verified fx=rich && !Save-Data and flipped the class. */
+.hero__video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  transition: opacity var(--t-slow) var(--ease);
+}
+.hero__bg.is-video .hero__video { opacity: 1; }
+.hero__bg.is-video .hero__slide { animation: none; opacity: 0; }
+
+/* ============================================================
+   r47 — the location chip's pin glyph + demo flag, and the
+   bubbly title reveal (data-bubble-title).
+
+   THE BUBBLE (owner request): the on-media pill that used to say
+   "Demo listing" now indicates the listing's LOCATION — pin glyph +
+   area name, on every card. Demo rows keep their disclosure as a
+   quieter "demo" flag behind a hairline (the bento index, search
+   rows and the detail page still spell it out in full).
+
+   THE BUBBLY TITLES (owner request): every section topic title pops
+   in letter-by-letter — a bubble rising to the surface, overshooting,
+   wobbling, settling. Reversible: the IntersectionObserver in
+   motion.js (setupBubbleTitles) re-arms a title once it has FULLY
+   left the viewport (ratio 0) and pops it again when ≥30% of it is
+   back — scrolling down or back up, exactly as asked. Hysteresis
+   between 0 and 30% keeps a title at the viewport edge from
+   flickering.
+
+   Safety (D-MOTION-SAFE): letters are only hidden under
+   .bt-armed, a class JS adds per element ONLY after the observer is
+   attached — no JS, no fx gate (data-fx=none), or a crash before
+   arming leaves the title as plain, fully-visible text. The split
+   itself (motion.js) is DOM-APIs-only and never runs under fx=none,
+   so reduced-motion users get plain titles; the reduce block below
+   is the belt-and-braces pin.
+   ============================================================ */
+.loc-chip__pin { display: block; flex: none; }
+.loc-chip__flag {
+  font-style: normal;
+  opacity: .82;
+  padding-left: 7px;
+  border-left: 1px solid rgba(90, 64, 50, .3);
+}
+
+/* --- the bubbly title ----------------------------------------- */
+.bt-w { display: inline-block; white-space: nowrap; }   /* words wrap as units */
+.bt-l { display: inline-block; }                        /* letters transform  */
+.bt-armed .bt-l { opacity: 0; }                         /* hidden until pop  */
+.bt-armed.is-bubbled .bt-l {
+  animation: bt-pop .58s cubic-bezier(.25, 1.25, .4, 1) both;
+  animation-delay: calc(var(--wd, 0ms) + var(--ld, 0ms));
+}
+@keyframes bt-pop {
+  0%   { opacity: 0; transform: translateY(.5em) scale(.3); }   /* deep    */
+  55%  { opacity: 1; transform: translateY(-.09em) scale(1.16); } /* overshoot */
+  78%  { transform: translateY(.025em) scale(.965); }           /* wobble  */
+  100% { opacity: 1; transform: none; }                          /* settle  */
+}
+@media (prefers-reduced-motion: reduce) {
+  .bt-armed .bt-l { opacity: 1; transform: none; animation: none !important; }
+}
+
+/* ==========================================================================
+   5. CLIENT QUOTES (r75 BACKEND-PLAN 3C) — owner testimonials on the home
+   page. Whole band hides when there is nothing consented to show.
+   Tokens only; grid collapses 3 -> 2 -> 1.
+   ========================================================================== */
+.home-quotes { background: var(--paper); }
+.home-quotes__grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+}
+.quote-card {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 22px 22px 20px;
+  background: var(--cream);
+  border: 1px solid var(--sand);
+  border-radius: 16px;
+}
+.quote-card__stars {
+  position: relative;
+  display: inline-block;
+  font-size: var(--text-sm);
+  line-height: 1;
+  letter-spacing: 2px;
+}
+.quote-card__stars-base { color: var(--sand); }
+.quote-card__stars-fill {
+  position: absolute;
+  inset: 0 auto 0 0;
+  overflow: hidden;
+  white-space: nowrap;
+  color: var(--burnt);
+}
+.quote-card__quote {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: var(--text-md);
+  line-height: 1.5;
+  color: var(--ink);
+  flex: 1;
+}
+.quote-card__who { font-size: var(--text-sm); color: var(--taupe); }
+.quote-card__who strong { color: var(--espresso); }
+
+@media (max-width: 900px) { .home-quotes__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 620px) { .home-quotes__grid { grid-template-columns: minmax(0, 1fr); } }
