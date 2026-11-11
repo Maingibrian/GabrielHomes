@@ -1,0 +1,595 @@
+     1→"""Listings views — search results page + location autocomplete.
+     2→
+     3→Per WORK.md §7-§9:
+     4→- SEO-friendly URLs: /<type-plural>-for-sale/<location-slug>/
+     5→- FilterSet with location descendants (searching "Nairobi" includes
+     6→  Westlands, Kilimani, etc.)
+     7→- Pagination (24 per page) via HTMX with graceful full-page fallback
+     8→- Generated H1, breadcrumbs, canonical URL (clean path, no query params)
+     9→- Empty state with suggestions
+    10→- All queries use select_related / prefetch_related to avoid N+1
+    11→"""
+    12→from __future__ import annotations
+    13→
+    14→from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
+    15→from django.db.models import Q
+    16→from django.http import JsonResponse
+    17→from django.shortcuts import get_object_or_404, render
+    18→from django.urls import reverse
+    19→
+    20→from apps.locations.models import Location
+    21→
+    22→from .filters import PropertyFilter, SORT_OPTIONS
+    23→from .models import Property, PropertyType
+    24→
+    25→# 24 per page — per WORK.md §8 (Search results).
+    26→PAGE_SIZE = 24
+    27→
+    28→
+    29→def _resolve_location(location_slug: str | None) -> Location | None:
+    30→    """Resolve a location slug to a Location, matching at any level."""
+    31→    if not location_slug:
+    32→        return None
+    33→    # Slug is unique per parent, so a bare slug may match multiple
+    34→    # locations at different levels (e.g. "nyali" the area vs a
+    35→    # neighbourhood that happens to share the slug). Prefer the
+    36→    # shallowest match (county > area > neighbourhood).
+    37→    qs = Location.objects.filter(slug=location_slug).order_by("level")
+    38→    return qs.first()
+    39→
+    40→
+    41→def _location_filter_q(location: Location) -> Q:
+    42→    """Build a Q object matching the location AND all its descendants.
+    43→
+    44→    WORK.md §9: "searching 'Nairobi' includes Westlands, Kilimani, etc."
+    45→    We walk 3 levels deep (county > area > neighbourhood) and OR the
+    46→    pks together.
+    47→    """
+    48→    descendant_pks = set(location.get_descendants(include_self=True).values_list("pk", flat=True))
+    49→    return Q(location__in=descendant_pks)
+    50→
+    51→
+    52→def _build_h1(listing_type: str, ptype: PropertyType | None, location: Location | None) -> str:
+    53→    """Generate the H1 from the URL context.
+    54→
+    55→    Examples:
+    56→        sale, Flats & Apartments, None      -> "Flats & Apartments for Sale"
+    57→        rent, Houses, Mombasa               -> "Houses for Rent in Mombasa"
+    58→        sale, None, Mombasa                 -> "Property for Sale in Mombasa"
+    59→    """
+    60→    type_name = ptype.name if ptype else "Property"
+    61→    if listing_type is None:
+    62→        # Combined browse-all page (/properties/) — no type filter applied.
+    63→        if not ptype:
+    64→            type_name = "Properties"
+    65→        return f"{type_name} for Sale and Rent" + (
+    66→            f" in {location.name}" if location else ""
+    67→        )
+    68→    action = "for Sale" if listing_type == "sale" else "for Rent"
+    69→    h1 = f"{type_name} {action}"
+    70→    if location:
+    71→        # Use the location's own name (not the full path) for the H1.
+    72→        h1 += f" in {location.name}"
+    73→    return h1
+    74→
+    75→
+    76→def _build_breadcrumbs(listing_type: str, ptype: PropertyType | None, location: Location | None) -> list[dict]:
+    77→    """Build breadcrumb trail: Home > [Type] for [Sale/Rent] > [Location]."""
+    78→    crumbs = [{"name": "Home", "url": "/"}]
+    79→    if listing_type is None:
+    80→        # Combined page: Home > Properties > [Location]
+    81→        crumbs.append({"name": "Properties", "url": ""})
+    82→        if location:
+    83→            crumbs.append({"name": location.name, "url": ""})
+    84→        return crumbs
+    85→    action = "for Sale" if listing_type == "sale" else "for Rent"
+    86→    type_name = ptype.name if ptype else "Property"
+    87→
+    88→    if ptype:
+    89→        type_url = f"/{ptype.slug_plural}-{'for-sale' if listing_type == 'sale' else 'for-rent'}/"
+    90→    else:
+    91→        type_url = f"/property-{'for-sale' if listing_type == 'sale' else 'for-rent'}/"
+    92→
+    93→    crumbs.append({"name": f"{type_name} {action}", "url": type_url})
+    94→    if location:
+    95→        crumbs.append({"name": location.name, "url": ""})  # current page
+    96→    return crumbs
+    97→
+    98→
+    99→def _build_canonical_url(listing_type: str, ptype: PropertyType | None, location: Location | None) -> str:
+   100→    """Canonical URL = the clean path without query params (per §7)."""
+   101→    if listing_type is None:
+   102→        # Combined browse-all page.
+   103→        return "/properties/" + (f"{location.slug}/" if location else "")
+   104→    if ptype:
+   105→        base = f"/{ptype.slug_plural}-{'for-sale' if listing_type == 'sale' else 'for-rent'}/"
+   106→    else:
+   107→        base = f"/property-{'for-sale' if listing_type == 'sale' else 'for-rent'}/"
+   108→    if location:
+   109→        base += f"{location.slug}/"
+   110→    return base
+   111→
+   112→
+   113→def _build_related_searches(listing_type: str, ptype: PropertyType | None, location: Location | None) -> list[dict]:
+   114→    """Build a 'Related searches' link block for the bottom of the page."""
+   115→    if listing_type is None:
+   116→        # Combined page — point people at the two canonical SEO surfaces
+   117→        # plus the top counties.
+   118→        related = [
+   119→            {"name": "Property for Sale", "url": "/property-for-sale/"},
+   120→            {"name": "Property for Rent", "url": "/property-for-rent/"},
+   121→        ]
+   122→        top_counties = Location.objects.filter(
+   123→            level=Location.Level.COUNTY
+   124→        ).order_by("name")[:6]
+   125→        for county in top_counties:
+   126→            related.append({
+   127→                "name": f"Property for Sale in {county.name}",
+   128→                "url": f"/property-for-sale/{county.slug}/",
+   129→            })
+   130→        return related[:8]
+   131→    related = []
+   132→    action_suffix = "for-sale" if listing_type == "sale" else "for-rent"
+   133→    action_label = "for Sale" if listing_type == "sale" else "for Rent"
+   134→
+   135→    if location:
+   136→        # Other types in the same location
+   137→        other_types = PropertyType.objects.exclude(pk=ptype.pk if ptype else None).order_by("position")[:5]
+   138→        for ot in other_types:
+   139→            related.append({
+   140→                "name": f"{ot.name} {action_label} in {location.name}",
+   141→                "url": f"/{ot.slug_plural}-{action_suffix}/{location.slug}/",
+   142→            })
+   143→        # Same type (or all-types) in sibling locations
+   144→        if location.parent:
+   145→            siblings = Location.objects.filter(parent=location.parent).exclude(pk=location.pk)[:4]
+   146→            for sib in siblings:
+   147→                if ptype:
+   148→                    url = f"/{ptype.slug_plural}-{action_suffix}/{sib.slug}/"
+   149→                else:
+   150→                    url = f"/property-{action_suffix}/{sib.slug}/"
+   151→                label_pt = ptype.name if ptype else "Property"
+   152→                related.append({
+   153→                    "name": f"{label_pt} {action_label} in {sib.name}",
+   154→                    "url": url,
+   155→                })
+   156→    else:
+   157→        # No location — show top locations for this type
+   158→        top_counties = Location.objects.filter(level=Location.Level.COUNTY).order_by("name")[:5]
+   159→        for county in top_counties:
+   160→            if ptype:
+   161→                url = f"/{ptype.slug_plural}-{action_suffix}/{county.slug}/"
+   162→            else:
+   163→                url = f"/property-{action_suffix}/{county.slug}/"
+   164→            label_pt = ptype.name if ptype else "Property"
+   165→            related.append({
+   166→                "name": f"{label_pt} {action_label} in {county.name}",
+   167→                "url": url,
+   168→            })
+   169→
+   170→    return related[:8]
+   171→
+   172→
+   173→def search(request, type_slug: str | None = None, location_slug: str | None = None, listing_type: str = "sale"):
+   174→    """Search results page — the heart of the portal.
+   175→
+   176→    URL patterns (per §7):
+   177→        /<type>-for-sale/                       -> type_slug set, no location
+   178→        /<type>-for-sale/<location>/            -> both set
+   179→        /<type>-for-rent/                       -> type_slug set, no location
+   180→        /<type>-for-rent/<location>/            -> both set
+   181→        /property-for-sale/<location>/          -> type_slug=None, location set
+   182→        /property-for-rent/<location>/          -> type_slug=None, location set
+   183→    """
+   184→    # ------------------------------------------------------------------
+   185→    # Resolve URL context
+   186→    # ------------------------------------------------------------------
+   187→    # No-JS hero-search fallback: when JavaScript is unavailable the hero
+   188→    # form submits GET params (listing_type / type / location_slug) to the
+   189→    # bare /property-for-<sale|rent>/ route. Honour those params only when
+   190→    # the URL path didn't already provide them, so SEO URLs are unaffected.
+   191→    if type_slug is None:
+   192→        type_slug = request.GET.get("type") or None
+   193→    if location_slug is None:
+   194→        location_slug = request.GET.get("location_slug") or None
+   195→
+   196→    ptype = None
+   197→    if type_slug:
+   198→        ptype = get_object_or_404(PropertyType, slug_plural=type_slug)
+   199→
+   200→    location = _resolve_location(location_slug)
+   201→    if location_slug and not location:
+   202→        from django.http import Http404
+   203→        raise Http404("Location not found.")
+   204→
+   205→    # ------------------------------------------------------------------
+   206→    # Base queryset — only published listings, filtered by URL context
+   207→    # ------------------------------------------------------------------
+   208→    qs = Property.objects.published()
+   209→    if listing_type:  # None on the combined /properties/ page — all types
+   210→        qs = qs.filter(listing_type=listing_type)
+   211→    else:
+   212→        # Keep placeholder inventory Mombasa-only while never hiding genuine
+   213→        # owner-entered listings should the business expand later.
+   214→        mombasa = Location.objects.filter(level=Location.Level.COUNTY, name="Mombasa").first()
+   215→        if mombasa:
+   216→            qs = qs.filter(
+   217→                Q(is_demo=False)
+   218→                | Q(location__in=mombasa.get_descendants(include_self=True))
+   219→            )
+   220→    market = request.GET.get("market", "").lower()
+   221→    if market == "sale":
+   222→        qs = qs.filter(listing_type=Property.ListingType.SALE)
+   223→    elif market == "rent":
+   224→        qs = qs.filter(listing_type=Property.ListingType.RENT, is_short_stay=False)
+   225→    elif market == "bnb":
+   226→        qs = qs.filter(listing_type=Property.ListingType.RENT, is_short_stay=True)
+   227→
+   228→    if ptype:
+   229→        qs = qs.filter(property_type=ptype)
+   230→
+   231→    if location:
+   232→        qs = qs.filter(_location_filter_q(location))
+   233→
+   234→    # Eager-load everything the listing card needs (avoid N+1).
+   235→    qs = qs.select_related(
+   236→        "property_type", "location__parent__parent", "agent__user",
+   237→    ).prefetch_related("images", "amenities")
+   238→
+   239→    # ------------------------------------------------------------------
+   240→    # Apply query-param filters via the FilterSet
+   241→    # ------------------------------------------------------------------
+   242→    filter_set = PropertyFilter(request.GET, queryset=qs)
+   243→    qs = filter_set.qs
+   244→
+   245→    # Keep the map readable: presentation/demo mode pins the curated homes,
+   246→    # while every genuine owner-entered listing remains eligible.
+   247→    map_source = qs.filter(Q(is_demo=False) | ~Q(address_text=""))
+   248→    map_rows = map_source.exclude(lat__isnull=True).exclude(lng__isnull=True).values(
+   249→        "lat", "lng", "title", "slug", "pk", "price", "listing_type", "is_short_stay", "location__name",
+   250→        "location__parent__name", "location__parent__parent__name",
+   251→    )[:18]
+   252→    map_listings = []
+   253→    for item in map_rows:
+   254→        location_bits = [
+   255→            item.get("location__parent__parent__name"),
+   256→            item.get("location__parent__name"),
+   257→            item.get("location__name"),
+   258→        ]
+   259→        map_listings.append({
+   260→            "id": item["pk"],  # L1: pairs each pin with its result row
+   261→            "lat": float(item["lat"]), "lng": float(item["lng"]),
+   262→            "title": item["title"],
+   263→            "url": f"/listing/{item['slug']}-{item['pk']}/",
+   264→            "price": f"KES {item['price']:,.0f}",
+   265→            "price_short": (
+   266→                f"KSh {item['price'] / 1_000_000:.1f}M" if item["price"] >= 1_000_000
+   267→                else f"KSh {item['price'] / 1_000:.0f}K"
+   268→            ),
+   269→            "market": "bnb" if item["is_short_stay"] else item["listing_type"],
+   270→            "location": " > ".join(bit for bit in location_bits if bit),
+   271→        })
+   272→
+   273→    # ------------------------------------------------------------------
+   274→    # Paginate (24 per page)
+   275→    # ------------------------------------------------------------------
+   276→    paginator = Paginator(qs, PAGE_SIZE)
+   277→    page_num = request.GET.get("page", "1")
+   278→    try:
+   279→        page = paginator.page(page_num)
+   280→    except (PageNotAnInteger, EmptyPage):
+   281→        page = paginator.page(1)
+   282→
+   283→    # ------------------------------------------------------------------
+   284→    # Context
+   285→    # ------------------------------------------------------------------
+   286→    h1 = _build_h1(listing_type, ptype, location)
+   287→    if listing_type is None and not location:
+   288→        h1 = {
+   289→            "sale": "Mombasa homes for sale",
+   290→            "rent": "Mombasa homes for long-term rent",
+   291→            "bnb": "Mombasa short stays and BnB",
+   292→        }.get(market, "Homes across Mombasa")
+   293→    breadcrumbs = _build_breadcrumbs(listing_type, ptype, location)
+   294→    canonical_url = _build_canonical_url(listing_type, ptype, location)
+   295→    related_searches = _build_related_searches(listing_type, ptype, location)
+   296→
+   297→    # Count of total results (before pagination)
+   298→    total_count = paginator.count
+   299→
+   300→    # Whether we have any active filters (for the "Clear filters" link)
+   301→    active_filters = bool(request.GET.dict())
+   302→
+   303→    context = {
+   304→        "body_class": "page-search",
+   305→        "page_title": h1,
+   306→        "meta_description": f"{h1}. Browse checked listings on Gabriel Homes — real estate with a human point of view.",
+   307→        "h1": h1,
+   308→        "breadcrumbs": breadcrumbs,
+   309→        "canonical_url": canonical_url,
+   310→        "listing_type": listing_type,
+   311→        "property_type": ptype,
+   312→        "location": location,
+   313→        "page_obj": page,
+   314→        "total_count": total_count,
+   315→        "page_size": PAGE_SIZE,
+   316→        "filter_form": filter_set.form,
+   317→        "filterset": filter_set,
+   318→        "sort_options": SORT_OPTIONS,
+   319→        "current_sort": request.GET.get("sort", "newest"),
+   320→        "active_filters": active_filters,
+   321→        "current_market": market,
+   322→        "map_listings": map_listings,
+   323→        "related_searches": related_searches,
+   324→        "is_htmx": request.headers.get("HX-Request") == "true",
+   325→        # For the filter sidebar — pass all property types and top locations
+   326→        "all_property_types": PropertyType.objects.order_by("position", "name"),
+   327→        "all_counties": Location.objects.filter(level=Location.Level.COUNTY).order_by("name"),
+   328→    }
+   329→
+   330→    # If HTMX request, return just the results partial
+   331→    if context["is_htmx"]:
+   332→        return render(request, "listings/_results_grid.html", context)
+   333→
+   334→    return render(request, "listings/search.html", context)
+   335→
+   336→
+   337→def location_autocomplete(request):
+   338→    """JSON endpoint for the hero search bar's location input.
+   339→
+   340→    Returns up to 8 locations whose name starts with (or contains)
+   341→    the `q` query param. Each result includes the slug, name, full
+   342→    path, and level — enough for the JS to build a URL.
+   343→
+   344→    Usage: /search/locations/?q=mom
+   345→    Returns: [{"slug": "mombasa", "name": "Mombasa", "full_path": "Mombasa", "level": "county"}, ...]
+   346→    """
+   347→    q = request.GET.get("q", "").strip()
+   348→    if len(q) < 2:
+   349→        return JsonResponse({"results": []})
+   350→
+   351→    # Match by name (case-insensitive icontains) — shallowest first.
+   352→    qs = Location.objects.filter(name__icontains=q).order_by("level", "name")[:8]
+   353→    results = [
+   354→        {
+   355→            "slug": loc.slug,
+   356→            "name": loc.name,
+   357→            "full_path": loc.full_path(),
+   358→            "level": loc.level,
+   359→        }
+   360→        for loc in qs
+   361→    ]
+   362→    return JsonResponse({"results": results})
+   363→
+   364→
+   365→# ---------------------------------------------------------------------------
+   366→# Listing detail
+   367→# ---------------------------------------------------------------------------
+   368→SIMILAR_LISTINGS_COUNT = 3
+   369→
+   370→# Approximate nearby places for the fictional Mombasa showcase listings.
+   371→# Replace these presentation values with verified places/times before launch.
+   372→_DEMO_NEARBY_AMENITIES = {
+   373→    "Bamburi Mwisho": [
+   374→        {"symbol": "▦", "category": "Mall", "name": "City Mall Nyali", "distance": "Sample · about 12 min by car"},
+   375→        {"symbol": "≈", "category": "Resort", "name": "Sarova Whitesands Beach Resort", "distance": "Sample · about 8 min by car"},
+   376→        {"symbol": "▤", "category": "Conference venue", "name": "PrideInn Paradise Beach Resort", "distance": "Sample · about 12 min by car"},
+   377→        {"symbol": "◉", "category": "Nature attraction", "name": "Haller Park", "distance": "Sample · about 7 min by car"},
+   378→    ],
+   379→    "Nyali Centre": [
+   380→        {"symbol": "▦", "category": "Mall", "name": "City Mall Nyali", "distance": "Sample · about 5 min by car"},
+   381→        {"symbol": "≈", "category": "Resort", "name": "Voyager Beach Resort", "distance": "Sample · about 6 min by car"},
+   382→        {"symbol": "▤", "category": "Conference & events", "name": "EnglishPoint Marina", "distance": "Sample · about 9 min by car"},
+   383→        {"symbol": "◎", "category": "Leisure", "name": "Wild Waters", "distance": "Sample · about 8 min by car"},
+   384→    ],
+   385→    "Mkomani": [
+   386→        {"symbol": "▦", "category": "Mall", "name": "City Mall Nyali", "distance": "Sample · about 6 min by car"},
+   387→        {"symbol": "≈", "category": "Resort", "name": "Voyager Beach Resort", "distance": "Sample · about 7 min by car"},
+   388→        {"symbol": "▤", "category": "Conference & events", "name": "EnglishPoint Marina", "distance": "Sample · about 8 min by car"},
+   389→        {"symbol": "◎", "category": "Leisure", "name": "Wild Waters", "distance": "Sample · about 9 min by car"},
+   390→    ],
+   391→    "Shanzu": [
+   392→        {"symbol": "≈", "category": "Beach", "name": "Shanzu Beach", "distance": "About 6 min drive"},
+   393→        {"symbol": "▦", "category": "Shopping", "name": "Mtwapa shopping area", "distance": "About 12 min drive"},
+   394→        {"symbol": "＋", "category": "Healthcare", "name": "Mtwapa health services", "distance": "About 12 min drive"},
+   395→        {"symbol": "◉", "category": "Leisure", "name": "North Coast resorts", "distance": "Close by"},
+   396→    ],
+   397→    "Mtwapa Town": [
+   398→        {"symbol": "▦", "category": "Shopping", "name": "Mtwapa Mall", "distance": "About 4 min drive"},
+   399→        {"symbol": "≈", "category": "Leisure", "name": "Mtwapa Creek", "distance": "About 8 min drive"},
+   400→        {"symbol": "↗", "category": "Getting around", "name": "Mtwapa Bridge", "distance": "About 5 min drive"},
+   401→        {"symbol": "＋", "category": "Everyday", "name": "Mtwapa town centre", "distance": "Close by"},
+   402→    ],
+   403→    "Likoni Ferry": [
+   404→        {"symbol": "↗", "category": "Getting around", "name": "Likoni Ferry", "distance": "About 5 min drive"},
+   405→        {"symbol": "▦", "category": "Shopping", "name": "Likoni town centre", "distance": "About 5 min drive"},
+   406→        {"symbol": "≈", "category": "Beach", "name": "Shelly Beach", "distance": "About 15 min drive"},
+   407→        {"symbol": "＋", "category": "Healthcare", "name": "Likoni health services", "distance": "Nearby"},
+   408→    ],
+   409→    "CBD": [
+   410→        {"symbol": "▦", "category": "Shopping", "name": "Mombasa CBD", "distance": "Close by"},
+   411→        {"symbol": "＋", "category": "Healthcare", "name": "Coast General Hospital", "distance": "About 8 min drive"},
+   412→        {"symbol": "↗", "category": "Getting around", "name": "Likoni Ferry", "distance": "About 8 min drive"},
+   413→        {"symbol": "◉", "category": "Culture", "name": "Fort Jesus", "distance": "About 10 min drive"},
+   414→    ],
+   415→    "Tudor": [
+   416→        {"symbol": "＋", "category": "Healthcare", "name": "Coast General Hospital", "distance": "About 8 min drive"},
+   417→        {"symbol": "▦", "category": "Shopping", "name": "Mombasa CBD", "distance": "About 8 min drive"},
+   418→        {"symbol": "↗", "category": "Getting around", "name": "Tudor Creek routes", "distance": "Close by"},
+   419→        {"symbol": "◎", "category": "Education", "name": "Mombasa town schools", "distance": "Nearby"},
+   420→    ],
+   421→}
+   422→
+   423→
+   424→def listing_detail(request, slug: str, pk: int):
+   425→    """Property detail page — per WORK.md §8 (Listing detail).
+   426→
+   427→    URL: /listing/<slug>-<pk>/
+   428→    - Only published listings are visible (404 otherwise).
+   429→    - View counter is debounced per session (one count per session per
+   430→      listing — a session flag prevents reloads from inflating the count).
+   431→    - Sticky brand contact card (Call / WhatsApp / Email, brand row) and enquiry form.
+   432→    - Save and Share buttons.
+   433→    - Similar listings: same property_type + same county (via location
+   434→      ancestors), ±30% price, exclude self.
+   435→    - JSON-LD structured data for SEO.
+   436→    - Leaflet map with approximate pin (respects address_text privacy).
+   437→    """
+   438→    from django.shortcuts import get_object_or_404, render as _render
+   439→
+   440→    property = get_object_or_404(
+   441→        Property.objects.published().select_related(
+   442→            "property_type",
+   443→            "location__parent__parent",
+   444→            "agent__user",
+   445→        ).prefetch_related("images", "amenities"),
+   446→        slug=slug, pk=pk,
+   447→    )
+   448→
+   449→    # ------------------------------------------------------------------
+   450→    # View counter — debounced per session (one count per session per listing)
+   451→    # ------------------------------------------------------------------
+   452→    session_key = f"viewed_property_{property.pk}"
+   453→    if not request.session.get(session_key):
+   454→        property.increment_views()
+   455→        request.session[session_key] = True
+   456→        # Mark session as modified so it's saved.
+   457→        request.session.modified = True
+   458→
+   459→    # ------------------------------------------------------------------
+   460→    # Similar listings — same type + same county, ±30% price, exclude self
+   461→    # ------------------------------------------------------------------
+   462→    from decimal import Decimal
+   463→    price_min = property.price * Decimal("0.7")
+   464→    price_max = property.price * Decimal("1.3")
+   465→    # Get the county ancestor of this listing's location.
+   466→    county = None
+   467→    if property.location.parent:
+   468→        county = property.location.parent
+   469→        if county.parent:
+   470→            county = county.parent
+   471→    else:
+   472→        county = property.location  # property is at county level (shouldn't happen but safe)
+   473→
+   474→    similar_qs = Property.objects.published().filter(
+   475→        property_type=property.property_type,
+   476→        listing_type=property.listing_type,
+   477→        price__gte=price_min,
+   478→        price__lte=price_max,
+   479→    ).exclude(pk=property.pk)
+   480→
+   481→    # Filter to the same county via descendants.
+   482→    if county:
+   483→        descendant_pks = set(county.get_descendants(include_self=True).values_list("pk", flat=True))
+   484→        similar_qs = similar_qs.filter(location__in=descendant_pks)
+   485→
+   486→    similar_listings = list(
+   487→        similar_qs.select_related(
+   488→            "property_type", "location__parent__parent", "agent__user",
+   489→        ).prefetch_related("images")[:SIMILAR_LISTINGS_COUNT]
+   490→    )
+   491→
+   492→    # ------------------------------------------------------------------
+   493→    # Breadcrumbs
+   494→    # ------------------------------------------------------------------
+   495→    crumbs = [{"name": "Home", "url": "/"}]
+   496→    if property.listing_type == "sale":
+   497→        type_url = f"/{property.property_type.slug_plural}-for-sale/"
+   498→        type_label = f"{property.property_type.name} for Sale"
+   499→    else:
+   500→        type_url = f"/{property.property_type.slug_plural}-for-rent/"
+   501→        type_label = f"{property.property_type.name} for Rent"
+   502→    crumbs.append({"name": type_label, "url": type_url})
+   503→    if property.location.parent:
+   504→        # location is a neighbourhood; link to the area
+   505→        loc_url = f"/{property.property_type.slug_plural}-{'for-sale' if property.listing_type == 'sale' else 'for-rent'}/{property.location.parent.slug}/"
+   506→        crumbs.append({"name": property.location.parent.name, "url": loc_url})
+   507→    crumbs.append({"name": property.title, "url": ""})
+   508→
+   509→    # ------------------------------------------------------------------
+   510→    # JSON-LD structured data
+   511→    # ------------------------------------------------------------------
+   512→    from django.conf import settings
+   513→    from django.urls import reverse
+   514→
+   515→    json_ld = {
+   516→        "@context": "https://schema.org",
+   517→        "@type": "Residence" if property.property_type.is_residential else "Place",
+   518→        "name": property.title,
+   519→        "description": property.description[:500] if property.description else "",
+   520→        "url": f"{settings.SITE_DOMAIN}{property.get_absolute_url()}",
+   521→        "address": {
+   522→            "@type": "PostalAddress",
+   523→            "addressLocality": property.location.name,
+   524→            "addressRegion": county.name if county else "",
+   525→            "addressCountry": "KE",
+   526→        },
+   527→        "offers": {
+   528→            "@type": "Offer",
+   529→            "price": str(property.price),
+   530→            "priceCurrency": "KES",
+   531→        },
+   532→    }
+   533→    if property.lat and property.lng:
+   534→        json_ld["geo"] = {
+   535→            "@type": "GeoCoordinates",
+   536→            "latitude": str(property.lat),
+   537→            "longitude": str(property.lng),
+   538→        }
+   539→    if property.bedrooms:
+   540→        json_ld["numberOfRooms"] = property.bedrooms
+   541→    if property.bathrooms:
+   542→        json_ld["amenityFeature"] = [{
+   543→            "@type": "LocationFeatureSpecification",
+   544→            "name": "Bathrooms",
+   545→            "value": property.bathrooms,
+   546→        }]
+   547→
+   548→    # ------------------------------------------------------------------
+   549→    # Enquiry form (for the sticky agent card)
+   550→    # ------------------------------------------------------------------
+   551→    from apps.inquiries.forms import InquiryForm
+   552→    enquiry_form = InquiryForm()
+   553→
+   554→    # ------------------------------------------------------------------
+   555→    # WhatsApp link with prefilled message (single-owner mode: the brand
+   556→    # row, not the retired agency concept — P1-2)
+   557→    # ------------------------------------------------------------------
+   558→    from apps.core.models import BrandSettings
+   559→    wa_number = BrandSettings.load().whatsapp_digits
+   560→    wa_message = (
+   561→        f"Hello Gabriel Homes, I'm interested in '{property.title}' "
+   562→        f"({property.price} KES) listed on Gabriel Homes. "
+   563→        f"{settings.SITE_DOMAIN}{property.get_absolute_url()}"
+   564→    )
+   565→    from urllib.parse import quote
+   566→    wa_url = f"https://wa.me/{wa_number}?text={quote(wa_message)}" if wa_number else ""
+   567→
+   568→    # ------------------------------------------------------------------
+   569→    # Context
+   570→    # ------------------------------------------------------------------
+   571→    # NOTE: body_class here is informational only — the template's
+   572→    # {% block body_class %} is the real switch for page-level CSS
+   573→    # (see detail.html; has-contact-bar gates the mobile sticky bar).
+   574→    context = {
+   575→        "body_class": "page-detail",
+   576→        "page_title": f"{property.title} — {property.get_listing_type_display()} in {property.location.name}",
+   577→        "meta_description": (
+   578→            f"{property.title} — {property.get_listing_type_display().lower()} in "
+   579→            f"{property.location.full_path()}. "
+   580→            f"{property.bedrooms} bed, {property.bathrooms} bath. "
+   581→            f"Checked by Gabriel Homes."
+   582→        ),
+   583→        "property": property,
+   584→        "nearby_amenities": _DEMO_NEARBY_AMENITIES.get(property.location.name, []) if property.is_demo else [],
+   585→        "similar_listings": similar_listings,
+   586→        "breadcrumbs": crumbs,
+   587→        "json_ld": json_ld,
+   588→        "enquiry_form": enquiry_form,
+   589→        "whatsapp_url": wa_url,
+   590→        "canonical_url": property.get_absolute_url(),
+   591→        "county": county,
+   592→    }
+   593→
+   594→    return _render(request, "listings/detail.html", context)
+   595→
