@@ -1,3 +1,68 @@
+Run 69 | BUILDER (owner round, off-loop) | 2026-11-11 ~14:00-15:10 +03:00 | items:
+(1) **OWNER ASK — "the palms are stagnant they need to move ...but not
+to slow they look stagnant and not to fast they move together with the
+listings."** Diagnosis: the r68 pass pinned the field to the VIEWPORT
+(background-attachment: fixed) — speed 0, "the deepest tier" on paper,
+but on screen the field never moves: stagnant (and iOS/Android ignore
+fixed attachment outright, so phones never saw even that). The owner's
+words define a middle: palms must MOVE under scroll, slower than the
+listings — not 0 (stagnant), not 1:1 (glued to the rows). HALF SPEED
+is that middle.
+(2) MECHANISM — motion.js setupPalmParallax() (NEW, called from init
+after setupRowSlides): writes --palms-y on .listings-band; search.css
+.listings-band::before now reads background-position:
+0 var(--palms-y, 0px). DRIFT=0.5 (pattern px per scrolled px → field
+speed exactly half), EASE=0.14 lerp — the chase carries weight: during
+a fast fling the field hangs back a touch and eases in once the scroll
+settles, never snaps. Anchored at the scroll where the band's top
+enters the viewport (exactly static on arrival, drifts while any part
+of the band is on screen, freezes after it passes — no wasted work in
+the footer); scroll/resize kicks passive; htmx:afterSwap + isConnected
+guard re-resolves a swapped band and restarts the chase from the
+static pose. The tile repeats, so the drift never seams; the
+box-relative 84% mask stays anchored (dissolve lands exactly at the
+band's end); no stacking changes (r62 root-negative contract intact —
+the drift moves paint inside the ::before, never the box).
+background-attachment: fixed is BANNED from search.css by test pin so
+the stagnant pin cannot return.
+(3) GATING — D-FX-GATE as the row slides: rich + lite drift (a
+position shift costs no data); fx=none (prefers-reduced-motion — the
+WCAG 2.3.3 vestibular ask) and the attribute-less document (scripts
+blocked, fails closed) never write the var: the 0px fallback scrolls
+the exact static r65 tile. No media query re-checked (the gate owns
+it). Band markup untouched (r65 markup pin stands).
+GATES: check 0 · makemigrations 0 · **878 passed** (2 obsolete r68
+parallax pins rewritten in place — fixed-gated-rich+lite +
+scroll-default-fails-closed → half-speed-drift-not-viewport-pinned +
+js-half-speed-gated-fail-closed; test docstring updated; r65
+scroll-attachment pin, r65-contract and home-keeps-r46 pins untouched
+and green).
+E3 (agent-browser, live /properties/): data-fx=rich confirmed; the
+drift var settles at EXACTLY 0.5× in-band travel at four readings
+(1040.19 / 1595.80 / 2063.87 / 2546.29 — computed ::before
+backgroundPosition reads the var live); back-to-back 1000px scroll →
+var delta 482 (0.48 with ±35px lazy-load layout creep above the band);
+PIXEL PROOF at 1600×1000 (sentinels off <1620px → clean gutters):
+both gutters cross-correlate the PAINTED field 450px UP against the
+cards' full 1000px — half speed, nowhere near stagnant (0) or 1:1
+(1000); VLM A/B read: "pattern shifted… much less than cards…
+parallax confirmed". Fail-closed live: var removed → computed
+background-position 0px 0px, attachment scroll (the exact static
+pose); the fxNone early-return is the same gate mechanism live-verified
+four-tier in r68 (route-abort of fx-gate.js not matchable via the
+agent-browser CLI — noted). Desktop VLM: palms visible, even, cards
+readable, nothing broken; mobile 390px: "coherent repeating botanical
+texture, no areas too heavy" (one earlier "clumped" read at a single
+phase disproved by a second neutral read — a 390px window shows less
+than half the tile, so one phase can look sparse; the structural
+one-centroid-per-cell pin governs).
+Deliverables in download/: r69-parallax-proof.png (A|B with the
+measurements), r69-listings-drift-desktop.png,
+r69-listings-drift-mobile.png; E3 script scripts/r69_parallax_proof.py.
+FOR THE NEXT RUN: preview bootstrap is scripts/start_preview.sh
+(self-healing after sandbox recycles). Owner's cloud PAT still
+"Later" — push when provided, delete after use.
+
 Run 68 | BUILDER (owner round, off-loop) | 2026-11-11 ~11:40-12:40 +03:00 | items:
 (1) **OWNER ASK — "the listings page palms need to be spread out
 evenly to look less bushy in some areas than others and maximise the

@@ -16,12 +16,15 @@ still stands):
    the 5×5 grid, checkerboard layers, golden-angle aim — a future
    regeneration that clumps again fails these pins.
 
-2. PARALLAX — .listings-band::before opts into
-   background-attachment: fixed under html[data-fx="rich"] and
-   html[data-fx="lite"] only. Scroll stays the default so scripts
-   blocked (no attribute — fails closed), prefers-reduced-motion
-   (fx=none, WCAG 2.3.3) and engines that ignore fixed-attachment
-   keep the exact r65 look.
+2. PARALLAX — r69 (owner round thirteen, second pass): "the palms
+   are stagnant they need to move ...but not to slow they look
+   stagnant and not to fast they move together with the listings."
+   The r68 fixed-attachment pin (speed 0 — stagnant, and ignored by
+   iOS/Android anyway) is gone; motion.js now advances the field at
+   HALF the scroll rate via --palms-y (lerped for weight). Fail-closed:
+   scripts blocked (no attribute) and fx=none (prefers-reduced-motion,
+   WCAG 2.3.3) never write the var — the 0px fallback scrolls the
+   tile exactly like r65.
 
 Home keeps the r46 tile — pinned here so the "spread them out" ask
 can never leak into the home market section unnoticed.
@@ -35,6 +38,7 @@ EVEN_SVG = (REPO / "static" / "img" / "palm-field-even.svg").read_text()
 OLD_SVG = (REPO / "static" / "img" / "palm-field.svg").read_text()
 SEARCH_CSS = (REPO / "static" / "css" / "search.css").read_text()
 HOME_CSS = (REPO / "static" / "css" / "home.css").read_text()
+MOTION_JS = (REPO / "static" / "js" / "motion.js").read_text()
 
 W, H = 1400.0, 1600.0
 GRID = 5
@@ -181,49 +185,72 @@ def test_even_tile_is_generated_not_hand_edited():
 
 
 # ---------------------------------------------------------------------------
-# 2. The parallax — deepest tier, gated like every other effect
+# 2. The parallax — r69 pass: HALF-SPEED drift, not the stagnant pin
 # ---------------------------------------------------------------------------
-def _gate_rules():
-    """Every rule setting background-attachment on the band."""
-    return re.findall(
-        r"[^{}]*\.listings-band::before[^{}]*\{[^}]*background-attachment:"
-        r"[^;}]*[^{}]*\}",
-        SEARCH_CSS,
+def test_parallax_half_speed_drift_not_viewport_pinned():
+    """r69 (owner round thirteen): "the palms are stagnant they need to
+    move ...but not too slow they look stagnant and not too fast they
+    move together with the listings." The r68 pass pinned the field to
+    the viewport (background-attachment: fixed — speed 0, stagnant; it
+    also silently dies on iOS/Android). The band now drifts: the
+    ::before's background-position Y rides var(--palms-y, 0px), which
+    motion.js advances at half the scroll rate — the field visibly
+    climbs while the listings slide past twice as fast. Fixed
+    attachment is banned outright so the stagnant pin can't return."""
+    assert "background-attachment: fixed" not in SEARCH_CSS, (
+        "fixed attachment pins the field to the viewport — stagnant; "
+        "the r69 half-speed drift replaces it"
     )
-
-
-def test_parallax_fixed_only_for_fx_tiers_that_opted_in():
-    gates = re.findall(
-        r"(html\[[^\]]*\][^{]*)\{\s*background-attachment: fixed;\s*\}",
-        SEARCH_CSS,
-    )
-    assert gates, "no gated fixed-attachment rule — the parallax vanished"
-    selectors = " ".join(gates)
-    assert 'data-fx="rich"' in selectors, "rich tier must get the parallax"
-    assert 'data-fx="lite"' in selectors, (
-        "fixed attachment costs no data — lite keeps it"
-    )
-    assert 'data-fx="none"' not in selectors, (
-        "reduced-motion visitors must NOT get scroll-linked parallax "
-        "(WCAG 2.3.3)"
-    )
-
-
-def test_parallax_scroll_default_fails_closed():
-    """No attribute (scripts blocked) means no parallax — the D-FX-GATE
-    contract: html:not([data-fx]) must never unlock fixed."""
     rule = re.search(r"\.listings-band::before \{[^}]*\}", SEARCH_CSS)
     assert rule, ".listings-band::before rule missing"
-    assert "background-attachment: scroll" in rule.group(0), (
-        "the safe default must be the scroll attachment"
+    assert "background-position: 0 var(--palms-y, 0px)" in rule.group(0), (
+        "the field must ride the drift var, with a 0px fallback for "
+        "every visitor the gate excludes"
     )
-    # and nothing reopens fixed for the attribute-less document
-    for m in re.finditer(
-        r"html:not\(\[data-fx\]\)[^{]*\{[^}]*\}", SEARCH_CSS
-    ):
-        assert "fixed" not in m.group(0), (
-            "html:not([data-fx]) must never set fixed — fails closed"
-        )
+    assert "background-attachment: scroll" in rule.group(0), (
+        "scroll stays the declared safe default (fail-closed)"
+    )
+
+
+def test_parallax_js_half_speed_gated_fail_closed():
+    """The drift engine: exactly HALF speed (midway between stagnant 0
+    and 1:1 with the listings — the owner's "not too slow / not too
+    fast" band), lerped so it carries weight, armed only under a gate
+    tier. fx=none and the attribute-less document (scripts blocked)
+    never write the var, so the 0px fallback keeps the static field
+    (D-MOTION-SAFE, D-FX-GATE: the gate owns reduced motion, no media
+    query is re-checked here)."""
+    setup = re.search(
+        r"function setupPalmParallax\(\) \{(.*?)\n  \}",
+        MOTION_JS,
+        re.S,
+    )
+    assert setup, "setupPalmParallax missing from motion.js"
+    body = setup.group(1)
+    # fail closed: the gate's none/missing decision stops it first
+    assert re.search(r"if \(fxNone\) return;", body), (
+        "the drift must never run under fx=none or without the gate "
+        "attribute (scripts blocked)"
+    )
+    # exactly half speed: DRIFT 0.5 pattern px per scrolled px
+    drift = re.search(r"var DRIFT = ([\d.]+);", body)
+    assert drift and abs(float(drift.group(1)) - 0.5) < 1e-9, (
+        "the drift rate must stay 0.5 — half speed: visibly moving, "
+        "never moving with the listings"
+    )
+    # it drives the CSS var, never the attachment (the hyphenated word
+    # may appear in comments; the JS APIs to set it may not)
+    assert '"--palms-y"' in body, "the engine must write --palms-y"
+    assert "backgroundAttachment" not in MOTION_JS, (
+        "JS must not touch attachment — the drift is a position shift"
+    )
+    assert 'setProperty("background-attachment' not in MOTION_JS
+    # the gate owns reduced motion — no media query is re-checked here
+    assert "matchMedia" not in body, "D-FX-GATE: the gate decides, not the setup"
+    assert "prefers-reduced-motion" not in body
+    # armed from init, like every other setup
+    init_block = MOTION_JS.split("function init", 1)[1]
+    assert "setupPalmParallax();" in init_block
 
 
 def test_parallax_keeps_the_r65_field_contract():

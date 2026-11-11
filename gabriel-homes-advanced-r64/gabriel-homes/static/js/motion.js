@@ -582,6 +582,85 @@
     document.addEventListener("htmx:afterSwap", function () { arm(document); });
   }
 
+  // ---------- r69 (owner round thirteen): listings palm-field drift ----------
+  // Owner: "the palms are stagnant they need to move ...but not to slow
+  // they look stagnant and not to fast they move together with the
+  // listings." The r68 pass pinned the field to the viewport
+  // (background-attachment: fixed — speed 0, stagnant; iOS/Android
+  // ignore fixed attachment outright, so phones never saw even that).
+  // A plain scrolling background runs 1:1 with the rows — glued to
+  // the listings. HALF SPEED is the middle the owner described: the
+  // field visibly climbs as the page scrolls while the rows, chips
+  // and pagination slide past twice as fast.
+  //
+  // Mechanism: this writes --palms-y on .listings-band; search.css
+  // points the ::before's background-position at var(--palms-y, 0px).
+  // The tile repeats, so the drift can run forever without a seam,
+  // and the box-relative 84% mask stays anchored to the band — the
+  // dissolve still lands exactly at the footer line wherever the
+  // scroll is. The chase is LERPED, not snapped: during a fast fling
+  // the field hangs back a touch and eases in once the scroll
+  // settles — weight, not lag.
+  //
+  // D-MOTION-SAFE / D-FX-GATE: fxNone (fx=none OR the attribute
+  // missing — scripts blocked, fails closed) returns before anything
+  // moves; the gate owns the reduced-motion decision, no media query
+  // is re-checked here. With JS blocked the var keeps its 0px
+  // fallback: the exact static field. Decorative only — no element
+  // moves, nothing for assistive tech to notice.
+  function setupPalmParallax() {
+    if (fxNone) return;
+    var band = document.querySelector(".listings-band");
+    if (!band) return;
+    var DRIFT = 0.5;   // pattern px per scrolled px -> field speed 1 - 0.5 = HALF
+    var EASE = 0.14;   // lerp per frame — the weight in the chase
+    var current = 0;
+    var target = 0;
+    var raf = 0;
+
+    function measure() {
+      // An htmx swap (filters, pagination, sort) can replace the band
+      // wholesale — re-resolve it, and restart the chase from the
+      // static pose so a fresh field eases in instead of snapping.
+      if (!band.isConnected) {
+        band = document.querySelector(".listings-band");
+        current = 0;
+        if (!band) return;
+      }
+      var y = window.scrollY || window.pageYOffset || 0;
+      var rect = band.getBoundingClientRect();
+      var vh = window.innerHeight ||
+               document.documentElement.clientHeight;
+      // anchored at the scroll where the band's top enters the
+      // viewport: the field is exactly static on arrival, drifts
+      // while any part of the band is on screen, freezes after it
+      // has passed (no wasted work in the footer).
+      var entry = rect.top + y - vh;
+      var travel = Math.max(0, Math.min(y - entry, rect.height + 2 * vh));
+      target = travel * DRIFT;
+    }
+
+    function frame() {
+      raf = 0;
+      if (!band.isConnected) return;   // the next kick() re-resolves
+      current += (target - current) * EASE;
+      if (Math.abs(target - current) < 0.05) current = target;
+      band.style.setProperty("--palms-y", current.toFixed(2) + "px");
+      if (current !== target) raf = requestAnimationFrame(frame);
+    }
+
+    function kick() {
+      measure();
+      if (!band || current === target) return;
+      if (!raf) raf = requestAnimationFrame(frame);
+    }
+
+    window.addEventListener("scroll", kick, { passive: true });
+    window.addEventListener("resize", kick, { passive: true });
+    document.addEventListener("htmx:afterSwap", kick);
+    kick();
+  }
+
   function init() {
     setupCounters();
     setupQuoteReveal();
@@ -591,6 +670,7 @@
     setupReveal();
     setupBubbleTitles();
     setupRowSlides();
+    setupPalmParallax();
     setupHeaderScroll();
     if (!fxNone) setupNavAutoHide();  // G1: hide/return is lite/rich only
     setupMobileMenu();
