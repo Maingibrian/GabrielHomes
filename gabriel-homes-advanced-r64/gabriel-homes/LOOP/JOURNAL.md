@@ -1,3 +1,56 @@
+Run 70 | BUILDER (owner round, off-loop) | 2026-11-11 ~16:20-17:10 +03:00 | items:
+(1) **OWNER ASK — "Asses the animations and resolve the glitches ...
+when the listing animation occurs ..the parralax effect drops down and
+up... ensure you take in to calculations everything."** MEASURED, not
+guessed: a 12s per-frame recorder (rAF cadence, scrollY, six block
+geometries above the band, band rect, computed --palms-y) installed
+live on /properties/ and driven through eight stepped 500px scrolls
+across the row animations. Trace scripts:
+scripts/r70_analyze_trace.py (before) + r70_analyze_after.py (after).
+(2) DIAGNOSIS — layout was INNOCENT: bandTop 966.7 / bandH 12349
+constant across all 323 before-frames (map box clamp-reserved,
+filters min-height-reserved, every row image carries width/height so
+lazy loads never shift; the r69 "±35px lazy-load creep" note was a
+measurement artifact of sampling a still-chasing lerp). The glitch
+was TIME: frame cadence collapsed 59fps -> 10-12fps exactly while
+the rows glided in and their images decoded (main-thread decode
+bursts), and the r69 chase stepped a fixed fraction PER FRAME
+(EASE 0.14/rAF tick) — frame-rate dependent, so the dip made it ~5x
+slower in wall clock: every scroll stop left the field 180-230px
+behind target and it kept sinking 600-800ms+ after the user stopped
+("settled 95%: NEVER"). That post-stop drift around each row glide
+IS the owner's "drops down and up".
+(3) FIX (two files, pins in a third) — motion.js setupPalmParallax
+rewritten: the chase is now a TIME-CONSTANT exponential
+k = 1 - exp(-dt / TAU), TAU=70ms (felt weight kept, settle bounded
+~200-300ms at ANY fps — 10fps low-end dip or 120hz flagship);
+measure() runs INSIDE frame() (target = live geometry, never a
+stale kick snapshot); dt clamped at MAXDT=400ms (background-tab
+stall = one bounded step, no catch-up mega jump); SNAP=0.25px ends
+the loop. DRIFT stays 0.5 (half speed — the owner's r69 middle),
+anchor semantics, htmx:afterSwap re-resolve, fxNone fail-closed and
+the 0px fallback all unchanged. _results_grid.html row images gain
+decoding="async" (the cards already had it) — decode off the main
+thread so the row glide stops starving rAF.
+(4) GATES — check 0 · makemigrations 0 · **880 passed** (+2: NEW
+test_parallax_chase_is_frame_rate_independent pins TAU 20-200 band,
+the exp form, the MAXDT clamp, in-frame measure(), the SNAP
+threshold, and BANS `var EASE =` outright so the frame-fraction
+chase can't return; NEW test_results_grid_images_decode_async pins
+decoding=async + the reserved 760x520 box. r68/r69 pins rewritten
+in place only where they described the lerp).
+(5) E3 (agent-browser, live /properties/, same 12s recorder, same
+eight stepped scrolls): frame cadence 59fps FLAT (the dip is gone);
+gap at stops 8-30px (was 180-230px); 95% settle at every stop
+167/200/234/233/300/266/250/250ms (was NEVER); worst 300ms; overall
+ratio palms/scroll = 0.501 over 3989px — half speed exact. No
+console errors; VLM on the mid-band screenshot: palms even on both
+edges, cards/images/actions intact, no glitches. Deliverable:
+download/r70-listings-after-fix.png.
+FOR THE NEXT RUN: preview bootstrap is scripts/start_preview.sh
+(self-healing after sandbox recycles). Owner's cloud PAT still
+"Later" — push when provided, delete after use.
+
 Run 69 | BUILDER (owner round, off-loop) | 2026-11-11 ~14:00-15:10 +03:00 | items:
 (1) **OWNER ASK — "the palms are stagnant they need to move ...but not
 to slow they look stagnant and not to fast they move together with the

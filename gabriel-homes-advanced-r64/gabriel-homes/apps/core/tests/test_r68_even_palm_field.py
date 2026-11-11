@@ -21,10 +21,20 @@ still stands):
    stagnant and not to fast they move together with the listings."
    The r68 fixed-attachment pin (speed 0 — stagnant, and ignored by
    iOS/Android anyway) is gone; motion.js now advances the field at
-   HALF the scroll rate via --palms-y (lerped for weight). Fail-closed:
-   scripts blocked (no attribute) and fx=none (prefers-reduced-motion,
-   WCAG 2.3.3) never write the var — the 0px fallback scrolls the
-   tile exactly like r65.
+   HALF the scroll rate via --palms-y. Fail-closed: scripts blocked
+   (no attribute) and fx=none (prefers-reduced-motion, WCAG 2.3.3)
+   never write the var — the 0px fallback scrolls the tile exactly
+   like r65.
+
+   r70 (owner round fourteen): "when the listing animation occurs
+   the parallax effect drops down and up." Measured 12s per-frame
+   trace: the r69 chase stepped a fixed fraction PER FRAME while the
+   row glide + image decode collapse the frame rate 59->10-12fps, so
+   the field sank 180-230px behind and kept drifting 600-800ms after
+   every scroll stop. The chase is now a TIME-CONSTANT exponential
+   (1 - exp(-dt/TAU)) — same ~200ms settle at any frame rate — with
+   live measure() per frame and a clamped dt; the rows' images gained
+   decoding="async" to keep decode off the main thread. Pinned here.
 
 Home keeps the r46 tile — pinned here so the "spread them out" ask
 can never leak into the home market section unnoticed.
@@ -39,6 +49,7 @@ OLD_SVG = (REPO / "static" / "img" / "palm-field.svg").read_text()
 SEARCH_CSS = (REPO / "static" / "css" / "search.css").read_text()
 HOME_CSS = (REPO / "static" / "css" / "home.css").read_text()
 MOTION_JS = (REPO / "static" / "js" / "motion.js").read_text()
+GRID_HTML = (REPO / "templates" / "listings" / "_results_grid.html").read_text()
 
 W, H = 1400.0, 1600.0
 GRID = 5
@@ -215,11 +226,12 @@ def test_parallax_half_speed_drift_not_viewport_pinned():
 def test_parallax_js_half_speed_gated_fail_closed():
     """The drift engine: exactly HALF speed (midway between stagnant 0
     and 1:1 with the listings — the owner's "not too slow / not too
-    fast" band), lerped so it carries weight, armed only under a gate
-    tier. fx=none and the attribute-less document (scripts blocked)
-    never write the var, so the 0px fallback keeps the static field
-    (D-MOTION-SAFE, D-FX-GATE: the gate owns reduced motion, no media
-    query is re-checked here)."""
+    fast" band), eased over wall-clock time (r70) so it carries
+    weight without sinking when the frame rate dips, armed only under
+    a gate tier. fx=none and the attribute-less document (scripts
+    blocked) never write the var, so the 0px fallback keeps the static
+    field (D-MOTION-SAFE, D-FX-GATE: the gate owns reduced motion, no
+    media query is re-checked here)."""
     setup = re.search(
         r"function setupPalmParallax\(\) \{(.*?)\n  \}",
         MOTION_JS,
@@ -251,6 +263,89 @@ def test_parallax_js_half_speed_gated_fail_closed():
     # armed from init, like every other setup
     init_block = MOTION_JS.split("function init", 1)[1]
     assert "setupPalmParallax();" in init_block
+
+
+def test_parallax_chase_is_frame_rate_independent():
+    """r70 (owner round fourteen): "when the listing animation occurs
+    the parallax effect drops down and up." Measured on /properties/
+    (12s, per-frame): while the listing rows glide in and their images
+    decode, the frame rate collapses 59fps -> 10-12fps; the r69 chase
+    stepped a fixed fraction PER FRAME (EASE 0.14/rAF tick), so the
+    dip slowed it ~5x in wall-clock time — every scroll stop left the
+    field 180-230px behind, still sinking 600-800ms after the user
+    stopped. The owner read that lag as the background "dropping down
+    and up" around the row animation.
+
+    The chase must therefore be a TIME-CONSTANT exponential, not a
+    per-frame fraction: k = 1 - exp(-dt / TAU) settles in the same
+    ~200ms of wall clock at 10fps and at 120fps. Pinned: TAU exists
+    and the exp form is used; dt is clamped (a background-tab stall is
+    one bounded step, never a mega jump); measure() runs inside
+    frame() (the target is live geometry, never a stale snapshot); a
+    snap threshold ends the loop instead of chasing sub-pixel deltas;
+    and the frame-fraction constant is banned outright so the
+    frame-rate-dependent glitch can't return."""
+    setup = re.search(
+        r"function setupPalmParallax\(\) \{(.*?)\n  \}",
+        MOTION_JS,
+        re.S,
+    )
+    assert setup, "setupPalmParallax missing from motion.js"
+    body = setup.group(1)
+    # the time constant exists and is used in the exponential ease
+    tau = re.search(r"var TAU = ([\d.]+);", body)
+    assert tau and 20 <= float(tau.group(1)) <= 200, (
+        "the chase time constant must exist and stay in the felt-weight "
+        "band — too high and the field lags again (the r70 glitch), "
+        "too low and the drift snaps with no weight at all"
+    )
+    assert re.search(r"1 - Math\.exp\(-dt / TAU\)", body), (
+        "the ease must be the frame-rate-independent exponential "
+        "k = 1 - exp(-dt / TAU) — identical wall-clock settle at any fps"
+    )
+    # dt is clamped: a tab-background stall is one bounded step
+    assert re.search(r"var MAXDT = \d+;", body) and "MAXDT)" in body, (
+        "dt must be clamped so a stalled tab produces one bounded step, "
+        "never a giant catch-up jump on return"
+    )
+    # live geometry: the target is re-measured inside the frame loop
+    frame = re.search(r"function frame\(now\) \{(.*?)\n    \}", body, re.S)
+    assert frame and "measure();" in frame.group(1), (
+        "frame() must re-measure every tick — a target snapshotted only "
+        "at kick time goes stale when anything above the band shifts"
+    )
+    # a snap threshold ends the loop (no sub-pixel chase forever)
+    assert re.search(r"var SNAP = [\d.]+;", body), (
+        "the chase must snap to the target and stop the loop"
+    )
+    # the r69 per-frame fraction is banned: it was 5x slower in wall
+    # clock during the row-animation frame dip — the r70 glitch
+    assert not re.search(r"var EASE = [\d.]+;", body), (
+        "a per-frame EASE constant is frame-rate dependent — during the "
+        "row glide the fps collapses and the field sinks behind the "
+        "scroll; only the dt-based exponential may drive the chase"
+    )
+
+
+def test_results_grid_images_decode_async():
+    """r70: the row images carry decoding="async" (the listing cards
+    already did). During the row glide the browser was decoding a
+    burst of listing photos on the main thread — the measured frame
+    rate collapsed 59fps -> 10-12fps exactly when the rows animated
+    in, which is what exposed the parallax chase lag. Async decode
+    keeps that work off the critical path; the width/height pair
+    (already present) keeps the layout box reserved so nothing "
+    shifts either."""
+    assert 'decoding="async"' in GRID_HTML, (
+        "the results-grid row images must decode off the main thread — "
+        "the r70 trace showed decode bursts dipping the frame rate "
+        "during the row glide"
+    )
+    assert re.search(r'loading="lazy"[^>]*decoding="async"', GRID_HTML)
+    assert 'width="760" height="520"' in GRID_HTML, (
+        "the reserved aspect-ratio box stays — image load must never "
+        "shift the band geometry the parallax anchors to"
+    )
 
 
 def test_parallax_keeps_the_r65_field_contract():

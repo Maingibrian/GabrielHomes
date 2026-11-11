@@ -10,7 +10,8 @@
       {% for property in page_obj %}
         <article class="listing-row listing-card-row{% if forloop.counter|divisibleby:2 %} listing-row--reverse{% endif %}" id="listing-row-{{ property.pk }}" data-listing-pk="{{ property.pk }}" data-cursor-view data-slide-row>
           <a class="listing-row__media" href="{{ property.get_absolute_url }}">
-            {% if property.images.all.0.image %}<img src="{{ property.images.all.0.image.url }}" alt="{{ property.title }}" loading="lazy" width="760" height="520" style="view-transition-name: prop-{{ property.pk }};">{% endif %}
+            {# r70: decoding=async keeps image decode off the main thread while the row glide + palm chase run #}
+            {% if property.images.all.0.image %}<img src="{{ property.images.all.0.image.url }}" alt="{{ property.title }}" loading="lazy" decoding="async" width="760" height="520" style="view-transition-name: prop-{{ property.pk }};">{% endif %}
             <span class="listing-row__index">[ {{ forloop.counter|stringformat:"03d" }} ]</span>
             {% if property.is_demo %}<span class="listing-row__demo">Demo listing</span>{% endif %}
           </a>

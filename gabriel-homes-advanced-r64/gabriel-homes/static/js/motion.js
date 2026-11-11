@@ -582,41 +582,50 @@
     document.addEventListener("htmx:afterSwap", function () { arm(document); });
   }
 
-  // ---------- r69 (owner round thirteen): listings palm-field drift ----------
-  // Owner: "the palms are stagnant they need to move ...but not to slow
-  // they look stagnant and not to fast they move together with the
-  // listings." The r68 pass pinned the field to the viewport
-  // (background-attachment: fixed — speed 0, stagnant; iOS/Android
-  // ignore fixed attachment outright, so phones never saw even that).
-  // A plain scrolling background runs 1:1 with the rows — glued to
-  // the listings. HALF SPEED is the middle the owner described: the
-  // field visibly climbs as the page scrolls while the rows, chips
-  // and pagination slide past twice as fast.
+  // ---------- r69/r70 (owner rounds thirteen/fourteen): palm drift ----------
+  // Owner r69: "the palms are stagnant they need to move ...but not to
+  // slow they look stagnant and not to fast they move together with
+  // the listings." Owner r70: "when the listing animation occurs the
+  // parallax effect drops down and up." Half speed stays (DRIFT 0.5);
+  // what changed is the CHASE.
   //
-  // Mechanism: this writes --palms-y on .listings-band; search.css
-  // points the ::before's background-position at var(--palms-y, 0px).
-  // The tile repeats, so the drift can run forever without a seam,
-  // and the box-relative 84% mask stays anchored to the band — the
-  // dissolve still lands exactly at the footer line wherever the
-  // scroll is. The chase is LERPED, not snapped: during a fast fling
-  // the field hangs back a touch and eases in once the scroll
-  // settles — weight, not lag.
+  // r70 diagnosis (measured, 12s per-frame trace on /properties/):
+  // the r69 chase stepped a fixed fraction PER FRAME (EASE 0.14/rAF
+  // tick). While the listing rows glide in and their images decode,
+  // the frame rate collapses 59fps -> 10-12fps exactly then, so the
+  // same per-frame constant becomes ~5x slower in wall-clock time:
+  // every scroll stop left the field 180-230px behind its target and
+  // it kept sinking for 600-800ms+ after the user stopped — the
+  // background "dropping down and up" around the row animation.
   //
-  // D-MOTION-SAFE / D-FX-GATE: fxNone (fx=none OR the attribute
-  // missing — scripts blocked, fails closed) returns before anything
-  // moves; the gate owns the reduced-motion decision, no media query
-  // is re-checked here. With JS blocked the var keeps its 0px
-  // fallback: the exact static field. Decorative only — no element
-  // moves, nothing for assistive tech to notice.
+  // r70 fix: the chase is now a TIME-CONSTANT exponential —
+  // k = 1 - exp(-dt/TAU) — which settles in the same ~200ms of wall
+  // clock at ANY frame rate (10fps low-end dip or 120hz flagship).
+  // measure() also runs inside frame() so the target always reflects
+  // live geometry (never a stale snapshot), dt is clamped so a
+  // background-tab stall can't produce one giant step, and a SNAP
+  // threshold ends the loop instead of chasing sub-pixel deltas.
+  //
+  // Mechanism (unchanged): this writes --palms-y on .listings-band;
+  // search.css points the ::before's background-position at
+  // var(--palms-y, 0px). The tile repeats, so the drift can run
+  // forever without a seam, and the box-relative 84% mask stays
+  // anchored to the band. D-MOTION-SAFE / D-FX-GATE: fxNone (fx=none
+  // OR the attribute missing — scripts blocked, fails closed) returns
+  // before anything moves; with JS blocked the var keeps its 0px
+  // fallback: the exact static field. Decorative only.
   function setupPalmParallax() {
     if (fxNone) return;
     var band = document.querySelector(".listings-band");
     if (!band) return;
     var DRIFT = 0.5;   // pattern px per scrolled px -> field speed 1 - 0.5 = HALF
-    var EASE = 0.14;   // lerp per frame — the weight in the chase
+    var TAU = 70;      // ms — chase time constant, frame-rate independent
+    var MAXDT = 400;   // ms — clamp: a background-tab stall is one bounded step
+    var SNAP = 0.25;   // px — close enough: settle, stop writing, stop the loop
     var current = 0;
     var target = 0;
     var raf = 0;
+    var last = 0;
 
     function measure() {
       // An htmx swap (filters, pagination, sort) can replace the band
@@ -640,11 +649,18 @@
       target = travel * DRIFT;
     }
 
-    function frame() {
+    function frame(now) {
       raf = 0;
       if (!band.isConnected) return;   // the next kick() re-resolves
-      current += (target - current) * EASE;
-      if (Math.abs(target - current) < 0.05) current = target;
+      measure();                       // live geometry — never a stale target
+      var dt = Math.min(Math.max(now - last, 0), MAXDT);
+      last = now;
+      // wall-clock ease: identical settle at 10fps and 120fps — the
+      // r70 fix. The old per-frame constant made the field sink for
+      // 600ms+ whenever the row animations dipped the frame rate.
+      var k = 1 - Math.exp(-dt / TAU);
+      current += (target - current) * k;
+      if (Math.abs(target - current) < SNAP) current = target;
       band.style.setProperty("--palms-y", current.toFixed(2) + "px");
       if (current !== target) raf = requestAnimationFrame(frame);
     }
@@ -652,7 +668,10 @@
     function kick() {
       measure();
       if (!band || current === target) return;
-      if (!raf) raf = requestAnimationFrame(frame);
+      if (!raf) {
+        last = performance.now();      // same clock as the rAF stamp
+        raf = requestAnimationFrame(frame);
+      }
     }
 
     window.addEventListener("scroll", kick, { passive: true });

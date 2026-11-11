@@ -1,0 +1,694 @@
+     1→/* =============================================================
+     2→   Gabriel Homes — motion layer (progressive enhancement)
+     3→   All effects disabled when the capability gate (fx-gate.js) sets
+     4→   html[data-fx="none"] — reduced-motion devices, and fail-closed when
+     5→   the gate script itself is missing.
+     6→
+     7→   Implements (per WORK.md §10.6):
+     8→     1. Smooth scrolling (lightweight, no Lenis dependency)
+     9→     2. Animated number counters via IntersectionObserver
+    10→     3. Word-by-word reveal for the founder quote
+    11→     4. Appear-on-scroll fades for cards / sections
+    12→     5. Header background change on scroll
+    13→     6. Mobile menu open/close toggle
+    14→     7. Search-bar Buy/Rent segment toggle
+    15→
+    16→   All text is readable without JS — these are enhancements only.
+    17→   ============================================================= */
+    18→(function () {
+    19→  "use strict";
+    20→
+    21→  // Gate for CSS-hidden reveal targets. CSS hides [data-reveal] elements
+    22→  // ONLY under `html.motion-ready`, which is set HERE — the first statement
+    23→  // this script executes. If motion.js is stale, blocked by a network error,
+    24→  // or crashes later, the class is absent and every element stays visible.
+    25→  // (D-MOTION-SAFE: content can never be permanently blank.)
+    26→  document.documentElement.classList.add("motion-ready");
+    27→
+    28→  // F2: the capability gate (static/js/fx-gate.js, always loaded first)
+    29→  // decides the tier ONCE for the whole site. data-fx="none" (reduced
+    30→  // motion) behaves exactly like the old in-file reduced-motion check;
+    31→  // a MISSING attribute fails CLOSED to "none" too — if fx-gate.js is
+    32→  // ever blocked or stale, every effect simply stays off (D-MOTION-SAFE:
+    33→  // content is rendered instantly, never blank).
+    34→  var fxNone =
+    35→    (document.documentElement.getAttribute("data-fx") || "none") === "none";
+    36→
+    37→  // ---------- 1. Smooth scrolling (very small Lenis-style ease) ----------
+    38→  if (!fxNone && "addEventListener" in window) {
+    39→    document.addEventListener("click", function (e) {
+    40→      var a = e.target.closest('a[href^="#"]');
+    41→      if (!a) return;
+    42→      var hash = a.getAttribute("href");
+    43→      if (hash === "#" || hash.length < 2) return;
+    44→      var target = document.querySelector(hash);
+    45→      if (!target) return;
+    46→      e.preventDefault();
+    47→      /* F5 (D-LOOP-29a): Lenis under fx=rich; native fallback keeps lite/none intact. */
+    48→      if (window.ghScrollTo) { window.ghScrollTo(target, "start"); }
+    49→      else { target.scrollIntoView({ behavior: "smooth", block: "start" }); }
+    50→    });
+    51→  }
+    52→
+    53→  // ---------- 2. Animated number counters ----------
+    54→  function animateCounter(el) {
+    55→    var target = parseFloat(el.dataset.count || "0");
+    56→    var suffix = el.dataset.suffix || "";
+    57→    var prefix = el.dataset.prefix || "";
+    58→    var decimals = parseInt(el.dataset.decimals || "0", 10);
+    59→    var duration = fxNone ? 0 : 1500;
+    60→    var start = performance.now();
+    61→    function fmt(v) {
+    62→      return prefix + v.toFixed(decimals).replace(/\B(?=(\d{3})+(?!\d))/g, ",") + suffix;
+    63→    }
+    64→    function step(now) {
+    65→      var t = Math.min(1, (now - start) / duration);
+    66→      // easeOutCubic
+    67→      var eased = 1 - Math.pow(1 - t, 3);
+    68→      el.textContent = fmt(target * eased);
+    69→      if (t < 1) requestAnimationFrame(step);
+    70→      else el.textContent = fmt(target);
+    71→    }
+    72→    requestAnimationFrame(step);
+    73→  }
+    74→
+    75→  function setupCounters() {
+    76→    var counters = document.querySelectorAll("[data-count]");
+    77→    if (!counters.length) return;
+    78→    if (!("IntersectionObserver" in window) || fxNone) {
+    79→      counters.forEach(animateCounter);
+    80→      return;
+    81→    }
+    82→    var io = new IntersectionObserver(function (entries) {
+    83→      entries.forEach(function (entry) {
+    84→        if (entry.isIntersecting) {
+    85→          animateCounter(entry.target);
+    86→          io.unobserve(entry.target);
+    87→        }
+    88→      });
+    89→    }, { threshold: 0.4 });
+    90→    counters.forEach(function (c) { io.observe(c); });
+    91→  }
+    92→
+    93→  // ---------- 3. Word-by-word reveal for the founder quote ----------
+    94→  function setupQuoteReveal() {
+    95→    var quote = document.querySelector("[data-quote-reveal]");
+    96→    if (!quote) return;
+    97→    var text = quote.textContent.trim();
+    98→    var words = text.split(/\s+/);
+    99→    // S11 audit: build spans via DOM APIs instead of innerHTML so no
+   100→    // template-supplied text is ever re-parsed as markup.
+   101→    quote.textContent = "";
+   102→    var wordEls = words.map(function (w, i) {
+   103→      var span = document.createElement("span");
+   104→      span.className = "word";
+   105→      span.textContent = w;
+   106→      if (i > 0) quote.appendChild(document.createTextNode(" "));
+   107→      quote.appendChild(span);
+   108→      return span;
+   109→    });
+   110→    if (fxNone || !("IntersectionObserver" in window)) {
+   111→      wordEls.forEach(function (w) { w.classList.add("is-lit"); });
+   112→      return;
+   113→    }
+   114→    var io = new IntersectionObserver(function (entries) {
+   115→      entries.forEach(function (entry) {
+   116→        if (!entry.isIntersecting) return;
+   117→        // Reveal one word every ~120ms while the quote is in view.
+   118→        wordEls.forEach(function (w, i) {
+   119→          setTimeout(function () { w.classList.add("is-lit"); }, i * 120);
+   120→        });
+   121→        io.unobserve(entry.target);
+   122→      });
+   123→    }, { threshold: 0.3 });
+   124→    io.observe(quote);
+   125→  }
+   126→
+   127→  // ---------- 4. Appear-on-scroll ----------
+   128→  function setupReveal() {
+   129→    var els = document.querySelectorAll("[data-reveal]");
+   130→    if (!els.length) return;
+   131→    if (fxNone || !("IntersectionObserver" in window)) {
+   132→      els.forEach(function (el) { el.classList.add("is-visible"); });
+   133→      return;
+   134→    }
+   135→    var io = new IntersectionObserver(function (entries) {
+   136→      entries.forEach(function (entry) {
+   137→        if (entry.isIntersecting) {
+   138→          entry.target.classList.add("is-visible");
+   139→          io.unobserve(entry.target);
+   140→        }
+   141→      });
+   142→    }, { threshold: 0.1, rootMargin: "0px 0px -10% 0px" });
+   143→    els.forEach(function (el) { io.observe(el); });
+   144→  }
+   145→
+   146→  // ---------- 5. Header scroll state ----------
+   147→  function setupHeaderScroll() {
+   148→    var header = document.querySelector(".site-header");
+   149→    if (!header) return;
+   150→    var onScroll = function () {
+   151→      if (window.scrollY > 24) header.classList.add("site-header--scrolled");
+   152→      else header.classList.remove("site-header--scrolled");
+   153→    };
+   154→    onScroll();
+   155→    window.addEventListener("scroll", onScroll, { passive: true });
+   156→  }
+   157→
+   158→  // ---------- 5b. G1: floating pill nav — hides on scroll-down, returns
+   159→  // on scroll-up. Called ONLY under fx lite or rich (see init); with JS
+   160→  // blocked or fx=none the class is never added, so the header stays
+   161→  // visible (D-MOTION-SAFE: CSS never hides it on its own).
+   162→  function setupNavAutoHide() {
+   163→    var header = document.querySelector(".site-header");
+   164→    if (!header) return;
+   165→    var lastY = window.scrollY;
+   166→    var ticking = false;
+   167→    var onScroll = function () {
+   168→      if (ticking) return;
+   169→      ticking = true;
+   170→      requestAnimationFrame(function () {
+   171→        var y = window.scrollY;
+   172→        if (y > lastY + 4 && y > 160) {
+   173→          header.classList.add("nav--hidden");
+   174→        } else if (y < lastY - 4 || y <= 160) {
+   175→          header.classList.remove("nav--hidden");
+   176→        }
+   177→        lastY = y;
+   178→        ticking = false;
+   179→      });
+   180→    };
+   181→    window.addEventListener("scroll", onScroll, { passive: true });
+   182→    // Keyboard safety: focus entering the header always returns it.
+   183→    header.addEventListener("focusin", function () {
+   184→      header.classList.remove("nav--hidden");
+   185→    });
+   186→  }
+   187→
+   188→  // ---------- 6. Mobile menu ----------
+   189→  function setupMobileMenu() {
+   190→    var openBtn = document.querySelector("[data-mobile-menu-open]");
+   191→    var menu = document.querySelector("[data-mobile-menu]");
+   192→    if (!openBtn || !menu) return;
+   193→    var closeBtn = menu.querySelector("[data-mobile-menu-close]");
+   194→
+   195→    var open = function () {
+   196→      menu.classList.add("is-open");
+   197→      menu.setAttribute("aria-hidden", "false");
+   198→      openBtn.setAttribute("aria-expanded", "true");
+   199→      document.body.style.overflow = "hidden";
+   200→    };
+   201→    var close = function () {
+   202→      menu.classList.remove("is-open");
+   203→      menu.setAttribute("aria-hidden", "true");
+   204→      openBtn.setAttribute("aria-expanded", "false");
+   205→      document.body.style.overflow = "";
+   206→    };
+   207→    openBtn.addEventListener("click", open);
+   208→    if (closeBtn) closeBtn.addEventListener("click", close);
+   209→    menu.addEventListener("click", function (e) {
+   210→      // Click on a nav link closes the menu.
+   211→      if (e.target.closest("a")) close();
+   212→    });
+   213→    document.addEventListener("keydown", function (e) {
+   214→      if (e.key === "Escape" && menu.classList.contains("is-open")) close();
+   215→    });
+   216→  }
+   217→
+   218→  // ---------- 7. Search bar Buy/Rent segment + URL builder + autocomplete ----------
+   219→  function setupSearchSegment() {
+   220→    var form = document.querySelector("[data-search-bar]");
+   221→    if (!form) return;
+   222→    var segBtns = form.querySelectorAll("[data-segment]");
+   223→    var hiddenType = form.querySelector("input[name='listing_type']");
+   224→    var typeSelect = form.querySelector("#hero-search-type");
+   225→    var locInput = form.querySelector("#hero-search-q");
+   226→    var locHidden = form.querySelector("#hero-search-location");
+   227→
+   228→    // Build the SEO-friendly action URL from the current selections.
+   229→    // Pattern: /<type>-for-<sale|rent>/<location-slug>/  (or /property-for-<sale|rent>/<location-slug>/)
+   230→    function buildAction() {
+   231→      var listingType = hiddenType ? hiddenType.value : "sale";
+   232→      var typeSlug = typeSelect ? typeSelect.value : "";
+   233→      var locSlug = locHidden ? locHidden.value : "";
+   234→      var action = typeSlug
+   235→        ? "/" + typeSlug + "-for-" + listingType + "/"
+   236→        : "/property-for-" + listingType + "/";
+   237→      if (locSlug) action += locSlug + "/";
+   238→      form.setAttribute("action", action);
+   239→    }
+   240→
+   241→    segBtns.forEach(function (btn) {
+   242→      btn.addEventListener("click", function () {
+   243→        segBtns.forEach(function (b) { b.classList.remove("is-active"); });
+   244→        btn.classList.add("is-active");
+   245→        if (hiddenType) hiddenType.value = btn.dataset.segment;
+   246→        buildAction();
+   247→      });
+   248→    });
+   249→    if (typeSelect) typeSelect.addEventListener("change", buildAction);
+   250→
+   251→    // If the user types a location but doesn't pick a suggestion,
+   252→    // fall back to a text search via the q param on the type-only URL.
+   253→    if (locInput) {
+   254→      locInput.addEventListener("input", function () {
+   255→        if (locHidden) locHidden.value = "";
+   256→        buildAction();
+   257→      });
+   258→    }
+   259→
+   260→    // Autocomplete dropdown
+   261→    if (locInput && locHidden) {
+   262→      var dropdown = null;
+   263→      var debounceTimer = null;
+   264→
+   265→      function clearDropdown() {
+   266→        if (dropdown) { dropdown.remove(); dropdown = null; }
+   267→      }
+   268→
+   269→      function showResults(results) {
+   270→        clearDropdown();
+   271→        if (!results.length) return;
+   272→        dropdown = document.createElement("div");
+   273→        dropdown.setAttribute("role", "listbox");
+   274→        dropdown.style.cssText = [
+   275→          "position:absolute",
+   276→          "background:var(--white)",
+   277→          "border:1px solid var(--sand)",
+   278→          "border-radius:var(--radius-sm)",
+   279→          "box-shadow:var(--shadow-card)",
+   280→          "max-height:300px",
+   281→          "overflow-y:auto",
+   282→          "z-index:100",
+   283→          "width:100%",
+   284→          "margin-top:4px",
+   285→        ].join(";");
+   286→        // Position relative to the input's parent label.
+   287→        var parentLabel = locInput.closest("label");
+   288→        if (parentLabel) {
+   289→          parentLabel.style.position = "relative";
+   290→          parentLabel.appendChild(dropdown);
+   291→        } else {
+   292→          locInput.parentNode.appendChild(dropdown);
+   293→        }
+   294→        results.forEach(function (res) {
+   295→          var item = document.createElement("div");
+   296→          item.setAttribute("role", "option");
+   297→          item.style.cssText = [
+   298→            "padding:0.6rem 0.85rem",
+   299→            "cursor:pointer",
+   300→            "font-size:var(--text-sm)",
+   301→            "color:var(--ink)",
+   302→            "border-bottom:1px solid var(--sand)",
+   303→          ].join(";");
+   304→          // S11 audit: DOM APIs instead of innerHTML (input is DB-derived
+   305→          // location data; textContent can never re-parse it as markup).
+   306→          var strong = document.createElement("strong");
+   307→          strong.textContent = res.name;
+   308→          var pathSpan = document.createElement("span");
+   309→          pathSpan.style.cssText =
+   310→            "display:block;font-size:var(--text-xs);color:var(--taupe);font-family:var(--font-mono)";
+   311→          pathSpan.textContent = res.full_path;
+   312→          item.appendChild(strong);
+   313→          item.appendChild(pathSpan);
+   314→          item.addEventListener("mouseenter", function () {
+   315→            item.style.background = "var(--cream)";
+   316→          });
+   317→          item.addEventListener("mouseleave", function () {
+   318→            item.style.background = "";
+   319→          });
+   320→          item.addEventListener("click", function () {
+   321→            locInput.value = res.name;
+   322→            locHidden.value = res.slug;
+   323→            buildAction();
+   324→            clearDropdown();
+   325→          });
+   326→          dropdown.appendChild(item);
+   327→        });
+   328→      }
+   329→
+   330→      locInput.addEventListener("input", function () {
+   331→        var q = locInput.value.trim();
+   332→        if (q.length < 2) { clearDropdown(); return; }
+   333→        clearTimeout(debounceTimer);
+   334→        debounceTimer = setTimeout(function () {
+   335→          fetch("/search/locations/?q=" + encodeURIComponent(q))
+   336→            .then(function (r) { return r.json(); })
+   337→            .then(function (data) { showResults(data.results || []); })
+   338→            .catch(function () { clearDropdown(); });
+   339→        }, 200);
+   340→      });
+   341→
+   342→      locInput.addEventListener("blur", function () {
+   343→        // Delay so click on suggestion fires first
+   344→        setTimeout(clearDropdown, 200);
+   345→      });
+   346→    }
+   347→  }
+   348→
+   349→  // ---------- H2.b: split-text mask headline ----------
+   350→  // Word-splits the hero headline in place (DOM APIs only — no innerHTML,
+   351→  // same rule as the quote reveal) so each word can rise out of its own
+   352→  // overflow-hidden mask. Ownership hand-over: once the words own the
+   353→  // entrance, the h1's own hv2-rise fade is removed (a one-shot transition
+   354→  // must never share the animated properties with the mask animation —
+   355→  // same sole-owner rule as G3/D-LOOP-31a). fxNone skips the split entirely:
+   356→  // the h1 stays plain and fully visible (D-MOTION-SAFE).
+   357→  function setupHeroHeadline() {
+   358→    var headline = document.querySelector("[data-hero-headline]");
+   359→    if (!headline) return;
+   360→    if (fxNone) return;
+   361→    var index = 0;
+   362→    // Split ONE text node inside its parent element: every run of
+   363→    // non-whitespace becomes a mask span, every whitespace run is kept
+   364→    // VERBATIM as plain text (leading/trailing/between — so the inter-part
+   365→    // spaces of the template survive and innerText matches the plain h1).
+   366→    function splitText(parent, textNode) {
+   367→      var raw = textNode.textContent;
+   368→      var frag = document.createDocumentFragment();
+   369→      var re = /\S+/g;
+   370→      var m;
+   371→      var last = 0;
+   372→      while ((m = re.exec(raw))) {
+   373→        if (m.index > last) {
+   374→          frag.appendChild(document.createTextNode(raw.slice(last, m.index)));
+   375→        }
+   376→        var mask = document.createElement("span");
+   377→        mask.className = "hero__w";
+   378→        var inner = document.createElement("span");
+   379→        inner.className = "hero__w-in";
+   380→        inner.style.setProperty("--d", index++);
+   381→        inner.textContent = m[0];
+   382→        mask.appendChild(inner);
+   383→        frag.appendChild(mask);
+   384→        last = m.index + m[0].length;
+   385→      }
+   386→      if (last < raw.length) {
+   387→        frag.appendChild(document.createTextNode(raw.slice(last)));
+   388→      }
+   389→      parent.replaceChild(frag, textNode);
+   390→    }
+   391→    Array.prototype.slice.call(headline.childNodes).forEach(function (n) {
+   392→      if (n.nodeType === 3 && n.textContent.trim()) {
+   393→        splitText(headline, n);
+   394→      } else if (n.nodeType === 1) {
+   395→        Array.prototype.slice.call(n.childNodes).forEach(function (m) {
+   396→          if (m.nodeType === 3 && m.textContent.trim()) splitText(n, m);
+   397→        });
+   398→      }
+   399→    });
+   400→    headline.classList.remove("hv2-rise");
+   401→    headline.style.removeProperty("--d");
+   402→  }
+   403→
+   404→  // ---------- H2.b: hero video under fx=rich && !Save-Data (D-LOOP-21a) ----------
+   405→  // The 1.5MB loop is a rich-device upgrade of the slide stack: it loads
+   406→  // ONLY when the gate says rich and Save-Data is off; otherwise the
+   407→  // template's hidden attribute keeps it from loading at all (preload=
+   408→  // "none" as a second belt) and the slides stay the visual.
+   409→  function setupHeroVideo() {
+   410→    var video = document.querySelector("[data-hero-video]");
+   411→    if (!video) return;
+   412→    var rich = document.documentElement.getAttribute("data-fx") === "rich";
+   413→    var conn = navigator.connection || {};
+   414→    var saveData = !!(conn.saveData ||
+   415→        (conn.effectiveType && /(^2g$)/.test(conn.effectiveType)));
+   416→    if (!rich || saveData) return;
+   417→    video.hidden = false;
+   418→    var bg = video.closest(".hero__bg");
+   419→    if (bg) bg.classList.add("is-video");
+   420→    var playPromise = video.play();
+   421→    if (playPromise && playPromise.catch) playPromise.catch(function () {});
+   422→  }
+   423→
+   424→  // ---------- G4: pointer polish (cursor-view bubble + magnetic CTAs) ----------
+   425→  // Rich devices with a fine, hover-capable pointer only (the fx gate alone
+   426→  // is not enough — a rich touch device must not grow a cursor bubble).
+   427→  // The bubble is JS-BUILT, aria-hidden decoration that duplicates an
+   428→  // existing link affordance ("View" — rows/cards are links), so keyboard
+   429→  // users lose nothing: only real pointer events drive it, and the bento
+   430→  // cards are excluded because M4 bento-shift owns the pointer there
+   431→  // (never two pointer effects on one element). Magnets are transform-only,
+   432→  // clamped to ±8px, and pointermove never fires on keyboard focus.
+   433→  function setupPointerPolish() {
+   434→    if (fxNone) return;
+   435→    if (document.documentElement.getAttribute("data-fx") !== "rich") return;
+   436→    if (!window.matchMedia("(pointer: fine)").matches) return;
+   437→    if (!window.matchMedia("(hover: hover)").matches) return;
+   438→    var PULL = 8;
+   439→    var bubbleTargets = document.querySelectorAll("[data-cursor-view]");
+   440→    if (bubbleTargets.length) {
+   441→      var bubble = document.createElement("div");
+   442→      bubble.className = "cursor-view";
+   443→      bubble.setAttribute("aria-hidden", "true");
+   444→      bubble.textContent = "View";
+   445→      document.body.appendChild(bubble);
+   446→      document.addEventListener("pointermove", function (e) {
+   447→        bubble.style.setProperty("--cx", e.clientX + "px");
+   448→        bubble.style.setProperty("--cy", e.clientY + "px");
+   449→      }, { passive: true });
+   450→      Array.prototype.forEach.call(bubbleTargets, function (t) {
+   451→        t.addEventListener("pointerenter", function () {
+   452→          document.body.classList.add("cursor-view-on");
+   453→        });
+   454→        t.addEventListener("pointerleave", function () {
+   455→          document.body.classList.remove("cursor-view-on");
+   456→        });
+   457→      });
+   458→    }
+   459→    Array.prototype.forEach.call(
+   460→      document.querySelectorAll("[data-magnetic]"), function (el) {
+   461→        el.addEventListener("pointermove", function (e) {
+   462→          var r = el.getBoundingClientRect();
+   463→          var dx = (e.clientX - (r.left + r.width / 2)) * 0.18;
+   464→          var dy = (e.clientY - (r.top + r.height / 2)) * 0.18;
+   465→          el.style.setProperty("--mx",
+   466→            Math.max(-PULL, Math.min(PULL, dx)).toFixed(1) + "px");
+   467→          el.style.setProperty("--my",
+   468→            Math.max(-PULL, Math.min(PULL, dy)).toFixed(1) + "px");
+   469→        });
+   470→        el.addEventListener("pointerleave", function () {
+   471→          el.style.setProperty("--mx", "0px");
+   472→          el.style.setProperty("--my", "0px");
+   473→        });
+   474→      });
+   475→  }
+   476→
+   477→  // ---------- r47: bubbly section-title reveal (data-bubble-title) ----------
+   478→  // Every topic title pops in letter-by-letter (the bt-pop bubble in
+   479→  // home.css: rise -> overshoot -> wobble -> settle) and REPLAYS when
+   480→  // it re-enters view, scrolling down or back up (owner request).
+   481→  // Hysteresis: pop at >=30% visible, re-arm only once the title has
+   482→  // FULLY left (ratio 0) — a title drifting past the edge never
+   483→  // flickers. Words wrap as units (.bt-w), letters animate (.bt-l);
+   484→  // per-letter delay = word stagger (capped) + letter stagger, both
+   485→  // set as CSS vars by the split.
+   486→  // D-MOTION-SAFE: fxNone / no-JS / no-IO -> the title never splits
+   487→  // and stays plain text. The .bt-armed class (the ONLY thing that
+   488→  // hides letters) is added per element AFTER io.observe succeeds —
+   489→  // a crash anywhere earlier leaves fully visible text behind.
+   490→  // Split is DOM-APIs-only (S11): template text is never re-parsed.
+   491→  function setupBubbleTitles() {
+   492→    var els = document.querySelectorAll("[data-bubble-title]");
+   493→    if (!els.length) return;
+   494→    if (fxNone || !("IntersectionObserver" in window)) return;
+   495→
+   496→    function splitTitle(el) {
+   497→      var wordIndex = 0;
+   498→      Array.prototype.slice.call(el.childNodes).forEach(function (n) {
+   499→        if (n.nodeType !== 3 || !n.textContent.trim()) return;
+   500→        var raw = n.textContent;
+   501→        var frag = document.createDocumentFragment();
+   502→        var re = /\S+/g, m, last = 0;
+   503→        while ((m = re.exec(raw))) {
+   504→          if (m.index > last) {
+   505→            frag.appendChild(document.createTextNode(raw.slice(last, m.index)));
+   506→          }
+   507→          var word = document.createElement("span");
+   508→          word.className = "bt-w";
+   509→          // cap the word stagger so long titles still pop as one gesture
+   510→          var wd = Math.min(wordIndex * 70, 420);
+   511→          for (var li = 0; li < m[0].length; li++) {
+   512→            var letter = document.createElement("span");
+   513→            letter.className = "bt-l";
+   514→            letter.style.setProperty("--wd", wd + "ms");
+   515→            letter.style.setProperty("--ld", (li * 26) + "ms");
+   516→            letter.textContent = m[0].charAt(li);
+   517→            word.appendChild(letter);
+   518→          }
+   519→          frag.appendChild(word);
+   520→          last = m.index + m[0].length;
+   521→          wordIndex++;
+   522→        }
+   523→        if (last < raw.length) {
+   524→          frag.appendChild(document.createTextNode(raw.slice(last)));
+   525→        }
+   526→        el.replaceChild(frag, n);
+   527→      });
+   528→    }
+   529→
+   530→    var io = new IntersectionObserver(function (entries) {
+   531→      entries.forEach(function (entry) {
+   532→        if (entry.intersectionRatio >= 0.3) {
+   533→          entry.target.classList.add("is-bubbled");
+   534→        } else if (entry.intersectionRatio === 0) {
+   535→          // fully out of view: re-arm so the next entry pops again
+   536→          entry.target.classList.remove("is-bubbled");
+   537→        }
+   538→      });
+   539→    }, { threshold: [0, 0.3] });
+   540→
+   541→    els.forEach(function (el) {
+   542→      splitTitle(el);
+   543→      io.observe(el);
+   544→      el.classList.add("bt-armed");   // after observe: hide letters
+   545→    });
+   546→  }
+   547→
+   548→  // ---------- r48: alternating listing-row slide-in (data-slide-row) ----------
+   549→  // Search-page rows glide into place from alternating sides — odd rows
+   550→  // (media left) enter from the LEFT, reverse rows (media right) from
+   551→  // the RIGHT (search.css owns the direction via --slide-dist). Same
+   552→  // hysteresis as the r47 bubble titles: slide at >=20% visible, re-arm
+   553→  // only once FULLY out (ratio 0), so the glide replays scrolling down
+   554→  // and back up. D-MOTION-SAFE: fxNone / no-JS / no-IO -> rows never
+   555→  // arm and stay visible; the .row-armed class (the ONLY thing that
+   556→  // hides a row) is added per element AFTER io.observe succeeds.
+   557→  // HTMX pagination/filter/sort swaps replace the grid wholesale, so
+   558→  // htmx:afterSwap re-arms whatever rows the swap brought in (rows the
+   559→  // swap removed simply never fire again).
+   560→  function setupRowSlides() {
+   561→    var rows = document.querySelectorAll("[data-slide-row]");
+   562→    if (!rows.length) return;
+   563→    if (fxNone || !("IntersectionObserver" in window)) return;
+   564→    var io = new IntersectionObserver(function (entries) {
+   565→      entries.forEach(function (entry) {
+   566→        if (entry.intersectionRatio >= 0.2) {
+   567→          entry.target.classList.add("is-slid");
+   568→        } else if (entry.intersectionRatio === 0) {
+   569→          // fully out of view: re-arm so the next entry glides again
+   570→          entry.target.classList.remove("is-slid");
+   571→        }
+   572→      });
+   573→    }, { threshold: [0, 0.2] });
+   574→    function arm(scope) {
+   575→      scope.querySelectorAll("[data-slide-row]:not(.row-armed)").forEach(
+   576→        function (el) {
+   577→          io.observe(el);
+   578→          el.classList.add("row-armed");   // after observe: crash = visible
+   579→        });
+   580→    }
+   581→    arm(document);
+   582→    document.addEventListener("htmx:afterSwap", function () { arm(document); });
+   583→  }
+   584→
+   585→  // ---------- r69 (owner round thirteen): listings palm-field drift ----------
+   586→  // Owner: "the palms are stagnant they need to move ...but not to slow
+   587→  // they look stagnant and not to fast they move together with the
+   588→  // listings." The r68 pass pinned the field to the viewport
+   589→  // (background-attachment: fixed — speed 0, stagnant; iOS/Android
+   590→  // ignore fixed attachment outright, so phones never saw even that).
+   591→  // A plain scrolling background runs 1:1 with the rows — glued to
+   592→  // the listings. HALF SPEED is the middle the owner described: the
+   593→  // field visibly climbs as the page scrolls while the rows, chips
+   594→  // and pagination slide past twice as fast.
+   595→  //
+   596→  // Mechanism: this writes --palms-y on .listings-band; search.css
+   597→  // points the ::before's background-position at var(--palms-y, 0px).
+   598→  // The tile repeats, so the drift can run forever without a seam,
+   599→  // and the box-relative 84% mask stays anchored to the band — the
+   600→  // dissolve still lands exactly at the footer line wherever the
+   601→  // scroll is. The chase is LERPED, not snapped: during a fast fling
+   602→  // the field hangs back a touch and eases in once the scroll
+   603→  // settles — weight, not lag.
+   604→  //
+   605→  // D-MOTION-SAFE / D-FX-GATE: fxNone (fx=none OR the attribute
+   606→  // missing — scripts blocked, fails closed) returns before anything
+   607→  // moves; the gate owns the reduced-motion decision, no media query
+   608→  // is re-checked here. With JS blocked the var keeps its 0px
+   609→  // fallback: the exact static field. Decorative only — no element
+   610→  // moves, nothing for assistive tech to notice.
+   611→  function setupPalmParallax() {
+   612→    if (fxNone) return;
+   613→    var band = document.querySelector(".listings-band");
+   614→    if (!band) return;
+   615→    var DRIFT = 0.5;   // pattern px per scrolled px -> field speed 1 - 0.5 = HALF
+   616→    var EASE = 0.14;   // lerp per frame — the weight in the chase
+   617→    var current = 0;
+   618→    var target = 0;
+   619→    var raf = 0;
+   620→
+   621→    function measure() {
+   622→      // An htmx swap (filters, pagination, sort) can replace the band
+   623→      // wholesale — re-resolve it, and restart the chase from the
+   624→      // static pose so a fresh field eases in instead of snapping.
+   625→      if (!band.isConnected) {
+   626→        band = document.querySelector(".listings-band");
+   627→        current = 0;
+   628→        if (!band) return;
+   629→      }
+   630→      var y = window.scrollY || window.pageYOffset || 0;
+   631→      var rect = band.getBoundingClientRect();
+   632→      var vh = window.innerHeight ||
+   633→               document.documentElement.clientHeight;
+   634→      // anchored at the scroll where the band's top enters the
+   635→      // viewport: the field is exactly static on arrival, drifts
+   636→      // while any part of the band is on screen, freezes after it
+   637→      // has passed (no wasted work in the footer).
+   638→      var entry = rect.top + y - vh;
+   639→      var travel = Math.max(0, Math.min(y - entry, rect.height + 2 * vh));
+   640→      target = travel * DRIFT;
+   641→    }
+   642→
+   643→    function frame() {
+   644→      raf = 0;
+   645→      if (!band.isConnected) return;   // the next kick() re-resolves
+   646→      current += (target - current) * EASE;
+   647→      if (Math.abs(target - current) < 0.05) current = target;
+   648→      band.style.setProperty("--palms-y", current.toFixed(2) + "px");
+   649→      if (current !== target) raf = requestAnimationFrame(frame);
+   650→    }
+   651→
+   652→    function kick() {
+   653→      measure();
+   654→      if (!band || current === target) return;
+   655→      if (!raf) raf = requestAnimationFrame(frame);
+   656→    }
+   657→
+   658→    window.addEventListener("scroll", kick, { passive: true });
+   659→    window.addEventListener("resize", kick, { passive: true });
+   660→    document.addEventListener("htmx:afterSwap", kick);
+   661→    kick();
+   662→  }
+   663→
+   664→  function init() {
+   665→    setupCounters();
+   666→    setupQuoteReveal();
+   667→    setupHeroHeadline();
+   668→    setupHeroVideo();
+   669→    setupPointerPolish();
+   670→    setupReveal();
+   671→    setupBubbleTitles();
+   672→    setupRowSlides();
+   673→    setupPalmParallax();
+   674→    setupHeaderScroll();
+   675→    if (!fxNone) setupNavAutoHide();  // G1: hide/return is lite/rich only
+   676→    setupMobileMenu();
+   677→    setupSearchSegment();
+   678→  }
+   679→
+   680→  if (document.readyState === "loading") {
+   681→    document.addEventListener("DOMContentLoaded", init);
+   682→  } else {
+   683→    init();
+   684→  }
+   685→})();
+   686→
+   687→// r11: flash-message dismiss (event delegation, works for dynamically added flashes)
+   688→document.addEventListener("click", function (e) {
+   689→  var btn = e.target.closest("[data-flash-close]");
+   690→  if (!btn) return;
+   691→  var flash = btn.closest(".flash");
+   692→  if (flash) flash.remove();
+   693→});
+   694→
