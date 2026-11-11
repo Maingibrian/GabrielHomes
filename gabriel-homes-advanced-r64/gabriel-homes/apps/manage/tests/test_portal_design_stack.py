@@ -84,9 +84,43 @@ def test_no_template_comment_leaks_on_any_portal_page(db, client):
         detail = Inquiry.objects.first().pk
     else:
         detail = None
-    pages = ["/manage/", "/manage/enquiries/", "/manage/site-content/", "/manage/seo/", "/manage/listings/"]
+
+    # r74 LESSON (caught live, not by this test): the guard used to sweep
+    # /manage/listings/ with an EMPTY list, so a multi-line {# #} comment
+    # inside the {% if listings %} branch never rendered and leaked in
+    # production uncaught. Always force at least one row onto the page.
+    if not Property.objects.exists():
+        from apps.agents.models import AgencyProfile
+        from apps.listings.models import Property, PropertyType
+        from apps.locations.models import Location
+        from django.contrib.auth import get_user_model as _gtum
+
+        _u = _gtum().objects.create(
+            email="guard-agency@test.com", full_name="Guard Agency", is_agent=True
+        )
+        _a = AgencyProfile.objects.create(user=_u, name="Guard Homes", slug="guard-homes")
+        _c = Location.objects.create(name="Mombasa", slug="guard-mombasa", level="county")
+        _ar = Location.objects.create(name="Nyali", slug="guard-nyali", level="area", parent=_c)
+        _h = Location.objects.create(name="Nyali Centre", slug="guard-nyali-centre", level="neighbourhood", parent=_ar)
+        _t = PropertyType.objects.create(name="Apartment", slug_plural="flats", slug_single="apartment")
+        Property.objects.create(
+            title="Guard row listing", listing_type="rent", property_type=_t,
+            location=_h, price=150000, description="x", agent=_a,
+            status=Property.Status.PUBLISHED, published_at="2026-01-01T10:00:00Z",
+        )
+    pages = [
+        "/manage/",
+        "/manage/enquiries/",
+        "/manage/site-content/",
+        "/manage/seo/",
+        "/manage/listings/",
+        "/manage/listings/new/",  # r74 wizard (basics, no draft yet)
+    ]
     if detail:
         pages.append(f"/manage/enquiries/{detail}/")
+    first = Property.objects.first()
+    if first:
+        pages.append(f"/manage/listings/{first.pk}/pin/")  # r74 pin picker
     for url in pages:
         r = client.get(url)
         assert r.status_code == 200, url

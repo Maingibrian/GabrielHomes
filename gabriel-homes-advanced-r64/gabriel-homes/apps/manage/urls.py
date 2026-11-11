@@ -32,6 +32,10 @@ urlpatterns = [
     path("enquiries/<int:pk>/status/", views.EnquiryStatusView.as_view(), name="enquiry_status"),
     path("enquiries/<int:pk>/note/", views.EnquiryNoteView.as_view(), name="enquiry_note"),
     path("enquiries/<int:pk>/delete/", views.EnquiryDeleteView.as_view(), name="enquiry_delete"),
-    # Listings (r73, read-first)
+    # Listings (r73 read-first + r74 Phase 2 tools)
     path("listings/", views.PortalListingsView.as_view(), name="listings"),
+    path("listings/new/", views.ListingWizardView.as_view(), name="listing_wizard"),
+    path("listings/bulk/", views.ListingBulkView.as_view(), name="listing_bulk"),
+    path("listings/<int:pk>/tools/", views.ListingRowToolsView.as_view(), name="listing_tools"),
+    path("listings/<int:pk>/pin/", views.ListingPinView.as_view(), name="listing_pin"),
 ]

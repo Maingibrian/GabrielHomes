@@ -1,5 +1,5 @@
 {% extends "manage/base.html" %}
-{% load core_tags %}
+{% load core_tags static %}
 
 {% block title %}Listings — {{ SITE_NAME }} owner portal{% endblock %}
 
@@ -7,7 +7,7 @@
   <div class="manage-page-head">
     <p class="manage-card__tag">[ LISTINGS ]</p>
     <h1 class="manage-card__title">Your listings.</h1>
-    <p class="manage-card__body">Every property, at a glance. Use Edit for the full editor — the step-by-step tools are being added to this screen next.</p>
+    <p class="manage-card__body">Every property, at a glance. Tick rows to change several at once; each row has its own quick tools. “Add a listing” walks you through five short steps and saves as you go.</p>
   </div>
 
   <nav class="manage-tabs" aria-label="Listing status filters">
@@ -20,26 +20,74 @@
   </nav>
 
   {% if listings %}
+    {% comment "r74 2B: the bulk bar. One form; the row checkboxes join it via the HTML5 form attribute so the per-row tool forms stay separate." %}{% endcomment %}
+    <form id="bulk-form" method="post" action="{% url 'manage:listing_bulk' %}" class="manage-bulk">
+      {% csrf_token %}
+      <input type="hidden" name="back" value="{{ tab }}">
+      <p class="manage-bulk__label">Tick rows, then:</p>
+      <span class="manage-bulk__actions">
+        <button type="submit" name="action" value="publish" class="manage-bulk__btn manage-bulk__btn--primary">Publish</button>
+        <button type="submit" name="action" value="under_offer" class="manage-bulk__btn">Under offer</button>
+        <button type="submit" name="action" value="sold_let" class="manage-bulk__btn">Sold / Let</button>
+        <button type="submit" name="action" value="archive" class="manage-bulk__btn">Archive</button>
+      </span>
+    </form>
+
     <ul class="manage-rows manage-rows--stack">
       {% for property in listings %}
-        <li class="manage-row">
-          <span class="manage-row__link manage-row__link--static">
-            <span class="manage-row__who">{{ property.title }}{% if property.is_demo %} <span class="manage-pill manage-pill--sample">Sample</span>{% endif %}</span>
+        <li class="manage-row manage-row--listing">
+          <input class="manage-row__check" type="checkbox" name="ids" value="{{ property.pk }}"
+                 form="bulk-form" aria-label="Select {{ property.title }}">
+          <div class="manage-row__main">
+            <span class="manage-row__who">{{ property.title }}{% if property.is_demo %} <span class="manage-pill manage-pill--sample">Sample</span>{% endif %}{% if property.is_featured %} <span class="manage-pill manage-pill--featured">★ Featured</span>{% endif %}</span>
             <span class="manage-row__meta">
-              {{ property.location.name }} · {{ property.get_status_display }} ·
-              {{ property.price|kes }} · {{ property.views_count }} view{{ property.views_count|pluralize }} ·
+              {{ property.location.name }} · {{ property.get_status_display|lower }} ·
+              {% if property.price and property.price > 0 %} {{ property.price|kes:property.price_period }}{% else %} no price yet{% endif %} ·
+              {{ property.views_count }} view{{ property.views_count|pluralize }} ·
               updated {{ property.updated_at|date:'j M' }}
             </span>
-          </span>
-          <span class="manage-row__side manage-row__side--links">
-            {% if property.is_published %}
+            {% comment "r74 2B: inline price edit — the visible input and button join the row's hidden form via the form attribute." %}{% endcomment %}
+            <details class="manage-price">
+              <summary class="manage-price__summary">
+                {% if property.price and property.price > 0 %}Change price{% else %}Set the price{% endif %}
+              </summary>
+              <span class="manage-price__row">
+                <label class="manage-price__label" for="price-{{ property.pk }}">KES</label>
+                <input id="price-{{ property.pk }}" type="number" step="any" inputmode="decimal"
+                       name="price" min="1" form="row-tools-{{ property.pk }}"
+                       value="{{ property.price|default_if_none:'' }}" required>
+                <button type="submit" form="row-tools-{{ property.pk }}"
+                        name="action" value="price" class="manage-row__mini manage-row__mini--primary">Save</button>
+              </span>
+              <p class="manage-price__help">Whole KES — {{ property.get_listing_type_display|lower }}{% if property.is_short_stay %}, per night{% endif %}.</p>
+            </details>
+          </div>
+          <span class="manage-row__side manage-row__side--tools">
+            {% if property.status == 'draft' %}
+              <a class="manage-row__mini manage-row__mini--primary" href="{% url 'manage:listing_wizard' %}?step=basics&amp;pk={{ property.pk }}">Finish set-up</a>
+            {% elif property.is_published %}
               <a class="manage-row__mini" href="{{ property.get_absolute_url }}" target="_blank" rel="noopener">View</a>
             {% endif %}
-            <a class="manage-row__mini manage-row__mini--primary" href="{% url 'agents:dashboard_listing_edit' property.pk %}">Edit</a>
+            <a class="manage-row__mini" href="{% url 'agents:dashboard_listing_edit' property.pk %}">Edit</a>
+            <a class="manage-row__mini" href="{% url 'manage:listing_pin' property.pk %}">{% if property.lat %}Pin ✓{% else %}Pin{% endif %}</a>
+            <button type="submit" form="row-tools-{{ property.pk }}" name="action" value="feature"
+                    class="manage-row__mini manage-row__mini--star">
+              {% if property.is_featured %}★ Unfeature{% else %}☆ Feature{% endif %}
+            </button>
+            <button type="submit" form="row-tools-{{ property.pk }}" name="action" value="copy"
+                    class="manage-row__mini">Copy</button>
           </span>
         </li>
       {% endfor %}
     </ul>
+
+    {% comment "r74: each row's POST endpoint — invisible, addressed by the form attribute from the row controls above." %}{% endcomment %}
+    <div hidden aria-hidden="true">
+      {% for property in listings %}
+        <form id="row-tools-{{ property.pk }}" method="post"
+              action="{% url 'manage:listing_tools' property.pk %}">{% csrf_token %}</form>
+      {% endfor %}
+    </div>
 
     {% if is_paginated %}
       <nav class="manage-pager" aria-label="Pages">
@@ -60,7 +108,8 @@
   {% endif %}
 
   <p class="manage-foot">
-    <a class="btn btn--primary" href="{% url 'agents:dashboard_listing_create' %}">Add a listing</a>
+    <a class="btn btn--primary" href="{% url 'manage:listing_wizard' %}">Add a listing</a>
+    <a class="manage-foot__link" href="{% url 'agents:dashboard_listing_create' %}">Use the full editor instead</a>
   </p>
 
 {% endblock %}

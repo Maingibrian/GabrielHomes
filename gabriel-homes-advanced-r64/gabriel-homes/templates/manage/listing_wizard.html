@@ -1,0 +1,181 @@
+{% extends "manage/base.html" %}
+{% load core_tags static %}
+
+{% block title %}Add a listing — {{ SITE_NAME }} owner portal{% endblock %}
+
+{% block manage_content %}
+  <div class="manage-page-head">
+    <p class="manage-card__tag">[ NEW LISTING ]</p>
+    <h1 class="manage-card__title">Add a listing.</h1>
+    <p class="manage-card__body">Five short steps. Every step saves straight away, so nothing is lost if you stop halfway — pick it up again under Drafts.</p>
+  </div>
+
+  {# Step chips — all clickable; future steps simply have nothing to save yet. #}
+  <ol class="manage-wizard__steps" aria-label="Wizard steps">
+    {% for s in steps %}
+      <li>
+        <a class="manage-wizard__step{% if s.is_current %} is-current{% endif %}{% if s.is_done %} is-done{% endif %}"
+           href="{% url 'manage:listing_wizard' %}?step={{ s.key }}{% if draft %}&amp;pk={{ draft.pk }}{% endif %}"
+           {% if s.is_current %}aria-current="step"{% endif %}>
+          <span class="manage-wizard__num">{% if s.is_done %}&#10003;{% else %}{{ s.num }}{% endif %}</span>
+          {{ s.label }}
+        </a>
+      </li>
+    {% endfor %}
+  </ol>
+
+  {# ------------------------------------------------------------------ #}
+  {% if step == 'basics' %}
+    <form method="post" action="{% url 'manage:listing_wizard' %}" class="manage-card manage-wizard__form" novalidate>
+      {% csrf_token %}
+      <input type="hidden" name="step" value="basics">
+      {% if draft %}<input type="hidden" name="pk" value="{{ draft.pk }}">{% endif %}
+      <h2 class="manage-form-section__title">The basics.</h2>
+      <p class="manage-form-section__intro">What it is, where it is, and the words that sell it.</p>
+      {% if form.non_field_errors %}<div class="manage-form-errors" role="alert">{{ form.non_field_errors }}</div>{% endif %}
+      {% for field in form %}
+        <div class="manage-field{% if field.errors %} has-error{% endif %}">
+          {{ field.label_tag }} {{ field }}
+          {% if field.help_text %}<p class="manage-field__help">{{ field.help_text }}</p>{% endif %}
+          {{ field.errors }}
+        </div>
+      {% endfor %}
+      <p class="manage-wizard__actions">
+        <button type="submit" name="action" value="continue" class="btn btn--primary">Save &amp; continue →</button>
+      </p>
+    </form>
+
+  {% elif step == 'price' %}
+    <form method="post" action="{% url 'manage:listing_wizard' %}" class="manage-card manage-wizard__form" novalidate>
+      {% csrf_token %}
+      <input type="hidden" name="step" value="price">
+      <input type="hidden" name="pk" value="{{ draft.pk }}">
+      <h2 class="manage-form-section__title">The price.</h2>
+      <p class="manage-form-section__intro">
+        {% if draft.listing_type == 'rent' %}Rent is per month.{% else %}For-sale prices are the total.{% endif %}
+        Short stays are priced per night — switch that on at the Details step.
+      </p>
+      {% if form.non_field_errors %}<div class="manage-form-errors" role="alert">{{ form.non_field_errors }}</div>{% endif %}
+      {% for field in form %}
+        <div class="manage-field{% if field.errors %} has-error{% endif %}{% if field.field.widget.input_type == 'checkbox' %} manage-field--check{% endif %}">
+          {{ field.label_tag }} {{ field }}
+          {% if field.help_text %}<p class="manage-field__help">{{ field.help_text }}</p>{% endif %}
+          {{ field.errors }}
+        </div>
+      {% endfor %}
+      <p class="manage-wizard__actions">
+        <button type="submit" name="action" value="continue" class="btn btn--primary">Save &amp; continue →</button>
+      </p>
+    </form>
+
+  {% elif step == 'details' %}
+    <form method="post" action="{% url 'manage:listing_wizard' %}" class="manage-card manage-wizard__form" novalidate>
+      {% csrf_token %}
+      <input type="hidden" name="step" value="details">
+      <input type="hidden" name="pk" value="{{ draft.pk }}">
+      <h2 class="manage-form-section__title">The details.</h2>
+      <p class="manage-form-section__intro">The numbers buyers ask about first. Everything here is optional — skip what you don't know yet.</p>
+      {% if form.non_field_errors %}<div class="manage-form-errors" role="alert">{{ form.non_field_errors }}</div>{% endif %}
+      {% for field in form %}
+        {% if field.name == 'amenities' %}
+          <fieldset class="manage-field manage-field--checks">
+            <legend>{{ field.label }}</legend>
+            {{ field }}
+            {% if field.help_text %}<p class="manage-field__help">{{ field.help_text }}</p>{% endif %}
+            {{ field.errors }}
+          </fieldset>
+        {% else %}
+          <div class="manage-field{% if field.errors %} has-error{% endif %}{% if field.field.widget.input_type == 'checkbox' %} manage-field--check{% endif %}">
+            {{ field.label_tag }} {{ field }}
+            {% if field.help_text %}<p class="manage-field__help">{{ field.help_text }}</p>{% endif %}
+            {{ field.errors }}
+          </div>
+        {% endif %}
+      {% endfor %}
+      <p class="manage-wizard__actions">
+        <button type="submit" name="action" value="continue" class="btn btn--primary">Save &amp; continue →</button>
+      </p>
+    </form>
+
+  {% elif step == 'photos' %}
+    <div class="manage-card manage-wizard__card">
+      <h2 class="manage-form-section__title">Photos.</h2>
+      <p class="manage-form-section__intro">Listings live on their photos. One is the cover — the big picture on the card.</p>
+      <p class="manage-wizard__photo-state">
+        {% if photos_count %}
+          {{ photos_count }} photo{{ photos_count|pluralize }} attached.{% if has_cover %} Cover set. ✓{% else %} <strong>No cover chosen yet.</strong>{% endif %}
+        {% else %}
+          No photos yet — the listing can't go live without at least one.
+        {% endif %}
+      </p>
+      <p class="manage-wizard__actions manage-wizard__actions--wrap">
+        <a class="btn btn--primary" href="{% url 'agents:dashboard_listing_images' draft.pk %}">Add / arrange photos →</a>
+        <a class="manage-foot__link" href="{% url 'manage:listing_pin' draft.pk %}">Set its map pin</a>
+      </p>
+    </div>
+    <form method="post" action="{% url 'manage:listing_wizard' %}" class="manage-wizard__foot" novalidate>
+      {% csrf_token %}
+      <input type="hidden" name="step" value="photos">
+      <input type="hidden" name="pk" value="{{ draft.pk }}">
+      <p class="manage-wizard__actions">
+        <button type="submit" name="action" value="continue" class="btn btn--primary">Continue →</button>
+      </p>
+    </form>
+
+  {% elif step == 'review' %}
+    <div class="manage-card manage-wizard__card">
+      <h2 class="manage-form-section__title">One last look.</h2>
+      <p class="manage-form-section__intro">Check it over, then publish. You can still edit everything afterwards.</p>
+      <dl class="manage-wizard__summary">
+        <div><dt>Title</dt><dd>{{ draft.title }}</dd></div>
+        <div><dt>Listing</dt><dd>{{ draft.get_listing_type_display }} · {{ draft.property_type.name }} · {{ draft.location.name }}</dd></div>
+        <div><dt>Managed by</dt><dd>{{ draft.agent.name }}</dd></div>
+        <div><dt>Price</dt><dd>{% if draft.price and draft.price > 0 %}{{ draft.price|kes:draft.price_period }}{% if draft.price_negotiable %} (negotiable){% endif %}{% else %}no price yet{% endif %}</dd></div>
+        <div><dt>Specs</dt><dd>{% if draft.bedrooms %}{{ draft.bedrooms }} bed · {% endif %}{% if draft.bathrooms %}{{ draft.bathrooms }} bath · {% endif %}{% if draft.size_sqm %}{{ draft.size_sqm }} sq m{% endif %}{% if not draft.bedrooms and not draft.bathrooms and not draft.size_sqm %}not set yet{% endif %}</dd></div>
+        <div><dt>Short stay</dt><dd>{% if draft.is_short_stay %}Yes — priced per night{% else %}No{% endif %}</dd></div>
+        <div><dt>Photos</dt><dd>{% if photos_count %}{{ photos_count }} attached{% if has_cover %} · cover set ✓{% else %} · <strong>no cover</strong>{% endif %}{% else %}none yet{% endif %}</dd></div>
+        <div><dt>Map pin</dt><dd>{% if draft.lat %}set ✓{% else %}not set{% endif %} <a class="manage-foot__link" href="{% url 'manage:listing_pin' draft.pk %}">Change</a></dd></div>
+        <div><dt>Address area</dt><dd>{{ draft.address_text|default:"—" }}</dd></div>
+        <div class="manage-wizard__summary--full"><dt>Description</dt><dd>{{ draft.description|truncatewords:40 }}</dd></div>
+      </dl>
+      {% if not has_cover or not draft.price or draft.price <= 0 %}
+        <div class="manage-wizard__warning" role="alert">
+          <p class="manage-wizard__warning-title">Not ready to publish yet — still needs:</p>
+          <ul>
+            {% if not draft.price or draft.price <= 0 %}<li>a price (step 2)</li>{% endif %}
+            {% if not has_cover %}<li>a cover photo (step 4)</li>{% endif %}
+          </ul>
+          <p>You can save it as a draft and finish later.</p>
+        </div>
+      {% endif %}
+    </div>
+    <form method="post" action="{% url 'manage:listing_wizard' %}" class="manage-wizard__foot" novalidate>
+      {% csrf_token %}
+      <input type="hidden" name="step" value="review">
+      <input type="hidden" name="pk" value="{{ draft.pk }}">
+      <p class="manage-wizard__actions manage-wizard__actions--wrap">
+        {% if has_cover and draft.price and draft.price > 0 %}
+          <button type="submit" name="action" value="publish" class="btn btn--primary">Publish now</button>
+        {% endif %}
+        <button type="submit" name="action" value="finish" class="btn btn--outline">Save as draft</button>
+      </p>
+    </form>
+  {% endif %}
+
+  {# Cross-step footer: available whenever a draft row exists. #}
+  {% if draft and step != 'review' %}
+    <form method="post" action="{% url 'manage:listing_wizard' %}" class="manage-wizard__foot" novalidate>
+      {% csrf_token %}
+      <input type="hidden" name="step" value="{{ step }}">
+      <input type="hidden" name="pk" value="{{ draft.pk }}">
+      <p class="manage-wizard__actions manage-wizard__actions--wrap">
+        <button type="submit" name="action" value="finish" class="btn btn--outline">Save &amp; finish later</button>
+        <button type="submit" name="action" value="discard" class="manage-wizard__discard">Discard this draft</button>
+      </p>
+    </form>
+  {% endif %}
+
+  <p class="manage-foot">
+    <a class="manage-foot__link" href="{% url 'manage:listings' %}">← Back to listings</a>
+  </p>
+{% endblock %}

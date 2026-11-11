@@ -1,3 +1,79 @@
+Run 74 | BUILDER (owner round, off-loop) | 2026-11-11 ~20:45-22:00 +03:00 | items:
+(1) **OWNER ASK — "kindly re access and ensure the back end is
+fully functional …thorough."** Re-audit first, measured live: the
+r73 state was intact (954 tests green, DB = 80 published + 20 sample
+enquiries + 2 spam + views 18,202; all five portal sections driven
+live as the owner — graphs, tabs "All 18 · Spam 2", auto-seen,
+one-tap status, note add, CSV 200 with 19 rows + header and spam
+excluded, spam folder delete-only, brand assets + SEO screens).
+My first honeypot count was a false alarm — `filter(honeypot=True)`
+on a CharField matches nothing; the codebase filter is
+`exclude(honeypot="")` (2 rows, exactly as seeded). Cloud PAT:
+STILL not found — full search of upload/, download/, repo and
+/home/z found no txt named gabriel; the zip fallback stands.
+(2) **PHASE 2 BUILT (all on /manage/listings/, BACKEND-PLAN 2A-2D):**
+(2A) duplicate — POST tools/ action=copy: full row copy, draft
+status, image FILES copied to fresh paths (asserted disjoint on
+disk), views 0, Featured off, slug regenerated, is_demo carried;
+(2B) bulk bar (tick rows → Publish/Under offer/Sold-Let/Archive —
+sticky, cream card, Publish is the only filled button) + per-row
+quick tools (☆ Feature toggle, Copy, inline price in a <details>)
+wired with the HTML5 `form` attribute so the bulk form stays flat —
+zero JS for all of it; the price period is DERIVED from
+type/short-stay (sale total, rent monthly, short-stay nightly) —
+the owner never sees a period field, so it can't be wrong; bulk
+publish REFUSES rows without photo+price and names them ("Needs a
+photo and a price first, so left untouched: …") — nothing goes on
+the public site half-finished; (2C) pin picker at listings/<pk>/pin/
+on the existing vendored MapLibre + OpenFreeMap positron (no new
+deps): tap/drag to set, writes 6-decimal lat/lng into the number
+fields (the no-JS fallback), remove-pin action, the "approximate
+pin only" promise repeated in the save message; (2D) wizard on ONE
+URL listings/new/ (hidden pk param): Basics → Price → Details →
+Photos → Review, every POST persists the draft (server-side
+autosave — a dead phone loses nothing), Save & finish later +
+Discard from any step, drafts re-enter via "Finish set-up" on the
+row, Publish gated on photo+price with an honest warning that
+names exactly what's missing (and the Publish button is absent
+until it's ready).
+(3) **THREE REAL BUGS, ALL CAUGHT BY THE LIVE PASS (not by first
+pytest):** (a) leak guard swept /manage/listings/ with an EMPTY
+list, so a multi-line {# #} comment inside the {% if listings %}
+branch never rendered — leaked live, fixed + the guard now SEEDS a
+guard row so the full branch always renders; (b) Number("") is 0,
+not NaN — the pin picker read "no pin yet" (data-lat="") as a real
+pin at null island, map centered on the Gulf of Guinea; fixed with
+parseFloat + the MOMBASA default was [lat,lng] in a [lng,lat]
+argument — both fixed, map now centers on Mombasa and a live click
+wrote -4.050059 / 39.668200 straight into the fields; (c) my
+listing row used Jinja's {%- (Django has no whitespace-control
+tags) — invalid block tag crash on render.
+(4) GATES — check 0 · makemigrations clean · **990 passed** (954 →
+990, +36: 35 listing-tools + the strengthened guard). The F1 hex
+ratchet caught my one new hard-coded colour (#8f1d14 → var(--burnt)
+— baselines only go DOWN).
+(5) E3 LIVE (agent-browser, logged in as the preview owner):
+listings screen shows the sticky bulk bar + every row with
+checkbox/Edit/Pin/Feature/Copy; form-attribute submits verified in
+a real browser (Feature → "Added to Featured" + ★ pill; inline
+price 235,000→245,000 saved with flash; Copy → "Draft copy …
+created" + Draft tab 1); bulk publish walked (a double-click race
+in my own script proved BOTH guards: under_offer applied, then
+Publish with no ticks showed the tick-first hint — a clean single
+action published the copy, Live 80→81); the full wizard walked
+live (basics → price 45,000 → details with short-stay → photos
+empty state → review refused without a cover photo and hid the
+Publish button); pin picker: map canvas rendered, click → inputs
+auto-filled, Save → "Pin saved. Visitors see an approximate pin —
+the exact spot is never shown."; mobile 390px both screens fit
+with zero horizontal overflow; VLM verdicts pass on both key
+screens (comments: "pass", map: real tiles visible). Deliverables:
+download/r74-{listings-tools,pin-picker,listing-tools-mobile,
+wizard-basics,wizard-review}.png.
+FOR THE NEXT RUN: Phase 3 per BACKEND-PLAN (taxonomy editor, media
+library, testimonials, newsletter compose). Owner cloud PAT still
+pending — nothing named gabriel exists to read it from.
+
 Run 73 | BUILDER (owner round, off-loop) | 2026-11-11 ~15:00-20:30 +03:00 | items:
 (1) **OWNER ASK — "plan extensively … backend SIMPLE TO USE … graphs
 sections … dont look too complex."** Plan first:

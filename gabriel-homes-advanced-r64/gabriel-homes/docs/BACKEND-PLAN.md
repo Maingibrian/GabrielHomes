@@ -36,7 +36,7 @@ four phases, in the order that unblocks the owner soonest.
 
 ---
 
-## Phase 1 — Owner Hub core `[~ run 73]`
+## Phase 1 — Owner Hub core `[x run 73]`
 
 ### 1A. Portal section nav
 Topbar keeps brand + sign out; a sticky chip row below it links the five
@@ -101,16 +101,27 @@ on this same screen.
 
 ---
 
-## Phase 2 — Listing management polish (next run)
+## Phase 2 — Listing management polish `[x run 74]`
 
-* **2A. Duplicate** (one click, "Copy of …", draft status, cover kept).
-* **2B. Bulk status** (tick rows → mark Published/Under offer/Sold/Let/
-  Archived) + **featured toggle** + **inline price edit**.
+* **2A. Duplicate** (one click, "Copy of …", draft status, cover kept). —
+  POST /manage/listings/&lt;pk&gt;/tools/ action=copy; image FILES copied
+  (never shared storage), views 0, Featured off, slug regenerated.
+* **2B. Bulk status** (tick rows → Publish/Under offer/Sold/Let/Archive)
+  + **featured toggle** + **inline price edit**. — Bulk publish refuses
+  rows without photo+price and names them; per-row Feature/Copy/price
+  submit via the HTML5 `form` attribute (zero-JS pattern); the price
+  period is DERIVED (sale total / rent monthly / short-stay nightly),
+  never asked.
 * **2C. Map pin picker** — click-to-set on the existing self-hosted
   MapLibre (no new deps), lat/lng never typed by hand again; keeps the
-  "approximate pin" privacy note.
+  "approximate pin" privacy note. — /manage/listings/&lt;pk&gt;/pin/;
+  number fields stay as the no-JS fallback; Number("")≠NaN lesson
+  fixed with parseFloat.
 * **2D. Wizard + draft autosave** — Basics → Price → Details → Photos →
-  Review; each step saves a draft, no lost work on a phone.
+  Review; each step saves a draft, no lost work on a phone. — One URL
+  /manage/listings/new/ (hidden pk param); every POST persists the
+  draft row; Save & finish later / Discard from any step; Publish
+  gated on photo + price (honest refusal names what's missing).
 
 ## Phase 3 — Content & taxonomy
 

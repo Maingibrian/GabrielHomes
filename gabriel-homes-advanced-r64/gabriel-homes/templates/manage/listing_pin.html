@@ -1,0 +1,58 @@
+{% extends "manage/base.html" %}
+{% load core_tags static %}
+
+{% block title %}Map pin — {{ listing.title }} — {{ SITE_NAME }} owner portal{% endblock %}
+
+{% block manage_content %}
+  <div class="manage-page-head">
+    <p class="manage-card__tag">[ MAP PIN ]</p>
+    <h1 class="manage-card__title">Where is it?</h1>
+    <p class="manage-card__body">Tap the map to drop a pin, or drag it to fine-tune. Visitors only ever see an approximate pin — the exact spot is never shown publicly.</p>
+  </div>
+
+  <div class="manage-card manage-pincard">
+    <p class="manage-pincard__listing">{{ listing.title }} · {{ listing.location.name }}</p>
+
+    <div id="pin-map"
+         class="manage-pincard__map"
+         data-lat="{{ listing.lat|default_if_none:'' }}"
+         data-lng="{{ listing.lng|default_if_none:'' }}"
+         data-maplibre-src="{% staticv 'vendor/maplibre-gl/maplibre-gl.mjs' %}"
+         data-lat-input="id_lat"
+         data-lng-input="id_lng"
+         role="application"
+         aria-label="Map for setting this listing's approximate pin">
+      <p class="manage-pincard__loading">Loading the map…</p>
+    </div>
+    <p class="manage-pincard__hint">No map? Type the numbers below — they work just as well.</p>
+
+    <form method="post" action="{% url 'manage:listing_pin' listing.pk %}" class="manage-wizard__form" novalidate>
+      {% csrf_token %}
+      {% if form.non_field_errors %}<div class="manage-form-errors" role="alert">{{ form.non_field_errors }}</div>{% endif %}
+      <div class="manage-pincard__fields">
+        <div class="manage-field{% if form.lat.errors %} has-error{% endif %}">
+          <label for="id_lat">Latitude</label>
+          {{ form.lat }}
+          {{ form.lat.errors }}
+        </div>
+        <div class="manage-field{% if form.lng.errors %} has-error{% endif %}">
+          <label for="id_lng">Longitude</label>
+          {{ form.lng }}
+          {{ form.lng.errors }}
+        </div>
+      </div>
+      <p class="manage-wizard__actions manage-wizard__actions--wrap">
+        <button type="submit" class="btn btn--primary">Save pin</button>
+        {% if listing.lat %}
+          <button type="submit" name="action" value="remove" class="btn btn--outline">Remove pin</button>
+        {% endif %}
+      </p>
+    </form>
+  </div>
+
+  <p class="manage-foot">
+    <a class="manage-foot__link" href="{% url 'manage:listings' %}">← Back to listings</a>
+  </p>
+
+  <script src="{% staticv 'js/pin-picker.js' %}" defer></script>
+{% endblock %}
