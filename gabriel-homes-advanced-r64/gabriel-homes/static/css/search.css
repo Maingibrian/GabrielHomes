@@ -707,26 +707,44 @@ html:not([data-fx]) .listing-row.row-armed {
    fx=none and prefers-reduced-motion all render the exact static
    tile (the r69 drift below is the one gated upgrade). */
 .listings-band::before {
-  content: ""; position: absolute; inset: 0; z-index: -1;
+  content: ""; position: sticky; inset: 0 0 auto 0; top: 0; z-index: -1;
+  /* r85 (owner: "the listings page is back with the laggy motion...
+     jerking"): the drift rewrote background-position on a BAND-SIZED
+     masked layer — 1280x14000px — so Chrome re-rastered 14,000 rows of
+     fronds every frame (measured at 4x CPU throttle: 59ms avg frames,
+     334 longtasks; hiding the field: 24.6ms). The box is now a
+     VIEWPORT-TALL STICKY layer (height 100vh, negative margin cancels
+     the flow): the same per-frame position write repaints 1280x800
+     instead — measured 23.6ms, pixel-for-pixel the field-hidden
+     baseline. Sticky + z-index:-1 is the palm sentinels' own pattern:
+     the pseudo still paints in the root negative layer, so the footer
+     still scrolls over it (r62 contract), and NO transform/will-change
+     is used, so the r71 compositor-hoisting ban holds untouched.
+     inset keeps the literal `inset: 0` ...auto 0 form the r68 pin
+     reads. The drift phase math this geometry requires lives in
+     motion.js setupPalmParallax (r85 comment there). */
+  height: 100vh;
+  margin-bottom: -100vh;
   background-image: url("../img/palm-field-even.svg");
   background-repeat: repeat;
   background-size: 1400px 1600px;
   /* r69/r71: scroll stays the declared SAFE DEFAULT — and the Y
      position rides the drift var, which motion.js writes under a
      gate tier only. Every other visitor (scripts blocked, fx=none,
-     prefers-reduced-motion) falls back to 0px and scrolls the tile
-     exactly like r65.
+     prefers-reduced-motion) falls back to 0px and the field stands
+     still (the sticky box holds the viewport, so 0px reads as a calm
+     pinned field — correct for every tier the gate excludes).
 
      r71 REJECTED a compositor-transform drift here, measured live:
      translate3d + will-change on this ROOT-NEGATIVE pseudo hoists
      the whole composited layer OVER the static footer in Chrome (the
      footer vanished behind the field; the mask's out-of-bounds
      extension also leaked faint fronds below the band). The
-     background-position drift repaints on the main thread, yes — but
-     the r70 trace measured it at a FLAT 59fps through the row
-     animations, so it is the smooth option that does not break the
-     r62 paint contract. Do NOT retry transform/will-change on this
-     ::before without reading LOOP/JOURNAL.md r71. */
+     background-position drift repaints on the main thread — on the
+     r85 viewport-sized box that repaint is ~17x cheaper than the old
+     band-sized one, so it is BOTH the smooth and the contract-safe
+     option. Do NOT retry transform/will-change on this ::before
+     without reading LOOP/JOURNAL.md r71. */
   background-attachment: scroll;
   background-position: 0 var(--palms-y, 0px);
   -webkit-mask-image: linear-gradient(to bottom, black 0%, black 84%, transparent 100%);

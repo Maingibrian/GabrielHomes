@@ -603,15 +603,24 @@
   //
   // Mechanism: this writes --palms-y on .listings-band; search.css
   // points the ::before's background-position at var(--palms-y, 0px).
-  // The tile repeats, so the drift can run forever without a seam,
-  // and the box-relative 84% mask stays anchored to the band — the
-  // dissolve still lands exactly at the footer line wherever the
-  // scroll is.
+  // r85: the ::before is now a VIEWPORT-TALL STICKY layer (see the
+  // r85 comment in search.css — the band-sized box re-rastered
+  // 1280x14000px every drift frame and was the measured cause of the
+  // owner's "jerking motion"; the viewport-sized box cuts that paint
+  // ~17x at identical pixels). Sticky geometry changes the target
+  // math: the box is only moving during ENTRY (rides the band, screen
+  // speed -1) and RELEASE (rides the band end, -1); while PINNED it
+  // holds the viewport (speed 0). measure() below therefore computes
+  // a three-phase target, each phase keeping the tile's SCREEN speed
+  // at exactly -DRIFT — the r69 half-speed contract, restated for
+  // this geometry. The tile repeats, so the drift can run forever
+  // without a seam, and the box-relative 84% mask still lands the
+  // dissolve over the band's final stretch wherever the scroll is.
   //
   // D-MOTION-SAFE / D-FX-GATE: fxNone (fx=none OR the attribute
   // missing — scripts blocked, fails closed) returns before anything
   // moves; with JS blocked the var keeps its 0px fallback: the
-  // exact static field. Decorative only.
+  // static pinned field. Decorative only.
   //
   // r70 diagnosis (measured, 12s per-frame trace on /properties/):
   // the r69 chase stepped a fixed fraction PER FRAME (EASE 0.14/rAF
@@ -656,13 +665,32 @@
       var rect = band.getBoundingClientRect();
       var vh = window.innerHeight ||
                document.documentElement.clientHeight;
-      // anchored at the scroll where the band's top enters the
-      // viewport: the field is exactly static on arrival, drifts
-      // while any part of the band is on screen, freezes after it
-      // has passed (no wasted work in the footer).
-      var entry = rect.top + y - vh;
-      var travel = Math.max(0, Math.min(y - entry, rect.height + 2 * vh));
-      target = travel * DRIFT;
+      // r85 three-phase target (the ::before is sticky, 100vh):
+      //   entry   y <= top:    box rides the band (screen speed -1),
+      //                         position climbs at (1 - DRIFT) from 0
+      //                         at arrival — exactly static on entry.
+      //   pinned  in between:  box holds the viewport (speed 0), so
+      //                         the position ALONE descends at DRIFT.
+      //   release y >= pinEnd: box rides the band end (speed -1)
+      //                         again, slope (1 - DRIFT), joined
+      //                         continuously at pinEnd, frozen once
+      //                         the band has fully left (no writes
+      //                         under the footer).
+      // Each phase nets the tile a screen speed of -DRIFT: the field
+      // climbs at half the scroll rate everywhere it is visible.
+      var top = rect.top + y;
+      var bottom = top + rect.height;
+      var pinEnd = Math.max(top, bottom - vh);
+      if (rect.top >= vh) { target = 0; return; }   // band below view
+      if (rect.bottom <= 0) { return; }             // band above: frozen
+      if (y <= top) {
+        target = Math.max(0, (1 - DRIFT) * (y - (top - vh)));
+      } else if (y >= pinEnd) {
+        var join = vh * (1 - DRIFT) - DRIFT * (pinEnd - top);
+        target = join + (1 - DRIFT) * (Math.min(y, bottom) - pinEnd);
+      } else {
+        target = vh * (1 - DRIFT) - DRIFT * (y - top);
+      }
     }
 
     function frame(now) {

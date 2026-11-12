@@ -1,3 +1,53 @@
+Run 85 | BUILDER (owner round, off-loop) | 2026-11-12 ~11:30-13:10 +03:00 | items:
+(1) **OWNER ASK — "the listings page is back with the laggy
+motion... jerking motion... I feel as though scroll motion and all
+the animations don't have something that regulates their motion."**
+Deep investigation, measured, fixed. Probe: 12s wheel scroll on
+/properties/ at 4x CPU throttle (mid-range laptop), 7-config
+isolation matrix + 4 component probes. BEFORE: avg frame 58.9ms,
+p99 200ms, 427 frames >50ms, 334 longtasks / 28.7s total.
+Isolation: rows-glide OFF → 57ms (glides are composited, free);
+images stubbed tiny → 57.3ms (decode is off-thread); Lenis
+destroyed → 69.9ms (native scroll is WORSE — Lenis holds cadence,
+not the culprit); field hidden → 24.6ms. Component split: mask
+removed → 55.5ms (mask free); flat gradient bg → 40.5ms (SVG
+raster ~15ms); both → 36.3ms; ONLY the box shrunk to a viewport-
+sticky layer (SVG+mask kept) → 23.6ms ≈ field-hidden. **ROOT
+CAUSE: the drift rewrites background-position on a BAND-SIZED
+masked ::before (1280×14000px) — Chrome re-rasters the entire
+band every chase frame.** The r70/r71 traces ran on unthrottled
+fast machines (59fps flat) and missed it.
+(2) **THE FIX (r85) — same visual, 1/17th the raster.** search.css:
+.listings-band::before is now position:sticky, top:0, height:
+100vh, margin-bottom:-100vh, inset:0 0 auto 0 (pin literal kept)
+— a viewport-tall sticky layer painting in the same root-negative
+position, so the r62 footer-over-field contract and the r71
+compositor ban (no transform/will-change, background-position
+stays) hold untouched; it is the palm sentinels' own sticky
+pattern applied to the field. motion.js measure() rewritten as a
+THREE-PHASE target (entry rides the band at (1-DRIFT); pinned
+descends at DRIFT since the box holds still; release rejoins at
+(1-DRIFT), continuous at pinEnd) so the tile's SCREEN speed is
+exactly -0.5x scroll in every phase — the r69 half-speed contract
+restated for sticky geometry. AFTER: avg 22.9ms, p99 50ms, 29
+frames >50ms, longtasks 35/3.5s — the shipped page now sits AT
+the fx=none baseline (18.8ms) and field-hidden (23.9ms); jumps=0
+under Lenis. Verified: drift exact at 7 depths (≤0.05px error),
+static on arrival, rows glide mid-band, footer paints over the
+field at release, VLM clean on pinned/release/footer states, mobile
+390px sticky holds + zero horizontal overflow + 860px tile,
+reduced-motion fail-closed (fx=none, 0px fallback, rows visible),
+zero console errors anywhere.
+(3) **CONTRACT MIGRATIONS** — new pin file
+apps/core/tests/test_r85_sticky_field.py (geometry + three-phase
+math + r69/r70 constants re-asserted); all prior pins verified
+green: r65 (tile, repeat, z-index, mask 84%), r68 (ban, even tile,
+chase exp/TAU/MAXDT/measure-in-frame), r71 compositor ban, C1
+sentinels, r48 row slides, F5 Lenis. Full suite **1052 + 5 new =
+1057 passed**. Committed r85. Owner-visible effect: /properties/
+scrolls at baseline smoothness; the palms drift at half speed
+exactly as designed, none of the visual contracts changed.
+
 Run 84 | BUILDER (owner round, off-loop) | 2026-11-12 ~09:25-11:05 +03:00 | items:
 (1) **OWNER ASK — "run the preview"** — but the sandbox had recycled
 again between messages: processes dead (expected) AND the project

@@ -1,0 +1,42 @@
+[
+ {
+  "avgMs": 55.5,
+  "p95Ms": 133.39999999999964,
+  "over50": 414,
+  "longtasks": 337,
+  "longtaskMs": 28702,
+  "finalScrollY": 13879,
+  "config": "H_rich_noMask",
+  "wall_s": 55.5
+ },
+ {
+  "avgMs": 40.5,
+  "p95Ms": 100,
+  "over50": 277,
+  "longtasks": 231,
+  "longtaskMs": 16513,
+  "finalScrollY": 13879,
+  "config": "I_rich_flatBg",
+  "wall_s": 43.2
+ },
+ {
+  "avgMs": 36.3,
+  "p95Ms": 83.29999999999927,
+  "over50": 199,
+  "longtasks": 156,
+  "longtaskMs": 11353,
+  "finalScrollY": 13879,
+  "config": "J_rich_noMask_flatBg",
+  "wall_s": 38.4
+ },
+ {
+  "avgMs": 23.6,
+  "p95Ms": 50,
+  "over50": 21,
+  "longtasks": 30,
+  "longtaskMs": 3201,
+  "finalScrollY": 13879,
+  "config": "K_rich_stickyBox",
+  "wall_s": 28.1
+ }
+]
