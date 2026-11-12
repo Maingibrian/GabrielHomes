@@ -1291,10 +1291,9 @@ html.motion-ready [data-reveal].is-visible {
     from { opacity: 0; transform: translateY(20px); }
     to   { opacity: 1; transform: translateY(0); }
   }
-  @keyframes g3-clip {
-    from { clip-path: inset(10% 7% 10% 7% round var(--radius-card, 18px)); opacity: .4; }
-    to   { clip-path: inset(0 0 0 0 round var(--radius-card, 18px)); opacity: 1; }
-  }
+  /* r83: g3-clip retired — its only consumer was the old .svc-row__media
+     frame. The sticky chapter media must NEVER animate (it pins), so the
+     services surfaces are now the TOC rows and chapter reading columns. */
   html.motion-ready .nearby-card[data-reveal] {
     /* transition: none — the scroll timeline is the sole motion owner of a
        g3 element; the IO one-shot transition must never fight it (a running
@@ -1305,17 +1304,17 @@ html.motion-ready [data-reveal].is-visible {
     animation-timeline: view();
     animation-range: entry 5% entry 55%;
   }
-  html.motion-ready .svc-row[data-reveal] {
+  html.motion-ready .svc-toc__row[data-reveal] {
     transition: none;
     animation: g3-rise linear both;
     animation-timeline: view();
     animation-range: entry 0% entry 60%;
   }
-  html.motion-ready .svc-row__media {
+  html.motion-ready .svc-chapter__body[data-reveal] {
     transition: none;
-    animation: g3-clip linear both;
+    animation: g3-rise linear both;
     animation-timeline: view();
-    animation-range: entry 10% entry 70%;
+    animation-range: entry 0% entry 50%;
   }
   html.motion-ready .about-story__figure[data-reveal] {
     transition: none;
@@ -1324,23 +1323,23 @@ html.motion-ready [data-reveal].is-visible {
     animation-range: entry 0% entry 55%;
   }
   html.motion-ready[data-fx="none"] .nearby-card[data-reveal],
-  html.motion-ready[data-fx="none"] .svc-row[data-reveal],
-  html.motion-ready[data-fx="none"] .svc-row__media,
+  html.motion-ready[data-fx="none"] .svc-toc__row[data-reveal],
+  html.motion-ready[data-fx="none"] .svc-chapter__body[data-reveal],
   html.motion-ready[data-fx="none"] .about-story__figure[data-reveal] {
     animation: none;
   }
   /* fail-closed: if fx-gate.js never set data-fx, nothing scroll-linked runs */
   html.motion-ready:not([data-fx]) .nearby-card[data-reveal],
-  html.motion-ready:not([data-fx]) .svc-row[data-reveal],
-  html.motion-ready:not([data-fx]) .svc-row__media,
+  html.motion-ready:not([data-fx]) .svc-toc__row[data-reveal],
+  html.motion-ready:not([data-fx]) .svc-chapter__body[data-reveal],
   html.motion-ready:not([data-fx]) .about-story__figure[data-reveal] {
     animation: none;
   }
   /* OS-level reduced motion before/at fx-gate time */
   @media (prefers-reduced-motion: reduce) {
     html.motion-ready .nearby-card[data-reveal],
-    html.motion-ready .svc-row[data-reveal],
-    html.motion-ready .svc-row__media,
+    html.motion-ready .svc-toc__row[data-reveal],
+    html.motion-ready .svc-chapter__body[data-reveal],
     html.motion-ready .about-story__figure[data-reveal] {
       animation: none;
     }

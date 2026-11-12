@@ -2,9 +2,9 @@
 
 Runbook §6 G3 / SCORECARD G3: CSS scroll-linked (animation-timeline: view())
 reveals behind @supports for the live named surfaces — home #nearby cards,
-the /services/ rows and their media frames, the /about/ story collage
-figure. Falls back to the existing IntersectionObserver reveal (motion.js,
-untouched). Animated properties are transform / clip-path / opacity ONLY —
+the /services/ index rows and chapter reading columns, the /about/ story
+collage figure. Falls back to the existing IntersectionObserver reveal
+(motion.js, untouched). Animated properties are transform / opacity ONLY —
 no layout shift. D-LOOP-31a:
 
   * every g3 selector is scoped under `html.motion-ready` — with JS blocked
@@ -13,8 +13,9 @@ no layout shift. D-LOOP-31a:
     animations (fx=none behaves exactly like reduced motion, F2);
   * the bento grid is NOT targeted (H3/M4 own it — MET-frozen);
   * true parallax is deferred: the only collage markup is dormant
-    (.story__* has no template) and .svc-row__media is a background-image
-    box — a clip reveal ships instead (see D-LOOP-31a).
+    (.story__* has no template), and the r83 services chapters pin
+    their media with sticky — the media itself never animates; the
+    TOC rows and chapter reading columns rise instead (D-LOOP-31a).
 """
 import re
 from pathlib import Path
@@ -40,11 +41,11 @@ def seeded_db(db):
 REPO = Path(__file__).resolve().parents[3]
 CSS = (REPO / "static" / "css" / "components.css").read_text()
 
-# The live G3 surfaces (D-LOOP-31a mapping).
+# The live G3 surfaces (D-LOOP-31a mapping; r83 services rebuild).
 TARGETS = [
     ".nearby-card[data-reveal]",      # home #nearby
-    ".svc-row[data-reveal]",          # /services/ rows
-    ".svc-row__media",                # /services/ media frames (clip)
+    ".svc-toc__row[data-reveal]",     # /services/ index rows
+    ".svc-chapter__body[data-reveal]",  # /services/ chapter reading columns
     ".about-story__figure[data-reveal]",  # /about/ story collage figure
 ]
 
@@ -83,6 +84,14 @@ def test_keyframes_animate_only_allowed_properties():
         assert props <= {"transform", "clip-path", "opacity"}, (
             f"G3 keyframes animate non-whitelisted properties: {props - {'transform', 'clip-path', 'opacity'}}"
         )
+
+
+def test_sticky_chapter_media_is_never_g3_targeted():
+    """r83: the pinned half-screen photo (.svc-chapter__media) is scroll
+    GEOMETRY — it must never carry a scroll-linked animation (the reveal
+    would fight the pin). Only the TOC rows and reading columns rise."""
+    block = g3_block()
+    assert ".svc-chapter__media" not in block
 
 
 def test_no_layout_shift_properties_in_g3_block():
@@ -144,5 +153,6 @@ def _get(path: str) -> str:
 def test_surfaces_render_on_their_pages(seeded_db):
     home, services, about = _get("/"), _get("/services/"), _get("/about/")
     assert re.search(r'class="nearby-card[^"]*"[^>]*data-reveal', home)
-    assert 'class="svc-row" data-reveal' in services
+    assert 'class="svc-chapter__body" data-reveal' in services
+    assert re.search(r'class="svc-toc__row"[^>]*data-reveal', services)
     assert re.search(r'class="about-story__figure[^"]*"[^>]*data-reveal', about)

@@ -402,6 +402,6 @@ def test_process_section_lives_on_services_not_home():
 
     services = Client().get("/services/").content.decode()
     assert "HOW BUYING WORKS" in services
-    assert "hv2-process" in services
+    assert "svc-steps" in services
     assert "From first search to a viewing." in services
     assert "Our fee" in services

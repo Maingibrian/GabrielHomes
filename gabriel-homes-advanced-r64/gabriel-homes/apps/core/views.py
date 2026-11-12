@@ -328,6 +328,9 @@ def services(request):
     def svc_photo(index):
         return gallery[index] if len(gallery) > index else ""
 
+    # r83 ledger: honest counters, derived from the published() chokepoint
+    # only — the same numbers the listings pages show, never rounded up.
+    published = Property.objects.published()
     return render(request, "core/services.html", _static_ctx(
         body_class="page-services",
         page_title="Services — Gabriel Homes",
@@ -337,6 +340,9 @@ def services(request):
             "honest photography, and support from offer to handover."
         ),
         canonical_url="/services/",
+        sale_count=published.for_sale().count(),
+        rent_count=published.for_rent().count(),
+        location_count=published.values("location").distinct().count(),
         real_listing=real,
         svc_img_buying=svc_photo(0),
         svc_img_renting=svc_photo(2),

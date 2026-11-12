@@ -1,3 +1,60 @@
+Run 83 | BUILDER (owner round, off-loop) | 2026-11-12 ~08:10-09:10 +03:00 | items:
+(1) **OWNER ASK — "what happened to our great services page...it
+has reverted to the bad styling", then "the page still looks
+uninspired not like the last one...same idea but way better
+execution."** Diagnosis: the r80/r81 sticky-chapter redesign never
+existed on THIS filesystem (the recycle that Run 82 documented wiped
+it; r82 could only rebuild env + real-listing photos on the old
+svc-row template). This run rebuilt the design from the run-80/81
+reports and then, after the second message, pushed the execution to
+magazine grade.
+(2) **STICKY-CHAPTER REBUILD (r80 structure, r82 photos)** —
+services.html rewritten: hero + honest credit → THE INDEX (four
+numbered editorial rows, hairline separators, right-aligned honest
+mono meta: "44 for sale / 37 to rent" live from published(),
+"authority in writing / a named person" for the word rows) → THE
+LEDGER (framed espresso band, oversized Fraunces numerals behind
+hairline dividers, 44/37/10 counted from published() only) → four
+CHAPTERS: `.svc-chapter` 2-col grid, `.svc-chapter__media`
+position:sticky top:0 height:100vh (pin = scroll geometry, never a
+G3 target), `.svc-chapter--flip` zigzag L/R/L/R, ghost outlined
+numeral + honest caption over a paint-only ::after scrim, serif
+`.svc-chapter__lede`, Fraunces titles clamp→3.9rem, how-buying-works
+steps + fee folded INTO chapter 001 (kills the old hv2-process band)
+→ THE PLEDGE (roman numerals on hairlines). scroll-margin-top:84px
+on chapters (r81 fix carried over). ≤900px: chapters stack 4:3,
+pin stands down.
+(3) **MIGRATIONS OF DEPENDENTS** — services() view now also passes
+sale_count/rent_count/location_count; G3 scroll-linked selectors
+re-pointed svc-row→svc-toc__row + svc-chapter__body (media NEVER
+targeted; g3-clip keyframe retired; new pin test added); test pins
+updated in test_g3_scroll_linked.py + test_phase2_home.py
+("svc-steps" replaces "hv2-process"); F3 dead-CSS purge completed in
+home.css (hv2-steps/fee/h2/sub/head gone — note: purge COMMENTS must
+not spell the class with a leading dot, the F3 regex counts them).
+(4) **VERIFICATION** — full suite **1052 passed** (r82 baseline 1051
++ 1 new G3 pin test). Playwright r83_svc_visual_check.py: 4 chapters
+pin through their full ranges (media top=0 at 5%/50%/95% of each pin
+range, 100vh tall), zigzag L/R/L/R exact, scrim painted, TOC anchor
+click lands chapter at 84px (±1 Lenis easing), zero console errors,
+mobile 390px zero horizontal overflow + stacked + not sticky,
+reduced-motion keeps the pin and shows content. VLM design review:
+chapters 86/100 "confident, editorial magazine", TOC 8/10 after the
+meta-column + contrast fixes, no real bugs outstanding.
+(5) **A HARNESS FALSE ALARM, DIAGNOSED** — the anchor click first
+measured 143px instead of 84: Playwright's own pre-click
+scrollIntoView desyncs Lenis's internal targetScroll (its element
+math then lands short). With Lenis-owned scrolls — i.e. every real
+wheel user under fx=rich — the click lands at exactly 84. Fixed the
+harness to emulate a user; the site needed no change. (Also chased a
+"corrupted selector" in motion.js that turned out to be a Bash tool
+display artifact — od -c showed the source correct.)
+(6) **PREVIEW + ARTIFACTS** — daemon restarted per template edit
+(runserver --noreload caches templates); public preview verified 200
+on /services/; 9 r83 screenshots + gallery updated (download/
+screenshots/index.html → Run 83).
+| score: the sticky-chapter services page is back at full execution — pinned real-listing photography, editorial index with honest counts, ledger band, zigzag chapters — 1052 green, geometry proven | evidence: test_services_page.py, test_g3_scroll_linked.py, scripts/r83_svc_visual_check.py, download/screenshots/svc-r83-*.png |
+
 Run 82 | BUILDER (owner round, off-loop) | 2026-11-12 ~07:35-08:00 +03:00 | items:
 (1) **OWNER ASK — "ensure the first services page uses the images
 from the real listing and run the preview."** Context: the sandbox

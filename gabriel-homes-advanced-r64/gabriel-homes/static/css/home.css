@@ -1339,15 +1339,11 @@ html.motion-ready .bento-grid--shift .bento-card[data-reveal] {
 .hv2-marquee__track span { flex: none; }
 
 /* ---- shared headings ------------------------------------------- */
-.hv2-h2 {
-  font-family: var(--font-display, Georgia, serif);
-  font-size: clamp(2rem, 3.6vw, 3rem); line-height: 1.12; font-weight: 500;
-  letter-spacing: var(--track-tight, -0.02em); color: var(--ink, #1c1511); margin: 12px 0 18px;
-  max-width: 22ch;
-}
+/* r83: the hv2-h2 / hv2-sub / hv2-head heading rules are purged — their
+   only consumer was the services process band, whose content now lives in
+   the /services/ sticky chapters (pages.css svc-steps). hv2-lede stays
+   (checks page). */
 .hv2-lede { font-size: 1.15rem; color: var(--brown, #5a4032); max-width: 58ch; }
-.hv2-sub { color: var(--taupe, #6b5e53); max-width: 58ch; margin: 0; }
-.hv2-head { margin-bottom: 52px; }
 
 /* ---- founder signature (r52: the r24 chip + hv2-split wrapper left
    with the about redesign — the portrait is owned by pages.css
@@ -1356,43 +1352,9 @@ html.motion-ready .bento-grid--shift .bento-card[data-reveal] {
 .hv2-founder__role {font-family: var(--font-mono, monospace); font-weight: 600; font-size: 13px; text-transform: uppercase; letter-spacing: .08em; color: var(--clay, #b06a3b); margin: 0 0 2px !important;}
 .hv2-founder__name { font-family: var(--font-display, Georgia, serif); font-size: 1.25rem; color: var(--ink, #1c1511) !important; margin: 0 0 2px !important; }
 
-/* ---- process timeline ------------------------------------------ */
-.hv2-steps {
-  list-style: none; margin: 0; padding: 0; position: relative;
-  display: grid; grid-template-columns: repeat(4, 1fr); gap: 28px;
-}
-.hv2-steps::before {
-  content: ""; position: absolute; left: 6px; right: 6px; top: 6px; height: 2px;
-  background: var(--sand, #d8c9b8); transform-origin: left; transform: scaleX(0);
-  transition: transform 1.6s var(--ease-out, ease) .2s;
-}
-.hv2-steps.is-visible::before { transform: scaleX(1); }
-.hv2-steps li { position: relative; padding-top: 34px; }
-.hv2-steps__dot {
-  position: absolute; left: 0; top: 0; width: 14px; height: 14px; border-radius: 50%;
-  background: var(--burnt, #a0522d); box-shadow: 0 0 0 5px var(--cream, #faf8f4);
-  transform: scale(0); transition: transform .5s var(--ease-out, ease);
-}
-.hv2-steps.is-visible .hv2-steps__dot { transform: scale(1); }
-.hv2-steps li:nth-child(2) .hv2-steps__dot { transition-delay: .35s; }
-.hv2-steps li:nth-child(3) .hv2-steps__dot { transition-delay: .7s; }
-.hv2-steps li:nth-child(4) .hv2-steps__dot { transition-delay: 1.05s; }
-.hv2-steps h3 { font-family: var(--font-display, Georgia, serif); font-size: 1.4rem; font-weight: 500; margin: 0 0 8px; }
-.hv2-steps p { color: var(--taupe, #6b5e53); margin: 0; }
-.hv2-fee {
-  margin-top: 56px; padding: 26px 30px; border-radius: var(--radius-card, 18px);
-  background: var(--white, #fff); border-left: 4px solid var(--burnt, #a0522d);
-}
-.hv2-fee__label {font-family: var(--font-mono, monospace); font-weight: 600; font-size: 13px; text-transform: uppercase; letter-spacing: .08em; color: var(--clay, #b06a3b); margin: 0 0 6px !important;}
-.hv2-fee p { color: var(--brown, #5a4032); margin: 0; }
-
-/* ---- responsive -------------------------------------------------- */
-@media (max-width: 960px) {
-  .hv2-steps { grid-template-columns: repeat(2, 1fr); row-gap: 40px; }
-}
-@media (max-width: 640px) {
-  .hv2-steps { grid-template-columns: 1fr; }
-}
+/* r83: the process timeline (hv2-steps / hv2-steps__dot / hv2-fee) is
+   purged — the how-buying-works steps moved into the /services/
+   chapter-001 reading column (pages.css svc-steps / svc-fee). */
 
 /* ---- reduced motion: keep layout, drop movement ---------------- */
 @media (prefers-reduced-motion: reduce) {
@@ -1401,13 +1363,12 @@ html.motion-ready .bento-grid--shift .bento-card[data-reveal] {
      state in the base rule) — the fail-open contract. */
   .hv2-rise, .hv2-marquee__track, .hv2-scroll span,
   .hero__assurances li, .hero__loc, .hero__locations-label { animation: none !important; }
-  .hv2-steps::before, .hv2-steps__dot { transition: none !important; transform: none !important; }
   /* r51: the focus-within pill lift renders as a plain 2px jump at
      worst — kill the transform so the pill stays put. */
   .hero__search:focus-within { transform: none !important; }
 }
 
-/* ---- checklist used on the services and checks pages ---------- */
+/* ---- checklist used on the checks page ------------------------- */
 .hv2-checklist { list-style: none; padding: 0; margin: 28px 0 0; display: grid; gap: 14px; max-width: 760px; }
 .hv2-checklist li {
   position: relative; padding: 18px 22px 18px 52px; border-radius: var(--radius-card, 18px);
