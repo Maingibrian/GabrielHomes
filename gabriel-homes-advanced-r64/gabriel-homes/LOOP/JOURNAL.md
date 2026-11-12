@@ -1,4 +1,28 @@
-Run 86 | BUILDER (owner round, off-loop) | 2026-11-12 ~14:30-15:20 +03:00 | items:
+Run 87 | BUILDER (owner round, off-loop) | 2026-11-12 ~15:30-16:10 +03:00 | items:
+(1) **OWNER ASK — "the bento grind in the home page now only has one
+listing the real listing...add the others so it has the same layout
+as before...dont mess up the animation that was there before."**
+Root cause in home(): showcase_source = real_showcase if
+real_showcase.exists() else public_listings — the 6-card top-up ran
+only INSIDE the chosen source, so once import_real_listing (r84)
+created a single real listing the bento rendered 1 card + the CTA
+closer and the shape-shift mosaic collapsed (the rest of the page
+was unaffected: sale/rent/nearby rails always used public_listings,
+which is why only the bento thinned). Fix: keep real inventory
+first (order -is_featured, -published_at) then top up from
+public_listings (the same disclosed Mombasa presentation set the
+rails use, ordered -is_featured, -published_at to match the old
+fallback exactly). The hide-demo switch stays airtight — the top-up
+runs through .published(). Animation untouched (bento-shift.js was
+never card-count-broken; geometry re-verified live): is-live grid
+7 cards / 3 cols / 4 rows, resting spotlight 1210x572 (3x2 span),
+hover on card 3 promotes it full-width 1210x572 with the FLIP
+(clip-grow for the promoted card, slide for the rest, no overlap),
+pointer-leave resets to resting. New pins
+apps/core/tests/test_r87_bento_topup.py (thin-real fills 6, real
+leads, hide-demo switch empties top-up). Full suite: **1064
+passed**. Committed r87, pushed.
+
 (1) **OWNER ASK — "the listings page has a blank background behind
 the map just before the palm leaves start.... give it the same
 image background as the Homes close to what matters. section in

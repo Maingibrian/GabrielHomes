@@ -89,17 +89,20 @@ def home(request):
     real_showcase = Property.objects.published().exclude(is_demo=True).select_related(
         "property_type", "location__parent__parent", "agent__user",
     ).prefetch_related("images", "amenities")
-    # Real owner-entered inventory always takes priority. Until it exists,
-    # the explicitly labelled Mombasa presentation set demonstrates the UI.
-    showcase_source = real_showcase if real_showcase.exists() else public_listings
+    # Real owner-entered inventory always takes priority, and when it is
+    # thin (r87: one imported listing) the bento tops up with the
+    # explicitly labelled Mombasa presentation set — the same disclosed
+    # fallback the rest of the page (sale/rent/nearby rails) already
+    # uses, so the 6-card shape-shift grid keeps its layout. public_
+    # listings runs through .published(), so the hide-demo switch still
+    # empties it and the bento drops back to real-or-nothing.
     cache_key = "home:showcase_listings"
     showcase_listings = cache.get(cache_key)
     if showcase_listings is None:
-        showcase_listings = list(showcase_source.filter(is_featured=True).order_by("-published_at")[:6])
-        if len(showcase_listings) < 6:
-            seen = {p.pk for p in showcase_listings}
-            extra = showcase_source.exclude(pk__in=seen).order_by("-published_at")[: 6 - len(showcase_listings)]
-            showcase_listings.extend(list(extra))
+        real_ordered = list(real_showcase.order_by("-is_featured", "-published_at")[:6])
+        seen = {p.pk for p in real_ordered}
+        extra = public_listings.exclude(pk__in=seen).order_by("-is_featured", "-published_at")[: 6 - len(real_ordered)]
+        showcase_listings = real_ordered + list(extra)
         cache.set(cache_key, showcase_listings, 60 * 5)  # 5 minutes
 
     # r13: three per market so each home-page section can lay out as a
