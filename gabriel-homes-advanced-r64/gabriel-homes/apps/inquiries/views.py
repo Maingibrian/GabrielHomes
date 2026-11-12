@@ -127,10 +127,22 @@ def _send_enquiry_email(property: Property, inquiry: Inquiry) -> None:
     In both cases the caller proceeds: the enquiry itself was saved, so
     the visitor still gets the success partial.
     """
-    owner_email = (getattr(settings, "OWNER_EMAIL", "") or "").strip()
-    if owner_email:
-        recipient = owner_email
-    else:
+    # r90 (backend reassessment): recipient priority is now
+    # BrandSettings.notification_email (editable in the portal's Site
+    # content screen) → settings.OWNER_EMAIL → the listing agent's
+    # address. The DB field first means the owner can retarget alerts
+    # without a redeploy; the env setting remains the deployment
+    # default and the checklist fallback.
+    recipient = ""
+    try:
+        from apps.core.models import BrandSettings
+
+        recipient = (BrandSettings.load().notification_email or "").strip()
+    except Exception:
+        pass  # a brand-row failure must never block the notification
+    if not recipient:
+        recipient = (getattr(settings, "OWNER_EMAIL", "") or "").strip()
+    if not recipient:
         recipient = property.agent.display_email
     if not recipient:
         return  # nothing we can do without an address — leave tracking untouched

@@ -413,3 +413,44 @@ def healthz(request):
     except Exception:
         return JsonResponse({"status": "unavailable"}, status=503)
     return JsonResponse({"status": "ok"})
+
+
+# ---------------------------------------------------------------------------
+# r90 (backend reassessment): branded error pages.
+#
+# The stock Django 403 was the portal's dead end — an agent or staff
+# member who followed a /manage/ link saw a grey technical page with no
+# way back. These three render the site's own chrome with plain
+# language and a route home. 404/500 cover the public site the same
+# way. All are plain TemplateResponses (DEBUG=False only — Django
+# shows its technical pages while DEBUG=True, which is what we want
+# during development).
+# ---------------------------------------------------------------------------
+def error_403(request, exception=None):
+    """Permission denied — wrong door, friendly exit."""
+    return render(
+        request,
+        "403.html",
+        {"body_class": "page-error"},
+        status=403,
+    )
+
+
+def error_404(request, exception=None):
+    """Not found — the page moved or never existed."""
+    return render(
+        request,
+        "404.html",
+        {"body_class": "page-error"},
+        status=404,
+    )
+
+
+def error_500(request):
+    """Server error — honest, no details leaked, a way back."""
+    return render(
+        request,
+        "500.html",
+        {"body_class": "page-error"},
+        status=500,
+    )

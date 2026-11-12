@@ -208,10 +208,30 @@ EMAIL_BACKEND = env.str(
 )
 DEFAULT_FROM_EMAIL = env.str("DEFAULT_FROM_EMAIL", default="hello@gabrielhomes.co.ke")
 
+# r90 (backend reassessment): the SMTP variables were DOCUMENTED in
+# .env.example / DEPLOY.md but never read — an owner who followed the
+# deploy guide got Django's default (SMTP to localhost:25) and every
+# notification email silently vanished. They are wired now, exactly as
+# documented: EMAIL_HOST/PORT/USER/PASSWORD/USE_TLS/USE_SSL + a bounded
+# EMAIL_TIMEOUT (default 10s) so a dead SMTP server delays a request by
+# seconds, not the gunicorn worker timeout.
+if EMAIL_BACKEND.endswith(".smtp.EmailBackend"):
+    EMAIL_HOST = env.str("EMAIL_HOST", default="localhost")
+    EMAIL_PORT = env.int("EMAIL_PORT", default=587)
+    EMAIL_HOST_USER = env.str("EMAIL_HOST_USER", default="")
+    EMAIL_HOST_PASSWORD = env.str("EMAIL_HOST_PASSWORD", default="")
+    EMAIL_USE_TLS = env.bool("EMAIL_USE_TLS", default=True)
+    EMAIL_USE_SSL = env.bool("EMAIL_USE_SSL", default=False)
+    EMAIL_TIMEOUT = env.int("EMAIL_TIMEOUT", default=10)
+
 # P1-4 single-owner enquiry routing: when set, EVERY public enquiry
 # notification goes to this address, no matter which (legacy) agency row
 # owns the listing — the owner must never miss an enquiry. Empty/unset
 # keeps the dev/demo fallback (email the listing agent's own address).
+# r90: the portal's Site content screen writes the same value into
+# BrandSettings.notification_email; the inquiry view prefers the DB field
+# so the owner can change it without a redeploy (this env remains the
+# deployment-level default and the checklist fallback).
 OWNER_EMAIL = env.str("OWNER_EMAIL", default="")
 
 # ---------------------------------------------------------------------------

@@ -36,10 +36,16 @@
         <small>Owner portal</small>
       </span>
     </a>
-    <form method="post" action="{% url 'account_logout' %}" class="manage-topbar__signout">
-      {% csrf_token %}
-      <button type="submit" class="btn btn--light-outline manage-topbar__signout-btn">Sign out</button>
-    </form>
+    {# r90: account tools beside sign-out — password change used to #}
+    {# require navigating the Django admin. #}
+    <nav class="manage-topbar__account" aria-label="Account">
+      <a class="manage-topbar__account-link" href="{% url 'manage:password_change' %}">Password</a>
+      <a class="manage-topbar__account-link" href="/admin/" target="_blank" rel="noopener">Studio</a>
+      <form method="post" action="{% url 'account_logout' %}" class="manage-topbar__signout">
+        {% csrf_token %}
+        <button type="submit" class="btn btn--light-outline manage-topbar__signout-btn">Sign out</button>
+      </form>
+    </nav>
   </header>
 
   {# Five sections, one nav (r73 BACKEND-PLAN rule 3) — the badge whispers, never shouts. #}

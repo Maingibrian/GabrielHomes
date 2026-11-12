@@ -21,7 +21,7 @@
       <h2>Contact details</h2>
       <p>Buttons stay hidden when a contact channel is empty.</p>
       {% for field in form %}
-        {% if field.name == 'phone' or field.name == 'whatsapp' or field.name == 'email' %}
+        {% if field.name == 'phone' or field.name == 'whatsapp' or field.name == 'email' or field.name == 'notification_email' %}
           <div class="manage-field{% if field.errors %} has-error{% endif %}">
             <label for="{{ field.id_for_label }}">{{ field.label }}</label>
             {{ field }}

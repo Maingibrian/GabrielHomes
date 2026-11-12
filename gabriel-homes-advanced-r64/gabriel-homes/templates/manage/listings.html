@@ -10,6 +10,15 @@
     <p class="manage-card__body">Every property, at a glance. Tick rows to change several at once; each row has its own quick tools. “Add a listing” walks you through five short steps and saves as you go.</p>
   </div>
 
+  {# r90: search — find a listing by title, place or type. GET form, zero JS. #}
+  <form method="get" action="{% url 'manage:listings' %}" class="manage-search">
+    {% if tab != 'all' %}<input type="hidden" name="tab" value="{{ tab }}">{% endif %}
+    <input class="manage-search__input" type="search" name="q" value="{{ q }}"
+           placeholder="Search title, place or type…" aria-label="Search listings">
+    <button type="submit" class="manage-search__btn btn btn--outline">Search</button>
+    {% if q %}<a class="manage-search__clear" href="{% url 'manage:listings' %}{% if tab != 'all' %}?tab={{ tab }}{% endif %}">Clear</a>{% endif %}
+  </form>
+
   <nav class="manage-tabs" aria-label="Listing status filters">
     {% for item in tab_items %}
       <a class="manage-tabs__tab {% if item.is_current %}is-current{% endif %}"
@@ -76,6 +85,14 @@
             </button>
             <button type="submit" form="row-tools-{{ property.pk }}" name="action" value="copy"
                     class="manage-row__mini">Copy</button>
+            {% if property.status == 'archived' or property.status == 'sold_let' %}
+              {# r90: reversible put-away + restore, right on the row #}
+              <button type="submit" form="row-tools-{{ property.pk }}" name="action" value="restore"
+                      class="manage-row__mini manage-row__mini--primary">Restore</button>
+            {% elif property.status != 'draft' %}
+              <button type="submit" form="row-tools-{{ property.pk }}" name="action" value="archive"
+                      class="manage-row__mini">Archive</button>
+            {% endif %}
           </span>
         </li>
       {% endfor %}
@@ -92,18 +109,23 @@
     {% if is_paginated %}
       <nav class="manage-pager" aria-label="Pages">
         {% if page_obj.has_previous %}
-          <a class="manage-pager__link" href="?tab={{ tab }}&amp;page={{ page_obj.previous_page_number }}">&larr; Newer</a>
+          <a class="manage-pager__link" href="?tab={{ tab }}{% if q %}&amp;q={{ q|urlencode }}{% endif %}&amp;page={{ page_obj.previous_page_number }}">&larr; Newer</a>
         {% endif %}
         <span class="manage-pager__where">Page {{ page_obj.number }} of {{ paginator.num_pages }}</span>
         {% if page_obj.has_next %}
-          <a class="manage-pager__link" href="?tab={{ tab }}&amp;page={{ page_obj.next_page_number }}">Older &rarr;</a>
+          <a class="manage-pager__link" href="?tab={{ tab }}{% if q %}&amp;q={{ q|urlencode }}{% endif %}&amp;page={{ page_obj.next_page_number }}">Older &rarr;</a>
         {% endif %}
       </nav>
     {% endif %}
   {% else %}
     <div class="manage-card manage-empty">
-      <p class="manage-empty__title">No listings here.</p>
-      <p class="manage-empty__body">Nothing with this status right now.</p>
+      {% if q %}
+        <p class="manage-empty__title">Nothing matches “{{ q }}”.</p>
+        <p class="manage-empty__body">Check the spelling, or clear the search to see everything.</p>
+      {% else %}
+        <p class="manage-empty__title">No listings here.</p>
+        <p class="manage-empty__body">Nothing with this status right now.</p>
+      {% endif %}
     </div>
   {% endif %}
 

@@ -82,11 +82,8 @@
                 <input type="hidden" name="action" value="toggle">
                 <button type="submit" class="manage-row__mini">{% if t.shown %}Hide{% else %}Show{% endif %}</button>
               </form>
-              <form method="post" action="{% url 'manage:testimonial_action' t.pk %}">
-                {% csrf_token %}
-                <input type="hidden" name="action" value="delete">
-                <button type="submit" class="manage-row__mini manage-row__mini--danger">Delete</button>
-              </form>
+              {# r90: a confirm screen first — deleting a quote is forever (Hide keeps it saved) #}
+              <a class="manage-row__mini manage-row__mini--danger" href="{% url 'manage:testimonial_delete' t.pk %}">Delete…</a>
             </span>
           </li>
         {% endfor %}

@@ -70,7 +70,15 @@ def _real_listings_done() -> bool:
 
 
 def _owner_email_done() -> bool:
-    """Enquiry notification emails have a destination (P1-4 OWNER_EMAIL)."""
+    """Enquiry alerts have a destination (r90: portal-editable first).
+
+    BrandSettings.notification_email (the Site content screen) wins;
+    the deployment's OWNER_EMAIL env setting is the fallback. Either
+    one being set means an alert has somewhere to land.
+    """
+    brand = BrandSettings.load()
+    if (brand.notification_email or "").strip():
+        return True
     return bool((getattr(settings, "OWNER_EMAIL", "") or "").strip())
 
 
@@ -106,10 +114,13 @@ REGISTRY: tuple[ChecklistItem, ...] = (
             "The site currently shows sample homes so it doesn't look empty. "
             "Before you go live they must be hidden from visitors."
         ),
+        # r90: the portal has its own switch now — the "Ask Brian" copy
+        # is retired with the screen that was promised.
         action=(
-            "Ask Brian to switch on \u201chide demo data\u201d — a one-tap switch "
-            "for it is coming to this portal."
+            "Open Sample data in this portal and switch on "
+            "“hide sample listings”."
         ),
+        url="/manage/site-content/sample-data/",
     ),
     ChecklistItem(
         key="real_listings",
@@ -120,9 +131,10 @@ REGISTRY: tuple[ChecklistItem, ...] = (
             "and its status is Published. Sample homes don't count."
         ),
         action=(
-            "Send Brian your first real property (photos, price, location) — "
-            "the step-by-step listing wizard is coming soon."
+            "Use “Add a listing” on the Listings screen — five short "
+            "steps, saved as you go."
         ),
+        url="/manage/listings/",
     ),
     ChecklistItem(
         key="owner_email",
@@ -132,10 +144,12 @@ REGISTRY: tuple[ChecklistItem, ...] = (
             "Every enquiry is saved in this portal and also emailed to you. "
             "Choose the address those emails should go to."
         ),
+        # r90: same screen as the contact details — "Alert email".
         action=(
-            "Tell Brian which email address should receive enquiry alerts "
-            "(he sets it once in the site settings)."
+            "Open Site content in this portal and set the alert email "
+            "address."
         ),
+        url="/manage/site-content/",
     ),
     ChecklistItem(
         key="about_story",

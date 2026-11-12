@@ -115,6 +115,19 @@ class BrandSettings(models.Model):
     email = models.EmailField(
         blank=True, help_text="Shown on the Email button. Empty = button hidden."
     )
+    # r90 (backend reassessment): enquiry-alert destination, editable in
+    # the portal's Site content screen. The inquiry email prefers this
+    # DB value over settings.OWNER_EMAIL so the owner can change where
+    # alerts go without a redeploy; empty falls back to the env setting
+    # (see apps/inquiries/views._send_enquiry_email and the checklist's
+    # owner_email item).
+    notification_email = models.EmailField(
+        blank=True,
+        help_text=(
+            "Where enquiry alert emails are sent. Empty = the server's "
+            "OWNER_EMAIL setting is used."
+        ),
+    )
     hero_tag = models.CharField(
         max_length=120,
         # r13: owner asked for a better slogan — the tag now names the place,

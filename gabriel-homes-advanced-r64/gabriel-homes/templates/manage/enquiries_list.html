@@ -9,6 +9,15 @@
     <p class="manage-card__body">Every message from the site, newest first. Open one to reply and move it along.</p>
   </div>
 
+  {# r90: search — find "the one from Amina" without paging. GET form, zero JS. #}
+  <form method="get" action="{% url 'manage:enquiries' %}" class="manage-search">
+    {% if tab != 'all' %}<input type="hidden" name="tab" value="{{ tab }}">{% endif %}
+    <input class="manage-search__input" type="search" name="q" value="{{ q }}"
+           placeholder="Search name, email, phone or listing…" aria-label="Search enquiries">
+    <button type="submit" class="manage-search__btn btn btn--outline">Search</button>
+    {% if q %}<a class="manage-search__clear" href="{% url 'manage:enquiries' %}{% if tab != 'all' %}?tab={{ tab }}{% endif %}">Clear</a>{% endif %}
+  </form>
+
   {# Tabs with counts — the inbox's five states plus spam #}
   <nav class="manage-tabs" aria-label="Enquiry status filters">
     {% for item in tab_items %}
@@ -20,21 +29,40 @@
   </nav>
 
   {% if enquiries %}
+    {# r90: the bulk bar, same pattern as the listings screen — rows join via the HTML5 form attribute. #}
+    <form id="enquiry-bulk-form" method="post" action="{% url 'manage:enquiry_bulk' %}" class="manage-bulk">
+      {% csrf_token %}
+      <input type="hidden" name="back" value="{{ tab }}">
+      {% if q %}<input type="hidden" name="q" value="{{ q }}">{% endif %}
+      <p class="manage-bulk__label">Tick rows, then:</p>
+      <span class="manage-bulk__actions">
+        <button type="submit" name="action" value="seen" class="manage-bulk__btn">Mark seen</button>
+        <button type="submit" name="action" value="done" class="manage-bulk__btn">Mark done</button>
+        {% if tab == 'spam' %}
+          <button type="submit" name="action" value="delete" class="manage-bulk__btn manage-bulk__btn--primary">Delete</button>
+        {% endif %}
+      </span>
+    </form>
+
     <ul class="manage-rows manage-rows--stack">
       {% for inquiry in enquiries %}
         <li class="manage-row {% if tab == 'spam' %}manage-row--spam{% endif %}">
           {% if tab == 'spam' %}
+            <input class="manage-row__check" type="checkbox" name="ids" value="{{ inquiry.pk }}"
+                   form="enquiry-bulk-form" aria-label="Select enquiry from {{ inquiry.name }}">
             <span class="manage-row__link manage-row__link--static">
               <span class="manage-row__who">{{ inquiry.name }}{% if inquiry.is_demo %} <span class="manage-pill manage-pill--sample">Sample</span>{% endif %}</span>
               <span class="manage-row__meta">Caught by the spam filter · {{ inquiry.created_at|date:'j M Y' }}</span>
             </span>
-            <form method="post" action="{% url 'manage:enquiry_delete' inquiry.pk %}" class="manage-row__side">
-              {% csrf_token %}
-              <button type="submit" class="btn btn--outline manage-row__btn">Delete</button>
-            </form>
+            <span class="manage-row__side">
+              {# r90: a confirm screen first — deleting is forever #}
+              <a class="btn btn--outline manage-row__btn" href="{% url 'manage:enquiry_delete' inquiry.pk %}">Delete…</a>
+            </span>
           {% else %}
+            <input class="manage-row__check" type="checkbox" name="ids" value="{{ inquiry.pk }}"
+                   form="enquiry-bulk-form" aria-label="Select enquiry from {{ inquiry.name }}">
             <a class="manage-row__link" href="{% url 'manage:enquiry_detail' inquiry.pk %}">
-              <span class="manage-row__who">{{ inquiry.name }}{% if inquiry.is_demo %} <span class="manage-pill manage-pill--sample">Sample</span>{% endif %}</span>
+              <span class="manage-row__who">{{ inquiry.name }}{% if inquiry.is_demo %} <span class="manage-pill manage-pill--sample">Sample</span>{% endif %}{% if inquiry.email_error %} <span class="manage-pill manage-pill--warn" title="The email notification failed — open the enquiry to retry it">Email didn't send</span>{% endif %}</span>
               <span class="manage-row__meta">{{ inquiry.property_ref.title|truncatechars:44 }} · {{ inquiry.created_at|date:'j M' }}</span>
             </a>
             <span class="manage-pill">{{ inquiry.get_status_display }}</span>
@@ -46,11 +74,11 @@
     {% if pages > 1 %}
       <nav class="manage-pager" aria-label="Pages">
         {% if page > 1 %}
-          <a class="manage-pager__link" href="?tab={{ tab }}&amp;page={{ page|add:'-1' }}">&larr; Newer</a>
+          <a class="manage-pager__link" href="?tab={{ tab }}{% if q %}&amp;q={{ q|urlencode }}{% endif %}&amp;page={{ page|add:'-1' }}">&larr; Newer</a>
         {% endif %}
         <span class="manage-pager__where">Page {{ page }} of {{ pages }}</span>
         {% if page < pages %}
-          <a class="manage-pager__link" href="?tab={{ tab }}&amp;page={{ page|add:'1' }}">Older &rarr;</a>
+          <a class="manage-pager__link" href="?tab={{ tab }}{% if q %}&amp;q={{ q|urlencode }}{% endif %}&amp;page={{ page|add:'1' }}">Older &rarr;</a>
         {% endif %}
       </nav>
     {% endif %}
@@ -59,6 +87,9 @@
       {% if tab == 'spam' %}
         <p class="manage-empty__title">No spam.</p>
         <p class="manage-empty__body">The filter catches bots quietly — anything it catches shows up here.</p>
+      {% elif q %}
+        <p class="manage-empty__title">Nothing matches “{{ q }}”.</p>
+        <p class="manage-empty__body">Check the spelling, or clear the search to see everything.</p>
       {% else %}
         <p class="manage-empty__title">Nothing here.</p>
         <p class="manage-empty__body">No enquiries with this status right now. Try the All tab.</p>

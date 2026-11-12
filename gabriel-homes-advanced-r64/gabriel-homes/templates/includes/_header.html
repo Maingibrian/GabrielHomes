@@ -28,15 +28,20 @@
     </nav>
 
     <div class="site-header__actions">
-      {# Account links — signed-in users get Saved + (agents) Dashboard + a #}
-      {# POST sign-out (allauth requires POST). Anonymous visitors get no #}
-      {# account links in the header at all: public sign-up is closed, the #}
-      {# header keeps its clean contact block, and agents sign in via the #}
-      {# footer link or the mobile menu. #}
+      {# Account links — signed-in users get Saved + (agents) Dashboard + #}
+      {# (owner) Portal + a POST sign-out (allauth requires POST). #}
+      {# Anonymous visitors get no account links in the header at all: #}
+      {# public sign-up is closed, the header keeps its clean contact #}
+      {# block, and agents sign in via the footer link or the mobile #}
+      {# menu. r90: superusers see "Portal" so /manage/ is one click #}
+      {# away from any public page instead of a memorised address. #}
       {% if request.user.is_authenticated %}
         <a class="nav-link" href="/account/saved/">Saved</a>
         {% if request.user.is_agent %}
           <a class="nav-link" href="/dashboard/">Dashboard</a>
+        {% endif %}
+        {% if request.user.is_superuser %}
+          <a class="nav-link" href="/manage/">Portal</a>
         {% endif %}
         <form class="nav-signout" method="post" action="/account/logout/">{% csrf_token %}
           <button type="submit" class="nav-link nav-link--button">Sign out</button>

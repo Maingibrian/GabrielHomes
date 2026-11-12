@@ -53,11 +53,8 @@
                 <button type="submit" class="manage-row__mini manage-row__mini--primary">Save</button>
               </form>
             </details>
-            <form method="post" action="{% url 'manage:media_action' image.pk %}">
-              {% csrf_token %}
-              <input type="hidden" name="action" value="delete">
-              <button type="submit" class="manage-row__mini manage-row__mini--danger">Delete photo</button>
-            </form>
+            {# r90: a confirm screen first — photo deletion is forever #}
+            <a class="manage-row__mini manage-row__mini--danger" href="{% url 'manage:media_image_delete' image.pk %}">Delete photo…</a>
           </div>
         </li>
       {% endfor %}

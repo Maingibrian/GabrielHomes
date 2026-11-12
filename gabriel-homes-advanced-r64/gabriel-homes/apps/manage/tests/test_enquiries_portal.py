@@ -239,18 +239,38 @@ def test_csv_export_owner_only():
 
 
 # ---------------------------------------------------------------------------
-# Spam delete — real enquiries can never be deleted
+# Spam delete — real enquiries can never be deleted.
+# r90: deletion goes through a confirm screen — GET shows the stakes,
+# POST with action=confirm does it (a bare POST is a cancel, not a
+# delete), mirroring every other irreversible action in the portal.
 # ---------------------------------------------------------------------------
-def test_spam_can_be_deleted(owner):
+def test_spam_delete_confirm_screen_then_delete(owner):
     inquiry = _enquiry(name="Bot", honeypot="http://spam", email="bot@x.com")
+    # GET shows the confirmation, not the delete
+    r = owner.get(f"/manage/enquiries/{inquiry.pk}/delete/")
+    assert r.status_code == 200
+    assert b"Delete this spam enquiry" in r.content
+    assert Inquiry.objects.filter(pk=inquiry.pk).exists()
+    # a bare POST (no action=confirm) cancels — row survives
     r = owner.post(f"/manage/enquiries/{inquiry.pk}/delete/")
+    assert r.status_code == 302
+    assert Inquiry.objects.filter(pk=inquiry.pk).exists()
+    # the confirmed POST deletes
+    r = owner.post(
+        f"/manage/enquiries/{inquiry.pk}/delete/", {"action": "confirm"}
+    )
     assert r.status_code == 302
     assert not Inquiry.objects.filter(pk=inquiry.pk).exists()
 
 
 def test_real_enquiry_cannot_be_deleted(owner):
     inquiry = _enquiry()
-    r = owner.post(f"/manage/enquiries/{inquiry.pk}/delete/")
+    # neither the confirm screen nor a confirmed POST may touch it
+    r = owner.get(f"/manage/enquiries/{inquiry.pk}/delete/")
+    assert r.status_code == 404
+    r = owner.post(
+        f"/manage/enquiries/{inquiry.pk}/delete/", {"action": "confirm"}
+    )
     assert r.status_code == 404
     assert Inquiry.objects.filter(pk=inquiry.pk).exists()
 

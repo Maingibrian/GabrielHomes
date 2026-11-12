@@ -170,7 +170,8 @@
       <input type="hidden" name="pk" value="{{ draft.pk }}">
       <p class="manage-wizard__actions manage-wizard__actions--wrap">
         <button type="submit" name="action" value="finish" class="btn btn--outline">Save &amp; finish later</button>
-        <button type="submit" name="action" value="discard" class="manage-wizard__discard">Discard this draft</button>
+        {# r90: discard is irreversible — it goes through a confirm screen now #}
+        <a class="manage-wizard__discard" href="{% url 'manage:listing_discard' draft.pk %}">Discard this draft…</a>
       </p>
     </form>
   {% endif %}

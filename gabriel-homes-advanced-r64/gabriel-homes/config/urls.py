@@ -77,3 +77,16 @@ urlpatterns = [
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+
+
+# ---------------------------------------------------------------------------
+# r90 (backend reassessment): branded error pages. The portal's 403 used
+# to render Django's plain grey dead-end — an agent stumbling onto
+# /manage/ had no way back. Same for 404/500 site-wide: stock Django
+# pages with no link home. These handlers render the site's own chrome
+# (templates/403.html, 404.html, 500.html) with a plain-language
+# explanation and links back to browsing, the contact page, or sign-in.
+# ---------------------------------------------------------------------------
+handler403 = "apps.core.views.error_403"
+handler404 = "apps.core.views.error_404"
+handler500 = "apps.core.views.error_500"

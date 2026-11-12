@@ -43,6 +43,10 @@ class SiteContentForm(forms.ModelForm):
             "phone",
             "whatsapp",
             "email",
+            # r90: where enquiry alerts are emailed (empty = server
+            # setting). One screen for "how people reach me" — the
+            # alert destination belongs with them.
+            "notification_email",
             # Homepage hero
             "hero_tag",
             "hero_heading_lead",

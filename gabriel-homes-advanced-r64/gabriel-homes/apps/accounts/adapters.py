@@ -2,6 +2,11 @@
 apply rate limiting to login attempts.
 
 Per WORK.md §11 Phase 7: rate limiting on auth endpoints.
+
+r90 (backend reassessment) merges the login-redirect adapter INTO this
+one: allauth reads a single ACCOUNT_ADAPTER, so the role-aware
+destination (superuser → /manage/, agent → /dashboard/) lives here as
+get_login_redirect_url().
 """
 from allauth.account.adapter import DefaultAccountAdapter
 
@@ -30,6 +35,24 @@ class AccountAdapter(DefaultAccountAdapter):
             user.full_name = full_name
         return super().save_user(request, user, form, commit=commit)
 
+    def get_login_redirect_url(self, request):
+        """r90: after sign-in, land each role where they work.
+
+        The owner (superuser) was landing on the public homepage with
+        no link to /manage/ anywhere — the portal address had to be
+        memorised. Superusers now land in the owner portal, agents in
+        their dashboard, everyone else on the homepage (unchanged).
+        Allauth still honours an explicit ?next= before asking here,
+        so deep links like /manage/enquiries/ keep working.
+        """
+        user = getattr(request, "user", None)
+        if user is not None and user.is_authenticated:
+            if user.is_superuser:
+                return "/manage/"
+            if user.is_agent:
+                return "/dashboard/"
+        return "/"
+
     def authenticate(self, request, **credentials):
         """Rate-limit login attempts before they reach the auth backend.
 
@@ -40,8 +63,14 @@ class AccountAdapter(DefaultAccountAdapter):
         import time as _time
 
         if request:
-            xff = request.headers.get("X-Forwarded-For", "")
-            ip = xff.split(",")[0].strip() if xff else request.META.get("REMOTE_ADDR", "unknown")
+            # r90: key on the project's OWN client-ip helper, never the
+            # client-supplied X-Forwarded-For (D-RL / apps.core.clientip
+            # policy). The old XFF-first key let an attacker rotate the
+            # header to dodge this layer and double-counted legitimate
+            # logins across two buckets.
+            from apps.core.clientip import get_client_ip
+
+            ip = get_client_ip(request)
             key = f"auth_login_rl:{ip}"
             now_ts = _time.time()
             timestamps = cache.get(key, [])
@@ -51,3 +80,4 @@ class AccountAdapter(DefaultAccountAdapter):
             timestamps.append(now_ts)
             cache.set(key, timestamps, 60)
         return super().authenticate(request, **credentials)
+

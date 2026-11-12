@@ -1,3 +1,59 @@
+Run 90 | BUILDER (owner round, off-loop) | 2026-11-12 ~18:50-21:20 +03:00 | items:
+(1) **OWNER ASK — push current changes, then "reassess that backend
+thoroughly whatever is missing kindly add, remember this owner portal
+is supposed to be easy to use."** Sandbox had recycled post-r89
+(working tree rolled back, inner .git gone); restored from remote
+7c4978c1, fresh venv, baseline 1073 green before any work.
+SURVEY: 3 parallel read-only agents covered manage (portal), listings/
+inquiries/agents, accounts/config/templates. Verdict: portal content
+workflow strong; the OWNER'S OWN JOURNEY was the weak layer.
+(2) **r90 gaps closed (10):** (a) SMTP env wiring CRITICAL —
+EMAIL_HOST/PORT/USER/PASSWORD/USE_TLS/USE_SSL/TIMEOUT documented in
+DEPLOY.md but never read by settings → prod emails silently went to
+localhost:25; now wired behind the smtp-backend check. (b) Login
+redirect was "/" for everyone and NO link to /manage/ existed
+anywhere — allauth adapter get_login_redirect_url: superuser→/manage/,
+agent→/dashboard/, ?next= honoured; public header shows "Portal" for
+superusers. (c) Enquiry list: ?page=abc crashed 500 (int() ValueError)
+→ safe fallback; ?q= search (name/email/phone/message/title); bulk
+bar mark-seen/mark-done/delete-spam-only (mixed selection skips real
+rows with a count); email_error rows flagged "Email didn't send".
+(d) Listings: ?q= search (title/location/type); row Archive +
+Restore (restore → Draft, never straight to live). (e) Confirm
+screens (zero-JS GET→POST action=confirm) before every irreversible
+delete: spam enquiry, photo, testimonial, wizard draft; r75 guards
+(live cover/last photo) survive the confirm. (f) Sample-data switch
+IN THE PORTAL (/manage/site-content/sample-data/, Site content tab,
+same cache-key invalidation as the agents toggle) — the checklist's
+"Ask Brian" copy retired: all four derived items now point at real
+portal screens. (g) BrandSettings.notification_email (migration
+0017) — enquiry email recipient priority DB→env→agent; editable on
+the Site content screen; checklist owner_email follows it. (h)
+Password change screen in portal chrome (/manage/account/password/,
+SetPasswordForm, update_session_auth_hash keeps the session). (i)
+Branded 403/404/500 templates + handlers (config/urls.py; DEBUG=True
+still shows technical pages by design). (j) Hardening: XFF-first
+rate-limit key in AccountAdapter.authenticate → apps.core.clientip
+get_client_ip (D-RL policy); ListingBulkView per-row saves wrapped
+in transaction.atomic (no half-moved batches).
+(3) PINS: apps/manage/tests/test_r90_backend_reassessment.py (28
+tests: SMTP wiring, both redirects + ?next=, header link, searches,
+page-abc, bulk actions incl. spam-refusal, email pill, archive/
+restore, all four confirm flows, live-photo guard on confirm,
+sample-data flip, no-Brian checklist copy, notification_email
+priority + delivery stamp, password change + mismatch, branded
+403/404); test_enquiries_portal delete tests rewritten for the
+confirm flow. Test-order lesson: login tests must cache.clear() —
+the rate limiter's LocMem bucket is shared across the whole pytest
+run (phase7's 6 bad logins leave the IP throttled); agent fixture
+must use create_user (objects.create stores the hash raw).
+(4) PROOF (live, scripts/r90_live_check.py): owner login lands
+/manage/; public enquiry → portal search finds it; listing search
+9 rows; row Archive→Archived tab→Restore works; sample-data switch
+VISIBLE↔HIDDEN; password screen renders; screenshots r90-enquiries-
+search/-listings-search/-sample-data/-password-change/-404.png.
+Full suite: **1102 passed**. Committed r90, pushed.
+
 Run 89 | BUILDER (owner round, off-loop) | 2026-11-12 ~17:50-18:35 +03:00 | items:
 (1) **OWNER ASK — "the palms in the listings page should be
 stagnant."** Full reversal of the r69-r88 motion lineage on BOTH palm

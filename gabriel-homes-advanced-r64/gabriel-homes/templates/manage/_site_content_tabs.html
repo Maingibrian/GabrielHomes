@@ -14,4 +14,7 @@
      href="{% url 'manage:testimonials' %}">Testimonials</a>
   <a class="manage-tabs__tab {% if '/newsletter' in request.path %}is-current{% endif %}"
      href="{% url 'manage:newsletter' %}">Newsletter</a>
+  {# r90: the portal's own sample-data switch — was dashboard-only #}
+  <a class="manage-tabs__tab {% if '/sample-data' in request.path %}is-current{% endif %}"
+     href="{% url 'manage:sample_data' %}">Sample data</a>
 </nav>

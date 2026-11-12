@@ -196,7 +196,16 @@ def _tab_counts() -> dict:
 
 
 class EnquiryListView(OwnerRequiredMixin, PortalNavMixin, TemplateView):
-    """The enquiries inbox: tab chips with counts + newest first rows."""
+    """The enquiries inbox: tab chips with counts + newest first rows.
+
+    r90 (backend reassessment): a search box (name, email, phone,
+    message, listing title) so the owner can find "the one from
+    Amina" without paging; page numbers that never crash (?page=abc
+    now falls back to page 1 instead of a 500); a "email didn't send"
+    pill on rows whose notification failed, linking to the fix; and a
+    bulk bar (mark seen / mark done / delete spam) mirroring the
+    listings screen's pattern.
+    """
 
     template_name = "manage/enquiries_list.html"
 
@@ -220,7 +229,26 @@ class EnquiryListView(OwnerRequiredMixin, PortalNavMixin, TemplateView):
             qs = _visible_inquiries().select_related("property_ref").order_by("-created_at")
             if tab in STATUS_FOR_TAB:
                 qs = qs.filter(status=STATUS_FOR_TAB[tab])
-        page = int(self.request.GET.get("page", 1) or 1)
+
+        q = (self.request.GET.get("q") or "").strip()
+        if q:
+            from django.db.models import Q
+
+            qs = qs.filter(
+                Q(name__icontains=q)
+                | Q(email__icontains=q)
+                | Q(phone__icontains=q)
+                | Q(message__icontains=q)
+                | Q(property_ref__title__icontains=q)
+            )
+        ctx["q"] = q
+
+        # r90: a non-numeric ?page= used to raise ValueError (a 500 for
+        # a typo'd URL). Coerce honestly: not a number = page 1.
+        try:
+            page = int(self.request.GET.get("page", 1) or 1)
+        except (TypeError, ValueError):
+            page = 1
         paginator_range = 20
         total = qs.count()
         # Simple pagination without django.core.paginator's page-object
@@ -231,6 +259,65 @@ class EnquiryListView(OwnerRequiredMixin, PortalNavMixin, TemplateView):
         ctx["pages"] = pages
         ctx["enquiries"] = qs[(page - 1) * paginator_range : page * paginator_range]
         return ctx
+
+
+class EnquiryBulkView(OwnerRequiredMixin, View):
+    """r90: tick enquiry rows → one bar, mirroring the listings screen.
+
+    Actions are deliberately the safe, common ones: mark seen, mark
+    done, and delete — with delete refusing anything the spam filter
+    didn't catch, exactly like the per-row delete. All-or-nothing per
+    row: non-spam rows in a mixed selection are skipped with a count,
+    never silently destroyed.
+    """
+
+    def post(self, request):
+        action = request.POST.get("action", "")
+        tab = request.POST.get("back") or "all"
+        back = f"{reverse('manage:enquiries')}?tab={tab}"
+        q = (request.POST.get("q") or "").strip()
+        if q:
+            from urllib.parse import urlencode
+
+            back += "&" + urlencode({"q": q})
+        ids = [int(i) for i in request.POST.getlist("ids") if i.isdigit()]
+        if not ids:
+            messages.info(request, "Tick the rows first, then press an action.")
+            return redirect(back)
+        rows = list(Inquiry.objects.filter(pk__in=ids))
+
+        if action == "seen":
+            for row in rows:
+                if row.status == Inquiry.Status.NEW:
+                    Inquiry.objects.filter(pk=row.pk).update(
+                        status=Inquiry.Status.READ, updated_at=timezone.now()
+                    )
+            messages.success(request, f"Marked {len(rows)} as seen.")
+        elif action == "done":
+            for row in rows:
+                Inquiry.objects.filter(pk=row.pk).update(
+                    status=Inquiry.Status.CLOSED, updated_at=timezone.now()
+                )
+            messages.success(request, f"Marked {len(rows)} as done.")
+        elif action == "delete":
+            spam, refused = [], []
+            for row in rows:
+                if row.is_spam:
+                    spam.append(row)
+                else:
+                    refused.append(row)
+            for row in spam:
+                row.delete()
+            parts = [f"Deleted {len(spam)} spam enquiry{'' if len(spam) == 1 else 's'}."]
+            if refused:
+                parts.append(
+                    f"{len(refused)} real enquir{'y was' if len(refused) == 1 else 'ies were'} "
+                    "left alone — only spam can be deleted."
+                )
+            messages.success(request, " ".join(parts))
+        else:
+            raise Http404("Unknown enquiry bulk action.")
+        return redirect(back)
 
 
 class EnquiryDetailView(OwnerRequiredMixin, PortalNavMixin, TemplateView):
@@ -382,7 +469,11 @@ LISTING_TAB_LABELS = {
 
 
 class PortalListingsView(OwnerRequiredMixin, PortalNavMixin, ListView):
-    """Every listing the owner has (samples badged), status chips, edit links."""
+    """Every listing the owner has (samples badged), status chips, edit links.
+
+    r90: a search box (title, location, type) — same pattern as the
+    enquiries screen, so both big lists are findable on a phone.
+    """
 
     template_name = "manage/listings.html"
     context_object_name = "listings"
@@ -395,6 +486,15 @@ class PortalListingsView(OwnerRequiredMixin, PortalNavMixin, ListView):
         status = LISTING_TABS.get(self.request.GET.get("tab", "all"))
         if status is not None:
             qs = qs.filter(status=status)
+        q = (self.request.GET.get("q") or "").strip()
+        if q:
+            from django.db.models import Q
+
+            qs = qs.filter(
+                Q(title__icontains=q)
+                | Q(location__name__icontains=q)
+                | Q(property_type__name__icontains=q)
+            )
         return qs
 
     def get_context_data(self, **kwargs):
@@ -403,6 +503,7 @@ class PortalListingsView(OwnerRequiredMixin, PortalNavMixin, ListView):
         if tab not in LISTING_TABS:
             tab = "all"
         ctx["tab"] = tab
+        ctx["q"] = (self.request.GET.get("q") or "").strip()
         counts = {"all": Property.objects.count()}
         for key, status in LISTING_TABS.items():
             if status is not None:
@@ -542,6 +643,29 @@ class ListingRowToolsView(OwnerRequiredMixin, View):
                     "That price didn't look right — nothing was changed. "
                     "Use a whole number above zero.",
                 )
+        elif action == "archive":
+            # r90: the row gets its own reversible "put away" — the
+            # same status the bulk bar sets, one tap from the row, and
+            # un-doable from the Archived tab.
+            listing.status = Property.Status.ARCHIVED
+            listing.save(update_fields=["status", "updated_at"])
+            messages.info(
+                request,
+                f"“{listing.title}” is archived — nothing is deleted; "
+                "find it under the Archived tab to restore.",
+            )
+        elif action == "restore":
+            # Restoring returns the row to Draft, never straight to
+            # live: a stale price or removed photos must be reviewed
+            # before the public sees it again (the publish gate
+            # re-checks anyway).
+            listing.status = Property.Status.DRAFT
+            listing.save(update_fields=["status", "updated_at"])
+            messages.success(
+                request,
+                f"“{listing.title}” is back as a draft — check it over and "
+                "press Publish when it's ready.",
+            )
         else:
             raise Http404("Unknown row action.")
         return redirect(back)
@@ -569,15 +693,22 @@ class ListingBulkView(OwnerRequiredMixin, View):
             return redirect(back)
         rows = list(Property.objects.filter(pk__in=ids))
 
+        # r90: one transaction for the whole batch — a mid-list failure
+        # used to leave half the rows moved, which reads as random
+        # behaviour to the owner ("I pressed Archive and three did").
+        from django.db import transaction
+
         if action == "publish":
             published, held = [], []
             for row in rows:
                 if _publish_ready(row):
-                    row.status = Property.Status.PUBLISHED
-                    row.save()  # save() stamps published_at on first publish
                     published.append(row)
                 else:
                     held.append(row)
+            with transaction.atomic():
+                for row in published:
+                    row.status = Property.Status.PUBLISHED
+                    row.save()  # save() stamps published_at on first publish
             parts = [f"Published {len(published)} listing{'s' if len(published) != 1 else ''}."]
             if held:
                 names = ", ".join(h.title for h in held[:3])
@@ -589,9 +720,10 @@ class ListingBulkView(OwnerRequiredMixin, View):
             messages.success(request, " ".join(parts))
         elif action in BULK_STATUSES:
             status, label = BULK_STATUSES[action]
-            for row in rows:
-                row.status = status
-                row.save(update_fields=["status", "updated_at"])
+            with transaction.atomic():
+                for row in rows:
+                    row.status = status
+                    row.save(update_fields=["status", "updated_at"])
             n = len(rows)
             messages.success(request, f"Marked {n} listing{'s' if n != 1 else ''} as {label.lower()}.")
         else:
@@ -1261,3 +1393,279 @@ class NewsletterComposeView(OwnerRequiredMixin, PortalNavMixin, TemplateView):
         else:
             messages.error(request, "That didn't work — check the picks and try again.")
         return redirect("manage:newsletter")
+
+
+# ---------------------------------------------------------------------------
+# r90 (backend reassessment) — the "easy to use" round.
+#
+# Every screen below closes a gap found by the full-backend survey:
+#   * SampleDataScreenView  — the portal's own demo-data switch (the
+#     checklist used to say "Ask Brian"; the switch lived only in the
+#     retired agents dashboard)
+#   * confirmation screens  — a plain-language "this cannot be undone"
+#     step before every irreversible delete (spam enquiry, photo,
+#     testimonial, draft) — zero-JS, GET then POST
+#   * OwnerPasswordChangeView — change password WITHOUT going through
+#     the Django admin skin; allauth's page exists but is unbranded
+#     and unlinked from the portal
+# ---------------------------------------------------------------------------
+from django.contrib.auth import update_session_auth_hash
+from django.contrib.auth.forms import SetPasswordForm  # noqa: E402
+
+
+class SampleDataScreenView(OwnerRequiredMixin, PortalNavMixin, TemplateView):
+    """Sample data on/off — the portal's own switch (r90).
+
+    The public site ships with seeded sample rows so it never looks
+    empty. This screen flips SiteSetting.hide_demo_data exactly like
+    the retired agents-dashboard toggle did (same cache invalidation),
+    but in the portal's plain language: what the switch does, what
+    stays visible where, and an honest count of what's sample data
+    right now.
+    """
+
+    template_name = "manage/sample_data.html"
+
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+        ctx["body_class"] = "page-manage"
+        setting = SiteSetting.load()
+        ctx["hidden"] = setting.hide_demo_data
+        ctx["sample_counts"] = {
+            "listings": Property.objects.filter(is_demo=True).count(),
+            "live_sample_listings": Property.objects.published()
+            .filter(is_demo=True)
+            .count(),
+            "agencies": 0,  # single-owner mode: agency rows are legacy
+        }
+        return ctx
+
+    def post(self, request):
+        from django.core.cache import cache
+
+        setting = SiteSetting.load()
+        setting.hide_demo_data = not setting.hide_demo_data
+        setting.save()
+        cache.delete("home:showcase_listings")  # same key the agents toggle used
+        if setting.hide_demo_data:
+            messages.success(
+                request,
+                "Sample data is hidden — the public site now shows only "
+                "your real listings.",
+            )
+        else:
+            messages.info(
+                request,
+                "Sample data is visible again — useful while the site is "
+                "still being filled in.",
+            )
+        return redirect("manage:sample_data")
+
+
+class _ConfirmScreenView(OwnerRequiredMixin, PortalNavMixin, TemplateView):
+    """Shared base for the delete confirmations: GET shows the stakes,
+    POST (action=confirm) does the delete.
+
+    Subclasses set ``what`` (short noun), ``headline``, ``detail`` and
+    implement ``load()`` + ``do_delete()``. The URL always carries the
+    row's pk so a shared link lands exactly on the decision.
+    """
+
+    def load(self, pk: int):
+        raise NotImplementedError
+
+    def do_delete(self, request, obj):
+        raise NotImplementedError
+
+    def get(self, request, pk: int):
+        obj = self.load(pk)  # may raise Http404
+        ctx = super().get_context_data()
+        ctx["obj"] = obj
+        ctx["headline"] = self.headline(obj)
+        ctx["detail"] = self.detail(obj)
+        return TemplateResponse(request, "manage/confirm_delete.html", ctx)
+
+    def post(self, request, pk: int):
+        if request.POST.get("action") != "confirm":
+            return redirect(self.back_url(pk))
+        obj = self.load(pk)
+        done = self.do_delete(request, obj)
+        if done is None:
+            done = self.done_message(obj)
+        messages.success(request, done)
+        return redirect(self.after_delete_url())
+
+
+class EnquiryDeleteConfirmView(_ConfirmScreenView):
+    """Spam-enquiry delete, with the message spelled out first."""
+
+    def load(self, pk: int):
+        inquiry = get_object_or_404(Inquiry, pk=pk)
+        if not inquiry.is_spam:
+            raise Http404("Only spam can be deleted from the portal.")
+        return inquiry
+
+    def headline(self, inquiry):
+        return f"Delete this spam enquiry from {inquiry.name}?"
+
+    def detail(self, inquiry):
+        return (
+            "The spam filter caught this message, so it was never emailed "
+            "to you. Deleting it removes it for good — the name, email and "
+            "message will be gone from this portal."
+        )
+
+    def back_url(self, pk):
+        return reverse("manage:enquiry_detail", kwargs={"pk": pk})
+
+    def do_delete(self, request, inquiry):
+        inquiry.delete()
+
+    def done_message(self, inquiry):
+        return "Spam enquiry deleted."
+
+    def after_delete_url(self):
+        return reverse("manage:enquiries")
+
+
+class MediaImageDeleteConfirmView(_ConfirmScreenView):
+    """Photo delete, with the same guards the one-tap version had."""
+
+    def load(self, pk: int):
+        return get_object_or_404(
+            PropertyImage.objects.select_related("property"), pk=pk
+        )
+
+    def headline(self, image):
+        return f"Delete this photo from “{image.property.title}”?"
+
+    def detail(self, image):
+        return (
+            "The photo file is removed from the site for good. Captions "
+            "and the photo itself can't be recovered afterwards."
+        )
+
+    def back_url(self, pk):
+        return reverse("manage:media")
+
+    def do_delete(self, request, image):
+        prop = image.property
+        if prop.status == Property.Status.PUBLISHED:
+            if image.is_cover:
+                messages.error(
+                    request,
+                    f"This is the cover photo of the live listing "
+                    f"“{prop.title}” — choose a different cover there first.",
+                )
+                return "SKIP"  # signal: do not show the success message
+            if prop.images.count() <= 1:
+                messages.error(
+                    request,
+                    f"“{prop.title}” is live and needs at least one photo — "
+                    "add a new one before deleting this.",
+                )
+                return "SKIP"
+        image.image.delete(save=False)
+        image.delete()
+
+    def done_message(self, image):
+        return "Photo deleted."
+
+    def after_delete_url(self):
+        return reverse("manage:media")
+
+
+class TestimonialDeleteConfirmView(_ConfirmScreenView):
+    """Testimonial delete, quotes spelled out first."""
+
+    def load(self, pk: int):
+        return get_object_or_404(Testimonial, pk=pk)
+
+    def headline(self, row):
+        return f"Delete the testimonial from “{row.name}”?"
+
+    def detail(self, row):
+        return (
+            "Their words, role and rating are removed for good. If you "
+            "only want it off the site for now, cancel here and use Hide "
+            "instead — hidden quotes stay saved."
+        )
+
+    def back_url(self, pk):
+        return reverse("manage:testimonials")
+
+    def do_delete(self, request, row):
+        row.delete()
+
+    def done_message(self, row):
+        return f"Deleted “{row.name}”."
+
+    def after_delete_url(self):
+        return reverse("manage:testimonials")
+
+
+class DraftDiscardConfirmView(_ConfirmScreenView):
+    """Wizard draft discard, with what's lost spelled out first."""
+
+    def load(self, pk: int):
+        draft = get_object_or_404(Property, pk=pk)
+        if draft.status != Property.Status.DRAFT:
+            raise Http404("Only wizard drafts can be discarded.")
+        return draft
+
+    def headline(self, draft):
+        return f"Discard the draft “{draft.title or 'Untitled listing'}”?"
+
+    def detail(self, draft):
+        return (
+            "The draft and everything in it — description, price, details "
+            "and uploaded photos — is deleted for good. Published listings "
+            "are never affected."
+        )
+
+    def back_url(self, pk):
+        return f"{reverse('manage:listing_wizard')}?step=review&pk={pk}"
+
+    def do_delete(self, request, draft):
+        draft.delete()
+
+    def done_message(self, draft):
+        return f"Draft “{draft.title or 'Untitled listing'}” discarded."
+
+    def after_delete_url(self):
+        return f"{reverse('manage:listings')}?tab=draft"
+
+
+class OwnerPasswordChangeView(OwnerRequiredMixin, PortalNavMixin, FormView):
+    """Change the owner password in the portal's own skin (r90).
+
+    allauth's /account/password/change/ works but is unbranded and was
+    linked from nowhere — the sanctioned path was "navigate Django
+    admin → CHANGE PASSWORD". This screen is the same form, the
+    portal's plain language, and it keeps the session signed in after
+    the change (update_session_auth_hash) so the owner isn't logged
+    out mid-task.
+    """
+
+    template_name = "manage/password_change.html"
+    form_class = SetPasswordForm
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs["user"] = self.request.user
+        return kwargs
+
+    def form_valid(self, form):
+        form.save()
+        update_session_auth_hash(self.request, self.request.user)
+        messages.success(
+            self.request,
+            "Password changed. You stay signed in — use the new password "
+            "next time you sign in.",
+        )
+        return redirect("manage:password_change")
+
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+        ctx["body_class"] = "page-manage"
+        return ctx
