@@ -1,3 +1,38 @@
+Run 88 | BUILDER (owner round, off-loop) | 2026-11-12 ~16:30-17:40 +03:00 | items:
+(1) **OWNER ASK — "the ocean background in the listings page doesnt
+look well when contrasted to the map and objects before it.... use
+vision to confirm.... return the palm tree background but peg it to
+the listings so one can scroll and them move so they dont seem
+stagnant.... simple motion."** VISION CONFIRMED the clash (VLM on
+r88-mapdeck-top/mid): the r86 near-ink scrim faded unevenly (0.93 top
+-> 0.55 mid), so the outlined market cards sat on busy mid-tone photo
+texture with mushy edges, and the photo's greens/teals fought the
+cream map tile + brand palette; VLM's own recommendation: flatten/
+retire the photo. FIX: the map deck now carries the SAME palm field
+the listings band introduces — palm-field-even.svg repeat (same
+1400x1600 tile + 1020px drop as the band, so no scale seam) under a
+soft cream veil (color-mix cream 72%), ink type restored to pre-r86
+values (burnt eyebrow / ink h1 / taupe subline — the light type was
+part of the clash), white card outline dropped (was there only for
+the dark deck). DRIFT: setupPalmParallax now also resolves
+.search-map-shell and writes the SAME --palms-y var on it — the deck
+is absolute/deck-sized (rides at screen speed -1 while visible, so
+the band's entry-phase formula yields the shared target; one motion
+engine, no second rAF loop), tile screen speed -0.5 everywhere
+(the r69 half-speed contract). VERIFIED LIVE: 299px pattern per 600px
+scroll (0.498), fx=none never writes the var (CSS 0px fallback);
+VLM re-review: harmony 8/10, "one continuous backdrop", deck-to-band
+seam fixed in r88b (mask ramp 70/96 -> 46/88 after VLM saw a faint
+traceable edge). PERF (4x throttle, r85 methodology): human-speed
+flick 25.4ms avg vs 22.3 deck-frozen — inside the r85 envelope
+(band-only was 23.6-24.6ms); the earlier 38ms reading was the
+machine-gun 42ms step scroll, not a user-speed trace, and it was
+still under r85's old 59ms problem line. r86 pins retired ->
+apps/core/tests/test_r88_deck_palm_field.py (10 pins: tile + scale
+match + cream veil + drift var + JS writer + ink type + no outline +
+no isolation + home dhow untouched). Full suite: **1067 passed**.
+Committed r88, pushed.
+
 Run 87 | BUILDER (owner round, off-loop) | 2026-11-12 ~15:30-16:10 +03:00 | items:
 (1) **OWNER ASK — "the bento grind in the home page now only has one
 listing the real listing...add the others so it has the same layout

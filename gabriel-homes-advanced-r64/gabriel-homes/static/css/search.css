@@ -8,35 +8,67 @@
 .page-search { background: var(--cream); }
 
 /* OpenStreetMap vector map with property price pins; market cards follow immediately.
-   r86 — the map deck gets the home "Homes close to what matters"
-   treatment (owner: "the listings page has a blank background behind
-   the map just before the palm leaves start.... give it the same
-   image background"). Same recipe as .home-nearby on the index:
-   coast-dhow.jpg cover under a near-ink scrim, light type. The
-   pseudos are ROOT-NEGATIVE (z-index -1/-2) — NO isolation on this
-   section, unlike home's, because the fixed .map-return-pill
-   (z-index var(--z-modal)) must stay above later in-flow content.
-   Scrim alphas follow the home section's (AA over bright sky). */
+   r88 — the ocean photo deck is retired (owner: "the ocean background
+   in the listings page doesnt look well when contrasted to the map and
+   objects before it"; the r88 vision review confirmed the clash: the
+   near-ink scrim faded unevenly, so the outlined market cards sat on
+   busy mid-tone photo texture, and the photo's greens and teals fought
+   the cream map tile). The deck now carries the SAME palm field as the
+   listings band it introduces — palm-field-even.svg under a soft cream
+   veil — so the page reads as one continuous cream world from EXPLORE
+   MOMBASA down to the footer palms, and the map card keeps its crisp
+   light-on-light contrast (ink type is back to the pre-r86 values).
+
+   The pattern DRIFTS with the scroll (owner: "return the palm tree
+   background but peg it to the listings so one can scroll and them
+   move so they dont seem stagnant.... simple motion"): motion.js
+   setupDeckPalmDrift writes --palms-y on this shell, the ::before
+   reads it as its background-position Y, and the tile's screen speed
+   is -0.5 — the same half-speed climb the band field makes below
+   (r69 contract, one continuous motion). JS-blocked, fx=none and
+   prefers-reduced-motion all keep the 0px fallback: the static tile.
+
+   The deck box is ABSOLUTE and deck-sized (not the band's sticky
+   viewport trick — the deck is short, so an inset:0 box already
+   repaints ~one viewport: the r85 raster guard holds by geometry).
+   The pseudos stay ROOT-NEGATIVE (z-index -1/-2) — NO isolation on
+   this section, because the fixed .map-return-pill (z-index
+   var(--z-modal)) must stay above later in-flow content (r86
+   contract, unchanged). The bottom dissolve mask hands the pattern
+   over to the band's own field without a phase seam: the deck tile
+   fades out before the band's full-strength field begins. */
 .search-map-shell { position: relative; padding: 12px 0 46px; }
 .search-map-shell::before {
   content: ""; position: absolute; inset: 0; z-index: -2;
-  background-image: url("../img/real/coast-dhow.jpg");
-  background-size: cover; background-position: center 62%;
+  background-image: url("../img/palm-field-even.svg");
+  background-repeat: repeat;
+  background-size: 1400px 1600px;   /* same tile scale as the band field */
+  background-attachment: scroll;    /* r68: fixed reads stagnant + dies on iOS */
+  background-position: 0 var(--palms-y, 0px);
+  /* r88b: fade starts earlier and lands later (was 70/96) — the vision
+     pass saw a faint traceable horizontal seam where the deck pattern
+     met the plain band; the longer ramp dissolves that edge while the
+     veil keeps the pattern subtle through it */
+  -webkit-mask-image: linear-gradient(to bottom, black 0%, black 46%, transparent 88%);
+  mask-image: linear-gradient(to bottom, black 0%, black 46%, transparent 88%);
+  pointer-events: none;
 }
 .search-map-shell::after {
   content: ""; position: absolute; inset: 0; z-index: -1;
-  background: linear-gradient(180deg,
-    rgba(24, 17, 13, 0.93) 0%, rgba(24, 17, 13, 0.93) 14%,
-    rgba(24, 17, 13, 0.55) 24%, rgba(24, 17, 13, 0.55) 62%,
-    rgba(24, 17, 13, 0.80) 72%, rgba(24, 17, 13, 0.80) 94%,
-    rgba(24, 17, 13, 0.93) 100%);
+  /* the veil keeps the pattern a whisper behind the heading and map
+     card (AA holds: ink on this mix measures ~14:1, taupe ~5:1) */
+  background: color-mix(in srgb, var(--cream) 72%, transparent);
+  pointer-events: none;
+}
+/* finer grain on narrow screens — the same tile drop the band field
+   makes under 1020px, so phones see whole fronds, not slivers */
+@media (max-width: 1020px) {
+  .search-map-shell::before { background-size: 860px 985px; }
 }
 .search-map-heading { margin: 0 0 18px; }
-/* light type on the dark deck — mirrors the home section's palette
-   (ember eyebrow + cream h1 + cream-78 subline) */
-.search-map-heading p { margin:0 0 7px; color:var(--ember); font:700 13px var(--font-mono); letter-spacing:.11em; }
-.search-map-heading h1 { margin:0 0 5px; font:500 clamp(2rem,4vw,3.2rem)/1 var(--font-display); letter-spacing:-.045em; color:var(--cream); }
-.search-map-heading > span { color: color-mix(in srgb, var(--cream) 78%, transparent); font-size:14px; }
+.search-map-heading p { margin:0 0 7px; color:var(--burnt); font:700 13px var(--font-mono); letter-spacing:.11em; }
+.search-map-heading h1 { margin:0 0 5px; font:500 clamp(2rem,4vw,3.2rem)/1 var(--font-display); letter-spacing:-.045em; }
+.search-map-heading > span { color:var(--taupe); font-size:14px; }
 .search-map-stage { position: relative; overflow: hidden; border-radius: 24px; background: var(--map-stage); box-shadow: 0 12px 34px rgba(45,31,23,.10); isolation: isolate; }
 .search-map { position:relative; height: clamp(280px,32vw,390px); min-height: 280px; background: var(--map-stage); }
 .search-map > p { padding: 30px; color: var(--taupe); }
@@ -53,7 +85,7 @@
 .map-price-pin--rent { border-color:rgba(47,102,90,.65); }.map-price-pin--bnb { border-color:rgba(35,56,77,.65); }
 .map-property-popup { display:grid; gap:7px; min-width:210px; padding:4px; }.map-property-popup small { color:var(--burnt); font:700 13px var(--font-mono); letter-spacing:.1em; }.map-property-popup strong { font:500 18px/1.1 var(--font-display); }.map-property-popup p { margin:0; color:var(--taupe); font-size:13px; }.map-property-popup a { margin-top:4px; color:var(--ink); font-size:13px; font-weight:700; }
 .market-filters { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:18px; margin-top:24px; }
-.market-filter { position:relative; min-height:260px; overflow:hidden; padding:24px; border-radius:24px; display:flex; flex-direction:column; color:var(--white); box-shadow:0 12px 35px rgba(28,21,17,.13), 0 0 0 1.5px rgba(250,248,244,.4); transition:transform .35s cubic-bezier(.2,.7,.2,1),box-shadow .35s; isolation:isolate; }
+.market-filter { position:relative; min-height:260px; overflow:hidden; padding:24px; border-radius:24px; display:flex; flex-direction:column; color:var(--white); box-shadow:0 12px 35px rgba(28,21,17,.13); transition:transform .35s cubic-bezier(.2,.7,.2,1),box-shadow .35s; isolation:isolate; }
 .market-filter img { position:absolute; inset:0; z-index:-2; width:100%; height:100%; object-fit:cover; transition:transform .7s cubic-bezier(.2,.7,.2,1); }.market-filter__shade { position:absolute; inset:0; z-index:-1; background:linear-gradient(180deg,rgba(16,12,10,.18),rgba(16,12,10,.86)); }.market-filter:hover,.market-filter.is-active { transform:translateY(-7px); box-shadow:0 22px 48px rgba(28,21,17,.23); }.market-filter:hover img { transform:scale(1.065); }.market-filter.is-active::after { content:"Selected"; position:absolute; top:18px; right:18px; padding:7px 10px; border-radius:999px; background:var(--white); color:var(--ink); font:700 13px var(--font-mono); letter-spacing:.08em; text-transform:uppercase; }
 .market-filter__number { font:700 13px var(--font-mono); letter-spacing:.1em; opacity:.85; }.market-filter__copy { margin-top:auto; display:grid; gap:9px; padding-right:48px; }.market-filter__copy strong { font:500 clamp(1.65rem,2.6vw,2.5rem)/.98 var(--font-display); letter-spacing:-.03em; }.market-filter__copy small { max-width:30ch; color:rgba(255,255,255,.78); font-size:13px; line-height:1.4; }.market-filter__arrow { position:absolute; right:22px; bottom:22px; display:grid; place-items:center; width:42px; height:42px; border:1px solid rgba(255,255,255,.55); border-radius:50%; background:rgba(255,255,255,.1); font-size:20px; backdrop-filter:blur(8px); }
 .listing-tools { margin-bottom: 22px; }

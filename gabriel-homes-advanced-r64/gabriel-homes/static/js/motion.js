@@ -642,7 +642,18 @@
   function setupPalmParallax() {
     if (fxNone) return;
     var band = document.querySelector(".listings-band");
-    if (!band) return;
+    // r88 — the map deck now carries the same palm field the band
+    // introduces (owner: "return the palm tree background but peg it
+    // to the listings so one can scroll and them move so they dont
+    // seem stagnant.... simple motion"). Its ::before is ABSOLUTE and
+    // deck-sized (not sticky): while any part of the deck is on
+    // screen, its screen speed is a plain -1, so the position that
+    // nets the tile -DRIFT is exactly the band's entry slope. Writing
+    // the SAME --palms-y var on the shell keeps deck and band in one
+    // continuous motion: the deck's dissolve hands over to the band's
+    // full-strength field at the same phase, never a seam or a snap.
+    var deck = document.querySelector(".search-map-shell");
+    if (!band && !deck) return;
     var DRIFT = 0.5;   // pattern px per scrolled px -> field speed 1 - 0.5 = HALF
     var TAU = 70;      // ms — chase time constant, frame-rate independent
     var MAXDT = 400;   // ms — clamp: a background-tab stall is one bounded step
@@ -656,13 +667,18 @@
       // An htmx swap (filters, pagination, sort) can replace the band
       // wholesale — re-resolve it, and restart the chase from the
       // static pose so a fresh field eases in instead of snapping.
-      if (!band.isConnected) {
+      if (band && !band.isConnected) {
         band = document.querySelector(".listings-band");
         current = 0;
-        if (!band) return;
+        if (!band && !deck) return;
       }
       var y = window.scrollY || window.pageYOffset || 0;
-      var rect = band.getBoundingClientRect();
+      var rect = band ? band.getBoundingClientRect()
+                      : { top: Infinity, bottom: Infinity, height: 0 };
+      // r88: while the deck is on screen the band is below it, so the
+      // band's own ENTRY phase already yields the shared target — the
+      // deck's absolute box rides the page at screen speed -1 over
+      // that whole stretch. One formula, both fields.
       var vh = window.innerHeight ||
                document.documentElement.clientHeight;
       // r85 three-phase target (the ::before is sticky, 100vh):
@@ -695,7 +711,7 @@
 
     function frame(now) {
       raf = 0;
-      if (!band.isConnected) return;   // the next kick() re-resolves
+      if (band && !band.isConnected) return;   // the next kick() re-resolves
       measure();                       // live geometry — never a stale target
       var dt = Math.min(Math.max(now - last, 0), MAXDT);
       last = now;
@@ -705,13 +721,15 @@
       var k = 1 - Math.exp(-dt / TAU);
       current += (target - current) * k;
       if (Math.abs(target - current) < SNAP) current = target;
-      band.style.setProperty("--palms-y", current.toFixed(2) + "px");
+      var val = current.toFixed(2) + "px";
+      if (band) band.style.setProperty("--palms-y", val);
+      if (deck) deck.style.setProperty("--palms-y", val);
       if (current !== target) raf = requestAnimationFrame(frame);
     }
 
     function kick() {
       measure();
-      if (!band || current === target) return;
+      if ((!band && !deck) || current === target) return;
       if (!raf) {
         last = performance.now();      // same clock as the rAF stamp
         raf = requestAnimationFrame(frame);
