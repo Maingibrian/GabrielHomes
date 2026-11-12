@@ -1,0 +1,96 @@
+[ensure-runtime] creating .venv and installing requirements...
+[ensure-runtime] writing default .env...
+Operations to perform:
+  Apply all migrations: account, accounts, admin, agents, auth, contenttypes, core, easy_thumbnails, inquiries, listings, locations, manage, sessions
+Running migrations:
+  Applying contenttypes.0001_initial... OK
+  Applying contenttypes.0002_remove_content_type_name... OK
+  Applying auth.0001_initial... OK
+  Applying auth.0002_alter_permission_name_max_length... OK
+  Applying auth.0003_alter_user_email_max_length... OK
+  Applying auth.0004_alter_user_username_opts... OK
+  Applying auth.0005_alter_user_last_login_null... OK
+  Applying auth.0006_require_contenttypes_0002... OK
+  Applying auth.0007_alter_validators_add_error_messages... OK
+  Applying auth.0008_alter_user_username_max_length... OK
+  Applying auth.0009_alter_user_last_name_max_length... OK
+  Applying auth.0010_alter_group_name_max_length... OK
+  Applying auth.0011_update_proxy_permissions... OK
+  Applying auth.0012_alter_user_first_name_max_length... OK
+  Applying accounts.0001_initial... OK
+  Applying account.0001_initial... OK
+  Applying account.0002_email_max_length... OK
+  Applying account.0003_alter_emailaddress_create_unique_verified_email... OK
+  Applying account.0004_alter_emailaddress_drop_unique_email... OK
+  Applying account.0005_emailaddress_idx_upper_email... OK
+  Applying account.0006_emailaddress_lower... OK
+  Applying account.0007_emailaddress_idx_email... OK
+  Applying account.0008_emailaddress_unique_primary_email_fixup... OK
+  Applying account.0009_emailaddress_unique_primary_email... OK
+  Applying locations.0001_initial... OK
+  Applying agents.0001_initial... OK
+  Applying listings.0001_initial... OK
+  Applying accounts.0002_savedsearch_savedproperty... OK
+  Applying admin.0001_initial... OK
+  Applying admin.0002_logentry_remove_auto_add... OK
+  Applying admin.0003_logentry_add_action_flag_choices... OK
+  Applying agents.0002_alter_agencyprofile_logo... OK
+  Applying agents.0003_fix_seed_agency_bios... OK
+  Applying agents.0004_agencyprofile_is_demo... OK
+  Applying agents.0005_fix_seed_bio_checked_wording... OK
+  Applying core.0001_initial... OK
+  Applying core.0002_newsletter... OK
+  Applying core.0003_brandsettings... OK
+  Applying core.0004_seed_brandsettings_row... OK
+  Applying core.0005_brandsettings_site_content... OK
+  Applying core.0006_alter_brandsettings_about_heading_and_more... OK
+  Applying core.0007_hero_slogan_r13... OK
+  Applying core.0008_brandsettings_hero_defaults_r13... OK
+  Applying core.0007_slogan_good_homes_properly_checked... OK
+  Applying core.0009_merge_20261103_1542... OK
+  Applying core.0010_adopt_canonical_r13_slogan... OK
+  Applying core.0011_slogan_r43_home_like... OK
+  Applying core.0012_alter_brandsettings_hero_heading_accent_and_more... OK
+  Applying core.0013_taste_copy_r55... OK
+  Applying core.0014_comfort_copy_r56... OK
+  Applying core.0015_brandsettings_address_line_and_more... OK
+  Applying core.0016_testimonial... OK
+  Applying easy_thumbnails.0001_initial... OK
+  Applying easy_thumbnails.0002_thumbnaildimensions... OK
+  Applying inquiries.0001_initial... OK
+  Applying inquiries.0002_inquiry_email_error_inquiry_email_sent_at... OK
+  Applying inquiries.0003_alter_inquiry_message... OK
+  Applying inquiries.0004_inquiry_is_demo_alter_inquiry_status_inquirynote... OK
+  Applying inquiries.0005_replied_to_contacted... OK
+  Applying listings.0002_alter_propertyimage_image... OK
+  Applying listings.0003_alter_property_bathrooms_alter_property_bedrooms_and_more... OK
+  Applying listings.0004_property_video... OK
+  Applying listings.0005_set_nyali_listing_coords... OK
+  Applying listings.0006_property_is_demo... OK
+  Applying listings.0007_portable_cover_constraint... OK
+  Applying listings.0008_fix_seed_agent_phrasing... OK
+  Applying listings.0009_property_short_stay... OK
+  Applying listings.0010_correct_mombasa_coordinates... OK
+  Applying listings.0011_amenity_is_active_propertytype_is_active... OK
+  Applying locations.0002_location_is_active... OK
+  Applying manage.0001_initial... OK
+  Applying sessions.0001_initial... OK
+[ensure-runtime] ok
+
+Done.
+  Locations:      61
+  Property types: 11
+  Amenities:      24
+  Agencies:       6
+  Listings:       80
+  Sample enquiries: 0
+  Sample testimonials: 0
+  Images:         generated
+Mombasa showcase ready: 0 created, 8 updated.
+Real listing created: Modern Beachfront Apartment in Nyali | 11 photos | video=no | files copied: 11
+django daemon pid: 1147
+bridge /: 200
+bridge /properties/: 200
+published: 81
+[rebuild] DONE
+exit: 0

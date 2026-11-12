@@ -1,4 +1,40 @@
-Run 85 | BUILDER (owner round, off-loop) | 2026-11-12 ~11:30-13:10 +03:00 | items:
+Run 86 | BUILDER (owner round, off-loop) | 2026-11-12 ~14:30-15:20 +03:00 | items:
+(1) **OWNER ASK — "the listings page has a blank background behind
+the map just before the palm leaves start.... give it the same
+image background as the Homes close to what matters. section in
+the index page."** The blank zone was .search-map-shell (plain
+cream above the palm band). The home recipe (.home-nearby) was
+copied: coast-dhow.jpg cover + the near-ink shaped gradient scrim
+(0.93→0.55→0.80→0.93, rgba 24,17,13), light type (ember eyebrow,
+cream h1, cream-78 subline), and the market cards gained the
+home's light outline (rgba(250,248,244,.4) ring) so they separate
+from the photo deck. ONE structural difference from home: NO
+isolation on the section — the fixed .map-return-pill (z
+var(--z-modal)) must keep stacking above later in-flow rows, so
+the pseudos are root-negative instead of trapped in a section
+stacking context. First draft used a flat 0.80 scrim — VLM scored
+6/10 ("photo barely registers; cards muddy into the deck"); the
+shaped home gradient + card outlines took it to 8/10 (dhow reads,
+cards separated, handoff clean). Pre-existing issues verified NOT
+introduced: mobile tile squeeze (r76 fold tradeoff) and map pill
+crowding (MapLibre collision) both present in a before-capture.
+Zero hex added (rgba + tokens only; F1 green). New pin file
+apps/core/tests/test_r86_map_deck.py (photo, scrim, no-isolation,
+light type, card outline, home recipe untouched). Verified: map
+canvas + 8 pins, pill ON TOP, sticky drift −600px @ y+2000
+(r85 intact), zero console errors, mobile overflow 0.
+(2) **RECYCLE RECOVERY** — the sandbox recycled mid-run AGAIN:
+local git reverted to c5756f1a (r83; .venv/.env/db gone). r84+r85
+were safe on GitHub (pushed 24f33b97/86c7a4e9): discarded the
+regenerated screenshot diffs blocking the merge, ff-merged to
+86c7a4e9, reapplied the deck edits cleanly on the r85 base (the
+r85 sticky block and the r86 deck block touch different rules).
+Standard rebuild (scripts/r86_rebuild.sh, fixed): .env separators
+are COMMAS — 'A B' one-host string caused DisallowedHost 400 on
+the public gateway for .fcapp.run; patched in both .env and the
+script. Full suite on recovered code: **1061 passed** (1057 + 6
+new − 2 retargeted). Committed r86, pushed.
+
 (1) **OWNER ASK — "the listings page is back with the laggy
 motion... jerking motion... I feel as though scroll motion and all
 the animations don't have something that regulates their motion."**
