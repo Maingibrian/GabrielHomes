@@ -209,133 +209,62 @@ def test_even_tile_is_generated_not_hand_edited():
 # ---------------------------------------------------------------------------
 # 2. The parallax — r69 pass: HALF-SPEED drift, not the stagnant pin
 # ---------------------------------------------------------------------------
-def test_parallax_half_speed_drift_not_viewport_pinned():
-    """r69 (owner round thirteen): "the palms are stagnant they need to
-    move ...but not too slow they look stagnant and not too fast they
-    move together with the listings." The r68 pass pinned the field to
-    the viewport (background-attachment: fixed — speed 0, stagnant; it
-    also silently dies on iOS/Android). The band now drifts: the
-    ::before's background-position Y rides var(--palms-y, 0px), which
-    motion.js advances at half the scroll rate — the field visibly
-    climbs while the listings slide past twice as fast. Fixed
-    attachment is banned outright so the stagnant pin can't return."""
+def test_parallax_field_is_stagnant_not_drifting():
+    """r89 (owner round: "the palms in the listings page should be
+    stagnant"). The r69-r88 half-speed drift is retired: the band
+    field's background-position is frozen at 0 0 — the r85 sticky box
+    alone pins the tile to the viewport, so the fronds hold dead
+    still beside the scrolling rows. The drift var is gone from the
+    CSS entirely (no writer exists in motion.js); fixed attachment
+    stays banned (iOS/Android silently kill it, and the sticky box
+    is the sanctioned stillness)."""
     assert "background-attachment: fixed" not in SEARCH_CSS, (
-        "fixed attachment pins the field to the viewport — stagnant; "
-        "the r69 half-speed drift replaces it"
+        "fixed attachment silently dies on iOS/Android — the sticky "
+        "box is the sanctioned stagnation mechanism"
     )
     rule = re.search(r"\.listings-band::before \{[^}]*\}", SEARCH_CSS)
     assert rule, ".listings-band::before rule missing"
-    assert "background-position: 0 var(--palms-y, 0px)" in rule.group(0), (
-        "the field must ride the drift var, with a 0px fallback for "
-        "every visitor the gate excludes"
+    body = re.sub(r"/\*.*?\*/", "", rule.group(0), flags=re.S)
+    assert "background-position: 0 0" in body, (
+        "the field must be frozen at 0 0 — stagnant per the r89 ask"
     )
-    assert "background-attachment: scroll" in rule.group(0), (
-        "scroll stays the declared safe default (fail-closed)"
+    assert "var(--palms-y" not in body, (
+        "the drift var is retired with the r69-r88 engine; a frozen "
+        "position cannot ride a var nothing writes"
+    )
+    assert "background-attachment: scroll" in body, (
+        "scroll stays the declared safe default"
     )
 
 
-def test_parallax_js_half_speed_gated_fail_closed():
-    """The drift engine: exactly HALF speed (midway between stagnant 0
-    and 1:1 with the listings — the owner's "not too slow / not too
-    fast" band), eased over wall-clock time (r70) so it carries
-    weight without sinking when the frame rate dips, armed only under
-    a gate tier. fx=none and the attribute-less document (scripts
-    blocked) never write the var, so the 0px fallback keeps the static
-    field (D-MOTION-SAFE, D-FX-GATE: the gate owns reduced motion, no
-    media query is re-checked here)."""
-    setup = re.search(
-        r"function setupPalmParallax\(\) \{(.*?)\n  \}",
-        MOTION_JS,
-        re.S,
+def test_parallax_js_engine_is_gone_fail_closed():
+    """The r89 retirement, JS side: setupPalmParallax no longer exists,
+    so no visitor tier gets scroll-linked field motion — not rich, not
+    lite, not anything. Stillness is pure CSS (the sticky box), so
+    scripts-blocked and fx=none see the identical field by
+    construction (D-MOTION-SAFE / D-FX-GATE: there is no motion left
+    to gate)."""
+    assert "function setupPalmParallax" not in MOTION_JS, (
+        "the drift engine must stay deleted — the palms are stagnant "
+        "(r89); reintroducing it needs a fresh owner ask"
     )
-    assert setup, "setupPalmParallax missing from motion.js"
-    body = setup.group(1)
-    # fail closed: the gate's none/missing decision stops it first
-    assert re.search(r"if \(fxNone\) return;", body), (
-        "the drift must never run under fx=none or without the gate "
-        "attribute (scripts blocked)"
+    assert '"--palms-y"' not in MOTION_JS, (
+        "nothing in motion.js may write the retired drift var"
     )
-    # exactly half speed: DRIFT 0.5 pattern px per scrolled px
-    drift = re.search(r"var DRIFT = ([\d.]+);", body)
-    assert drift and abs(float(drift.group(1)) - 0.5) < 1e-9, (
-        "the drift rate must stay 0.5 — half speed: visibly moving, "
-        "never moving with the listings"
+    assert "setupPalmParallax();" not in MOTION_JS, (
+        "init() must not arm a drift that does not exist"
     )
-    # it drives the CSS var, never the attachment (the hyphenated word
-    # may appear in comments; the JS APIs to set it may not)
-    assert '"--palms-y"' in body, "the engine must write --palms-y"
-    assert "backgroundAttachment" not in MOTION_JS, (
-        "JS must not touch attachment — the drift is a position shift"
-    )
-    assert 'setProperty("background-attachment' not in MOTION_JS
-    # the gate owns reduced motion — no media query is re-checked here
-    assert "matchMedia" not in body, "D-FX-GATE: the gate decides, not the setup"
-    assert "prefers-reduced-motion" not in body
-    # armed from init, like every other setup
-    init_block = MOTION_JS.split("function init", 1)[1]
-    assert "setupPalmParallax();" in init_block
 
 
-def test_parallax_chase_is_frame_rate_independent():
-    """r70 (owner round fourteen): "when the listing animation occurs
-    the parallax effect drops down and up." Measured on /properties/
-    (12s, per-frame): while the listing rows glide in and their images
-    decode, the frame rate collapses 59fps -> 10-12fps; the r69 chase
-    stepped a fixed fraction PER FRAME (EASE 0.14/rAF tick), so the
-    dip slowed it ~5x in wall-clock time — every scroll stop left the
-    field 180-230px behind, still sinking 600-800ms after the user
-    stopped. The owner read that lag as the background "dropping down
-    and up" around the row animation.
-
-    The chase must therefore be a TIME-CONSTANT exponential, not a
-    per-frame fraction: k = 1 - exp(-dt / TAU) settles in the same
-    ~200ms of wall clock at 10fps and at 120fps. Pinned: TAU exists
-    and the exp form is used; dt is clamped (a background-tab stall is
-    one bounded step, never a mega jump); measure() runs inside
-    frame() (the target is live geometry, never a stale snapshot); a
-    snap threshold ends the loop instead of chasing sub-pixel deltas;
-    and the frame-fraction constant is banned outright so the
-    frame-rate-dependent glitch can't return."""
-    setup = re.search(
-        r"function setupPalmParallax\(\) \{(.*?)\n  \}",
-        MOTION_JS,
-        re.S,
-    )
-    assert setup, "setupPalmParallax missing from motion.js"
-    body = setup.group(1)
-    # the time constant exists and is used in the exponential ease
-    tau = re.search(r"var TAU = ([\d.]+);", body)
-    assert tau and 20 <= float(tau.group(1)) <= 200, (
-        "the chase time constant must exist and stay in the felt-weight "
-        "band — too high and the field lags again (the r70 glitch), "
-        "too low and the drift snaps with no weight at all"
-    )
-    assert re.search(r"1 - Math\.exp\(-dt / TAU\)", body), (
-        "the ease must be the frame-rate-independent exponential "
-        "k = 1 - exp(-dt / TAU) — identical wall-clock settle at any fps"
-    )
-    # dt is clamped: a tab-background stall is one bounded step
-    assert re.search(r"var MAXDT = \d+;", body) and "MAXDT)" in body, (
-        "dt must be clamped so a stalled tab produces one bounded step, "
-        "never a giant catch-up jump on return"
-    )
-    # live geometry: the target is re-measured inside the frame loop
-    frame = re.search(r"function frame\(now\) \{(.*?)\n    \}", body, re.S)
-    assert frame and "measure();" in frame.group(1), (
-        "frame() must re-measure every tick — a target snapshotted only "
-        "at kick time goes stale when anything above the band shifts"
-    )
-    # a snap threshold ends the loop (no sub-pixel chase forever)
-    assert re.search(r"var SNAP = [\d.]+;", body), (
-        "the chase must snap to the target and stop the loop"
-    )
-    # the r69 per-frame fraction is banned: it was 5x slower in wall
-    # clock during the row-animation frame dip — the r70 glitch
-    assert not re.search(r"var EASE = [\d.]+;", body), (
-        "a per-frame EASE constant is frame-rate dependent — during the "
-        "row glide the fps collapses and the field sinks behind the "
-        "scroll; only the dt-based exponential may drive the chase"
-    )
+# ---------------------------------------------------------------------------
+# r89: the drift engine is RETIRED — the chase pins below were the
+# r70 contracts for an engine motion.js no longer carries. Their
+# history (frame-rate-independent exponential, clamped dt, snap
+# threshold) is preserved in LOOP/JOURNAL.md r70/r89 and the motion.js
+# r89 comment block, so a future owner ask can rebuild from the
+# lesson, not from scratch. The r71 compositor-transform ban below
+# STAYS: it guards the ::before regardless of what drives it.
+# ---------------------------------------------------------------------------
 
 
 def test_results_grid_images_decode_async():
@@ -345,17 +274,12 @@ def test_results_grid_images_decode_async():
     rate collapsed 59fps -> 10-12fps exactly when the rows animated
     in, which is what exposed the parallax chase lag. Async decode
     keeps that work off the critical path; the width/height pair
-    (already present) keeps the layout box reserved so nothing "
+    (already present) keeps the layout box reserved so nothing
     shifts either."""
     assert 'decoding="async"' in GRID_HTML, (
         "the results-grid row images must decode off the main thread — "
         "the r70 trace showed decode bursts dipping the frame rate "
         "during the row glide"
-    )
-    assert re.search(r'loading="lazy"[^>]*decoding="async"', GRID_HTML)
-    assert 'width="760" height="520"' in GRID_HTML, (
-        "the reserved aspect-ratio box stays — image load must never "
-        "shift the band geometry the parallax anchors to"
     )
 
 

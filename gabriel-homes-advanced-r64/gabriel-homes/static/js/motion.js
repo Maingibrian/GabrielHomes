@@ -582,165 +582,23 @@
     document.addEventListener("htmx:afterSwap", function () { arm(document); });
   }
 
-  // ---------- r69/r70/r71 (owner rounds 13-15): palm drift ----------
-  // Owner r69: "the palms are stagnant they need to move ...but not to
-  // slow they look stagnant and not to fast they move together with
-  // the listings." Owner r70: "when the listing animation occurs the
-  // parallax effect drops down and up." Owner r71: "ensure the
-  // movements are smooth." Half speed stays (DRIFT 0.5); the chase
-  // stays the r70 time-constant exponential.
-  //
-  // r71 EXPERIMENT REJECTED, measured live: applying the drift as a
-  // compositor transform (translate3d + will-change on the band's
-  // ::before) was pixel-equivalent in-band — but Chrome HOISTS the
-  // composited ROOT-NEGATIVE layer over the static footer (the
-  // footer vanished behind the field) and the extended masked box
-  // leaked faint fronds below the band. The r62 paint contract
-  // (field and sentinels root-negative, footer scrolls over them)
-  // beats the compositor; the background-position application stays.
-  // It repaints on the main thread, but the r70 trace measured a
-  // FLAT 59fps through the row animations — smooth, and safe.
-  //
-  // Mechanism: this writes --palms-y on .listings-band; search.css
-  // points the ::before's background-position at var(--palms-y, 0px).
-  // r85: the ::before is now a VIEWPORT-TALL STICKY layer (see the
-  // r85 comment in search.css — the band-sized box re-rastered
-  // 1280x14000px every drift frame and was the measured cause of the
-  // owner's "jerking motion"; the viewport-sized box cuts that paint
-  // ~17x at identical pixels). Sticky geometry changes the target
-  // math: the box is only moving during ENTRY (rides the band, screen
-  // speed -1) and RELEASE (rides the band end, -1); while PINNED it
-  // holds the viewport (speed 0). measure() below therefore computes
-  // a three-phase target, each phase keeping the tile's SCREEN speed
-  // at exactly -DRIFT — the r69 half-speed contract, restated for
-  // this geometry. The tile repeats, so the drift can run forever
-  // without a seam, and the box-relative 84% mask still lands the
-  // dissolve over the band's final stretch wherever the scroll is.
-  //
-  // D-MOTION-SAFE / D-FX-GATE: fxNone (fx=none OR the attribute
-  // missing — scripts blocked, fails closed) returns before anything
-  // moves; with JS blocked the var keeps its 0px fallback: the
-  // static pinned field. Decorative only.
-  //
-  // r70 diagnosis (measured, 12s per-frame trace on /properties/):
-  // the r69 chase stepped a fixed fraction PER FRAME (EASE 0.14/rAF
-  // tick). While the listing rows glide in and their images decode,
-  // the frame rate collapses 59fps -> 10-12fps exactly then, so the
-  // same per-frame constant becomes ~5x slower in wall-clock time:
-  // every scroll stop left the field 180-230px behind its target and
-  // it kept sinking for 600-800ms+ after the user stopped — the
-  // background "dropping down and up" around the row animation.
-  //
-  // r70 fix: the chase is now a TIME-CONSTANT exponential —
-  // k = 1 - exp(-dt/TAU) — which settles in the same ~200ms of wall
-  // clock at ANY frame rate (10fps low-end dip or 120hz flagship).
-  // measure() also runs inside frame() so the target always reflects
-  // live geometry (never a stale snapshot), dt is clamped so a
-  // background-tab stall can't produce one giant step, and a SNAP
-  // threshold ends the loop instead of chasing sub-pixel deltas.
-  //
-  function setupPalmParallax() {
-    if (fxNone) return;
-    var band = document.querySelector(".listings-band");
-    // r88 — the map deck now carries the same palm field the band
-    // introduces (owner: "return the palm tree background but peg it
-    // to the listings so one can scroll and them move so they dont
-    // seem stagnant.... simple motion"). Its ::before is ABSOLUTE and
-    // deck-sized (not sticky): while any part of the deck is on
-    // screen, its screen speed is a plain -1, so the position that
-    // nets the tile -DRIFT is exactly the band's entry slope. Writing
-    // the SAME --palms-y var on the shell keeps deck and band in one
-    // continuous motion: the deck's dissolve hands over to the band's
-    // full-strength field at the same phase, never a seam or a snap.
-    var deck = document.querySelector(".search-map-shell");
-    if (!band && !deck) return;
-    var DRIFT = 0.5;   // pattern px per scrolled px -> field speed 1 - 0.5 = HALF
-    var TAU = 70;      // ms — chase time constant, frame-rate independent
-    var MAXDT = 400;   // ms — clamp: a background-tab stall is one bounded step
-    var SNAP = 0.25;   // px — close enough: settle, stop writing, stop the loop
-    var current = 0;
-    var target = 0;
-    var raf = 0;
-    var last = 0;
-
-    function measure() {
-      // An htmx swap (filters, pagination, sort) can replace the band
-      // wholesale — re-resolve it, and restart the chase from the
-      // static pose so a fresh field eases in instead of snapping.
-      if (band && !band.isConnected) {
-        band = document.querySelector(".listings-band");
-        current = 0;
-        if (!band && !deck) return;
-      }
-      var y = window.scrollY || window.pageYOffset || 0;
-      var rect = band ? band.getBoundingClientRect()
-                      : { top: Infinity, bottom: Infinity, height: 0 };
-      // r88: while the deck is on screen the band is below it, so the
-      // band's own ENTRY phase already yields the shared target — the
-      // deck's absolute box rides the page at screen speed -1 over
-      // that whole stretch. One formula, both fields.
-      var vh = window.innerHeight ||
-               document.documentElement.clientHeight;
-      // r85 three-phase target (the ::before is sticky, 100vh):
-      //   entry   y <= top:    box rides the band (screen speed -1),
-      //                         position climbs at (1 - DRIFT) from 0
-      //                         at arrival — exactly static on entry.
-      //   pinned  in between:  box holds the viewport (speed 0), so
-      //                         the position ALONE descends at DRIFT.
-      //   release y >= pinEnd: box rides the band end (speed -1)
-      //                         again, slope (1 - DRIFT), joined
-      //                         continuously at pinEnd, frozen once
-      //                         the band has fully left (no writes
-      //                         under the footer).
-      // Each phase nets the tile a screen speed of -DRIFT: the field
-      // climbs at half the scroll rate everywhere it is visible.
-      var top = rect.top + y;
-      var bottom = top + rect.height;
-      var pinEnd = Math.max(top, bottom - vh);
-      if (rect.top >= vh) { target = 0; return; }   // band below view
-      if (rect.bottom <= 0) { return; }             // band above: frozen
-      if (y <= top) {
-        target = Math.max(0, (1 - DRIFT) * (y - (top - vh)));
-      } else if (y >= pinEnd) {
-        var join = vh * (1 - DRIFT) - DRIFT * (pinEnd - top);
-        target = join + (1 - DRIFT) * (Math.min(y, bottom) - pinEnd);
-      } else {
-        target = vh * (1 - DRIFT) - DRIFT * (y - top);
-      }
-    }
-
-    function frame(now) {
-      raf = 0;
-      if (band && !band.isConnected) return;   // the next kick() re-resolves
-      measure();                       // live geometry — never a stale target
-      var dt = Math.min(Math.max(now - last, 0), MAXDT);
-      last = now;
-      // wall-clock ease: identical settle at 10fps and 120fps — the
-      // r70 fix. The old per-frame constant made the field sink for
-      // 600ms+ whenever the row animations dipped the frame rate.
-      var k = 1 - Math.exp(-dt / TAU);
-      current += (target - current) * k;
-      if (Math.abs(target - current) < SNAP) current = target;
-      var val = current.toFixed(2) + "px";
-      if (band) band.style.setProperty("--palms-y", val);
-      if (deck) deck.style.setProperty("--palms-y", val);
-      if (current !== target) raf = requestAnimationFrame(frame);
-    }
-
-    function kick() {
-      measure();
-      if ((!band && !deck) || current === target) return;
-      if (!raf) {
-        last = performance.now();      // same clock as the rAF stamp
-        raf = requestAnimationFrame(frame);
-      }
-    }
-
-    window.addEventListener("scroll", kick, { passive: true });
-    window.addEventListener("resize", kick, { passive: true });
-    document.addEventListener("htmx:afterSwap", kick);
-    kick();
-  }
+  // ---------- r69-r89: palm field — retired drift, stagnant pin ----------
+  // History: r69 shipped a half-speed drift (owner: "the palms are
+  // stagnant they need to move"), r70 made its chase frame-rate
+  // independent, r85 shrank its paint box to a viewport-sticky layer,
+  // r88 extended it to the map deck. r89 (owner: "the palms in the
+  // listings page should be stagnant") REMOVES the engine outright:
+  // no setupPalmParallax, no --palms-y writer, no scroll listener.
+  // The fields are pinned by pure CSS — search.css keeps the r85
+  // sticky box (the band's ::before holds the viewport, fronds
+  // perfectly still while the rows scroll) with a frozen
+  // background-position, so there is nothing left to gate, nothing
+  // to repaint per scroll frame, and every visitor (rich, lite,
+  // fx=none, scripts blocked, reduced motion) sees the exact same
+  // still field. The r71 lesson stays on record: any future motion
+  // on these ::befores must be background-position, never a
+  // compositor transform (Chrome hoists the root-negative layer
+  // over the static footer — see LOOP/JOURNAL.md r71/r89).
 
   function init() {
     setupCounters();
@@ -751,7 +609,6 @@
     setupReveal();
     setupBubbleTitles();
     setupRowSlides();
-    setupPalmParallax();
     setupHeaderScroll();
     if (!fxNone) setupNavAutoHide();  // G1: hide/return is lite/rich only
     setupMobileMenu();

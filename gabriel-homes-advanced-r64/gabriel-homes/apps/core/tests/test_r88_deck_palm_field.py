@@ -1,9 +1,11 @@
-"""r88 — the map deck carries the palm field, drifting with scroll.
+"""r88 — the map deck carries the palm field (r89: stagnant).
 
-Owner: "the ocean background in the listings page doesnt look well
-when contrasted to the map and objects before it.... return the palm
-tree background but peg it to the listings so one can scroll and them
-move so they dont seem stagnant.... simple motion."
+Owner (r88): "the ocean background in the listings page doesnt look
+well when contrasted to the map and objects before it.... return the
+palm tree background but peg it to the listings so one can scroll and
+them move so they dont seem stagnant.... simple motion."
+Owner (r89): "the palms in the listings page should be stagnant" —
+the r88 drift is retired; the pattern is frozen on BOTH fields.
 
 The r88 vision review confirmed the r86 ocean clash: the near-ink
 scrim faded unevenly down the deck (0.93 top, 0.55 middle), so the
@@ -11,9 +13,9 @@ outlined market cards sat on busy mid-tone photo texture with mushy
 edges, and the photo's greens/teals fought the cream map tile and the
 brand palette. The deck now repeats the SAME palm field the listings
 band introduces (palm-field-even.svg under a soft cream veil, ink
-type back to the pre-r86 values), and motion.js setupPalmParallax
-writes --palms-y on the shell too, so deck and band drift as one
-continuous half-speed motion.
+type back to the pre-r86 values) — and since r89 the pattern is
+STILL: frozen at background-position 0 0, no --palms-y var, no
+writer in motion.js (see test_r85_sticky_field.StagnantField).
 
 The r86 stacking contract is unchanged: the pseudos stay
 ROOT-NEGATIVE and the section keeps NO isolation, because the fixed
@@ -70,30 +72,23 @@ class DeckPalmField(SimpleTestCase):
         self.assertNotIn("rgba(24, 17, 13", body,
                          "the near-ink scrim is retired with the photo")
 
-    def test_deck_pattern_rides_the_drift_var(self):
-        """Pegged to the listings: the deck's background-position Y
-        reads the same var motion.js advances, with the 0px fallback
-        for every visitor the gate excludes."""
+    def test_deck_pattern_is_stagnant(self):
+        """r89 (owner: "the palms in the listings page should be
+        stagnant"): the deck's background-position is frozen at 0 0 —
+        no drift var, no writer. The deck is short, so its absolute
+        box simply scrolls away with the section; the still pattern
+        leaves the screen when the deck does."""
         before = re.search(r"\.search-map-shell::before \{[^}]*\}", SEARCH_CSS)
         assert before
-        body = before.group(0)
-        self.assertIn("background-position: 0 var(--palms-y, 0px)", body)
+        body = re.sub(r"/\*.*?\*/", "", before.group(0), flags=re.S)
+        self.assertIn("background-position: 0 0", body,
+                      "frozen at 0 0 — stagnant per the r89 ask")
+        self.assertNotIn("var(--palms-y", body,
+                         "the drift var is retired; nothing writes it")
         self.assertIn("background-attachment: scroll", body,
-                      "scroll stays the declared safe default (fail-closed)")
+                      "scroll stays the declared safe default")
         self.assertNotIn("background-attachment: fixed", SEARCH_CSS,
-                         "fixed attachment pins the pattern — stagnant")
-
-    def test_motion_js_drives_the_deck_var(self):
-        """setupPalmParallax writes --palms-y on the map shell too,
-        under the same gate as the band field (one continuous motion)."""
-        setup = re.search(
-            r"function setupPalmParallax\(\) \{(.*?)\n  \}", MOTION_JS, re.S)
-        assert setup, "setupPalmParallax missing from motion.js"
-        body = setup.group(1)
-        self.assertIn('.search-map-shell', body,
-                      "the setup must resolve the deck element")
-        self.assertIn('if (deck) deck.style.setProperty("--palms-y", val)',
-                      body or "", "the deck var is written with the band's")
+                         "fixed attachment dies silently on iOS/Android")
 
     def test_heading_is_ink_again(self):
         """Back to the pre-r86 light-page palette: burnt eyebrow, ink

@@ -19,32 +19,27 @@
    MOMBASA down to the footer palms, and the map card keeps its crisp
    light-on-light contrast (ink type is back to the pre-r86 values).
 
-   The pattern DRIFTS with the scroll (owner: "return the palm tree
-   background but peg it to the listings so one can scroll and them
-   move so they dont seem stagnant.... simple motion"): motion.js
-   setupDeckPalmDrift writes --palms-y on this shell, the ::before
-   reads it as its background-position Y, and the tile's screen speed
-   is -0.5 — the same half-speed climb the band field makes below
-   (r69 contract, one continuous motion). JS-blocked, fx=none and
-   prefers-reduced-motion all keep the 0px fallback: the static tile.
+   r89 — the pattern is STAGNANT (owner: "the palms in the listings
+   page should be stagnant"): the r88 drift is gone, motion.js no
+   longer writes --palms-y, and the position is frozen at 0 0. The
+   deck is short, so the absolute box scrolls away with the section —
+   the still pattern simply leaves the screen when the deck does.
 
-   The deck box is ABSOLUTE and deck-sized (not the band's sticky
-   viewport trick — the deck is short, so an inset:0 box already
-   repaints ~one viewport: the r85 raster guard holds by geometry).
-   The pseudos stay ROOT-NEGATIVE (z-index -1/-2) — NO isolation on
-   this section, because the fixed .map-return-pill (z-index
-   var(--z-modal)) must stay above later in-flow content (r86
-   contract, unchanged). The bottom dissolve mask hands the pattern
-   over to the band's own field without a phase seam: the deck tile
-   fades out before the band's full-strength field begins. */
+   The deck box is ABSOLUTE and deck-sized. The pseudos stay
+   ROOT-NEGATIVE (z-index -1/-2) — NO isolation on this section,
+   because the fixed .map-return-pill (z-index var(--z-modal)) must
+   stay above later in-flow content (r86 contract, unchanged). The
+   bottom dissolve mask hands the pattern over to the band's own
+   field without a phase seam: the deck tile fades out before the
+   band's full-strength field begins. */
 .search-map-shell { position: relative; padding: 12px 0 46px; }
 .search-map-shell::before {
   content: ""; position: absolute; inset: 0; z-index: -2;
   background-image: url("../img/palm-field-even.svg");
   background-repeat: repeat;
   background-size: 1400px 1600px;   /* same tile scale as the band field */
-  background-attachment: scroll;    /* r68: fixed reads stagnant + dies on iOS */
-  background-position: 0 var(--palms-y, 0px);
+  background-attachment: scroll;
+  background-position: 0 0;          /* r89: frozen — stagnant per owner ask */
   /* r88b: fade starts earlier and lands later (was 70/96) — the vision
      pass saw a faint traceable horizontal seam where the deck pattern
      met the plain band; the longer ramp dissolves that edge while the
@@ -759,50 +754,43 @@ html:not([data-fx]) .listing-row.row-armed {
    Token-only (D-LOOP-38a holds — zero hex here); the clay washes in
    the SVG were tuned for the home sand but read as the same soft
    tone-on-tone depth over cream. Decorative only: pointer-events
-   none, nothing for screen readers or keyboards to find; JS-blocked,
-   fx=none and prefers-reduced-motion all render the exact static
-   tile (the r69 drift below is the one gated upgrade). */
+   none, nothing for screen readers or keyboards to find; every
+   visitor renders the exact same still tile (r89). */
 .listings-band::before {
   content: ""; position: sticky; inset: 0 0 auto 0; top: 0; z-index: -1;
   /* r85 (owner: "the listings page is back with the laggy motion...
-     jerking"): the drift rewrote background-position on a BAND-SIZED
-     masked layer — 1280x14000px — so Chrome re-rastered 14,000 rows of
-     fronds every frame (measured at 4x CPU throttle: 59ms avg frames,
-     334 longtasks; hiding the field: 24.6ms). The box is now a
-     VIEWPORT-TALL STICKY layer (height 100vh, negative margin cancels
-     the flow): the same per-frame position write repaints 1280x800
-     instead — measured 23.6ms, pixel-for-pixel the field-hidden
-     baseline. Sticky + z-index:-1 is the palm sentinels' own pattern:
-     the pseudo still paints in the root negative layer, so the footer
-     still scrolls over it (r62 contract), and NO transform/will-change
-     is used, so the r71 compositor-hoisting ban holds untouched.
-     inset keeps the literal `inset: 0` ...auto 0 form the r68 pin
-     reads. The drift phase math this geometry requires lives in
-     motion.js setupPalmParallax (r85 comment there). */
+     jerking"): the then-drift rewrote background-position on a
+     BAND-SIZED masked layer — 1280x14000px — so Chrome re-rastered
+     14,000 rows of fronds every frame (measured at 4x CPU throttle:
+     59ms avg frames, 334 longtasks; hiding the field: 24.6ms). The
+     box became a VIEWPORT-TALL STICKY layer (height 100vh, negative
+     margin cancels the flow) so a position write repaints 1280x800
+     instead. r89 (owner: "the palms in the listings page should be
+     stagnant") freezes the position at 0 0 and deletes the drift
+     engine — but KEEPS this sticky box, because it is now the
+     stagnation itself: while the band is on screen the box holds the
+     viewport top, so the fronds sit perfectly still beside the
+     scrolling rows (the calm the r68 owner pass wanted, minus the
+     fixed-attachment iOS bug). Sticky + z-index:-1 is the palm
+     sentinels' own pattern: the pseudo still paints in the root
+     negative layer, so the footer still scrolls over it (r62
+     contract), and NO transform/will-change is used, so the r71
+     compositor-hoisting ban holds untouched. inset keeps the literal
+     `inset: 0` ...auto 0 form the r68 pin reads. */
   height: 100vh;
   margin-bottom: -100vh;
   background-image: url("../img/palm-field-even.svg");
   background-repeat: repeat;
   background-size: 1400px 1600px;
-  /* r69/r71: scroll stays the declared SAFE DEFAULT — and the Y
-     position rides the drift var, which motion.js writes under a
-     gate tier only. Every other visitor (scripts blocked, fx=none,
-     prefers-reduced-motion) falls back to 0px and the field stands
-     still (the sticky box holds the viewport, so 0px reads as a calm
-     pinned field — correct for every tier the gate excludes).
-
-     r71 REJECTED a compositor-transform drift here, measured live:
-     translate3d + will-change on this ROOT-NEGATIVE pseudo hoists
-     the whole composited layer OVER the static footer in Chrome (the
-     footer vanished behind the field; the mask's out-of-bounds
-     extension also leaked faint fronds below the band). The
-     background-position drift repaints on the main thread — on the
-     r85 viewport-sized box that repaint is ~17x cheaper than the old
-     band-sized one, so it is BOTH the smooth and the contract-safe
-     option. Do NOT retry transform/will-change on this ::before
-     without reading LOOP/JOURNAL.md r71. */
+  /* r89: STAGNANT — position frozen at 0 0, motion.js no longer
+     writes --palms-y anywhere (the r69-r88 drift is retired). The
+     r71 lesson stays on record: if motion ever returns to this
+     ::before it must be background-position only — a compositor
+     transform (translate3d + will-change) hoists the root-negative
+     layer OVER the static footer in Chrome and leaks fronds below
+     the band (LOOP/JOURNAL.md r71). */
   background-attachment: scroll;
-  background-position: 0 var(--palms-y, 0px);
+  background-position: 0 0;
   -webkit-mask-image: linear-gradient(to bottom, black 0%, black 84%, transparent 100%);
   mask-image: linear-gradient(to bottom, black 0%, black 84%, transparent 100%);
   pointer-events: none;
@@ -812,6 +800,16 @@ html:not([data-fx]) .listing-row.row-armed {
 @media (max-width: 1020px) {
   .listings-band::before { background-size: 860px 985px; }
 }
+/* r89 — STAGNANT FIELD (owner: "the palms in the listings page
+   should be stagnant"). The r69-r88 half-speed drift is retired: no
+   JS writer, no --palms-y var, no per-scroll repaint — the sticky
+   box above pins the tile to the viewport for the whole band, so the
+   field holds dead still while rows, chips and pagination slide past
+   (and the same stillness now holds on the map deck, whose absolute
+   box simply scrolls away with its short section). This is pure CSS:
+   identical for every visitor — rich, lite, fx=none, scripts
+   blocked, prefers-reduced-motion. The r62 footer-over-field paint
+   contract and the r65/r68 tile contracts are unchanged.
 /* r69/r70/r71 (owner rounds thirteen-fifteen): "the palms are
    stagnant they need to move ...but not to slow they look stagnant
    and not to fast they move together with the listings" (r69);
@@ -822,39 +820,23 @@ html:not([data-fx]) .listing-row.row-armed {
    with the rows. HALF SPEED is the middle the owner described: the
    field climbs visibly as the page scrolls while the rows, chips and
    pagination slide past twice as fast. It works on every device —
-   the old fixed attachment silently dies on iOS/Android, which is
-   part of why that pass read as stagnant on phones.
+   stillness now holds on the map deck, whose absolute box simply
+   scrolls away with its short section). This is pure CSS: identical
+   for every visitor — rich, lite, fx=none, scripts blocked,
+   prefers-reduced-motion. The r62 footer-over-field paint contract
+   and the r65/r68 tile contracts are unchanged.
 
-   motion.js owns the drift: it writes --palms-y on the band (the
-   r70 time-constant chase, so the field carries weight instead of
-   snapping, settling in the same ~200ms at any frame rate) and the
-   ::before above reads that var as its background-position Y. The
-   tile repeats, so the drift can run forever without a seam, and
-   the box-relative mask stays anchored to the band: the 84%
-   dissolve still lands exactly at the band's end wherever the
-   scroll is.
-
-   r71 (owner round fifteen, "ensure the movements are smooth") BUILT
-   the compositor-transform variant of this drift — translate3d +
-   will-change on the ::before, box extended one tile, mask
-   re-anchored — proved it pixel-identical in-band, and REJECTED it
-   on live evidence: Chrome hoists the composited root-negative
-   layer OVER the static footer, and the extended masked box leaked
-   faint fronds below the band. The background-position drift stays:
-   it repaints on the main thread, but the r70 trace measured it at
-   a FLAT 59fps through the row animations. Pinned by test
-   (test_parallax_compositor_transform_is_banned) so it is not
-   retried blind.
-
-   Gating follows the D-FX-GATE contract exactly like the row slides
-   above: the drift runs only when the gate set a tier (rich, and
-   lite — a position shift costs no data). Scripts blocked (no
-   attribute — fails closed) and fx=none (prefers-reduced-motion:
-   scroll-linked motion is what WCAG 2.3.3 asks sites to spare
-   vestibular-sensitive visitors) never write the var, so the 0px
-   fallback keeps the exact static field. No stacking changes (the
-   r62 root-negative-layer contract is intact — the drift moves paint
-   inside the ::before, never the box). */
+   History (r69-r88, retired): the field drifted at half speed —
+   motion.js wrote --palms-y and chased it with a time-constant
+   exponential (r70), the r85 pass shrank the paint box to this
+   sticky layer after the band-sized box caused the owner's "jerking
+   motion". A compositor-transform drift was BUILT and REJECTED
+   (r71): Chrome hoists the root-negative layer over the static
+   footer and the extended masked box leaked fronds below the band —
+   if motion ever returns to this ::before it must be
+   background-position only, never transform/will-change
+   (test_r89_stagnant_palms.py pins the stillness; LOOP/JOURNAL.md
+   r71/r89 hold the full story). */
 .palm-sentinel {
   position: absolute;
   top: 0;

@@ -1,3 +1,39 @@
+Run 89 | BUILDER (owner round, off-loop) | 2026-11-12 ~17:50-18:35 +03:00 | items:
+(1) **OWNER ASK — "the palms in the listings page should be
+stagnant."** Full reversal of the r69-r88 motion lineage on BOTH palm
+fields: (a) motion.js — setupPalmParallax DELETED (~100 lines: the
+r70 time-constant chase, the r85 three-phase measure, the r88 deck
+extension); no --palms-y writer exists anywhere; init() no longer
+arms it. (b) search.css — band ::before and deck ::before both
+freeze background-position at 0 0 (the drift var is gone; comments
+keep the history + the r71 lesson: any future motion must be
+background-position writes, never transform/will-change). The r85
+sticky box KEPT deliberately: it is now the stagnation itself — the
+viewport-tall ::before holds the screen while the band scrolls past,
+so the fronds sit dead still beside the rows (and the box stays
+cheap if motion ever returns). The deck's absolute box simply rides
+its short section off-screen. The sentinel TREES' r62 wind sway
+(idle animation, gated rich-only) is a different mechanism from the
+retired scroll-linked field motion — KEPT, flagged to owner in the
+r89 reply. PINS: r68 chase/half-speed pins rewritten to stagnation
+pins (test_parallax_field_is_stagnant_not_drifting,
+test_parallax_js_engine_is_gone_fail_closed); r85 ThreePhaseDriftMath
+-> StagnantField; r88 deck drift pins -> test_deck_pattern_is_stagnant
+(9 pins); NEW apps/core/tests/test_r89_stagnant_palms.py (8 pins:
+frozen positions both fields, no var in stripped CSS, engine deleted,
+sticky pin survives, r71 ban, fixed-attachment ban, sway survives).
+PROOF (live, /properties/ @1280x800 + 1700x900): computed
+background-position '0px 0px' at 6 scroll depths 0->9000; --palms-y
+empty on both elements; pixel proof — 600px scroll between shots,
+field-only strips (x<35, x>1245; strip pattern std 5.9 so not flat
+cream) diff 0.66/0.79 of 255 while content diff 101; deck box rides
+1:1 (top 116-> -484 over 600px); sentinels shown @1700 with 1 sway
+animation under rich; rAF during scroll+settle == idle baseline
+(67 vs 42 per 700ms window, both just the ~60fps display ticker —
+no drift loop). Screenshots: download/screenshots/r89-deck-top.png,
+r89-deck-top-wide.png, r89-band-still.png, r89-band-with-sentinels.png.
+Full suite: **1073 passed**. Committed r89, pushed.
+
 Run 88 | BUILDER (owner round, off-loop) | 2026-11-12 ~16:30-17:40 +03:00 | items:
 (1) **OWNER ASK — "the ocean background in the listings page doesnt
 look well when contrasted to the map and objects before it.... use

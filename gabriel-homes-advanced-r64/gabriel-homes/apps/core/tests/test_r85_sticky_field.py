@@ -42,8 +42,8 @@ class StickyFieldGeometry(SimpleTestCase):
         self.assertIn("position: sticky", rule,
                       "the field must be a sticky layer (the r85 fix)")
         self.assertIn("height: 100vh", rule,
-                      "viewport-tall box: the drift repaints 1280x800, "
-                      "not the whole 14,000px band (the measured jank)")
+                      "viewport-tall box: the paint box stays cheap even "
+                      "if a future pass re-arms motion (the measured jank)")
         self.assertIn("margin-bottom: -100vh", rule,
                       "the negative margin cancels the sticky box's "
                       "flow footprint — band geometry is unchanged")
@@ -51,7 +51,11 @@ class StickyFieldGeometry(SimpleTestCase):
                       "pins the viewport top while the band is on screen")
         # r65/r68 contracts still hold on the same rule
         self.assertIn('url("../img/palm-field-even.svg")', rule)
-        self.assertIn("background-position: 0 var(--palms-y, 0px)", rule)
+        # r89: the position is FROZEN — stagnation is the sticky box
+        # itself, no drift var, no writer
+        self.assertIn("background-position: 0 0", rule)
+        self.assertNotIn("var(--palms-y", rule,
+                         "the r69-r88 drift var is retired (r89)")
         self.assertIn("background-attachment: scroll", rule)
         self.assertIn("z-index: -1", rule)
         for banned in ("translate3d", "will-change", "transform:"):
@@ -64,26 +68,23 @@ class StickyFieldGeometry(SimpleTestCase):
         self.assertNotIn("z-index", base)
 
 
-class ThreePhaseDriftMath(SimpleTestCase):
-    """motion.js: the sticky geometry's three-phase target.
+class StagnantField(SimpleTestCase):
+    """r89 (owner: "the palms in the listings page should be stagnant").
+    The r85 sticky box is now the stagnation mechanism itself: the
+    tile is frozen at 0 0 and holds the viewport while the band is on
+    screen, so the fronds sit dead still beside the scrolling rows.
+    The three-phase drift math that used to live here (entry/pinned/
+    release targets keeping the tile at -0.5x screen speed) is retired
+    with the engine — motion.js has no setupPalmParallax and no
+    --palms-y writer. Any future motion must come back as
+    background-position writes on this same cheap sticky box (r71
+    bans compositor transforms outright)."""
 
-    While the box is PINNED it does not move, so the position alone
-    must descend at DRIFT; while it rides the band (entry/release)
-    the position climbs at (1 - DRIFT). Joined continuously, the
-    tile's SCREEN speed is exactly -0.5x scroll everywhere — the r69
-    half-speed contract restated for the sticky box.
-    """
-
-    def test_measure_has_three_phases(self):
-        m = re.search(r"function measure\(\) \{(.*?)\n    \}", MOTION_JS, re.S)
-        assert m, "measure() missing from setupPalmParallax"
-        body = m.group(1)
-        for needle in ("pinEnd", "1 - DRIFT", "vh * (1 - DRIFT) - DRIFT"):
-            self.assertIn(needle, body,
-                          f"the three-phase target needs '{needle}'")
-        # half speed is still the constant
-        drift = re.search(r"var DRIFT = ([\d.]+);", MOTION_JS)
-        self.assertTrue(drift and abs(float(drift.group(1)) - 0.5) < 1e-9)
-        # r70 chase contracts intact
-        self.assertIn("1 - Math.exp(-dt / TAU)", MOTION_JS)
-        self.assertIn("var MAXDT", MOTION_JS)
+    def test_no_drift_engine_or_var_writer_remains(self):
+        self.assertNotIn("function setupPalmParallax", MOTION_JS,
+                         "the drift engine is deleted (r89)")
+        self.assertNotIn('"--palms-y"', MOTION_JS,
+                         "nothing may write the retired drift var")
+        self.assertNotIn("--palms-y", re.sub(
+            r"/\*.*?\*/", "", SEARCH_CSS, flags=re.S),
+            "no rule may read the drift var — nothing writes it")
