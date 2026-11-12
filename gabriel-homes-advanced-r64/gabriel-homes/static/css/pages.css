@@ -302,17 +302,17 @@
 
 /* r82: honest photo credit — the service photographs are the real
    listing's own gallery, and the credit names that listing. Sits on
-   the dark page-hero, so cream/ember like the hero text tokens. */
+   the dark page-hero. r84: reset as a quiet italic-serif caption —
+   small caps-on-photo read as shouting; this reads as a footnote. */
 .svc-photo-credit {
-  margin: 1.15rem 0 0;
-  max-width: 46ch;
-  font-family: var(--font-mono);
-  font-size: var(--text-xs);
-  font-weight: 600;
-  letter-spacing: var(--track-mono);
-  text-transform: uppercase;
-  line-height: 1.7;
-  color: color-mix(in srgb, var(--cream) 72%, transparent);
+  margin: 1.35rem 0 0;
+  max-width: 44ch;
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 1rem;
+  line-height: 1.65;
+  letter-spacing: 0.005em;
+  color: color-mix(in srgb, var(--cream) 80%, transparent);
 }
 .svc-photo-credit a {
   color: var(--ember);
@@ -321,31 +321,62 @@
 }
 .svc-photo-credit a:hover { border-bottom-color: var(--ember); }
 
-/* --- the index: four numbered rows, hairline-separated ---------- */
+/* --- the index: four numbered rows, hairline-separated ------------
+   r84: the index IS content — the serif goes display-scale, the
+   ordinal cell can swap to a real photograph on hover, and the
+   meta + arrow group as one right-hand unit. --------------------- */
 .svc-toc { padding-block: var(--section-pad-y) calc(var(--section-pad-y) * 0.9); }
 .svc-toc .section-tag { margin-bottom: 2.25rem; }
 .svc-toc__list { border-top: 1px solid var(--sand-60); }
 .svc-toc__row {
+  position: relative;
   display: grid;
-  grid-template-columns: 3.75rem minmax(0, 1fr) auto 2.5rem;
-  column-gap: clamp(1rem, 2.5vw, 2rem);
+  grid-template-columns: 3.9rem minmax(0, 1fr) auto 2.75rem;
+  column-gap: 1.35rem;
   row-gap: 0.45rem;
   align-items: baseline;
-  padding: 1.6rem clamp(0.25rem, 1vw, 0.75rem) 1.6rem 0;
+  padding: 1.9rem clamp(0.25rem, 1vw, 0.75rem) 1.8rem 0;
   border-bottom: 1px solid var(--sand-60);
   transition: background-color 0.18s ease;
 }
+/* the ordinal cell: number by default; on hover the cell swaps to a
+   small photograph from the real listing (decorative, pointer-safe). */
+.svc-toc__lead { position: relative; }
 .svc-toc__num {
   font-family: var(--font-mono);
-  font-size: var(--text-sm);
+  font-size: var(--text-base);
   font-weight: 600;
   letter-spacing: 0.06em;
   color: var(--burnt);
+  transition: opacity 0.2s ease;
+}
+.svc-toc__thumb {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  width: 4.6rem;
+  aspect-ratio: 1;
+  border-radius: 3px;
+  background-size: cover;
+  background-position: center;
+  box-shadow: 0 6px 18px color-mix(in srgb, var(--espresso) 30%, transparent);
+  opacity: 0;
+  transform: translateY(-50%) scale(0.94) rotate(-1.5deg);
+  transition: opacity 0.22s var(--ease-out), transform 0.26s var(--ease-out);
+  pointer-events: none;
+}
+.svc-toc__row:hover .svc-toc__num,
+.svc-toc__row:focus-visible .svc-toc__num { opacity: 0; }
+.svc-toc__row:hover .svc-toc__thumb,
+.svc-toc__row:focus-visible .svc-toc__thumb {
+  opacity: 1;
+  transform: translateY(-50%) scale(1) rotate(-1.5deg);
 }
 .svc-toc__name {
   font-family: var(--font-display);
-  font-size: clamp(1.5rem, 1.1rem + 1.8vw, 2.25rem);
+  font-size: clamp(2rem, 1.5rem + 2.4vw, 3rem);
   font-weight: 500;
+  font-variation-settings: "opsz" 40;
   letter-spacing: var(--track-tighter);
   line-height: var(--leading-tight);
   transition: color 0.18s ease, transform 0.22s var(--ease-out);
@@ -354,13 +385,14 @@
   grid-column: 2;
   font-size: 0.95rem;
   color: color-mix(in srgb, var(--ink) 74%, var(--cream));
+  transition: color 0.18s ease;
 }
 .svc-toc__meta {
   grid-column: 3;
   grid-row: 1;
   justify-self: end;
   align-self: center;
-  padding-left: clamp(1.5rem, 3vw, 3rem);
+  padding-left: clamp(1rem, 2vw, 2rem);
   font-family: var(--font-mono);
   font-size: var(--text-xs);
   font-weight: 600;
@@ -368,6 +400,7 @@
   text-transform: uppercase;
   white-space: nowrap;
   color: color-mix(in srgb, var(--ink) 55%, var(--cream));
+  transition: color 0.18s ease;
 }
 .svc-toc__arrow {
   grid-column: 4;
@@ -381,15 +414,21 @@
 }
 .svc-toc__row:hover,
 .svc-toc__row:focus-visible {
-  background: color-mix(in srgb, var(--sand) 20%, transparent);
+  background: color-mix(in srgb, var(--sand) 26%, transparent);
 }
 .svc-toc__row:hover .svc-toc__name,
 .svc-toc__row:focus-visible .svc-toc__name {
   color: var(--burnt);
-  transform: translateX(6px);
+  transform: translateX(8px);
+}
+.svc-toc__row:hover .svc-toc__meta,
+.svc-toc__row:focus-visible .svc-toc__meta { color: var(--burnt); }
+.svc-toc__row:hover .svc-toc__hint,
+.svc-toc__row:focus-visible .svc-toc__hint {
+  color: color-mix(in srgb, var(--ink) 90%, var(--cream));
 }
 .svc-toc__row:hover .svc-toc__arrow,
-.svc-toc__row:focus-visible .svc-toc__arrow { transform: translateX(8px); }
+.svc-toc__row:focus-visible .svc-toc__arrow { transform: translateX(6px); }
 
 /* --- the ledger: honest counts, published listings only --------- */
 .svc-ledger {
@@ -417,7 +456,7 @@
   font-variation-settings: "opsz" 60;
 }
 .svc-ledger__label {
-  margin-top: 0.85rem;
+  margin-top: 0.55rem;
   font-family: var(--font-mono);
   font-size: var(--text-xs);
   font-weight: 600;
@@ -436,7 +475,8 @@
   letter-spacing: var(--track-mono);
   text-transform: uppercase;
   line-height: 1.7;
-  color: color-mix(in srgb, var(--cream) 55%, transparent);
+  text-align: right;
+  color: color-mix(in srgb, var(--cream) 72%, transparent);
 }
 
 /* --- the chapters: pinned photo + scrolling reading column ------ */
@@ -494,13 +534,16 @@
   text-wrap: balance;
 }
 /* the opening line of each chapter reads as a magazine lede:
-   Fraunces at a step up from body, slightly darker ink. */
+   r84 — Fraunces a clear step above body (was near-body size), so the
+   lede/in/body/description voices separate at a glance. */
 .svc-chapter__lede {
   font-family: var(--font-display);
-  font-size: clamp(1.05rem, 0.96rem + 0.45vw, 1.2rem);
-  line-height: 1.55;
+  font-size: clamp(1.2rem, 1.04rem + 0.8vw, 1.5rem);
+  line-height: 1.5;
   letter-spacing: -0.005em;
+  font-variation-settings: "opsz" 24;
   color: color-mix(in srgb, var(--ink) 90%, var(--cream));
+  margin-bottom: 1.1rem;
 }
 .svc-chapter__body p {
   max-width: 58ch;
@@ -517,15 +560,18 @@
 }
 .svc-chapter__body p a:hover { text-decoration-color: var(--burnt); }
 
-/* ghost chapter numeral + honest photo caption, over the pin */
+/* ghost chapter numeral + honest photo caption, over the pin.
+   r84: both share one bottom offset so the pair reads as a single
+   composed footer line over the photograph, and the caption rag
+   balances instead of breaking mid-phrase. */
 .svc-chapter__ghost {
   position: absolute;
   left: clamp(1.5rem, 3.5vw, 3rem);
-  bottom: clamp(0.5rem, 2vh, 1.25rem);
+  bottom: clamp(1.1rem, 3.5vh, 1.9rem);
   font-family: var(--font-mono);
   font-weight: 700;
   font-size: clamp(4.5rem, 10vw, 9rem);
-  line-height: 1;
+  line-height: 0.8;
   letter-spacing: -0.02em;
   color: transparent;
   -webkit-text-stroke: 1.5px color-mix(in srgb, var(--cream) 90%, transparent);
@@ -538,9 +584,10 @@
 .svc-chapter__caption {
   position: absolute;
   right: clamp(1.5rem, 3.5vw, 3rem);
-  bottom: clamp(1.5rem, 4.5vh, 2.5rem);
-  max-width: 20ch;
+  bottom: clamp(1.1rem, 3.5vh, 1.9rem);
+  max-width: 24ch;
   text-align: right;
+  text-wrap: balance;
   font-family: var(--font-mono);
   font-size: var(--text-xs);
   font-weight: 600;
@@ -551,9 +598,11 @@
   text-shadow: 0 1px 14px rgb(20 12 8 / 0.7);
 }
 
-/* how buying works — folded into chapter 001 (was the r12 process band) */
+/* how buying works — folded into chapter 001 (was the r12 process band).
+   r84: step titles go display-serif so the numbered list carries the
+   same editorial voice as the ghost numeral above the pin. */
 .svc-steps__tag { margin-top: 2.75rem; }
-.svc-steps__lead { font-style: italic; }
+.svc-steps__lead { font-style: italic; font-size: 1.0625rem; }
 .svc-steps {
   margin-top: 2.5rem;
   max-width: 58ch;
@@ -564,30 +613,34 @@
   grid-template-columns: 2.75rem minmax(0, 1fr);
   column-gap: 1rem;
   align-items: baseline;
-  padding: 1.05rem 0;
+  padding: 1.3rem 0;
   border-bottom: 1px solid var(--sand-60);
 }
 .svc-steps__num {
   font-family: var(--font-mono);
-  font-size: var(--text-sm);
+  font-size: var(--text-base);
   font-weight: 600;
   color: var(--burnt);
 }
 .svc-steps h3 {
-  font-size: var(--text-lg);
-  font-weight: 560;
+  font-family: var(--font-display);
+  font-size: var(--text-xl);
+  font-weight: 500;
   letter-spacing: var(--track-tight);
-  margin-bottom: 0.25rem;
+  margin-bottom: 0.3rem;
 }
 .svc-steps p {
-  font-size: var(--text-base);
+  font-size: 0.95rem;
+  color: color-mix(in srgb, var(--ink) 74%, var(--cream));
 }
+/* r84: the fee is framed like a pull-quote — lighter tint, thinner
+   rust tick — so it concludes the list instead of outweighing it. */
 .svc-fee {
-  margin-top: 2rem;
+  margin-top: 2.25rem;
   max-width: 58ch;
-  padding: 1.15rem 1.4rem;
-  border-left: 3px solid var(--burnt);
-  background: color-mix(in srgb, var(--sand) 32%, transparent);
+  padding: 1.3rem 1.35rem 1.35rem 1.4rem;
+  border-left: 2px solid var(--burnt);
+  background: color-mix(in srgb, var(--sand) 20%, transparent);
 }
 .svc-fee__label {
   font-family: var(--font-mono);
@@ -602,15 +655,15 @@
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  margin-top: 1.6rem;
+  margin-top: 2.1rem;
   font-family: var(--font-mono);
   font-weight: 600;
-  font-size: var(--text-sm);
+  font-size: var(--text-base);
   letter-spacing: var(--track-mono);
   text-transform: uppercase;
   color: var(--burnt);
   border-bottom: 1px solid var(--burnt-30);
-  padding-bottom: 0.2rem;
+  padding-bottom: 0.3rem;
   transition: border-color 0.18s ease, color 0.18s ease;
 }
 .svc-chapter__link:hover { color: var(--espresso); border-color: var(--espresso); }
@@ -619,7 +672,9 @@
 .svc-chapter__link:focus-visible .btn__arrow { transform: translateX(5px); }
 
 /* --- the pledge: what we will and will not do ------------------ */
-.svc-pledge { padding-block: var(--section-pad-y); }
+.svc-pledge {
+  padding-block: var(--section-pad-y) calc(var(--section-pad-y) * 1.15);
+}
 .svc-pledge .section-tag { margin-bottom: 1rem; }
 .svc-pledge__title {
   font-size: clamp(1.9rem, 1.25rem + 2.4vw, 2.75rem);
@@ -627,41 +682,66 @@
   letter-spacing: var(--track-tighter);
 }
 .svc-pledge__list {
-  margin-top: 2.5rem;
+  margin-top: 2rem;
   max-width: 68ch;
   border-top: 1px solid var(--sand-60);
 }
 .svc-pledge__item {
   display: grid;
-  grid-template-columns: 3rem minmax(0, 1fr);
-  column-gap: 1rem;
+  grid-template-columns: 3.5rem minmax(0, 1fr);
+  column-gap: 1.25rem;
   align-items: baseline;
-  padding: 1.35rem 0;
+  padding: 1.55rem 0;
   border-bottom: 1px solid var(--sand-60);
 }
+/* r84: the Roman markers join the display voice — italic Fraunces at
+   readable size, so the list markers stop whispering. */
 .svc-pledge__num {
-  font-family: var(--font-mono);
-  font-size: var(--text-sm);
-  font-weight: 600;
-  text-transform: uppercase;
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 1.4rem;
+  line-height: 1.35;
   color: var(--burnt);
 }
 .svc-pledge__item p {
-  font-size: 1.02rem;
+  font-size: 1.0625rem;
   color: color-mix(in srgb, var(--ink) 82%, var(--cream));
   line-height: var(--leading-body);
   letter-spacing: var(--track-tight);
 }
+/* r84: the closing beat — the pledge resolves toward a person instead
+   of cutting dead into the footer. */
+.svc-pledge__close {
+  margin-top: 2.75rem;
+  max-width: 58ch;
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 1.125rem;
+  line-height: 1.6;
+  color: color-mix(in srgb, var(--ink) 82%, var(--cream));
+}
+.svc-pledge__close a {
+  color: var(--burnt);
+  text-decoration: underline;
+  text-decoration-color: var(--burnt-30);
+  text-underline-offset: 3px;
+}
+.svc-pledge__close a:hover { text-decoration-color: var(--burnt); }
 
-/* --- 900px down: chapters stack; the photo stops pinning -------- */
+/* --- 900px down: chapters stack; the photo stops pinning. The
+   hover thumbnail is a pointer-device nicety — it never renders on
+   touch layouts. ---------------------------------------------- */
+@media (max-width: 900px), (hover: none) {
+  .svc-toc__thumb { display: none; }
+}
 @media (max-width: 900px) {
   .svc-toc__row {
     grid-template-columns: 2.5rem minmax(0, 1fr) 1.5rem;
-    padding: 1.2rem 0;
+    padding: 1.35rem 0;
   }
   .svc-toc__meta { display: none; }
   .svc-toc__arrow { grid-column: 3; }
-  .svc-toc__name { font-size: 1.375rem; }
+  .svc-toc__name { font-size: 1.5rem; }
   .svc-toc__hint { font-size: var(--text-sm); }
   .svc-ledger__inner { row-gap: 1.5rem; }
   .svc-ledger__stat { padding-inline-end: clamp(0.65rem, 2.5vw, 1rem); }
@@ -682,9 +762,14 @@
   .svc-chapter--flip .svc-chapter__body { order: initial; }
   .svc-chapter__body { padding: 3rem var(--gutter) 4.5rem; }
   .svc-chapter__title { font-size: var(--text-2xl); max-width: 22ch; }
-  .svc-chapter__lede { font-size: 1.05rem; }
+  .svc-chapter__lede { font-size: 1.1rem; }
   .svc-chapter__ghost { font-size: clamp(3rem, 14vw, 4.5rem); }
   .svc-chapter__caption { max-width: 16ch; }
+  .svc-steps h3 { font-size: var(--text-lg); }
+  .svc-fee { padding: 1.2rem 1.1rem 1.2rem 1.2rem; }
+  .svc-pledge__num { font-size: 1.15rem; }
+  .svc-pledge__item p { font-size: 1rem; }
+  .svc-pledge__close { font-size: 1rem; }
 }
 
 /* ============================================================

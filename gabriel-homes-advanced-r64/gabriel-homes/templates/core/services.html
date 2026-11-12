@@ -45,28 +45,40 @@
     <p class="section-tag" data-reveal>[ THE INDEX ]</p>
     <nav class="svc-toc__list" aria-label="The four services">
       <a class="svc-toc__row" href="#svc-buying" data-reveal>
-        <span class="svc-toc__num" aria-hidden="true">01</span>
+        <span class="svc-toc__lead" aria-hidden="true">
+          <span class="svc-toc__num">01</span>
+          <span class="svc-toc__thumb" style="background-image: url('{% if svc_img_buying %}{{ svc_img_buying }}{% else %}{% staticv 'img/real/real-01-kitchen-island.jpg' %}{% endif %}');"></span>
+        </span>
         <span class="svc-toc__name">Buying</span>
         <span class="svc-toc__meta">{{ sale_count }} for sale</span>
         <span class="svc-toc__hint">Checked homes for sale, confirmed in writing.</span>
         <span class="svc-toc__arrow" aria-hidden="true">&rarr;</span>
       </a>
       <a class="svc-toc__row" href="#svc-renting" data-reveal>
-        <span class="svc-toc__num" aria-hidden="true">02</span>
+        <span class="svc-toc__lead" aria-hidden="true">
+          <span class="svc-toc__num">02</span>
+          <span class="svc-toc__thumb" style="background-image: url('{% if svc_img_renting %}{{ svc_img_renting }}{% else %}{% staticv 'img/real/real-03-bedroom-garden.jpg' %}{% endif %}');"></span>
+        </span>
         <span class="svc-toc__name">Renting</span>
         <span class="svc-toc__meta">{{ rent_count }} to rent</span>
         <span class="svc-toc__hint">Rentals checked against the contract.</span>
         <span class="svc-toc__arrow" aria-hidden="true">&rarr;</span>
       </a>
       <a class="svc-toc__row" href="#svc-listing" data-reveal>
-        <span class="svc-toc__num" aria-hidden="true">03</span>
+        <span class="svc-toc__lead" aria-hidden="true">
+          <span class="svc-toc__num">03</span>
+          <span class="svc-toc__thumb" style="background-image: url('{% if svc_img_listing %}{{ svc_img_listing }}{% else %}{% staticv 'img/real/cta-balcony.jpg' %}{% endif %}');"></span>
+        </span>
         <span class="svc-toc__name">Listing with us</span>
         <span class="svc-toc__meta">authority in writing</span>
         <span class="svc-toc__hint">Written authority from the owner, honest checks.</span>
         <span class="svc-toc__arrow" aria-hidden="true">&rarr;</span>
       </a>
       <a class="svc-toc__row" href="#svc-enquiries" data-reveal>
-        <span class="svc-toc__num" aria-hidden="true">04</span>
+        <span class="svc-toc__lead" aria-hidden="true">
+          <span class="svc-toc__num">04</span>
+          <span class="svc-toc__thumb" style="background-image: url('{% if svc_img_enquiries %}{{ svc_img_enquiries }}{% else %}{% staticv 'img/real/real-08-aerial.jpg' %}{% endif %}');"></span>
+        </span>
         <span class="svc-toc__name">Enquiries</span>
         <span class="svc-toc__meta">a named person</span>
         <span class="svc-toc__hint">A named person replies.</span>
@@ -270,6 +282,11 @@
         <p>We will not quote years of history, sales totals or client numbers we cannot back up.</p>
       </li>
     </ul>
+    {# r84: a closing beat so the pledge resolves instead of cutting to the footer #}
+    <p class="svc-pledge__close" data-reveal>
+      If we ever break one of these, tell us —
+      <a href="/contact/">talk to a person</a>.
+    </p>
   </div>
 </section>
 

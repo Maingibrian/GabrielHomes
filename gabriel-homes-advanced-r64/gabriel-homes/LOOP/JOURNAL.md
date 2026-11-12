@@ -1,3 +1,77 @@
+Run 84 | BUILDER (owner round, off-loop) | 2026-11-12 ~09:25-11:05 +03:00 | items:
+(1) **OWNER ASK — "run the preview"** — but the sandbox had recycled
+again between messages: processes dead (expected) AND the project
+.venv + db.sqlite3 gone (untracked files wiped; only git-tracked
+state survived — HEAD c5756f1a still holds all r82/r83 code, and
+static/img/real + media/demo-photos pools are git-bundled). Rebuilt:
+.venv from pinned requirements (psycopg[binary] included — its
+absence had silently failed 4 prod-settings tests in an earlier
+install; mysqlclient stays out, nothing imports it), .env with
+EXTRA_ALLOWED_HOSTS=.space-z.ai **+.fcapp.run** (the public gateway
+forwards with Host: ws-…-vpc.fcapp.run — DisallowedHost 400 until
+allowlisted), migrate, then the standard dataset pipeline:
+media/real-listing-src staged from static/img/real (11 photos) →
+seed_demo (80) → seed_mombasa_showcase (8 updated) →
+import_real_listing (11 photos, published, is_demo=False) →
+setup_accounts. **Published counts reproduced exactly: 81 (44 sale /
+37 rent / 10 locations)** — the honest ledger reads the same as
+before. NOTE: this seed ran with default MEDIA_ROOT (BASE_DIR/media)
+so the git-bundled demo-photos pools were FOUND — cards now carry
+real pool photography instead of r82's Pillow gradient covers
+(strictly better; the repo-root property-images/2026/11 art covers
+are now orphans of the lost DB).
+(2) **THE EXECUTION PASS (r84) — owner's standing complaint was
+"same idea but way better execution"** — VLM critique of the
+rebuild's screenshots located the gaps, then pages.css +
+services.html got the magazine pass, all token-only (zero new hex,
+zero sub-13px — F1 suite green):
+  * TOC = the index IS content: serif names clamp→3rem @opsz40,
+    meta+arrow regrouped as one right-hand unit (grid 3.9rem/1fr/
+    auto/2.75rem, gap 1.35rem), row hover choreography — name slides
+    8px + burnt, meta burns, hint darkens, and **the ordinal cell
+    swaps to a small rotated photograph from the real listing**
+    (.svc-toc__lead wrapper + .svc-toc__thumb, opacity/scale/rotate
+    transition, pointer-events none, aria-hidden, display:none under
+    (hover:none)/900px — the "ordinal-to-thumbnail" editorial move;
+    CSS-only, no JS, no <img> so F3 dimensions/bytes ratchets hold).
+  * Ledger: label gap tightened 0.85→0.55rem, note brightened
+    cream55→72% and right-aligned (balances the left-heavy first
+    column).
+  * Chapters: lede now a true magazine step (clamp 1.2→1.5rem, opsz
+    24) above 16px body; step titles went display-serif (Fraunces
+    text-xl, echoing the ghost numeral) with 15.2px muted sans
+    descriptions — the lede/body/description ladder separates at a
+    glance; ghost + caption now share ONE bottom offset (the pair
+    reads as a single composed footer line; caption text-wrap
+    balance kills the mid-phrase rag); fee callout softened to a
+    pull-quote (2px rust tick, sand-20 tint) so it concludes the
+    steps instead of outweighing them; chapter link to text-base.
+  * Pledge: Roman markers joined the display voice (italic Fraunces
+    1.4rem — they had been 14px mono, nearly invisible), item
+    padding up, section bottom padding ×1.15, and a NEW closing beat
+    (.svc-pledge__close italic line + /contact/ link) so the section
+    resolves toward a person instead of cutting dead into the footer.
+  * Hero credit reset from shouting mono-caps to a quiet italic
+    Fraunces caption (cream-80) — still the pinned honest copy
+    ("owner-listed", listing title, detail link).
+(3) **VERIFICATION** — full suite **1052 passed** (1048 + the 4
+prod-config tests once psycopg was installed; matches the r83
+baseline exactly). Targeted re-run after the final CSS nudges: 62
+passed (services + G3 + phase2 + F1 + F3). r83_svc_visual_check.py
+ALL PASS on the upgraded page: pins/zigzag/100vh/84px anchors/scrim/
+mobile stacking/reduced-motion all intact. Hover probe (Playwright):
+thumb opacity 1 + rotate −1.5° + num opacity 0 + name burnt +
+translateX(8px) + meta burnt — the choreography fires exactly.
+Mobile 390px: zero horizontal overflow. VLM scores on the new
+screenshots: TOC 8.5 ("one hover interaction away from a 9" — the
+hover now exists), chapter 8.5 (ladder praised), hover verdict
+"distinctive, editorial-feeling, intentional", pledge 9/10 after the
+exhale fix, mobile 8 (clean, no overflow).
+(4) **PREVIEW + ARTIFACTS** — daemon restarted per template edit
+(noreload caches templates); public preview 200 on / and /services/;
+screenshots r84-*.png (10) in download/screenshots/.
+| score: preview restored end-to-end after a full env+DB recycle (counts identical 44/37/10), and the services page pushed from "correct rebuild" to confident editorial execution — display-scale index with photo-swap hovers, magazine type ladder in the chapters, a resolving pledge — 1052 green, geometry + ratchets proven | evidence: test_services_page.py, test_g3_scroll_linked.py, scripts/r83_svc_visual_check.py, scripts/r84_new_state.py, download/screenshots/r84-*.png |
+
 Run 83 | BUILDER (owner round, off-loop) | 2026-11-12 ~08:10-09:10 +03:00 | items:
 (1) **OWNER ASK — "what happened to our great services page...it
 has reverted to the bad styling", then "the page still looks
