@@ -307,7 +307,27 @@ def checks(request):
 
 
 def services(request):
-    """Services page — what Gabriel Homes does: buy, rent & stays, list, support."""
+    """Services page — what Gabriel Homes does: buy, rent & stays, list, support.
+
+    The four service photographs are served from the owner's REAL listing
+    (imported by `import_real_listing`) rather than static copies, so the
+    page always shows the actual property. Slots fall back to the static
+    images when the listing is absent or its gallery is short — the page
+    must never render a broken background.
+    """
+    from apps.listings.management.commands.import_real_listing import REAL_SLUG
+
+    real = (
+        Property.objects.published()
+        .filter(slug=REAL_SLUG)
+        .prefetch_related("images")
+        .first()
+    )
+    gallery = [img.image.url for img in real.images.all()] if real else []
+
+    def svc_photo(index):
+        return gallery[index] if len(gallery) > index else ""
+
     return render(request, "core/services.html", _static_ctx(
         body_class="page-services",
         page_title="Services — Gabriel Homes",
@@ -317,6 +337,11 @@ def services(request):
             "honest photography, and support from offer to handover."
         ),
         canonical_url="/services/",
+        real_listing=real,
+        svc_img_buying=svc_photo(0),
+        svc_img_renting=svc_photo(2),
+        svc_img_enquiries=svc_photo(7),
+        svc_img_listing=svc_photo(6),
     ))
 
 

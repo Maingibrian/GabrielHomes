@@ -1,3 +1,75 @@
+Run 82 | BUILDER (owner round, off-loop) | 2026-11-12 ~07:35-08:00 +03:00 | items:
+(1) **OWNER ASK — "ensure the first services page uses the images
+from the real listing and run the preview."** Context: the sandbox
+was RECYCLED between messages and restored from a pre-r77 snapshot
+— the r77-r81 work (row-glide passes, services redesign rounds,
+parallax audit) is NOT in this filesystem, git HEAD sits 5 commits
+back (ef6dd9b5), the DB was empty, and the preview served the
+FIRST services page (pre-r72 svc-row rows). The owner's message
+points at that first page: wire ITS images to the real listing and
+bring the preview back up. Numbering continues at 82 (77-81 existed
+in the recycled sandbox; their reports were delivered but the code
+is gone).
+(2) **ENVIRONMENT REBUILT** — project .venv recreated
+(ensure-runtime.sh: requirements + migrate); dataset restored with
+the standard pipeline: media/real-listing-src/ staged from the
+listing's 11 photos preserved in static/img/real/ → seed_demo
+(80 listings, generated covers) → seed_mombasa_showcase (8) →
+import_real_listing (**"Modern Beachfront Apartment in Nyali"** —
+11 photos, published, is_demo=False). Published counts: 81 (44
+sale / 37 rent).
+(3) **SERVICES PAGE ← REAL LISTING GALLERY** — services() now
+loads the real listing (REAL_SLUG from import_real_listing,
+published(), prefetch images) and passes four gallery URLs: buying
+= slot 0 (kitchen island), renting = 2 (bedroom garden),
+enquiries = 7 (aerial), listing-with-us = 6 (balcony). Template
+swaps each svc-row background to the media URL with the OLD static
+image as fallback when the listing is absent (page never breaks);
+hero gains an honest mono credit — "The photographs beside each
+service are from our real, owner-listed home — [title]" — linking
+to the listing detail page (CSS: .svc-photo-credit in pages.css,
+cream/ember on the dark hero). Pinned markers untouched.
+(4) **BUG CAUGHT BY VLM, FIXED** — the credit's r82 template
+comment used a MULTI-LINE {# … #} (Django single-line syntax —
+the run-4 bug class, documented in Run 16's gates!) and leaked
+into the rendered page; caught in the VLM visual audit, converted
+to {% comment %}. Note for the future: under runserver --noreload
+the serving process cached templates — template edits need a
+daemon restart.
+(5) **PREVIEW RUNS AGAIN, DAEMONIZED** — this recycled sandbox
+kills every process attached to a Bash call (nohup+setsid both
+die); a double-fork daemon (scripts/launch_preview.py — child
+setsid, grandchild reparented to init) survives. Django
+runserver 0.0.0.0:8000 + preview bridge :3000 run under it
+(GABRIEL_PREVIEW_BRIDGE=1 in .env). Gateway fix: the public
+gateway forwards Host: ws-….cn-hongkong-vpc.fcapp.run, so
+EXTRA_ALLOWED_HOSTS now carries .fcapp.run alongside .space-z.ai
+(DisallowedHost 400 → 200).
+(6) **VERIFICATION** — full suite **1051 passed** (post-rollback
+baseline + 2 new pins: real-listing photos render / static
+fallback contract); 18/18 services+real-listing tests; Playwright:
+4/4 row backgrounds decode from /media/property-images/real/
+(natural 1200x800), credit link → listing page 200, zero console
+errors; site smoke 200 (/, /properties/, /property-for-sale/,
+/contact/); PUBLIC preview verified: /services/ 200 serving all
+four nyali-real URLs + credit, media 200 through the public
+origin; VLM final pass clean (hero legible, kitchen panel
+well-framed, no glitches).
+| score: first services page now photographs itself from the
+owner's real property; preview restored end-to-end on a sandbox
+that had lost DB, venv and servers | evidence: test_services_page
++2 pins (1051 total), scripts/launch_preview.py,
+scripts/r82_visual_check.py, svc-r82-real-listing.png in gallery,
+public-URL greps (4 images, credit, 0 leaks) | gates: start —
+empty DB, no venv, no servers; end — 1051 passed, public preview
+200 with real-listing images | FOR THE NEXT RUN: remaining backlog
+— mobile no-scroll audit ("one should not scroll to view data on
+the page"), owner tools (enquiry workflow UI, listing tools + map
+pin, brand asset editor, SEO/analytics), GitHub push (PAT on
+file); note the r77-r81 chapter-scroll redesign can be rebuilt on
+request (template + CSS documented in the delivered reports) |
+blockers: none
+
 Run 76 | BUILDER (owner round, off-loop) | 2026-11-11 ~19:30-22:00 +03:00 | items:
 (1) **OWNER ASK — the mobile audit + poster hero + THE PUSH.**
 "ensure you audit the mobile view … one should not scroll to view

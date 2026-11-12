@@ -24,6 +24,16 @@
       Gabriel Homes is a new company, founded in 2026 and centred in Kenya.
       These are the services we offer today.
     </p>
+    {% comment %}
+      r82: the service photographs are the real listing's own gallery —
+      an honest credit links straight to the property it belongs to.
+    {% endcomment %}
+    {% if real_listing %}
+    <p class="svc-photo-credit" data-reveal>
+      The photographs beside each service are from our real, owner-listed
+      home — <a href="{{ real_listing.get_absolute_url }}">{{ real_listing.title }}</a>.
+    </p>
+    {% endif %}
   </div>
 </section>
 
@@ -35,7 +45,7 @@
 
   <article class="svc-row" data-reveal>
     <div class="svc-row__media" aria-hidden="true"
-         style="background-image: url('{% staticv 'img/real/real-01-kitchen-island.jpg' %}');"></div>
+         style="background-image: url('{% if svc_img_buying %}{{ svc_img_buying }}{% else %}{% staticv 'img/real/real-01-kitchen-island.jpg' %}{% endif %}');"></div>
     <div class="svc-row__body">
       <span class="eyebrow">Buying</span>
       <h2 class="svc-row__title">Find a home to buy.</h2>
@@ -94,7 +104,7 @@
 
   <article class="svc-row svc-row--flip" data-reveal>
     <div class="svc-row__media" aria-hidden="true"
-         style="background-image: url('{% staticv 'img/real/real-03-bedroom-garden.jpg' %}');"></div>
+         style="background-image: url('{% if svc_img_renting %}{{ svc_img_renting }}{% else %}{% staticv 'img/real/real-03-bedroom-garden.jpg' %}{% endif %}');"></div>
     <div class="svc-row__body">
       <span class="eyebrow">Renting</span>
       <h2 class="svc-row__title">Find a home to rent.</h2>
@@ -121,7 +131,7 @@
 
   <article class="svc-row svc-row--flip" data-reveal>
     <div class="svc-row__media" aria-hidden="true"
-         style="background-image: url('{% staticv 'img/real/real-08-aerial.jpg' %}');"></div>
+         style="background-image: url('{% if svc_img_enquiries %}{{ svc_img_enquiries }}{% else %}{% staticv 'img/real/real-08-aerial.jpg' %}{% endif %}');"></div>
     <div class="svc-row__body">
       <span class="eyebrow">Enquiries</span>
       <h2 class="svc-row__title">Talk to a person about a listing.</h2>
@@ -144,7 +154,7 @@
 
   <article class="svc-row" data-reveal>
     <div class="svc-row__media" aria-hidden="true"
-         style="background-image: url('{% staticv 'img/real/cta-balcony.jpg' %}');"></div>
+         style="background-image: url('{% if svc_img_listing %}{{ svc_img_listing }}{% else %}{% staticv 'img/real/cta-balcony.jpg' %}{% endif %}');"></div>
     <div class="svc-row__body">
       <span class="eyebrow">Owners &amp; agents</span>
       <h2 class="svc-row__title">List a property with us.</h2>

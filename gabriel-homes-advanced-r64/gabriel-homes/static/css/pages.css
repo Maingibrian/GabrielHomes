@@ -294,6 +294,26 @@
    ============================================================ */
 .svc { row-gap: 0; }
 .svc .section-tag { margin-bottom: 1.25rem; }
+/* r82: honest photo credit — the service photographs are the real
+   listing's own gallery, and the credit names that listing. Sits on
+   the dark page-hero, so cream/ember like the hero text tokens. */
+.svc-photo-credit {
+  margin: 1.15rem 0 0;
+  max-width: 46ch;
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  letter-spacing: var(--track-mono);
+  text-transform: uppercase;
+  line-height: 1.7;
+  color: color-mix(in srgb, var(--cream) 72%, transparent);
+}
+.svc-photo-credit a {
+  color: var(--ember);
+  text-decoration: none;
+  border-bottom: 1px solid color-mix(in srgb, var(--ember) 45%, transparent);
+}
+.svc-photo-credit a:hover { border-bottom-color: var(--ember); }
 .svc-row {
   display: grid;
   grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
