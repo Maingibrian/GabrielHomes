@@ -46,3 +46,5 @@ If the gate fails on something outside your task, mark BLOCKED-AGENT with the ou
 - Task BLOCKED-AGENT (after rule 8).
 - Task BLOCKED-OWNER (needs an answer from section 6 of the plan).
 - Budget used ≥ 28 calls: finish the status update and stop.
+Before planning or editing anything, read AGENTS.md and AGENTS-COLLAB.md.
+State the rules and traps that apply to this task before you start.
