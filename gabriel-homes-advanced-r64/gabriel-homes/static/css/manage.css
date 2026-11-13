@@ -1357,3 +1357,248 @@
 }
 .manage-facts li + li { margin-top: 0.25rem; }
 .manage-form-actions { margin-top: 0.75rem; }
+
+/* =============================================================
+   r91 — Desktop dashboard shell + board
+   DESIGN.md §9: "agent dashboard (cream background, espresso
+   sidebar)". Under 64rem nothing changes (mobile-first, P2-1);
+   at >=64rem the sidebar becomes the primary nav and /manage/
+   lays out as a 12-column board instead of a 44rem column.
+   ============================================================= */
+
+/* ---------- Sidebar: hidden on small screens ---------- */
+.manage-side { display: none; }
+
+.manage-side__brand {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  color: inherit;
+  text-decoration: none;
+  min-width: 0;
+  padding: 0 0.5rem;
+}
+
+.manage-side__name {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.2;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  min-width: 0;
+}
+
+.manage-side__name small {
+  font-family: var(--font-mono);
+  font-weight: 600;
+  font-size: var(--text-xs);
+  color: var(--ember);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.manage-side__nav {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.manage-side__link {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  padding: 0.625rem 0.875rem;
+  border-radius: var(--radius-pill);
+  color: var(--cream);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  text-decoration: none;
+  border: 1px solid transparent;
+  white-space: nowrap;
+}
+
+.manage-side__link:hover {
+  border-color: color-mix(in srgb, var(--cream) 40%, transparent);
+}
+
+.manage-side__link.is-current {
+  background: var(--cream);
+  color: var(--espresso);
+  font-weight: 600;
+}
+
+.manage-side__index {
+  flex: none;
+  width: 1.375rem;
+  font-family: var(--font-mono);
+  font-weight: 600;
+  font-size: var(--text-xs);
+  letter-spacing: 0.06em;
+  color: var(--ember);
+}
+
+.manage-side__link.is-current .manage-side__index { color: var(--burnt); }
+
+.manage-side__foot {
+  border-top: 1px solid color-mix(in srgb, var(--cream) 14%, transparent);
+  padding-top: 1rem;
+  display: grid;
+  gap: 0.25rem;
+}
+
+.manage-side__tool {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 0.5rem 0.875rem;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: none;
+  color: color-mix(in srgb, var(--cream) 75%, transparent);
+  font: inherit;
+  font-size: var(--text-sm);
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.manage-side__tool:hover {
+  background: color-mix(in srgb, var(--cream) 10%, transparent);
+  color: var(--cream);
+}
+
+.manage-side__signout { margin: 0; }
+
+/* ---------- KPI tiles (replaces the flat manage-stats on home) ---------- */
+.manage-kpis {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+  margin: 0;
+}
+
+@media (min-width: 48rem) {
+  .manage-kpis { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}
+
+.manage-kpi {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  min-width: 0;
+  background: var(--white);
+  border: 1px solid var(--sand);
+  border-radius: var(--radius-card);
+  padding: 1rem 1rem 0.875rem;
+}
+
+.manage-kpi dt {
+  order: 1;
+  font-family: var(--font-mono);
+  font-weight: 600;
+  font-size: var(--text-xs);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--taupe);
+}
+
+.manage-kpi__value {
+  order: 2;
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(1.5rem, 3vw, 2.25rem);
+  line-height: 1.1;
+  color: var(--espresso);
+}
+
+.manage-kpi__value a { color: inherit; text-decoration: none; }
+.manage-kpi__value a:hover { text-decoration: underline; text-underline-offset: 3px; }
+
+.manage-kpi__hint {
+  order: 3;
+  margin: 0;
+  font-size: var(--text-xs);
+  color: var(--taupe);
+}
+
+/* Micro-sparkline: 30 zero-filled CSS bars from stats.per_day, no JS */
+.manage-kpi__spark {
+  order: 4;
+  display: flex;
+  align-items: flex-end;
+  gap: 1px;
+  height: 2rem;
+  margin-top: 0.375rem;
+}
+
+.manage-kpi__spark i {
+  flex: 1 1 0;
+  min-width: 0;
+  display: block;
+  background: var(--burnt);
+  border-radius: 1px 1px 0 0;
+  opacity: 0.55;
+}
+
+/* ---------- Desktop: sidebar shell (>=64rem) ---------- */
+@media (min-width: 64rem) {
+  body.page-manage {
+    display: grid;
+    grid-template-columns: 16.5rem minmax(0, 1fr);
+  }
+
+  .manage-side {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
+    background: var(--espresso);
+    color: var(--cream);
+    padding: 1.5rem 1rem;
+  }
+
+  /* The mobile chrome is replaced, not removed from the DOM */
+  .manage-topbar,
+  .manage-nav { display: none; }
+
+  .manage-main {
+    grid-column: 2;
+    min-height: 100vh;
+  }
+
+  /* The board may use the full desktop column; other screens keep 44rem */
+  .manage-main > .manage-board { max-width: 72rem; }
+}
+
+/* ---------- Desktop: the /manage/ board (12-column grid) ---------- */
+@media (min-width: 64rem) {
+  .manage-board {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    gap: 1.5rem;
+    align-items: start;
+  }
+
+  /* Zone wrappers flatten so each card is a grid item */
+  .manage-board .manage-duo { display: contents; }
+  .manage-board .manage-module,
+  .manage-board .manage-check { margin-top: 0; }
+
+  .manage-board__welcome { grid-column: 1 / -1; grid-row: 1; }
+  .manage-board__chart    { grid-column: 1 / 9;  grid-row: 2; }
+  .manage-board__pipe     { grid-column: 9 / -1; grid-row: 2; }
+  .manage-board__top      { grid-column: 1 / 9;  grid-row: 3; }
+  .manage-board__recent   { grid-column: 9 / -1; grid-row: 3; }
+  .manage-board__check    { grid-column: 1 / 9;  grid-row: 4 / 6; }
+  .manage-board__quick    { grid-column: 9 / -1; }
+
+  .manage-board > .manage-foot { grid-column: 1 / -1; }
+
+  /* The chart breathes on a wide tile */
+  .manage-board .manage-chart { height: 11rem; }
+}

@@ -24,6 +24,38 @@
 </head>
 <body class="{% block body_class %}page-manage{% endblock %}">
 
+  {% comment %}
+    r91 — desktop shell. On >=64rem viewports the sidebar below becomes the
+    primary navigation (DESIGN.md §9: "cream background, espresso sidebar")
+    and the topbar + chip nav above it are hidden by manage.css. Under 64rem
+    the sidebar is display:none and the original mobile layout is unchanged.
+  {% endcomment %}
+  <aside class="manage-side" aria-label="Portal sections">
+    <a class="manage-side__brand" href="{% url 'manage:home' %}">
+      {% if brand.logo %}
+        <img class="manage-topbar__logo" src="{{ brand.logo.url }}" alt="" width="40" height="40">
+      {% else %}
+        <span class="manage-topbar__mark" aria-hidden="true">{{ SITE_NAME|initials }}</span>
+      {% endif %}
+      <span class="manage-side__name">
+        {{ SITE_NAME }}
+        <small>Owner portal</small>
+      </span>
+    </a>
+    <nav class="manage-side__nav" aria-label="Portal sections (sidebar)">
+      {% include "manage/_nav.html" with variant="sidebar" %}
+    </nav>
+    <div class="manage-side__foot">
+      <a class="manage-side__tool" href="/">View live site</a>
+      <a class="manage-side__tool" href="{% url 'manage:password_change' %}">Password</a>
+      <a class="manage-side__tool" href="/admin/" target="_blank" rel="noopener">Studio</a>
+      <form method="post" action="{% url 'account_logout' %}" class="manage-side__signout">
+        {% csrf_token %}
+        <button type="submit" class="manage-side__tool manage-side__tool--btn">Sign out</button>
+      </form>
+    </div>
+  </aside>
+
   <header class="manage-topbar">
     <a class="manage-topbar__brand" href="{% url 'manage:home' %}">
       {% if brand.logo %}
@@ -49,19 +81,9 @@
   </header>
 
   {# Five sections, one nav (r73 BACKEND-PLAN rule 3) — the badge whispers, never shouts. #}
+  {# r91: links come from manage/_nav.html so sidebar + chip nav cannot drift. #}
   <nav class="manage-nav" aria-label="Portal sections">
-    <a class="manage-nav__link {% if request.path == '/manage/' %}is-current{% endif %}"
-       href="{% url 'manage:home' %}">Home</a>
-    <a class="manage-nav__link {% if '/enquiries' in request.path %}is-current{% endif %}"
-       href="{% url 'manage:enquiries' %}">Enquiries
-       {% if nav_new_enquiries %}<span class="manage-nav__badge">{{ nav_new_enquiries }}</span>{% endif %}
-    </a>
-    <a class="manage-nav__link {% if '/listings' in request.path %}is-current{% endif %}"
-       href="{% url 'manage:listings' %}">Listings</a>
-    <a class="manage-nav__link {% if '/site-content' in request.path %}is-current{% endif %}"
-       href="{% url 'manage:site_content' %}">Site content</a>
-    <a class="manage-nav__link {% if '/seo' in request.path %}is-current{% endif %}"
-       href="{% url 'manage:seo' %}">SEO</a>
+    {% include "manage/_nav.html" %}
   </nav>
 
   <main class="manage-main">

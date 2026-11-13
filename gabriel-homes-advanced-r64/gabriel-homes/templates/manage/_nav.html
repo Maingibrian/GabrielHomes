@@ -1,0 +1,43 @@
+{% comment %}
+  r91 — the five portal sections, one source of truth.
+  Included twice by base.html: once for the desktop sidebar
+  (variant="sidebar" adds the 01-05 index numbers DESIGN.md §2b calls
+  for) and once for the mobile chip nav. Passing variant="" renders
+  the chip variant.
+{% endcomment %}
+{% if variant == "sidebar" %}
+  <a class="manage-side__link {% if request.path == '/manage/' %}is-current{% endif %}"
+     href="{% url 'manage:home' %}">
+    <span class="manage-side__index" aria-hidden="true">01</span>Home
+  </a>
+  <a class="manage-side__link {% if '/enquiries' in request.path %}is-current{% endif %}"
+     href="{% url 'manage:enquiries' %}">
+    <span class="manage-side__index" aria-hidden="true">02</span>Enquiries
+    {% if nav_new_enquiries %}<span class="manage-nav__badge">{{ nav_new_enquiries }}</span>{% endif %}
+  </a>
+  <a class="manage-side__link {% if '/listings' in request.path %}is-current{% endif %}"
+     href="{% url 'manage:listings' %}">
+    <span class="manage-side__index" aria-hidden="true">03</span>Listings
+  </a>
+  <a class="manage-side__link {% if '/site-content' in request.path %}is-current{% endif %}"
+     href="{% url 'manage:site_content' %}">
+    <span class="manage-side__index" aria-hidden="true">04</span>Site content
+  </a>
+  <a class="manage-side__link {% if '/seo' in request.path %}is-current{% endif %}"
+     href="{% url 'manage:seo' %}">
+    <span class="manage-side__index" aria-hidden="true">05</span>SEO
+  </a>
+{% else %}
+  <a class="manage-nav__link {% if request.path == '/manage/' %}is-current{% endif %}"
+     href="{% url 'manage:home' %}">Home</a>
+  <a class="manage-nav__link {% if '/enquiries' in request.path %}is-current{% endif %}"
+     href="{% url 'manage:enquiries' %}">Enquiries
+     {% if nav_new_enquiries %}<span class="manage-nav__badge">{{ nav_new_enquiries }}</span>{% endif %}
+  </a>
+  <a class="manage-nav__link {% if '/listings' in request.path %}is-current{% endif %}"
+     href="{% url 'manage:listings' %}">Listings</a>
+  <a class="manage-nav__link {% if '/site-content' in request.path %}is-current{% endif %}"
+     href="{% url 'manage:site_content' %}">Site content</a>
+  <a class="manage-nav__link {% if '/seo' in request.path %}is-current{% endif %}"
+     href="{% url 'manage:seo' %}">SEO</a>
+{% endif %}

@@ -4,35 +4,50 @@
 {% block title %}Owner portal — {{ SITE_NAME }}{% endblock %}
 
 {% block manage_content %}
+{% comment %}
+  r91 — desktop dashboard board. The zone classes (manage-board__chart,
+  --pipe, --recent, --top, --check, --actions) place each section on the
+  12-column grid at >=64rem (manage.css); under 64rem everything stacks
+  in this DOM order, which is the original mobile flow. Every number
+  still comes from stats.py / checklist.py — this is layout only.
+{% endcomment %}
+<div class="manage-board">
 
   {# ---------- Greeting + today's numbers (all from the database) ---------- #}
-  <section class="manage-card">
+  <section class="manage-card manage-board__welcome">
     <p class="manage-card__tag">[ HOME ]</p>
     <h1 class="manage-card__title">Welcome back{% if request.user.full_name %}, {{ request.user.full_name }}{% endif %}.</h1>
     <p class="manage-card__body">Here is where your site stands today.</p>
 
-    <dl class="manage-stats manage-stats--four">
-      <div class="manage-stat">
+    <dl class="manage-kpis">
+      <div class="manage-kpi">
         <dt>New enquiries</dt>
-        <dd><a href="{% url 'manage:enquiries' %}?tab=new">{{ counts.new_enquiries }}</a></dd>
+        <dd class="manage-kpi__value"><a href="{% url 'manage:enquiries' %}?tab=new">{{ counts.new_enquiries }}</a></dd>
+        <dd class="manage-kpi__hint">waiting for your first reply</dd>
       </div>
-      <div class="manage-stat">
+      <div class="manage-kpi">
         <dt>Live listings</dt>
-        <dd><a href="{% url 'manage:listings' %}?tab=live">{{ counts.live_listings }}</a></dd>
+        <dd class="manage-kpi__value"><a href="{% url 'manage:listings' %}?tab=live">{{ counts.live_listings }}</a></dd>
+        <dd class="manage-kpi__hint">visible on the public site</dd>
       </div>
-      <div class="manage-stat">
+      <div class="manage-kpi">
         <dt>Drafts</dt>
-        <dd><a href="{% url 'manage:listings' %}?tab=draft">{{ counts.drafts }}</a></dd>
+        <dd class="manage-kpi__value"><a href="{% url 'manage:listings' %}?tab=draft">{{ counts.drafts }}</a></dd>
+        <dd class="manage-kpi__hint">unfinished work</dd>
       </div>
-      <div class="manage-stat">
+      <div class="manage-kpi">
         <dt>Listing views</dt>
-        <dd>{{ stats.totals.views }}</dd>
+        <dd class="manage-kpi__value">{{ stats.totals.views }}</dd>
+        <dd class="manage-kpi__hint">across every live listing</dd>
+        <dd class="manage-kpi__spark" aria-hidden="true">
+          {% for day in stats.per_day %}<i style="height: {{ day.pct }}%"></i>{% endfor %}
+        </dd>
       </div>
     </dl>
   </section>
 
   {# ---------- Graph: enquiries, last 30 days (CSS bars, no chart library) ---------- #}
-  <section class="manage-card manage-module" aria-label="Enquiries over the last 30 days">
+  <section class="manage-card manage-module manage-board__chart" aria-label="Enquiries over the last 30 days">
     <div class="manage-card__head">
       <h2 class="manage-check__title">Enquiries, last 30 days</h2>
       <p class="manage-card__body manage-card__body--tight">
@@ -63,7 +78,7 @@
 
   {# ---------- Two-up: status breakdown + most viewed ---------- #}
   <div class="manage-duo">
-    <section class="manage-card" aria-label="Enquiries by status">
+    <section class="manage-card manage-board__pipe" aria-label="Enquiries by status">
       <h2 class="manage-check__title">Where enquiries stand</h2>
       {% if stats.totals.enquiries %}
         <ul class="manage-hbars">
@@ -83,7 +98,7 @@
       {% endif %}
     </section>
 
-    <section class="manage-card" aria-label="Most viewed listings">
+    <section class="manage-card manage-board__top" aria-label="Most viewed listings">
       <h2 class="manage-check__title">Most-viewed listings</h2>
       {% if stats.top_viewed %}
         <ul class="manage-hbars">
@@ -105,7 +120,7 @@
   </div>
 
   {# ---------- Latest enquiries ---------- #}
-  <section class="manage-card manage-module" aria-label="Latest enquiries">
+  <section class="manage-card manage-module manage-board__recent" aria-label="Latest enquiries">
     <div class="manage-card__head">
       <h2 class="manage-check__title">Latest enquiries</h2>
       <a class="manage-card__see-all" href="{% url 'manage:enquiries' %}">See all</a>
@@ -131,7 +146,7 @@
   </section>
 
   {# ---------- Setup checklist: % done + the exact next step ---------- #}
-  <section class="manage-card manage-check" aria-label="Setup checklist">
+  <section class="manage-card manage-check manage-board__check" aria-label="Setup checklist">
     <h2 class="manage-check__title">Setup checklist</h2>
 
     <div class="manage-check__progress">
@@ -196,7 +211,7 @@
 
   {# ---------- Quick actions ---------- #}
   <div class="manage-duo">
-    <section class="manage-card manage-module">
+    <section class="manage-card manage-module manage-board__quick">
       <p class="manage-card__tag">[ SITE CONTENT ]</p>
       <h2 class="manage-check__title">Update the public website.</h2>
       <p class="manage-card__body">Wording, contact details, your logo and socials — one screen, no code.</p>
@@ -204,7 +219,7 @@
         <a class="btn btn--primary" href="{% url 'manage:site_content' %}">Edit site content</a>
       </div>
     </section>
-    <section class="manage-card manage-module">
+    <section class="manage-card manage-module manage-board__quick">
       <p class="manage-card__tag">[ SEO ]</p>
       <h2 class="manage-check__title">Search &amp; tracking.</h2>
       <p class="manage-card__body">The Google Analytics ID, Search Console code and the site's search description.</p>
@@ -218,4 +233,5 @@
     <a class="manage-foot__link" href="/">View your live site</a>
   </p>
 
+</div>
 {% endblock %}
