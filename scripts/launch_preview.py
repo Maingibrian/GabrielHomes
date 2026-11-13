@@ -65,6 +65,12 @@ def main() -> None:
 
     env = dict(os.environ)
     env["GABRIEL_PREVIEW_BRIDGE"] = "1"
+    # The public gateway proxies :81 -> :3000, so the browser's Origin is
+    # http://127.0.0.1:81 while Django serves :8000 — without listing the
+    # gateway origin here every POST form (login, enquiries, portal
+    # actions) 403s on CSRF origin checking. Plain local runs on :8000
+    # never see this because their Origin matches the host.
+    env.setdefault("CSRF_TRUSTED_ORIGINS", "http://127.0.0.1:81")
     proc = subprocess.Popen(
         [str(REPO / ".venv/bin/python"), "manage.py", "runserver",
          "0.0.0.0:8000", "--noreload"],
