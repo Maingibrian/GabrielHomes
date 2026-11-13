@@ -65,12 +65,17 @@ def main() -> None:
 
     env = dict(os.environ)
     env["GABRIEL_PREVIEW_BRIDGE"] = "1"
-    # The public gateway proxies :81 -> :3000, so the browser's Origin is
-    # http://127.0.0.1:81 while Django serves :8000 — without listing the
-    # gateway origin here every POST form (login, enquiries, portal
-    # actions) 403s on CSRF origin checking. Plain local runs on :8000
-    # never see this because their Origin matches the host.
-    env.setdefault("CSRF_TRUSTED_ORIGINS", "http://127.0.0.1:81")
+    # The public preview chain (browser -> preview-chat-*.space-z.ai ->
+    # *.fcapp.run gateway -> :81) delivers requests with Host headers the
+    # dev server does not know, so Django answers 400 DisallowedHost before
+    # any view runs. Allow both proxy domains (leading dot = any subdomain,
+    # so future chat preview URLs keep working).
+    env.setdefault("EXTRA_ALLOWED_HOSTS", ".space-z.ai,.fcapp.run")
+    # CSRF: the browser's Origin is the https preview domain when accessed
+    # through the public URL, or http://127.0.0.1:81 through the local
+    # gateway — both must be trusted or every POST form 403s.
+    env.setdefault("CSRF_TRUSTED_ORIGINS",
+                   "http://127.0.0.1:81,https://*.space-z.ai")
     proc = subprocess.Popen(
         [str(REPO / ".venv/bin/python"), "manage.py", "runserver",
          "0.0.0.0:8000", "--noreload"],
