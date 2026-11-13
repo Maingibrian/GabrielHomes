@@ -1602,3 +1602,171 @@
   /* The chart breathes on a wide tile */
   .manage-board .manage-chart { height: 11rem; }
 }
+
+/* =============================================================
+   r92 — dashboard visual polish. Same zones as r91, tokens only,
+   no JS. Mobile-first additions apply everywhere; the desktop
+   tweaks stay inside the 64rem shell. (Everything above is r91.)
+   ============================================================= */
+
+/* ---------- Hero KPI: the one number that matters today ---------- */
+.manage-kpi--hero {
+  background: var(--espresso);
+  border-color: var(--espresso);
+}
+
+.manage-kpi--hero dt { color: var(--ember); }
+
+.manage-kpi--hero .manage-kpi__value { color: var(--white); }
+
+.manage-kpi--hero .manage-kpi__value a { color: inherit; }
+
+.manage-kpi--hero .manage-kpi__hint {
+  color: var(--cream-90);
+}
+
+/* The 30-day sparkline now sits under the KPI it measures (per_day
+   = enquiries/day), grounded on a hairline so it reads as a chart. */
+.manage-kpi__spark {
+  border-bottom: 1px solid color-mix(in srgb, var(--cream) 25%, transparent);
+  padding-bottom: 2px;
+}
+
+.manage-kpi--hero .manage-kpi__spark i {
+  background: var(--ember);
+  opacity: 0.8;
+}
+
+.manage-kpi--hero .manage-kpi__value a:hover { text-decoration-color: var(--ember); }
+
+/* ---------- Checklist: the espresso anchor ---------- */
+.manage-check--dark {
+  background: var(--espresso);
+  border-color: var(--espresso);
+}
+
+.manage-check--dark .manage-check__title,
+.manage-check--dark .manage-check__count { color: var(--cream); }
+
+.manage-check--dark .manage-check__bar {
+  background: color-mix(in srgb, var(--cream) 16%, transparent);
+  border-color: color-mix(in srgb, var(--cream) 25%, transparent);
+}
+
+.manage-check--dark .manage-check__item {
+  background: color-mix(in srgb, var(--cream) 7%, transparent);
+  border-color: color-mix(in srgb, var(--cream) 14%, transparent);
+}
+
+.manage-check--dark .manage-check__state {
+  background: transparent;
+  border-color: color-mix(in srgb, var(--cream) 35%, transparent);
+  color: var(--cream-90);
+}
+
+.manage-check--dark .manage-check__item.is-done .manage-check__state {
+  background: var(--burnt);
+  border-color: var(--burnt);
+  color: var(--white);
+}
+
+.manage-check--dark .manage-check__label { color: var(--white); }
+
+.manage-check--dark .manage-check__help { color: var(--cream-90); }
+
+.manage-check--dark .manage-check__pill {
+  background: transparent;
+  border-color: color-mix(in srgb, var(--cream) 35%, transparent);
+  color: var(--ember);
+}
+
+.manage-check--dark .manage-check__pill.is-done {
+  background: var(--ember);
+  border-color: var(--ember);
+  color: var(--espresso);
+}
+
+.manage-check--dark .manage-check__auto { color: var(--ember); }
+
+/* The next-step banner sits inside the dark card: blend it in as a
+   raised cream-on-espresso panel instead of a second espresso box. */
+.manage-check--dark .manage-next {
+  background: var(--cream);
+  color: var(--ink);
+}
+
+.manage-check--dark .manage-next__label { color: var(--clay); }
+
+.manage-check--dark .manage-next--done {
+  background: color-mix(in srgb, var(--cream) 10%, transparent);
+  border-color: color-mix(in srgb, var(--cream) 25%, transparent);
+  color: var(--cream);
+}
+
+.manage-check--dark .manage-next--done .manage-next__label { color: var(--ember); }
+
+/* ---------- Desktop refinement (>=64rem) ---------- */
+@media (min-width: 64rem) {
+
+  /* The welcome card leads the board: flatten it into the cream page
+     so the KPI tiles become the visual opening, not a boxed intro. */
+  .manage-board__welcome {
+    background: transparent;
+    border-color: transparent;
+    box-shadow: none;
+    padding: 0 0 0.5rem;
+  }
+
+  .manage-board__welcome .manage-card__tag { margin-bottom: 0.5rem; }
+
+  .manage-board__welcome .manage-card__title {
+    font-size: clamp(2rem, 3.2vw, 2.75rem);
+  }
+
+  .manage-board__welcome .manage-card__body { margin-bottom: 1.25rem; }
+
+  /* KPI tiles: tighter, tappable, with a subtle hover lift */
+  .manage-kpi {
+    padding: 1.125rem 1.125rem 1rem;
+    transition: border-color 160ms ease-out, box-shadow 160ms ease-out,
+                transform 160ms ease-out;
+  }
+
+  .manage-kpi:hover {
+    border-color: var(--taupe-35);
+    box-shadow: var(--shadow-card-hover);
+    transform: translateY(-2px);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .manage-kpi { transition: none; }
+    .manage-kpi:hover { transform: none; }
+  }
+
+  /* A grounded sparkline deserves height on desktop */
+  .manage-kpi--hero .manage-kpi__spark { height: 2.5rem; }
+
+  /* Compact quick-action tiles: they stop being full cards with big
+     buttons and become short entries that let the checklist anchor
+     own the bottom left. */
+  .manage-board__quick {
+    padding: 1.25rem 1.25rem 1.5rem;
+  }
+
+  .manage-board__quick .manage-check__title { font-size: 1.125rem; }
+
+  .manage-board__quick .manage-card__body { margin-bottom: 1rem; }
+
+  .manage-board__quick .manage-card__actions .btn { min-height: 2.75rem; }
+
+  /* The chart keeps its axis; give the status pipeline room to breathe */
+  .manage-board__pipe .manage-hbar { gap: 0.75rem; }
+
+  /* Latest-enquiries rows: keep the panel tidy at 4 columns */
+  .manage-board__recent .manage-row { padding-block: 0.625rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .manage-kpi { transition: none; }
+  .manage-kpi:hover { transform: none; }
+}

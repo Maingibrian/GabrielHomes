@@ -5,6 +5,54 @@ Replace this file's content at the end of every session that runs the gate.
 
 ---
 
+## 2026-11-13 · r92 — dashboard visual polish on the r91 board
+
+Working tree at verification time: HEAD `e88c1b6a` + r92 changes
+(`templates/manage/home.html`, `static/css/manage.css`,
+`apps/manage/tests/test_r92_dashboard_polish.py` NEW).
+
+### `manage.py check`
+```
+System check identified no issues (0 silenced).
+```
+
+### Full suite — `.venv/bin/python -m pytest -q` (real output, tail)
+```
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+1118 passed, 620 warnings in 134.57s (0:02:14)
+PYTEST_EXIT:0
+```
+(1112 r91 baseline + 6 new r92 tests. First run caught r91's
+`test_kpi_strip_has_four_tiles_with_hints` counting the exact attribute
+string `class="manage-kpi"` — broken by the hero tile's longer class
+list; fixed to a word-boundary regex count, then full suite green.)
+
+### `bash scripts/gate.sh` (real output, tail)
+```
+==> G-DEPLOY check --deploy
+System check identified no issues (0 silenced).
+==> G-SAFE |safe allowlist
+==> G-CDN third-party hosts
+==> G-STATIC collectstatic (prod)
+==> G-COV coverage 80
+==> coverage
+GATE GREEN
+GATE_EXIT:0
+```
+
+### Live DOM + VLM screenshot review (through gateway :81)
+- Desktop 1440×900 full-page: `.manage-kpi--hero` ×1, `.manage-check--dark` ×1,
+  `.manage-kpi__spark` ×1 (now under the enquiry KPI it measures). VLM: hero
+  tile dark with sparkline, other three KPI tiles white; espresso checklist
+  anchor with cream "Start here" box + orange button; compact site-content/SEO
+  tiles; "Mark as done" buttons readable on espresso (btn--light-outline);
+  no overlap/misalignment/unreadable text.
+- Mobile 390×844 full-page: sidebar `none`, topbar `flex` (r91 mobile stack
+  untouched), hero + dark anchor render additively; VLM: 2×2 KPI grid, chips,
+  checklist readable, no clipped text.
+
+---
+
 ## 2026-11-13 · r91 — owner-portal desktop dashboard (sidebar + board)
 
 Working tree at verification time: HEAD `21f4745b` + r91 changes

@@ -1,6 +1,11 @@
 # STATUS — Gabriel Homes
 
-Current loop: 5 · Current task: done (H3–H7) · Tool calls used: 22/30 · Next: owner inputs O1–O12 → see docs/OWNER-INPUTS.md; then V4 (owner) + R3 sign-off
+Current loop: 6 · Current task: done (r92 dashboard polish) · Tool calls used: 28/30 · Gate: GATE GREEN · Next: owner preview review
+
+## Loop 6 plan
+- Task: r92 (M) — visual polish of the r91 owner-portal dashboard, owner-requested ("the design of the dashboard can be more well designed"). Layout only: tokens only, no JS, mobile stack untouched, stats.py shapes pinned.
+- Files: templates/manage/home.html; static/css/manage.css; NEW apps/manage/tests/test_r92_dashboard_polish.py; docs/STATUS.md.
+- Proof: manage.py check 0 issues; full pytest (1112 r91 baseline + 6 new r92 tests); VLM screenshot review desktop 1440 + mobile 390 (hero tile, dark checklist anchor, compact quick tiles, no overlap/clipping); gate.sh exit 0.
 
 ## Loop 5 plan
 - Tasks: H3 (S) pin pytest-cov in requirements.txt dev block so G-COV reproduces in a fresh venv; H4 (S) fix build_workspace_snapshot.sh (WS_ROOT env, arg-1 output, count read back from the zip); H5 (S) re-verify the live :3000 allow-list matrix from a clean state; H6 (S) doc-lint DEPLOY.md (manage.py commands, env vars vs .env.example, script paths); H7 (docs) docs/OWNER-INPUTS.md covering O1–O12.

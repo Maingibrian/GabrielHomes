@@ -10,6 +10,11 @@
   12-column grid at >=64rem (manage.css); under 64rem everything stacks
   in this DOM order, which is the original mobile flow. Every number
   still comes from stats.py / checklist.py — this is layout only.
+  r92 — visual polish on the same zones (still layout only): the first
+  KPI is the espresso hero tile, the 30-day sparkline sits under the
+  enquiry KPI it actually measures (per_day = enquiries/day), the setup
+  checklist becomes the espresso anchor (manage-check--dark), and the
+  two quick-action cards become compact tiles.
 {% endcomment %}
 <div class="manage-board">
 
@@ -20,10 +25,13 @@
     <p class="manage-card__body">Here is where your site stands today.</p>
 
     <dl class="manage-kpis">
-      <div class="manage-kpi">
+      <div class="manage-kpi manage-kpi--hero">
         <dt>New enquiries</dt>
         <dd class="manage-kpi__value"><a href="{% url 'manage:enquiries' %}?tab=new">{{ counts.new_enquiries }}</a></dd>
         <dd class="manage-kpi__hint">waiting for your first reply</dd>
+        <dd class="manage-kpi__spark" aria-hidden="true">
+          {% for day in stats.per_day %}<i style="height: {{ day.pct }}%"></i>{% endfor %}
+        </dd>
       </div>
       <div class="manage-kpi">
         <dt>Live listings</dt>
@@ -39,9 +47,6 @@
         <dt>Listing views</dt>
         <dd class="manage-kpi__value">{{ stats.totals.views }}</dd>
         <dd class="manage-kpi__hint">across every live listing</dd>
-        <dd class="manage-kpi__spark" aria-hidden="true">
-          {% for day in stats.per_day %}<i style="height: {{ day.pct }}%"></i>{% endfor %}
-        </dd>
       </div>
     </dl>
   </section>
@@ -145,8 +150,8 @@
     {% endif %}
   </section>
 
-  {# ---------- Setup checklist: % done + the exact next step ---------- #}
-  <section class="manage-card manage-check manage-board__check" aria-label="Setup checklist">
+  {# ---------- Setup checklist: the espresso anchor, % done + the exact next step ---------- #}
+  <section class="manage-card manage-check manage-check--dark manage-board__check" aria-label="Setup checklist">
     <h2 class="manage-check__title">Setup checklist</h2>
 
     <div class="manage-check__progress">
@@ -196,7 +201,7 @@
               <form method="post" action="{% url 'manage:checklist_toggle' item.spec.key %}"
                     class="manage-check__form">
                 {% csrf_token %}
-                <button type="submit" class="btn {% if item.done %}btn--outline{% else %}btn--primary{% endif %} manage-check__btn">
+                <button type="submit" class="btn {% if item.done %}btn--light-outline{% else %}btn--primary{% endif %} manage-check__btn">
                   {% if item.done %}Mark as not done{% else %}Mark as done{% endif %}
                 </button>
               </form>
@@ -209,20 +214,20 @@
     </ul>
   </section>
 
-  {# ---------- Quick actions ---------- #}
+  {# ---------- Quick actions: compact tiles, one line of context each ---------- #}
   <div class="manage-duo">
     <section class="manage-card manage-module manage-board__quick">
       <p class="manage-card__tag">[ SITE CONTENT ]</p>
-      <h2 class="manage-check__title">Update the public website.</h2>
-      <p class="manage-card__body">Wording, contact details, your logo and socials — one screen, no code.</p>
+      <h2 class="manage-check__title">Wording, logo &amp; contact details.</h2>
+      <p class="manage-card__body">One screen, no code.</p>
       <div class="manage-card__actions">
         <a class="btn btn--primary" href="{% url 'manage:site_content' %}">Edit site content</a>
       </div>
     </section>
     <section class="manage-card manage-module manage-board__quick">
       <p class="manage-card__tag">[ SEO ]</p>
-      <h2 class="manage-check__title">Search &amp; tracking.</h2>
-      <p class="manage-card__body">The Google Analytics ID, Search Console code and the site's search description.</p>
+      <h2 class="manage-check__title">Analytics, Search Console &amp; description.</h2>
+      <p class="manage-card__body">How Google sees the site.</p>
       <div class="manage-card__actions">
         <a class="btn btn--outline" href="{% url 'manage:seo' %}">Open SEO settings</a>
       </div>

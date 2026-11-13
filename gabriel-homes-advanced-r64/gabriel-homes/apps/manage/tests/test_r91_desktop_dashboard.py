@@ -106,7 +106,11 @@ def test_home_is_a_board_with_all_zones(owner):
 
 def test_kpi_strip_has_four_tiles_with_hints(owner):
     body = owner.get("/manage/").content.decode()
-    assert body.count('class="manage-kpi"') == 4
+    # r92: the first tile is the hero — its class list grew, so count
+    # the manage-kpi element itself, not an exact attribute string.
+    # (?![-_a-z]) skips manage-kpis / manage-kpi--hero / manage-kpi__*.
+    import re
+    assert len(re.findall(r"manage-kpi(?![-_a-z])", body)) == 4
     assert "manage-kpi__value" in body and "manage-kpi__hint" in body
 
 

@@ -4,10 +4,10 @@ Update this file at the END of every session. Keep it short enough to read
 in under 3 minutes together with AGENTS.md.
 
 ## Current state
-- **Last updated:** 2026-11-13 (r91 session)
+- **Last updated:** 2026-11-13 (r92 session)
 - **Active branch:** `main` (remote `Maingibrian/GabrielHomes`, GitHub)
-- **HEAD before this session's commit:** `21f4745b` (coordination layer, pushed)
-- **Last dev round:** r91 — owner-portal desktop dashboard (espresso sidebar + 12-column board); 1112 tests green
+- **HEAD before this session's commit:** `e88c1b6a` (r91, pushed)
+- **Last dev round:** r92 — dashboard visual polish (espresso hero KPI + grounded enquiry sparkline, dark checklist anchor, compact quick tiles); tests see receipts
 - **Blocked-on:** nothing. Known recurring cost: sandbox recycle wipes `db.sqlite3`/`.venv`/daemon between sessions (restore recipe: `.agents/memory/lessons.md`)
 - **Preview:** up on ports 3000/81 inside the sandbox; public URL `https://preview-chat-32c380a6-f37c-48b2-a3b0-ee41938bc50c.space-z.ai` works only while this sandbox instance lives
 
@@ -16,6 +16,7 @@ in under 3 minutes together with AGENTS.md.
 - `loops/plan-execute-verify.md` is the operating loop for non-trivial changes; small fixes may skip it but must still paste a verification receipt.
 - Coordination files live at git root; the Django tree keeps its own `docs/AGENT-BRIEF.md` protocol — both apply, AGENTS.md reading order first.
 - r91: portal desktop shell keys on `body.page-manage` at `min-width: 64rem`; mobile chrome (topbar + chip nav) stays in the DOM and is only hidden by CSS. Both nav variants render from `templates/manage/_nav.html` — edit that one file, never one variant alone.
+- r92: the dashboard's visual hierarchy is expressed with additive classes on the r91 zones — `manage-kpi--hero` (first KPI, espresso, owns the 30-day sparkline because `stats.per_day` counts ENQUIRIES) and `manage-check--dark` (espresso anchor). Mobile keeps the r91 stack: these classes restyle, they do not move DOM. Undo buttons inside the dark card use `btn--light-outline`.
 
 ## Traps (do not repeat)
 - POST forms 403 through any gateway unless its Origin is in `CSRF_TRUSTED_ORIGINS` → traps.md #1
@@ -42,6 +43,20 @@ What I verified (command + output):
 What I did NOT do:
 Next concrete step:
 ```
+
+### Handoff — 2026-11-13 · ZCode (r92 — dashboard visual polish)
+What I did:
+- Owner asked for better dashboard design. r92 = layout-only polish on the r91 zones: `manage-kpi--hero` (first KPI becomes the espresso hero tile and owns the 30-day sparkline — it moved from "Listing views" because `stats.per_day` counts enquiries, not views), `manage-check--dark` (setup checklist becomes the espresso anchor: cream text, ember pills, cream "Start here" box), manual-item undo buttons switched to `btn--light-outline` for contrast, quick-action cards compacted on desktop, welcome card flattened into the page at ≥64rem, KPI hover lift with `prefers-reduced-motion` off-switch. Tokens only, no JS, mobile stack untouched.
+- NEW `apps/manage/tests/test_r92_dashboard_polish.py` (6 tests: hero+sparkline placement, dark anchor, compact tiles, CSS pins, token existence, no-JS/mobile guarantees). Updated r91's KPI count pin to a word-boundary regex (the hero's class list grew).
+What I verified (command + output):
+- `manage.py check` → `System check identified no issues (0 silenced).`
+- `pytest -q` → `1118 passed, 620 warnings in 134.57s` · EXIT:0 (1112 baseline + 6 new)
+- `bash scripts/gate.sh` → `GATE GREEN` · EXIT:0
+- Live DOM via :81 + VLM full-page screenshots (desktop 1440 + mobile 390): hero/dark/compact all confirmed, sidebar + 2×2 mobile KPI grid intact, no overlap/clipping/unreadable text. First full-suite run caught the r91 pin break (see above) — fixed, rerun green.
+What I did NOT do:
+- Did not touch views/stats/checklist logic (`stats.py` shapes stay pinned); did not restyle other portal screens; mobile layout unchanged by design.
+Next concrete step:
+- Owner reviews the preview (same URL); if the espresso anchor reads too heavy, the fallback is a single CSS token swap (`.manage-check--dark` background → cream) — no template change needed.
 
 ### Handoff — 2026-11-13 · ZCode (r91 — desktop dashboard, design→plan→execute loops)
 What I did:
