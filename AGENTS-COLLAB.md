@@ -4,12 +4,13 @@ Update this file at the END of every session. Keep it short enough to read
 in under 3 minutes together with AGENTS.md.
 
 ## Current state
-- **Last updated:** 2026-11-15 (r101 incident session)
+- **Last updated:** 2026-11-15 (r102 security incident session)
 - **Active branch:** `main` (remote `Maingibrian/GabrielHomes`, GitHub)
-- **HEAD before this session's commit:** `a81fc9fb` (r100)
+- **HEAD before this session's commit:** `c7db02cf` (r101)
+- **r102 SECURITY INCIDENT (read before pushing anything):** platform auto-commit `15a2e2d2` (Nov 13) snapshotted `upload/gabriels pat.txt` — the owner's GitHub PAT — into the repo tree; the r101 push shipped it to a PUBLIC repo (raw.githubusercontent serves it 200 unauthenticated). Purged in `5e6075c5`: file removed from the tree (owner's disk copy untouched), `.gitignore` now blocks token-shaped uploads. History NOT rewritten (AGENTS.md rule 7 + the token is burned by the public exposure regardless) — the old commit still serves the file until GitHub GC. **The owner was told to REVOKE the PAT** (github.com/settings/tokens). New mandatory pre-push gate: `scripts/push_safety_check.sh` — exits 1 on any secret pattern in the push range / HEAD tree, tracked token files, or git config stores; run before EVERY push (also `--verify-clean` / `--audit-pat` modes).
 - **Last dev round:** r100 — hero video retired for a directed Ken Burns slideshow (80s cycle, per-slide character), mobile hero recropped (62svh portrait window), sale tile's bold move (polaroid fan + live count); D-RNG-POLLUTION defect fixed (seed_demo RNG moved into handle — full-suite coast-chip starvation)
 - **r101 incident (no code round):** owner reported "progress lost + images not loading". Diagnosis: NO code lost — HEAD/served page/CSS were exactly r100. The sandbox had been recycled; a restore reseeded the DB WITHOUT images/enquiries (80 listings, 0 PropertyImage rows) → photoless cards, tile fan gone (its image guards skip), empty portal inbox. Fixed by reseeding fully (`seed_demo --clear --with-enquiries`): 109 image rows (0 missing on disk), 43/43 sale covers, 34 enquiries. Verified: 21/21 page images 200 through :81 AND the public chain, fan 3/3 + rail 2/2 loaded in live DOM, count stat 43. Also learned: the public gateway 403s non-browser UAs (the initial "images broken" alarm) — always verify with a browser UA. Prevention + health-check scripts: `scripts/verify_after_reseed.py`, `scripts/diagnose_preview.py` (repo root).
-- **PAT note:** the owner's PAT (supplied r96 session) works; r93–r101 all on GitHub. If push 401s, ask for a new PAT (do NOT store it in any file — pass inline only, never commit it).
+- **PAT note:** the r96-supplied PAT is COMPROMISED (r102 public exposure) — future sessions need a NEW PAT from the owner after they revoke the old one. Never store it in any file or let it be committed; pass it inline only, and run `scripts/push_safety_check.sh` before pushing.
 - **Known recurring cost:** sandbox recycle wipes `db.sqlite3`/`.venv`/daemon between sessions (restore recipe: `.agents/memory/lessons.md`)
 - **Preview:** up on ports 3000/81 inside the sandbox; public URL `https://preview-chat-32c380a6-f37c-48b2-a3b0-ee41938bc50c.space-z.ai` works only while this sandbox instance lives
 
@@ -46,6 +47,19 @@ What I verified (command + output):
 What I did NOT do:
 Next concrete step:
 ```
+
+### Handoff — 2026-11-15 · ZCode (r102 — PAT exposure incident + push authorization)
+What I did:
+- Owner pasted a PAT and authorized pushing. Pre-push sweep found the REAL problem: platform auto-commit `15a2e2d2` (Nov 13) had snapshotted `upload/gabriels pat.txt` into the tracked tree; my r101 push had already shipped it to GitHub. Verified the repo is PUBLIC — `raw.githubusercontent.com/.../15a2e2d2/upload/gabriels%20pat.txt` returned **200 unauthenticated**.
+- Purged in `5e6075c5`: `git rm --cached` on the file (owner's disk copy in `upload/` kept), `.gitignore` extended (upload/*pat*.txt, *.pem, *.key, *token*). History deliberately NOT rewritten (AGENTS.md rule 7 — platform auto-commits; and the exposure window makes the token burned regardless).
+- Built `scripts/push_safety_check.sh` — the mandatory pre-push gate (secret-pattern sweep of push range + HEAD tree, tracked token files, git config/credential stores; `--audit-pat` / `--verify-clean` modes). It caught this incident's full extent; it now runs before every push.
+What I verified (command + output):
+- Pre-purge audit: sweep → UNSAFE (file in HEAD tree + reachable from origin/main + raw 200). Post-purge: sweep → SAFE; push `c7db02cf..5e6075c5 main -> main`; `--verify-clean`: origin/main tree clean, `raw@HEAD` → 404 (the file is gone from the tip; `raw@15a2e2d2` still 200 until GitHub GC — expected, token must be revoked).
+- Screenshot OCR (upload/pasted_image_1794546026489.png): 0 secret hits.
+What I did NOT do:
+- Did NOT rewrite git history (reasons above). Did NOT delete the owner's original file from disk. Did NOT touch the Django tree.
+Next concrete step:
+- **Owner action: revoke the PAT at github.com/settings/tokens** — it was publicly downloadable for ~2 days; treat it as compromised regardless of the purge. Then issue a fresh one when a future session needs to push.
 
 ### Handoff — 2026-11-15 · ZCode (r100 — hero slideshow + mobile hero + tile bold move)
 What I did (owner round seventeen, three asks):
