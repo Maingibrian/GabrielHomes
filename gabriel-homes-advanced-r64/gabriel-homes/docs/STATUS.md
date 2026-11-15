@@ -1,6 +1,11 @@
 # STATUS — Gabriel Homes
 
-Current loop: 11 · Current task: done (r97 reels run word→section edge) · Gate: GATE GREEN · Next: owner preview review
+Current loop: 12 · Current task: done (r98 full-sale-list tile upgrade) · Gate: GATE GREEN · Next: owner preview review
+
+## Loop 12 plan
+- Task: r98 (M) — owner round fifteen: the full sale list card (.market-rail__more, group 01's closing tile) needed its styling upgraded "building on the style it has". The sibling closer (.market-stay--more) already had the r18.1 language — ghost numeral, sand keyline, chip affordance; the sale tile was the plain one. Now: ghost "01" contained top-right, sand keyline over the eyebrow, circular arrow chip that fills burnt on hover, warm radial glow over the kept espresso gradient, bottom-anchored content, mobile-sized numeral. Markup untouched.
+- Files: static/css/home.css only; NEW apps/core/tests/test_r98_sale_tile_upgrade.py.
+- Proof: RED first (6 RED on the change); pytest -q → 1170 passed; gate.sh → GATE GREEN exit 0. Live: 1920/1440/mobile/fx=none verified, VLM confirms all five elements, no clipping. Receipts: .agents/reports/test-evidence.md. Pushed with the owner's PAT.
 
 ## Loop 11 plan
 - Task: r97 (M) — owner round fourteen: "the carousel should also run from the words all the way to edge of the section". The reel window (fixed 3-frame height since r94) now flex-fills the flank from the word's --reel-hug to the section edge; films ship 7 sets (21 frames) so coverage is always window + one set (worst case @1440: 1414px needed ≤ 1920px shipped). Loop distance unchanged (one set). Two superseded pins rewritten (r96 template-shape 12→42 frames, r95 film-duplication 6→21).

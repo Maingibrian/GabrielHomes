@@ -4,11 +4,11 @@ Update this file at the END of every session. Keep it short enough to read
 in under 3 minutes together with AGENTS.md.
 
 ## Current state
-- **Last updated:** 2026-11-15 (r97 session)
+- **Last updated:** 2026-11-15 (r98 session)
 - **Active branch:** `main` (remote `Maingibrian/GabrielHomes`, GitHub)
-- **HEAD before this session's commit:** `122f2fcc` (r96)
-- **Last dev round:** r97 — the reels run word→section edge (flex-fill window, 21-frame films); tests see receipts
-- **PAT note:** the owner's PAT (supplied r96 session) works; r93–r97 all on GitHub. If push 401s, ask for a new PAT (do NOT store it in any file — pass inline only, never commit it).
+- **HEAD before this session's commit:** `05414809` (r97)
+- **Last dev round:** r98 — the "Full sale list" tile upgrade (ghost 01, sand keyline, arrow chip, warm glow); tests see receipts
+- **PAT note:** the owner's PAT (supplied r96 session) works; r93–r98 all on GitHub. If push 401s, ask for a new PAT (do NOT store it in any file — pass inline only, never commit it).
 - **Known recurring cost:** sandbox recycle wipes `db.sqlite3`/`.venv`/daemon between sessions (restore recipe: `.agents/memory/lessons.md`)
 - **Preview:** up on ports 3000/81 inside the sandbox; public URL `https://preview-chat-32c380a6-f37c-48b2-a3b0-ee41938bc50c.space-z.ai` works only while this sandbox instance lives
 
@@ -45,6 +45,17 @@ What I verified (command + output):
 What I did NOT do:
 Next concrete step:
 ```
+
+### Handoff — 2026-11-15 · ZCode (r98 — "Full sale list" tile upgrade)
+What I did:
+- Owner round fifteen: the full sale list card (.market-rail__more) styling upgraded, building on its espresso base. It now speaks the same language as its sibling closer (group 03's stay tile): contained ghost "01" numeral, sand keyline over the eyebrow, circular arrow chip that fills burnt on hover, warm radial glow in the bottom-left, bottom-anchored content. CSS only — template markup untouched. Mobile band sized down (numeral 3.5–5rem, chip 34px).
+What I verified (command + output):
+- `pytest -q` → `1170 passed, 628 warnings in 189.46s` · `bash scripts/gate.sh` → `GATE GREEN` · FINAL_EXIT:0.
+- Live: keyline 1px rgba(217,162,126,.45), chip 40px/999px, glow layered; 1440 numeral 93.6px contained; mobile 413px numeral 56px @top 6px + overflow hidden; fx=none all styles present. VLM: all five elements confirmed, "no clipping, overlap, or cramped spacing".
+What I did NOT do:
+- No markup/JS changes; the rent group's tiles were not in scope.
+Next concrete step:
+- Owner preview review; if the glow should be warmer/stronger or the numeral bigger, both are single-value tweaks in the r98 block of home.css.
 
 ### Handoff — 2026-11-15 · ZCode (r97 — reels run word→section edge)
 What I did:

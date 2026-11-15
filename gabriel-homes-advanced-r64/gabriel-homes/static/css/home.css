@@ -2188,31 +2188,65 @@ html[data-fx="rich"] .bento-flank--homes .flank-reel__film {
 .market-rail__meta { margin: 8px 0 0; }
 .market-rail__price { font-size: 1.02rem; }
 .market-rail__facts { margin: 5px 0 0; }
-/* the closing tile: same espresso language as the stay "more" tile */
+/* the closing tile: r98 upgrade, building on the espresso language it
+   already had. The stay group's closer (r18.1) carried the ghost
+   numeral, sand keyline and chip affordance; the sale tile was the
+   plain one. Now it speaks the same language: ghost "01" contained
+   top-right, the eyebrow under a sand keyline, the arrow a circular
+   chip that fills burnt on hover, and a warm radial so the tall tile
+   reads lit from its corner instead of flat-empty. */
 .market-rail__more {
+  position: relative; overflow: hidden;
   flex: 1; min-height: 132px;
-  display: flex; flex-direction: column; justify-content: center; gap: 10px;
+  display: flex; flex-direction: column; justify-content: flex-end; align-items: flex-start; gap: 10px;
   margin-top: 0; padding: 24px 26px;
-  background: linear-gradient(160deg, #261c16, #3a291f);
+  background:
+    radial-gradient(120% 90% at 12% 100%, rgba(217, 162, 126, .14), rgba(217, 162, 126, 0) 55%),
+    linear-gradient(160deg, #261c16, #3a291f);
   border: 1px solid rgba(250, 248, 244, .07);
   color: #faf8f4;
   font: 500 clamp(1.2rem, 1.7vw, 1.5rem)/1.18 var(--font-display, Georgia, serif);
   letter-spacing: -.01em;
   transition: transform .3s cubic-bezier(.2,.7,.2,1), box-shadow .3s;
 }
+.market-rail__more::before {
+  content: "01";
+  position: absolute; top: 10px; right: 14px;
+  font: 700 clamp(5rem, 6.5vw, 6.5rem)/1 var(--font-mono, monospace);
+  color: rgba(250, 248, 244, .07);
+  letter-spacing: -.05em;
+  pointer-events: none;
+}
 .market-rail__more small {
   font: 600 13px var(--font-mono, monospace);
   text-transform: uppercase; letter-spacing: .12em;
   color: #d9a27e;
+  border-top: 1px solid rgba(217, 162, 126, .45);
+  padding-top: 14px;
 }
-.market-rail__more span[aria-hidden] { color: #eecfae; transition: transform .25s; }
+.market-rail__more span[aria-hidden] {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 40px; height: 40px; margin-top: 6px;
+  border: 1px solid rgba(238, 207, 174, .4);
+  border-radius: 999px;
+  color: #eecfae;
+  font: 500 20px/1 var(--font-sans, sans-serif);
+  transition: background .25s, border-color .25s, transform .25s;
+}
 .market-rail__more:hover {
-  background: linear-gradient(160deg, #2d2119, #443023);
+  background:
+    radial-gradient(120% 90% at 12% 100%, rgba(217, 162, 126, .2), rgba(217, 162, 126, 0) 55%),
+    linear-gradient(160deg, #2d2119, #443023);
   border-color: rgba(250, 248, 244, .16);
   transform: translateY(-4px);
   box-shadow: 0 18px 44px rgba(28, 21, 17, .28);
 }
-.market-rail__more:hover span[aria-hidden] { transform: translateX(5px); }
+.market-rail__more:hover span[aria-hidden] {
+  background: var(--burnt, #af4715);
+  border-color: var(--burnt, #af4715);
+  color: #fff;
+  transform: translateX(5px);
+}
 
 /* --- Group 02 · rent: banners with one shared rhythm */
 .market-rent { gap: 26px; }
@@ -2252,6 +2286,13 @@ html[data-fx="rich"] .bento-flank--homes .flank-reel__film {
   .market-sale { grid-template-columns: 1fr; }
   .market-rail { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
   .market-rail__more { grid-column: 1 / -1; min-height: 96px; flex: none; }
+  /* r98: the short full-width band keeps the ghost numeral but sized
+     to the band — the r18.1 containment trick, scaled down. */
+  .market-rail__more::before {
+    top: 6px; right: 10px;
+    font-size: clamp(3.5rem, 9vw, 5rem);
+  }
+  .market-rail__more span[aria-hidden] { width: 34px; height: 34px; font-size: 17px; margin-top: 2px; }
   .market-banner { grid-template-columns: 1fr; min-height: 0; }
   .market-banner__media { min-height: 0; aspect-ratio: 16/9.5; }
   .market-banner:nth-child(even) .market-banner__media { order: 0; }
