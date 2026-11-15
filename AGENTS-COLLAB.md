@@ -4,11 +4,12 @@ Update this file at the END of every session. Keep it short enough to read
 in under 3 minutes together with AGENTS.md.
 
 ## Current state
-- **Last updated:** 2026-11-15 (r100 session)
+- **Last updated:** 2026-11-15 (r101 incident session)
 - **Active branch:** `main` (remote `Maingibrian/GabrielHomes`, GitHub)
-- **HEAD before this session's commit:** `346802ac` (r99)
+- **HEAD before this session's commit:** `a81fc9fb` (r100)
 - **Last dev round:** r100 — hero video retired for a directed Ken Burns slideshow (80s cycle, per-slide character), mobile hero recropped (62svh portrait window), sale tile's bold move (polaroid fan + live count); D-RNG-POLLUTION defect fixed (seed_demo RNG moved into handle — full-suite coast-chip starvation)
-- **PAT note:** the owner's PAT (supplied r96 session) works; r93–r100 all on GitHub. If push 401s, ask for a new PAT (do NOT store it in any file — pass inline only, never commit it).
+- **r101 incident (no code round):** owner reported "progress lost + images not loading". Diagnosis: NO code lost — HEAD/served page/CSS were exactly r100. The sandbox had been recycled; a restore reseeded the DB WITHOUT images/enquiries (80 listings, 0 PropertyImage rows) → photoless cards, tile fan gone (its image guards skip), empty portal inbox. Fixed by reseeding fully (`seed_demo --clear --with-enquiries`): 109 image rows (0 missing on disk), 43/43 sale covers, 34 enquiries. Verified: 21/21 page images 200 through :81 AND the public chain, fan 3/3 + rail 2/2 loaded in live DOM, count stat 43. Also learned: the public gateway 403s non-browser UAs (the initial "images broken" alarm) — always verify with a browser UA. Prevention + health-check scripts: `scripts/verify_after_reseed.py`, `scripts/diagnose_preview.py` (repo root).
+- **PAT note:** the owner's PAT (supplied r96 session) works; r93–r101 all on GitHub. If push 401s, ask for a new PAT (do NOT store it in any file — pass inline only, never commit it).
 - **Known recurring cost:** sandbox recycle wipes `db.sqlite3`/`.venv`/daemon between sessions (restore recipe: `.agents/memory/lessons.md`)
 - **Preview:** up on ports 3000/81 inside the sandbox; public URL `https://preview-chat-32c380a6-f37c-48b2-a3b0-ee41938bc50c.space-z.ai` works only while this sandbox instance lives
 
