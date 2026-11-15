@@ -176,3 +176,12 @@ above); live preview login (no application change to verify live).
 - Live: gaps now exactly 28px BOTH sides, at 1920 and 1512; horizontal pins identical to the old right:0/left:0 pins; mobile (<1440px) flanks+reels hidden, 6 cards intact; fx=none → 28px hug holds, film static. VLM: "filmstrip sits close below the gabriel word... reading as one cohesive decorative unit"; no overlap with cards/header; no breakage.
 - Full suite: pytest -q → 1158 passed, 628 warnings (143.41s); bash scripts/gate.sh → GATE GREEN, exit 0. No edits during the run.
 - Login verification this round: owner login via the real chain (caddy :81) — POST /account/login/ → 302 /manage/ + sessionid cookie. NOTE the allauth field name is `login`, not `email` (cost two debug cycles). CSRF: the Origin/Referer must be the :81 origin the browser uses.
+
+## r97 — the reels run word→section edge (2026-11-15)
+
+- Owner ask: "the carousel should also run from the words all the way to edge of the section". r96 left the reel a fixed 3-frame window (276px) beside the word with dead space to the edge.
+- Fix: .flank-reel drops `height: var(--reel-set-h)` for `flex: 1` + `min-height: calc(3 * var(--reel-frame-h) + 2 * var(--reel-gap))` (the floor doubles as the flex-item min-height override so the 21-frame film can never force the flank taller than the section). Films grew from 6 to 21 frames (7 sets) via scripts/r97_expand_films.py — loop distance unchanged (exactly one set, r95 pin).
+- Coverage math: worst case @1440 window 1138px + set 276px = 1414px ≤ 7 sets (1920px). @1920: window 772 + set 464 = 1236 ≤ 7 sets (2760px).
+- RED first: NEW apps/core/tests/test_r97_reel_span.py (2 RED on the intended change, 3 keep-pins green). Rewrote two superseded pins deliberately: test_r96 template-shape pin 12→42 frames; test_r95 film-duplication pin 6→21 frames (both with reasons in their docstrings).
+- Live: gabriel reel_bottom→section_bottom = 0px, homes reel_top→section_top = 0px (both 1920 AND 1440); hug 28px both sides both breakpoints; mid-animation film covers window (transform -38px / -197px into cycle, covers:true); mobile 413px 0 reels visible, 6 cards; fx=none static with span held. VLM: "filled edge-to-edge... no empty band where a card is missing" both sides.
+- Full suite: pytest -q → 1163 passed, 628 warnings (180.73s); bash scripts/gate.sh → GATE GREEN, exit 0. No edits during the run.

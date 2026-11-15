@@ -87,10 +87,11 @@ def test_words_keep_their_anchors():
 
 
 def test_template_reel_markup_unchanged():
-    """Scope check (owner asked): this round touches ONLY placement CSS
-    in home.css — the template markup (frames, blur strips) is
-    untouched from r95."""
-    assert HOME_HTML.count("flank-reel__frame") == 12, (
-        "both reels keep their 6 frames (12 total)")
+    """Scope check: r96 (the hug) touched ONLY placement CSS — the
+    template markup kept its r95 shape. r97 later grew the films to 21
+    frames for the word→edge span (see test_r97_reel_span.py); this
+    pin now guards the r97 shape against accidental shrinkage."""
+    assert HOME_HTML.count("flank-reel__frame") == 42, (
+        "both reels keep their 21 frames (42 total)")
     assert len(re.findall(r'class="flank-reel__blur', HOME_HTML)) == 4, (
         "both reels keep their blur strips (4 divs total)")

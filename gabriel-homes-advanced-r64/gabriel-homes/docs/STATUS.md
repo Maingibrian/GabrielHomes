@@ -1,6 +1,11 @@
 # STATUS — Gabriel Homes
 
-Current loop: 10 · Current task: done (r96 reels hug their words) · Gate: GATE GREEN · Next: owner preview review
+Current loop: 11 · Current task: done (r97 reels run word→section edge) · Gate: GATE GREEN · Next: owner preview review
+
+## Loop 11 plan
+- Task: r97 (M) — owner round fourteen: "the carousel should also run from the words all the way to edge of the section". The reel window (fixed 3-frame height since r94) now flex-fills the flank from the word's --reel-hug to the section edge; films ship 7 sets (21 frames) so coverage is always window + one set (worst case @1440: 1414px needed ≤ 1920px shipped). Loop distance unchanged (one set). Two superseded pins rewritten (r96 template-shape 12→42 frames, r95 film-duplication 6→21).
+- Files: static/css/home.css; templates/core/home.html (films only — blur strips/markup shape untouched); NEW apps/core/tests/test_r97_reel_span.py; scripts/r97_expand_films.py (repo root scripts/).
+- Proof: RED first (2 RED on the change); pytest -q → 1163 passed; gate.sh → GATE GREEN exit 0. Live: 0px-to-edge both sides @1920+1440, mid-animation coverage verified, mobile hidden, fx=none static, VLM edge-to-edge. Receipts: .agents/reports/test-evidence.md. Pushed with the owner's fresh PAT.
 
 ## Loop 10 plan
 - Task: r96 (M) — owner round thirteen: "the carousels are way too far from the words" (measured 234px/303px @1920). The reels were pinned to the section's far edges while the words anchor from the opposite ends — the gap grew with section height. Fix: flanks become flex columns (word static, reel static, --reel-hug 1.75rem between); words keep their exact anchors via flank padding (7.5rem); gabriel stacks word→reel, homes reel→word. Gap now fixed 28px at every height/viewport.

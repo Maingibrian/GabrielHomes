@@ -43,11 +43,15 @@ def _reel_block(html):
 
 
 def test_reel_frames_duplicated_for_infinite_loop():
-    """Six frames per reel: the set appears twice so the rise can wrap
-    seamlessly (r94 shipped three — the reel 'ended')."""
+    """The film ships the set many times over so the rise can wrap
+    seamlessly. r94 shipped three (the reel 'ended'); r95 doubled to
+    six; r97 grew the window to word→section-edge and the film with
+    it — 7 sets (21 frames) keeps coverage at window + one full set
+    at every breakpoint (worst case 1440px). The loop distance itself
+    is still exactly ONE set (pinned below)."""
     for block in _reel_block(HOME_HTML):
         n = block.count("flank-reel__frame")
-        assert n == 6, f"reel must carry 6 frames (set x2), found {n}"
+        assert n == 21, f"reel must carry 21 frames (set x7), found {n}"
 
 
 def test_reel_translate_covers_exactly_one_set():

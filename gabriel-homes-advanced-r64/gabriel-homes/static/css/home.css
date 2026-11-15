@@ -1442,10 +1442,20 @@ html.motion-ready .bento-grid--shift .bento-card[data-reveal] {
      mobile-first rule below keeps it display:none everywhere else);
      STATIC — a fixed --reel-hug from its word (the old absolute
      section-edge pins are what pushed the reels hundreds of px away
-     from the words). */
+     from the words).
+     r97: the window no longer has a fixed 3-frame height — it
+     flex-fills the flank from the word all the way to the section
+     edge (owner round fourteen). The 3-frame min-height is the floor:
+     flex:1 alone collapses to 0 when the column is short. */
   position: static;
   width: var(--reel-w);
-  height: var(--reel-set-h);
+  flex: 1;
+  /* min-height does double duty: it replaces the flex item's auto
+     default (the 21-frame film would otherwise force the flank taller
+     than the section) AND floors the window at three frames so a
+     short column can never collapse the reel away. With flex-basis 0
+     the reel otherwise sizes purely by the leftover word→edge space. */
+  min-height: calc(3 * var(--reel-frame-h) + 2 * var(--reel-gap));
   overflow: hidden;
   /* gentle luminance mask under the blur strips */
   -webkit-mask-image: linear-gradient(to bottom, transparent, black 10%, black 90%, transparent);
