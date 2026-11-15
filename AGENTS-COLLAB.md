@@ -8,7 +8,8 @@ in under 3 minutes together with AGENTS.md.
 - **Active branch:** `main` (remote `Maingibrian/GabrielHomes`, GitHub)
 - **HEAD before this session's commit:** `6aebb81c` (r92, pushed)
 - **Last dev round:** r93 — listings edit pages (data bug + visual overhaul of /dashboard/listings/<pk>/edit/, wizard selects, /manage/listings/ desktop rows); tests see receipts
-- **Blocked-on:** nothing. Known recurring cost: sandbox recycle wipes `db.sqlite3`/`.venv`/daemon between sessions (restore recipe: `.agents/memory/lessons.md`)
+- **BLOCKED-OWNER: push failed — the PAT in `upload/gabriels pat.txt` returns 401 (rotated/expired). Commit `ef54df6f` (r93) is safe on local `main` but NOT on GitHub. Next session: get a fresh PAT from the owner and `git push` BEFORE any new work (recycle risk).**
+- **Known recurring cost:** sandbox recycle wipes `db.sqlite3`/`.venv`/daemon between sessions (restore recipe: `.agents/memory/lessons.md`)
 - **Preview:** up on ports 3000/81 inside the sandbox; public URL `https://preview-chat-32c380a6-f37c-48b2-a3b0-ee41938bc50c.space-z.ai` works only while this sandbox instance lives
 
 ## Active decisions (in-flight)
