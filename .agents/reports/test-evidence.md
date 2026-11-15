@@ -156,3 +156,14 @@ above); live preview login (no application change to verify live).
 - Mobile (iPhone 14 emulation, 413px): rail `h3-rail-drift` with `animation-timeline: scroll()`; measured transform −6.6px at section entry → −42.6px near page end (monotonic leftward drift driven by page scroll); reels/words display:none below 1440px.
 - Reduced motion (media emulation): rail, reels, and words all `animation: none`.
 - VLM (1920px): reels visible in both gutters, soft-faded edges, no overlap with bento cards or words; layout intact.
+
+## r95 — reel execution + bento polish (2026-11-15)
+
+- Owner asks: blur before/after on the carousel; rectangular (not square) images; infinite loop (r94 "currently ends"); better bento card presentation.
+- Root cause of the "ending" reel: r94 shipped ONE set of 3 frames while the keyframe translated a full loop height — the window emptied, then snapped. Fix: set shipped twice in markup (6 frames/reel) + loop distance = exactly one set height.
+- RED first: NEW `apps/core/tests/test_r95_reel_bento_polish.py` → 8 failed on the intended changes.
+- Geometry hardened in CSS vars: `--reel-w` (gutter clamp) → `--reel-frame-h = w × 2/3` (the 3/2 rectangle) → `--reel-set-h = 3 frames + 3 gaps` (window AND loop distance — they share the var, so they can never drift). Caught live: the first pass used `aspect-ratio: 3/2` + a separate hardcoded 8.5rem var — frames rendered 120px while the loop assumed 136px (would still jump); the derived-height fix makes drift impossible.
+- Blur strips: `.flank-reel__blur--top/--bottom`, backdrop-filter blur(7px) with their own fading masks — the frames dissolve through blur entering and leaving the window.
+- Bento polish: resting espresso shadow + cream hairline ring (outline, offset -1px); hover lift `translate: 0 -4px` (the SEPARATE `translate` property — bento-shift.js FLIP owns `transform`, they cannot clobber); bed/bath facts → frosted glass chips (fact dropped from the shared middot ::before; location keeps it); price up to ~21.3px sand; index smaller + 0.78 opacity.
+- Full suite: `pytest -q` → `1153 passed, 628 warnings in 183.70s` · `bash scripts/gate.sh` → `GATE GREEN` · EXIT:0. (An earlier gate run failed transiently: the geometry edit landed mid-run and pytest read the file mid-write; the clean re-run above is the receipt.)
+- Live DOM 1920px: frames 180×120 (ratio 1.500), film 780px = 2 sets, window/loop 396px = set height (loop == set ⇒ seamless), blur top+bottom `blur(7px)`, drift −55px over 4s ≈ 396px/30s. VLM: both reels show rectangular filmstrips dissolving through blur at the edges; cards show soft drop shadows; mobile shows bed/bath pills and prominent price, rail drift intact (`h3-rail-drift`), reels hidden below 1440px. Hover lift mechanism proven by injected-rule test (`translate: 0px -4px` applied) — the real rule is `(hover:hover)`-gated, correct for touch devices.

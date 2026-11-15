@@ -219,15 +219,24 @@
   {% endcomment %}
   <div class="bento-flank bento-flank--gabriel" aria-hidden="true">
     <span class="bento-flank__word">gabriel</span>
-    {# r94: the white space below "gabriel" gets a quiet vertical reel — #}
-    {# three coastal frames rising slowly. Decorative only (the flank #}
-    {# wrapper is already aria-hidden); pure CSS, fx-gated motion. #}
+    {# r95: the reel is now a true loop — the set of three frames is #}
+    {# shipped TWICE and the film rises exactly one set height, so #}
+    {# frame 1 reappears where its duplicate was: seamless, it never #}
+    {# ends. Frames are 3/2 landscape rectangles (180x120 markup #}
+    {# dimensions), and the top/bottom of the window dissolve through #}
+    {# blurred strips (flank-reel__blur, backdrop-filter in home.css). #}
+    {# Decorative only (the flank wrapper is already aria-hidden). #}
     <div class="flank-reel">
       <div class="flank-reel__film">
-        <img class="flank-reel__frame" src="{% staticv 'img/real/real-08-aerial.jpg' %}" alt="" loading="lazy" width="180" height="240">
-        <img class="flank-reel__frame" src="{% staticv 'img/real/real-10-sea-light.jpg' %}" alt="" loading="lazy" width="180" height="240">
-        <img class="flank-reel__frame" src="{% staticv 'img/real/real-11-slow-mornings.jpg' %}" alt="" loading="lazy" width="180" height="240">
+        <img class="flank-reel__frame" src="{% staticv 'img/real/real-08-aerial.jpg' %}" alt="" loading="lazy" width="180" height="120">
+        <img class="flank-reel__frame" src="{% staticv 'img/real/real-10-sea-light.jpg' %}" alt="" loading="lazy" width="180" height="120">
+        <img class="flank-reel__frame" src="{% staticv 'img/real/real-11-slow-mornings.jpg' %}" alt="" loading="lazy" width="180" height="120">
+        <img class="flank-reel__frame" src="{% staticv 'img/real/real-08-aerial.jpg' %}" alt="" loading="lazy" width="180" height="120">
+        <img class="flank-reel__frame" src="{% staticv 'img/real/real-10-sea-light.jpg' %}" alt="" loading="lazy" width="180" height="120">
+        <img class="flank-reel__frame" src="{% staticv 'img/real/real-11-slow-mornings.jpg' %}" alt="" loading="lazy" width="180" height="120">
       </div>
+      <div class="flank-reel__blur flank-reel__blur--top" aria-hidden="true"></div>
+      <div class="flank-reel__blur flank-reel__blur--bottom" aria-hidden="true"></div>
     </div>
   </div>
   <span class="visually-hidden">{% if showcase_listings %}HOMES · A small, chosen collection of coastal homes.{% else %}HOW WE CHECK · Five checks before anything goes live. We check who has the right to let or sell.{% endif %}</span>
@@ -356,14 +365,19 @@
     </div>
   </div>
   <div class="bento-flank bento-flank--homes" aria-hidden="true">
-    {# r94: the white space above "homes" gets the same rising reel, #}
-    {# so both gutters breathe while the words hold their anchors. #}
+    {# r95: same seamless loop as the gabriel reel — set x2, 3/2 #}
+    {# rectangles, blur dissolve at both ends of the window. #}
     <div class="flank-reel">
       <div class="flank-reel__film">
-        <img class="flank-reel__frame" src="{% staticv 'img/real/real-09-golden-hour.jpg' %}" alt="" loading="lazy" width="180" height="240">
-        <img class="flank-reel__frame" src="{% staticv 'img/real/real-04-bedroom-sea.jpg' %}" alt="" loading="lazy" width="180" height="240">
-        <img class="flank-reel__frame" src="{% staticv 'img/real/real-06-living-terrace.jpg' %}" alt="" loading="lazy" width="180" height="240">
+        <img class="flank-reel__frame" src="{% staticv 'img/real/real-09-golden-hour.jpg' %}" alt="" loading="lazy" width="180" height="120">
+        <img class="flank-reel__frame" src="{% staticv 'img/real/real-04-bedroom-sea.jpg' %}" alt="" loading="lazy" width="180" height="120">
+        <img class="flank-reel__frame" src="{% staticv 'img/real/real-06-living-terrace.jpg' %}" alt="" loading="lazy" width="180" height="120">
+        <img class="flank-reel__frame" src="{% staticv 'img/real/real-09-golden-hour.jpg' %}" alt="" loading="lazy" width="180" height="120">
+        <img class="flank-reel__frame" src="{% staticv 'img/real/real-04-bedroom-sea.jpg' %}" alt="" loading="lazy" width="180" height="120">
+        <img class="flank-reel__frame" src="{% staticv 'img/real/real-06-living-terrace.jpg' %}" alt="" loading="lazy" width="180" height="120">
       </div>
+      <div class="flank-reel__blur flank-reel__blur--top" aria-hidden="true"></div>
+      <div class="flank-reel__blur flank-reel__blur--bottom" aria-hidden="true"></div>
     </div>
     <span class="bento-flank__word">homes</span>
   </div>

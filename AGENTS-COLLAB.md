@@ -4,11 +4,11 @@ Update this file at the END of every session. Keep it short enough to read
 in under 3 minutes together with AGENTS.md.
 
 ## Current state
-- **Last updated:** 2026-11-15 (r94 session)
+- **Last updated:** 2026-11-15 (r95 session)
 - **Active branch:** `main` (remote `Maingibrian/GabrielHomes`, GitHub)
-- **HEAD before this session's commit:** `0ee21015` (r93 note, local only)
-- **Last dev round:** r94 — front-page motion (palms stagnant, phone-bento scroll drift, flank words breathing in place, gutter image reels); tests see receipts
-- **BLOCKED-OWNER: push still failed — the PAT in `upload/gabriels pat.txt` returns 401 (rotated/expired). Commits `ef54df6f` (r93) + this round's r94 commit are safe on local `main` but NOT on GitHub. Next session: get a fresh PAT from the owner and `git push` BEFORE any new work (recycle risk).**
+- **HEAD before this session's commit:** `96928dbb` (r94, local only)
+- **Last dev round:** r95 — reel execution + bento polish (infinite loop, blur edges, 3/2 rectangles, card shadows/chips/lift); tests see receipts
+- **BLOCKED-OWNER: push still failed — the PAT in `upload/gabriels pat.txt` returns 401 (rotated/expired). Commits `ef54df6f` (r93) + `96928dbb` (r94) + this round's r95 commit are safe on local `main` but NOT on GitHub. Next session: get a fresh PAT from the owner and `git push` BEFORE any new work (recycle risk).**
 - **Known recurring cost:** sandbox recycle wipes `db.sqlite3`/`.venv`/daemon between sessions (restore recipe: `.agents/memory/lessons.md`)
 - **Preview:** up on ports 3000/81 inside the sandbox; public URL `https://preview-chat-32c380a6-f37c-48b2-a3b0-ee41938bc50c.space-z.ai` works only while this sandbox instance lives
 
@@ -45,6 +45,20 @@ What I verified (command + output):
 What I did NOT do:
 Next concrete step:
 ```
+
+### Handoff — 2026-11-15 · ZCode (r95 — reel execution + bento polish)
+What I did:
+- Owner round twelve. (1) INFINITE REEL: root cause of "it currently ends" — r94 shipped one set of 3 frames but the keyframe translated a full loop height, so the window emptied then snapped. The set now ships TWICE (6 frames/reel) and the loop distance = exactly one set height. (2) BLUR BEFORE/AFTER: `.flank-reel__blur--top/--bottom` strips, backdrop-filter blur(7px) + fading masks — frames dissolve through blur entering and leaving. (3) RECTANGLES: 3/2 landscape; frame height DERIVED from reel width (`--reel-frame-h: calc(var(--reel-w) * 2 / 3)`) so ratio + loop math share one source. (4) BENTO POLISH: resting shadow + hairline ring, hover lift on the `translate` property (FLIP-safe; bento-shift.js owns `transform`), bed/bath glass chips (middot retired for facts only), price enlarged/sand, index quieter.
+- Live-caught geometry bug: first pass used `aspect-ratio: 3/2` + hardcoded 8.5rem loop var — frames rendered 120px, loop assumed 136px (would still jump every cycle). Derived-height fix makes drift structurally impossible; window and keyframe both read `--reel-set-h`.
+- Preview daemon restarted mid-session (stale template); fresh daemon serves 12 frames + 4 blur strips.
+What I verified (command + output):
+- `pytest -q` → `1153 passed, 628 warnings in 183.70s` · `bash scripts/gate.sh` → `GATE GREEN` · EXIT:0. (One earlier gate run failed transiently — my CSS edit landed while pytest was mid-run; clean re-run above is the receipt.)
+- Live 1920px: frames 180×120 (ratio 1.500), film 780px = 2 sets, window/loop 396px = set height ⇒ seamless; blur strips `blur(7px)` top+bottom; rise −55px/4s. VLM: both reels rectangular + blur-dissolved edges, cards show shadows; iPhone 413px: bed/bath pills + prominent price + rail drift intact, reels hidden. Hover lift proven via injected-rule test (`translate: 0px -4px` applies); real rule is `(hover:hover)`-gated — correct for touch.
+What I did NOT do:
+- Real-pointer hover screenshot (headless browser reports `(hover: hover)` false) — verified via CSSOM + injected rule instead.
+- Push NOT RUN successfully — PAT still 401. r93+r94+r95 sit on local main only.
+Next concrete step:
+- Owner reviews preview (hard-refresh). Fresh PAT → push three rounds.
 
 ### Handoff — 2026-11-15 · ZCode (r94 — front-page motion)
 What I did:

@@ -915,11 +915,13 @@ html.motion-ready .hero__search:focus-within {
 .bento-card__loc {
   color: var(--cream); /* r12: was cream @70% — unreadable over photos */
 }
-.bento-card__loc::before,
-.bento-card__fact::before {
+.bento-card__loc::before {
   content: "\00b7\00a0\00a0"; /* middot separator inside the meta line */
   color: var(--sand);
 }
+/* r95: the fact drops out of this shared separator — it is a glass
+   chip now (the r95 polish block below), and chips separate
+   themselves. */
 
 /* ============================================================
    3c. Homes bento — "shape shift" (home page only)
@@ -963,6 +965,85 @@ html.motion-ready .hero__search:focus-within {
       corner-shape: superellipse(1.6);
     }
   }
+}
+
+/* ============================================================
+   r95 — bento presentation polish ("the cards should have a better
+   presentation of the style", owner round twelve). Four upgrades on
+   the home cards, all FLIP-safe: bento-shift.js animates `transform`
+   for the shape-shift, so the hover lift uses the SEPARATE `translate`
+   property and the two can never clobber each other.
+
+   1. Resting elevation: a soft espresso shadow + hairline light ring
+      so each card reads as a physical tile, not a cut-out.
+   2. Hover lift: 4px rise + deeper shadow + ring brightening, on the
+      `translate` property (see above).
+   3. Facts as glass chips: bed/bath leave the middot text line and
+      become little frosted pills under the meta; the location keeps
+      its middot (it is a place, not a spec).
+   4. Type retune: the price stands up (larger, sand-tinted), the
+      index eyebrow recedes (smaller, translucent) so the name and
+      price own the card.
+   ============================================================ */
+
+/* 1 — resting elevation + hairline ring (the ring via outline so it
+   never eat into the card's 16px radius; offset -1px hugs the edge) */
+.bento-grid--shift .bento-card--home {
+  box-shadow:
+    0 1px 2px color-mix(in srgb, var(--espresso) 26%, transparent),
+    0 10px 28px -12px color-mix(in srgb, var(--espresso) 38%, transparent);
+  outline: 1px solid color-mix(in srgb, var(--cream) 22%, transparent);
+  outline-offset: -1px;
+  transition: box-shadow 0.45s var(--ease-out),
+              outline-color 0.45s var(--ease-out),
+              translate 0.45s var(--ease-out);
+}
+
+/* 2 — the hover lift (FLIP-safe: `translate`, never `transform`).
+   Focus-visible gets it too — keyboard users feel the same affordance. */
+@media (hover: hover) {
+  .bento-grid--shift .bento-card--home:hover,
+  .bento-grid--shift .bento-card--home:focus-visible {
+    translate: 0 -4px;
+    box-shadow:
+      0 2px 4px color-mix(in srgb, var(--espresso) 24%, transparent),
+      0 22px 44px -14px color-mix(in srgb, var(--espresso) 46%, transparent);
+    outline-color: color-mix(in srgb, var(--cream) 42%, transparent);
+  }
+}
+
+/* 3 — bed/bath facts as frosted glass chips (the flag chip's
+   language, miniaturised into the meta line) */
+.bento-card--home .bento-card__fact {
+  display: inline-block;
+  margin-top: 0.55rem;
+  margin-inline-end: 0.35rem;
+  padding: 0.22rem 0.6rem;
+  border-radius: 999px;
+  font-size: var(--text-xs);
+  font-weight: 600;
+  letter-spacing: var(--track-mono);
+  color: var(--cream);
+  background: color-mix(in srgb, var(--espresso) 55%, transparent);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  border: 1px solid color-mix(in srgb, var(--cream) 28%, transparent);
+}
+
+/* 4 — type retune: the price stands up, the index recedes */
+.bento-card--home .bento-card__price {
+  font-size: calc(var(--text-lg) + 0.08rem);
+  color: var(--sand);
+}
+.bento-card--home .bento-card__index {
+  font-size: calc(var(--text-xs) - 0.04rem);
+  opacity: 0.78;
+}
+
+/* r95 reduce: the lift snaps instead of gliding; the chips, shadow
+   and ring are static styling and stay. */
+@media (prefers-reduced-motion: reduce) {
+  .bento-grid--shift .bento-card--home { transition: none; }
 }
 
 /* ============================================================
@@ -1332,30 +1413,77 @@ html.motion-ready .bento-grid--shift .bento-card[data-reveal] {
    Base rule: display:none (mobile-first; the flanks themselves only
    exist at >=1440px). Motion strictly under html[data-fx="rich"];
    reduce/fx=none/scripts-off get a still, masked stack of three. */
+/* r95 — the reel, executed properly. r94 shipped only ONE set of
+   three frames while the keyframe translated a full loop height, so
+   the window visibly emptied and snapped ("that carousel should be
+   infinite, it currently ends"). Now: the set is shipped twice in the
+   markup and the film rises exactly ONE SET height — frame 1 reappears
+   precisely where its duplicate was, and the loop is seamless.
+   Geometry lives in custom properties so the frame size, the window
+   and the loop distance can never drift apart:
+     --reel-frame-h  one frame (3/2 landscape rectangle, not square)
+     --reel-gap       the strip between frames
+     --reel-set-h     3 frames + 3 gaps — the loop distance = window
+   The window itself keeps a linear mask (the blur strips below sit
+   ON TOP of it and do the dissolving). Motion strictly under
+   html[data-fx="rich"]; reduce/fx=none/scripts-off get a still stack. */
 .flank-reel {
-  display: none;
-  position: absolute;
   /* the flank wrappers are ZERO-WIDTH (the words are position:absolute
      and out of flow), so a percentage width here would collapse to 0 —
-     the reel gets a fixed gutter-scaled width instead. */
-  width: clamp(7.5rem, calc(50vw - 47rem), 11.25rem);
-  height: 34rem;
+     the reel gets a fixed gutter-scaled width instead. The frame height
+     DERIVES from it (x 2/3), so the rectangle stays 3/2 at every
+     gutter width and the loop math below can never drift. */
+  --reel-w: clamp(7.5rem, calc(50vw - 47rem), 11.25rem);
+  --reel-frame-h: calc(var(--reel-w) * 2 / 3);  /* the 3/2 rectangle */
+  --reel-gap: 0.75rem;
+  --reel-set-h: calc(3 * var(--reel-frame-h) + 3 * var(--reel-gap));
+  display: none;
+  position: absolute;
+  width: var(--reel-w);
+  height: var(--reel-set-h);
   overflow: hidden;
-  /* soft dissolve at both ends of the window */
-  -webkit-mask-image: linear-gradient(to bottom, transparent, black 18%, black 82%, transparent);
-  mask-image: linear-gradient(to bottom, transparent, black 18%, black 82%, transparent);
+  /* gentle luminance mask under the blur strips */
+  -webkit-mask-image: linear-gradient(to bottom, transparent, black 10%, black 90%, transparent);
+  mask-image: linear-gradient(to bottom, transparent, black 10%, black 90%, transparent);
   pointer-events: none;
 }
 .flank-reel__film {
   display: grid;
-  gap: 0.75rem;
+  gap: var(--reel-gap);
 }
 .flank-reel__frame {
   width: 100%;
-  height: 10.83rem;             /* 3 frames + 2 gaps = 34rem window */
+  height: var(--reel-frame-h);   /* = 2/3 of the width: the 3/2 rectangle */
   object-fit: cover;
   border-radius: 12px;
   display: block;
+}
+/* r95 — "some blur before and after": the frames enter and leave the
+   window through blurred strips pinned over its top and bottom edges.
+   backdrop-filter blurs whatever is passing beneath AT THAT MOMENT (a
+   live filter — it blurs the moving frames, not a frozen copy), and
+   each strip's own gradient fades the blur itself in and out so the
+   dissolve reads as: sharp -> soft -> gone. */
+.flank-reel__blur {
+  position: absolute;
+  left: 0; right: 0;
+  height: 32%;
+  z-index: 1;
+  pointer-events: none;
+}
+.flank-reel__blur--top {
+  top: 0;
+  -webkit-backdrop-filter: blur(7px);
+  backdrop-filter: blur(7px);
+  -webkit-mask-image: linear-gradient(to bottom, black, transparent);
+  mask-image: linear-gradient(to bottom, black, transparent);
+}
+.flank-reel__blur--bottom {
+  bottom: 0;
+  -webkit-backdrop-filter: blur(7px);
+  backdrop-filter: blur(7px);
+  -webkit-mask-image: linear-gradient(to top, black, transparent);
+  mask-image: linear-gradient(to top, black, transparent);
 }
 .bento-flank--gabriel .flank-reel { right: 0; bottom: 6rem; }
 .bento-flank--homes   .flank-reel { left: 0; top: 6rem; }
@@ -1364,20 +1492,19 @@ html.motion-ready .bento-grid--shift .bento-card[data-reveal] {
   .flank-reel { display: block; }
 }
 
-/* the rise: gated to rich fx only. One loop = one film height
-   (3 frames + their gaps); the duplicate frame set underneath makes
-   the wrap seamless. */
+/* the rise: gated to rich fx only. Exactly one set height — the
+   duplicate set underneath makes the wrap seamless. */
 html[data-fx="rich"] .flank-reel__film {
-  animation: r94-reel-rise 36s linear infinite;
+  animation: r94-reel-rise 30s linear infinite;
 }
 html[data-fx="rich"] .bento-flank--homes .flank-reel__film {
-  animation-duration: 44s;
-  animation-delay: -18s;        /* the two reels never rise in lockstep */
+  animation-duration: 38s;
+  animation-delay: -16s;        /* the two reels never rise in lockstep */
 }
 
 @keyframes r94-reel-rise {
   from { transform: translateY(0); }
-  to   { transform: translateY(calc(-1 * (3 * 10.83rem + 3 * 0.75rem))); }
+  to   { transform: translateY(calc(-1 * var(--reel-set-h))); }
 }
 
 /* r94 belt-and-braces: reduced motion stops the reels too. The fx
