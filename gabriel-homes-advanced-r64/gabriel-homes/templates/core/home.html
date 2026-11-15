@@ -25,21 +25,15 @@
 {# ============================================================ #}
 <section class="hero" id="hero" data-archetype="full-bleed">
   <div class="hero__bg" aria-hidden="true">
-    <div class="hero__slide" style="--slide-img: url('{% staticv 'img/real/hero-slide-1.webp' %}')"></div>
-    <div class="hero__slide" style="--slide-img: url('{% staticv 'img/real/hero-slide-2.webp' %}')"></div>
-    <div class="hero__slide" style="--slide-img: url('{% staticv 'img/real/hero-slide-3.webp' %}')"></div>
-    <div class="hero__slide" style="--slide-img: url('{% staticv 'img/real/hero-slide-4.webp' %}')"></div>
-    {% comment %}
-      H2.b (D-LOOP-21a): the loop is a rich-device upgrade. The gate lives in
-      motion.js setupHeroVideo and is test-pinned by test_h2_hero.py: this
-      video loads ONLY when html[data-fx]="rich" AND Save-Data is off;
-      anything else (lite, none, Save-Data, JS blocked) keeps the hidden
-      attribute — it never loads and the slides stay the visual.
-    {% endcomment %}
-    <video class="hero__video" data-hero-video hidden muted loop playsinline
-           preload="none" tabindex="-1" aria-hidden="true"
-           poster="{% staticv 'img/real/hero-poster.jpg' %}"
-           src="{% staticv 'video/hero-loop.mp4' %}"></video>
+    {# r100: the Ken Burns slideshow is the ONE hero visual on every #}
+    {# device (owner retired the 1.5MB video — "not the best"). Each #}
+    {# slide declares its own --kb-from/--kb-to motion character and #}
+    {# --slide-pos crop anchor (the mobile portrait window crops from #}
+    {# the photo's best vertical slice, not dead center). #}
+    <div class="hero__slide" style="--slide-img: url('{% staticv 'img/real/hero-slide-1.webp' %}'); --slide-pos: 50% 34%"></div>
+    <div class="hero__slide" style="--slide-img: url('{% staticv 'img/real/hero-slide-2.webp' %}'); --slide-pos: 46% 40%"></div>
+    <div class="hero__slide" style="--slide-img: url('{% staticv 'img/real/hero-slide-3.webp' %}'); --slide-pos: 54% 38%"></div>
+    <div class="hero__slide" style="--slide-img: url('{% staticv 'img/real/hero-slide-4.webp' %}'); --slide-pos: 50% 42%"></div>
   </div>
   {# r76: the poster plate rule — a mounted print's caption line, set #}
   {# BELOW the frame on the mobile poster hero (home.css). Purely #}
@@ -447,6 +441,21 @@
           {% endfor %}
           <a class="market-rail__more" href="/properties/?market=sale" data-reveal>
             <small>Full sale list</small>
+            {# r100: the bold move — the tall tile's empty middle gets #}
+            {# the sale list itself: a fanned trio of the rail's own #}
+            {# photos (aria-hidden decoration over the existing link) #}
+            {# and a live count under the eyebrow. No new queries: the #}
+            {# fan reads sale_listings, the count is view-computed. #}
+            {% if sale_listings|length > 1 %}
+            <div class="market-rail__fan" aria-hidden="true">
+              {% for property in sale_listings %}
+                {% if property.images.all.0.image %}
+                <img class="market-rail__fan-img" src="{{ property.images.all.0.image.url }}" alt="" loading="lazy" width="150" height="110">
+                {% endif %}
+              {% endfor %}
+            </div>
+            {% endif %}
+            <p class="market-rail__count"><strong>{{ sale_count }}</strong> homes for sale right now</p>
             Every home for sale
             <span aria-hidden="true">→</span>
           </a>

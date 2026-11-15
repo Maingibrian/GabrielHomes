@@ -1,6 +1,13 @@
 # STATUS — Gabriel Homes
 
-Current loop: 13 · Current task: done (r99 tile elevation + reveal-lift defect fix) · Gate: GATE GREEN · Next: owner preview review
+Current loop: 14 · Current task: done (r100 hero slideshow + mobile hero + tile bold move) · Gate: GATE GREEN · Next: owner preview review
+
+## Loop 14 plan
+- Task: r100 (M) — owner round seventeen, three asks: retire the "not the best" background video for a world-class slideshow; fix the mobile hero; the sale tile still isn't world class.
+- Slideshow: video tag + JS gate + flip CSS retired (1.5MB stops shipping everywhere); per-slide Ken Burns characters (--kb-from/--kb-to), 80s cycle (20s hold per slide), compositor-only props. Mobile hero: 62svh portrait window + per-slide crop anchors + simplified caption plate. Tile: polaroid photo fan (the sale group's own photos) + live sale count (view-computed) + full-measure keyline.
+- Defects fixed en route: D-RNG-POLLUTION (seed_demo module-level random.seed → handle(), full-suite coast-chip starvation), F1 decimal-size allowlist crash + 12.5px→13px floor.
+- Files: home.html, home.css, motion.js, views.py, seed_demo.py; tests: new test_r100_hero_slideshow_tile.py (RED-first), H2/f1/r98 pins superseded with reasons.
+- Proof: 1186 passed (206s); gate GATE GREEN exit 0; live 1920/1440/413/fx=none + hover; VLM: desktop "world-class-leaning", mobile "premium... not a template", tile "excellent execution". Receipts: .agents/reports/test-evidence.md.
 
 ## Loop 13 plan
 - Task: r99 (M) — owner round sixteen: "the card is well styled but not that great". Elevation pass on the full-sale-list tile: resting ambient shadow + inset hairline ring + grain weave (VLM-tuned to visibility), hover sheen sweep (transform-only), numeral drift + warm, chip glow ring, keyline brighten, serif cap 1.65rem. CSS only; all r98 pins kept (suite extended, not rewritten).

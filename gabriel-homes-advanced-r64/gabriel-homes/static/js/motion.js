@@ -402,24 +402,13 @@
   }
 
   // ---------- H2.b: hero video under fx=rich && !Save-Data (D-LOOP-21a) ----------
-  // The 1.5MB loop is a rich-device upgrade of the slide stack: it loads
-  // ONLY when the gate says rich and Save-Data is off; otherwise the
-  // template's hidden attribute keeps it from loading at all (preload=
-  // "none" as a second belt) and the slides stay the visual.
-  function setupHeroVideo() {
-    var video = document.querySelector("[data-hero-video]");
-    if (!video) return;
-    var rich = document.documentElement.getAttribute("data-fx") === "rich";
-    var conn = navigator.connection || {};
-    var saveData = !!(conn.saveData ||
-        (conn.effectiveType && /(^2g$)/.test(conn.effectiveType)));
-    if (!rich || saveData) return;
-    video.hidden = false;
-    var bg = video.closest(".hero__bg");
-    if (bg) bg.classList.add("is-video");
-    var playPromise = video.play();
-    if (playPromise && playPromise.catch) playPromise.catch(function () {});
-  }
+  // ---------- H2.b: hero video — RETIRED r100 ----------
+  // Owner round seventeen: "the background video is not the best...
+  // lets just have a slideshow of images." The <video> tag is gone
+  // from the template and this gate is retired with it: the Ken
+  // Burns slide stack (pure CSS, test-pinned in
+  // test_r100_hero_slideshow_tile.py) is the one hero visual on
+  // every device. Nothing to set up.
 
   // ---------- G4: pointer polish (cursor-view bubble + magnetic CTAs) ----------
   // Rich devices with a fine, hover-capable pointer only (the fx gate alone
@@ -604,7 +593,6 @@
     setupCounters();
     setupQuoteReveal();
     setupHeroHeadline();
-    setupHeroVideo();
     setupPointerPolish();
     setupReveal();
     setupBubbleTitles();

@@ -69,8 +69,13 @@ def test_ghost_numeral_watermark():
 # ---------------------------------------------------------------------------
 def test_eyebrow_sand_keyline():
     small = _rule(".market-rail__more small")
-    assert "border-top: 1px solid rgba(217, 162, 126, .45)" in small, (
-        "the sand keyline the stay tile's eyebrow already has")
+    # SUPERSEDED r100 (VLM polish pass): resting alpha .45 -> .55 and
+    # the rule spans the full measure (align-self: stretch) — the r98
+    # stub read as leftover decoration. The sand tone + air remain.
+    assert "border-top: 1px solid rgba(217, 162, 126, .55)" in small, (
+        "the sand keyline (r100: alpha .55, full measure)")
+    assert "align-self: stretch" in small, (
+        "r100: the keyline spans the tile's content measure")
     assert "padding-top" in small, "the keyline needs air beneath it"
     assert "#d9a27e" in small, "the eyebrow keeps its sand tone"
 

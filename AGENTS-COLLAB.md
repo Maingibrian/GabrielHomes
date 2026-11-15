@@ -4,11 +4,11 @@ Update this file at the END of every session. Keep it short enough to read
 in under 3 minutes together with AGENTS.md.
 
 ## Current state
-- **Last updated:** 2026-11-15 (r99 session)
+- **Last updated:** 2026-11-15 (r100 session)
 - **Active branch:** `main` (remote `Maingibrian/GabrielHomes`, GitHub)
-- **HEAD before this session's commit:** `8e49aa05` (r98)
-- **Last dev round:** r99 — sale-tile elevation (presence, sheen, drift, glow) + D-REVEAL-LIFT defect fix (all revealed home cards' hover lifts were dead under motion-ready)
-- **PAT note:** the owner's PAT (supplied r96 session) works; r93–r99 all on GitHub. If push 401s, ask for a new PAT (do NOT store it in any file — pass inline only, never commit it).
+- **HEAD before this session's commit:** `346802ac` (r99)
+- **Last dev round:** r100 — hero video retired for a directed Ken Burns slideshow (80s cycle, per-slide character), mobile hero recropped (62svh portrait window), sale tile's bold move (polaroid fan + live count); D-RNG-POLLUTION defect fixed (seed_demo RNG moved into handle — full-suite coast-chip starvation)
+- **PAT note:** the owner's PAT (supplied r96 session) works; r93–r100 all on GitHub. If push 401s, ask for a new PAT (do NOT store it in any file — pass inline only, never commit it).
 - **Known recurring cost:** sandbox recycle wipes `db.sqlite3`/`.venv`/daemon between sessions (restore recipe: `.agents/memory/lessons.md`)
 - **Preview:** up on ports 3000/81 inside the sandbox; public URL `https://preview-chat-32c380a6-f37c-48b2-a3b0-ee41938bc50c.space-z.ai` works only while this sandbox instance lives
 
@@ -45,6 +45,21 @@ What I verified (command + output):
 What I did NOT do:
 Next concrete step:
 ```
+
+### Handoff — 2026-11-15 · ZCode (r100 — hero slideshow + mobile hero + tile bold move)
+What I did (owner round seventeen, three asks):
+- VIDEO RETIRED → DIRECTED SLIDESHOW: <video> + motion.js gate + flip CSS all removed (the 1.5MB mp4 no longer ships on ANY device). The 4 slides now run a real Ken Burns: each declares its own --kb-from/--kb-to pan/zoom character (push-in on the sea, pull-back over the arches, terrace drift, counter-drift), cycle stretched 24s → 80s (20s hold per slide — director pace), crossfade overlap tightened, opacity+transform only.
+- MOBILE HERO: the 46vh letterbox (VLM: "raw phone snapshot") became a 62svh portrait window with per-slide crop anchors (--slide-pos in the template) so the crop is curated; caption plate simplified to gap separation. VLM after: "premium... designed boutique property site, not a template."
+- TILE BOLD MOVE: two polish rounds couldn't fix emptiness, so the tall middle now carries a fanned polaroid trio of the sale group's own photos (cream frames, committed tilts, deep shadows, fully contained) + a live count stat ("43 homes for sale right now", view-computed sale_count, white bold number) + full-measure sand keyline. Two VLM polish passes; final verdict "excellent execution; one interaction/rhythm refinement from world-class" (the hover liveness it asked for already existed; rhythm gap tightened).
+- DEFECTS fixed en route: D-RNG-POLLUTION (seed_demo seeded its RNG at module level → full-suite-only coast-chip starvation; seed moved into Command.handle, verified via bisection: accounts/test_saved → core/test_r65) and F1's allowlist int(px) crash on decimal sizes (+ my 12.5px count font raised to the 13px floor).
+What I verified (command + output):
+- `pytest -q` → `1186 passed, 631 warnings in 206.19s` · `bash scripts/gate.sh` → `GATE GREEN` · FINAL_EXIT:0 (first two gate runs failed on the RNG pollution — root-caused and fixed, not rerun-until-green).
+- Live: 1920 (no video element, s1 mid-drift scale 1.12, clean s1→s2 handover; hover: tile -4, fan straightens, sheen sweeps, chip burnt), 1440 (drift live, fan contained), iPhone 413 (fan 306px inside 355px tile, hover:none), fx=none (slide 1 static, tile+fan+count present). VLM verdicts quoted above.
+What I did NOT do:
+- The mp4 file itself still sits in static/video/ (unreferenced; f3's contract accepts that end state — deleting it is a one-liner if the owner confirms).
+- Search-pill contrast and carousel-dot contrast notes from the VLM pass were left (out of scope for the three asks).
+Next concrete step:
+- Owner preview review (hard-refresh); slideshow pacing/character per slide is pure CSS in the hero-drift block if any slide's move should be bolder/quieter.
 
 ### Handoff — 2026-11-15 · ZCode (r99 — sale-tile elevation + reveal-lift defect fix)
 What I did:

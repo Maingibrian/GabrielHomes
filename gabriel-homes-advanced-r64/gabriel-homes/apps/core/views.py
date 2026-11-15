@@ -110,6 +110,11 @@ def home(request):
     sale_listings = list(public_listings.filter(
         listing_type=Property.ListingType.SALE,
     ).order_by("-is_featured", "-published_at")[:3])
+    # r100: the sale tile states what it closes — the live number of
+    # published sale homes, computed here so the template never
+    # guesses.
+    sale_count = public_listings.filter(
+        listing_type=Property.ListingType.SALE).count()
     rent_listings = list(public_listings.filter(
         listing_type=Property.ListingType.RENT, is_short_stay=False,
     ).order_by("-is_featured", "-published_at")[:3])
@@ -162,6 +167,7 @@ def home(request):
         "hero_card_listings": showcase_listings[:5],
         "popular_areas": _hero_popular_areas(list(mombasa_ids)),
         "sale_listings": sale_listings,
+        "sale_count": sale_count,
         "rent_listings": rent_listings,
         "short_stay_listings": short_stay_listings,
         "amenity_listings": amenity_listings,

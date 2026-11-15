@@ -38,33 +38,56 @@
   inset: 0;
   background-image: var(--slide-img, none);
   background-size: cover;
-  background-position: center;
+  background-position: var(--slide-pos, center);
   opacity: 0;
-  animation: hero-fade 24s linear infinite,
-             hero-drift 24s linear infinite;
+  animation: hero-fade 80s linear infinite,
+             hero-drift 80s linear infinite;
   will-change: opacity, transform;
 }
-/* Slide order + animation offsets. The IMAGE itself comes from the
-   inline --slide-img custom property (staticv-versioned per file). */
-.hero__slide:nth-child(1) { animation-delay: 0s; }
-.hero__slide:nth-child(2) { animation-delay: 6s; }
-.hero__slide:nth-child(3) { animation-delay: 12s; }
-.hero__slide:nth-child(4) { animation-delay: 18s; }
-/* Fade in 0-4%, hold to 25%, fade out by 29% — the 1s overlap with
-   the next slide's fade-in makes a seamless crossfade. */
-@keyframes hero-fade {
-  0%   { opacity: 0; }
-  4%   { opacity: 1; }
-  25%  { opacity: 1; }
-  29%  { opacity: 0; }
-  100% { opacity: 0; }
+/* r100 — the directed slideshow. Each slide carries its own motion
+   character (--kb-from / --kb-to transform targets) so the show
+   reads directed, not looped: one slide pushes in on the sea, the
+   next pulls back over the arches, the next drifts along a terrace.
+   The fade overlaps into the next slide's first second, and each
+   photo now HOLDS ~20s at director pace (beginner shows restate
+   themselves every 6s). One compositor-friendly animation pair per
+   slide — opacity + transform only. */
+.hero__slide:nth-child(1) {
+  animation-delay: 0s;
+  --kb-from: scale(1.14) translate3d(3.2%, 1.4%, 0);
+  --kb-to:   scale(1.03) translate3d(-1.8%, -1%, 0);
 }
-/* Slow zoom runs only across the visible quarter; the snap-back to
-   1.02 happens while the slide is fully transparent. */
+.hero__slide:nth-child(2) {
+  animation-delay: 20s;
+  --kb-from: scale(1.05) translate3d(-2.6%, 1.2%, 0);
+  --kb-to:   scale(1.16) translate3d(1.6%, -1.6%, 0);
+}
+.hero__slide:nth-child(3) {
+  animation-delay: 40s;
+  --kb-from: scale(1.17) translate3d(-1.4%, -2%, 0);
+  --kb-to:   scale(1.04) translate3d(2.4%, 1.2%, 0);
+}
+.hero__slide:nth-child(4) {
+  animation-delay: 60s;
+  --kb-from: scale(1.06) translate3d(2.2%, -1.4%, 0);
+  --kb-to:   scale(1.15) translate3d(-1.6%, 1.8%, 0);
+}
+/* Crossfade: fade in over the first ~1s of the slide's 20s window
+   (0-1.25%), hold to 25%, hand over to the next slide's fade-in by
+   27.5% — the 1s overlap makes the cut invisible. */
+@keyframes hero-fade {
+  0%    { opacity: 0; }
+  1.25% { opacity: 1; }
+  25%   { opacity: 1; }
+  27.5% { opacity: 0; }
+  100%  { opacity: 0; }
+}
+/* The Ken Burns move runs the whole visible window; the snap back
+   to --kb-from happens while the slide is fully transparent. */
 @keyframes hero-drift {
-  0%   { transform: scale(1.02); }
-  25%  { transform: scale(1.085); }
-  100% { transform: scale(1.085); }
+  0%   { transform: var(--kb-from); }
+  25%  { transform: var(--kb-to); }
+  100% { transform: var(--kb-from); }
 }
 @media (prefers-reduced-motion: reduce) {
   .hero__slide { animation: none; opacity: 0; }
@@ -404,12 +427,17 @@ html:not([data-fx]) .hero-card__pane { transition: none !important; }
   }
   /* THE PRINT: the slideshow box becomes the poster itself —
      in-flow, edge-margined, rounded, hairline-framed, shadowed.
-     Slides + video + scrim all live inside it unchanged (they are
-     absolute inset-0, so they follow the frame). */
+     Slides + scrim all live inside it unchanged (they are absolute
+     inset-0, so they follow the frame).
+     r100: the old 46vh letterbox sliced the photos mid-subject and
+     read "raw phone snapshot" (VLM). The window is now a tall
+     portrait plate (62svh, clamped) and each slide crops from its
+     own --slide-pos anchor (set in the template per photo), so the
+     crop is curated, not centered-by-default. */
   .hero__bg {
     position: relative;
     inset: auto;
-    height: clamp(320px, 46vh, 420px);
+    height: clamp(380px, 62svh, 560px);
     margin: 0 16px;
     border-radius: var(--radius-card);
     overflow: hidden;
@@ -419,7 +447,7 @@ html:not([data-fx]) .hero-card__pane { transition: none !important; }
   }
   /* a light print grade: the slides get a touch of coastal snap
      so the photo reads as an art-directed poster, not a backdrop */
-  .hero__slide, .hero__video { filter: saturate(1.08) contrast(1.05); }
+  .hero__slide { filter: saturate(1.08) contrast(1.05); }
   /* the poster scrim: lighter than the desktop text-side pool —
      the photo speaks; only the frame's foot needs depth */
   .hero__bg::after {
@@ -428,9 +456,12 @@ html:not([data-fx]) .hero-card__pane { transition: none !important; }
       linear-gradient(180deg, rgba(28,21,17,0) 52%, rgba(28,21,17,.5) 100%);
   }
   /* the plate rule — a mounted print's caption line, set BELOW the
-     frame: two small-caps facts flanked by hairlines, gallery style */
+     frame: two small-caps facts flanked by hairlines, gallery style.
+     r100: one decorative device — the spans separate by gap alone
+     (VLM called the dot + dashes + tracking "three devices doing
+     one job"); the tracking stays, the hairlines stay. */
   .hero__poster-plate {
-    display: flex; align-items: center; gap: 14px;
+    display: flex; align-items: center; gap: 18px;
     margin: 13px 20px 0;
     font-family: var(--font-mono); font-size: var(--text-xs); font-weight: 600;
     text-transform: uppercase; letter-spacing: .18em;
@@ -2239,13 +2270,17 @@ html[data-fx="rich"] .bento-flank--homes .flank-reel__film {
   font: 600 13px var(--font-mono, monospace);
   text-transform: uppercase; letter-spacing: .12em;
   color: #d9a27e;
-  border-top: 1px solid rgba(217, 162, 126, .45);
+  /* r100 VLM pass: the keyline spans the full measure so the tile's
+     left axis is stated confidently (a short stub read as leftover
+     decoration); alpha up .45 -> .55 for presence. */
+  align-self: stretch;
+  border-top: 1px solid rgba(217, 162, 126, .55);
   padding-top: 14px;
   transition: border-color .3s;
 }
 .market-rail__more span[aria-hidden] {
   display: inline-flex; align-items: center; justify-content: center;
-  width: 40px; height: 40px; margin-top: 6px;
+  width: 40px; height: 40px; margin-top: 2px;
   border: 1px solid rgba(238, 207, 174, .4);
   border-radius: 999px;
   color: #eecfae;
@@ -2279,6 +2314,47 @@ html[data-fx="rich"] .bento-flank--homes .flank-reel__film {
   box-shadow: 0 0 0 5px rgba(175, 71, 21, .18), 0 0 22px rgba(217, 162, 126, .35);
   transform: translateX(5px);
 }
+/* r100 — the tile's bold move: the tall tile's middle was empty for
+   two rounds (VLM flagged it twice). The fan breathes in that air: a
+   tilted trio of the sale group's own photos as POLAROIDS — cream
+   frames, real drop shadows, committed tilts — clipped by the tile's
+   overflow:hidden. The fan aligns its left edge to the tile's own
+   content margin (it sat left of it in the first pass); the count
+   gets air below the fan so "evidence" and "data" separate. Rests
+   tilted (no keyframes); hover straightens the spread a step —
+   transform-only, fx-safe. */
+.market-rail__fan {
+  display: flex; align-items: center; justify-content: flex-start;
+  gap: 14px;
+  margin: 6px 0 10px 0;
+  padding-left: 2px;
+  transform: rotate(-4deg);
+  transition: transform .35s cubic-bezier(.2,.7,.2,1);
+  pointer-events: none;
+}
+.market-rail__fan-img {
+  width: 96px; height: 72px;
+  object-fit: cover;
+  padding: 4px 4px 12px;              /* the polaroid's cream chin */
+  background: #f6efe4;
+  border-radius: 3px;
+  box-shadow: 0 10px 22px rgba(15, 11, 8, .5), 0 2px 5px rgba(15, 11, 8, .35);
+  background-clip: padding-box;
+}
+.market-rail__fan-img:nth-child(1) { transform: rotate(-8deg) translateY(6px); z-index: 1; }
+.market-rail__fan-img:nth-child(2) { transform: rotate(1.5deg) translateY(-4px); z-index: 3; }
+.market-rail__fan-img:nth-child(3) { transform: rotate(8deg) translateY(6px); z-index: 2; }
+.market-rail__more:hover .market-rail__fan { transform: rotate(-1.5deg) translateY(-3px); }
+/* the live count: mono, sand — a fact stated, not decoration; the
+   number gets cream + weight so it reads as DATA (VLM: the sand vs
+   cream emphasis was too faint); air above separates evidence/data */
+.market-rail__count {
+  font: 600 13px/1.4 var(--font-mono, monospace);
+  letter-spacing: .02em;
+  color: #c9b09a;
+  margin: 8px 0 4px;
+}
+.market-rail__count strong { color: #ffffff; font-weight: 700; font-size: 14px; }
 /* r99 DEFECT FIX (found live while verifying the tile's hover): the
    site-wide reveal rule `html.motion-ready [data-reveal].is-visible`
    (0,3,1) pins transform: translateY(0) and out-specifies every
@@ -2445,19 +2521,9 @@ html.motion-ready .hero__w-in {
 @media (prefers-reduced-motion: reduce) {
   html.motion-ready .hero__w-in { animation: none; }
 }
-/* The loop crossfades over the slide stack only when motion.js has
-   verified fx=rich && !Save-Data and flipped the class. */
-.hero__video {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  opacity: 0;
-  transition: opacity var(--t-slow) var(--ease);
-}
-.hero__bg.is-video .hero__video { opacity: 1; }
-.hero__bg.is-video .hero__slide { animation: none; opacity: 0; }
+/* r100: the loop's flip block is RETIRED with the tag (owner
+   round seventeen retired the 1.5MB video — the Ken Burns slide
+   stack is the one hero visual on every device). */
 
 /* ============================================================
    r47 — the location chip's pin glyph + demo flag, and the

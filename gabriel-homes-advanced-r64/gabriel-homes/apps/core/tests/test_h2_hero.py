@@ -137,7 +137,7 @@ def test_split_text_mask_headline_contract():
     # removes the h1's own hv2-rise on hand-over, and skips under fxNone.
     assert "setupHeroHeadline" in js
     fn = js[js.index("function setupHeroHeadline"):
-            js.index("function setupHeroVideo")]
+            js.index("function setupPointerPolish")]
     assert "innerHTML" not in fn, "word spans must use DOM APIs, not innerHTML"
     assert 'createElement("span")' in fn and 'className = "hero__w-in"' in fn
     assert 'fxNone) return' in fn, "fx=none must keep the h1 plain (D-MOTION-SAFE)"
@@ -168,25 +168,23 @@ def test_headline_text_survives_the_split():
 
 
 # ---------------------------------------------------------------------------
-# H2.b — hero video under fx=rich && !Save-Data (D-LOOP-21a)
+# H2.b — hero video (SUPERSEDED r100; kept as the removal pin)
 # ---------------------------------------------------------------------------
 def test_hero_video_gated_and_progressive():
+    """SUPERSEDED (r100, owner round seventeen: "the background video
+    is not the best... lets just have a slideshow of images"): the
+    video tag and its motion.js gate are RETIRED — the slide stack is
+    the one hero visual on every device, and the 1.5MB mp4 stops
+    shipping even on rich devices. This pin flips from "gated" to
+    "gone": no <video data-hero-video> in the template, no
+    setupHeroVideo in motion.js. The slideshow's own contract lives
+    in test_r100_hero_slideshow_tile.py (per-slide Ken Burns,
+    director pace, fx-safe)."""
     html = HOME_HTML.read_text(encoding="utf-8")
     js = MOTION_JS.read_text(encoding="utf-8")
     css = HOME_CSS.read_text(encoding="utf-8")
-    m = re.search(r'<video[^>]*data-hero-video[^>]*>', html)
-    assert m, "hero video tag missing"
-    tag = m.group(0)
-    assert "hidden" in tag, "video must ship hidden (no load without the gate)"
-    assert 'preload="none"' in tag, "preload=none is the second belt"
-    assert "muted" in tag and "loop" in tag and "playsinline" in tag
-    assert "hero-poster.jpg" in tag, "poster required (F3/D-LOOP-21a)"
-    assert "hero-loop.mp4" in tag
-    # motion.js: rich AND !Save-Data only; anything else leaves it hidden.
-    fn = js[js.index("function setupHeroVideo"):js.index("function init")]
-    assert 'getAttribute("data-fx") === "rich"' in fn
-    assert "saveData" in fn
-    assert "hidden = false" in fn and 'classList.add("is-video")' in fn
-    # CSS: the flip crossfades the loop over the slides.
-    assert re.search(r"\.hero__bg\.is-video \.hero__video\s*\{[^}]*opacity:\s*1", css)
-    assert re.search(r"\.hero__bg\.is-video \.hero__slide\s*\{[^}]*opacity:\s*0", css)
+    assert "data-hero-video" not in html, (
+        "the hero video tag is retired (r100)")
+    assert "setupHeroVideo" not in js, "the gate function is retired (r100)"
+    assert ".hero__video {" not in css and "is-video" not in css, (
+        "the video flip CSS is retired with the tag (r100)")

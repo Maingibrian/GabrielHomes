@@ -32,7 +32,9 @@ from apps.inquiries.models import Inquiry
 from apps.listings.models import Amenity, Property, PropertyImage, PropertyType
 from apps.locations.models import Location
 
-random.seed(42)  # reproducible seed
+# (r100: the RNG seed moved INTO Command.handle — see D-RNG-POLLUTION
+# there; a module-level seed depended on import order and made the
+# listing spread vary by what ran first in the same process.)
 
 
 # ---------------------------------------------------------------------------
@@ -342,6 +344,15 @@ class Command(BaseCommand):
 
     @transaction.atomic
     def handle(self, *args, **opts):
+        # r100 (D-RNG-POLLUTION): the RNG used to be seeded once at
+        # module import, so its state depended on how many OTHER
+        # seed_demo runs had happened in the same process first — in
+        # the full test suite the random spread of listings across
+        # neighbourhoods differed by call order, occasionally leaving
+        # a coast-chip location (Shanzu/Mtwapa) with zero listings.
+        # Seeding here makes every invocation deterministic on its
+        # own, regardless of who ran before it.
+        random.seed(42)
         # C2 — production starts empty. Fictional listings on a live site
         # would be a launch-killer; refuse unless explicitly overridden.
         if not settings.DEBUG and not opts["i_know_this_is_demo"]:

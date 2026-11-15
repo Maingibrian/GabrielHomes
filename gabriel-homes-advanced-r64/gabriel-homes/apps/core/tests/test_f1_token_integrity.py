@@ -173,10 +173,14 @@ def test_paper_token_is_defined_and_single_sourced():
 # ---------------------------------------------------------------------------
 def test_sub_floor_sizes_are_allowlisted():
     css = css_files()
+    def _allowlisted(name, px):
+        # r100: compare on the rounded int too — a decimal size (e.g.
+        # 12.5px) crashed int(px) before the allowlist could judge it.
+        return (name, float(px)) in FONT_FLOOR_ALLOWLIST or \
+               (name, round(float(px))) in FONT_FLOOR_ALLOWLIST
     unlisted = [
         f"{name} {px}px" for (name, px) in sub_floor_sizes(css)
-        if (name, float(px)) not in FONT_FLOOR_ALLOWLIST
-        and (name, int(px)) not in FONT_FLOOR_ALLOWLIST
+        if not _allowlisted(name, px)
     ]
     assert unlisted == [], (
         f"font sizes below {FONT_FLOOR_PX}px outside the documented "
