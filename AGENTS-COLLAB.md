@@ -4,11 +4,11 @@ Update this file at the END of every session. Keep it short enough to read
 in under 3 minutes together with AGENTS.md.
 
 ## Current state
-- **Last updated:** 2026-11-15 (r98 session)
+- **Last updated:** 2026-11-15 (r99 session)
 - **Active branch:** `main` (remote `Maingibrian/GabrielHomes`, GitHub)
-- **HEAD before this session's commit:** `05414809` (r97)
-- **Last dev round:** r98 — the "Full sale list" tile upgrade (ghost 01, sand keyline, arrow chip, warm glow); tests see receipts
-- **PAT note:** the owner's PAT (supplied r96 session) works; r93–r98 all on GitHub. If push 401s, ask for a new PAT (do NOT store it in any file — pass inline only, never commit it).
+- **HEAD before this session's commit:** `8e49aa05` (r98)
+- **Last dev round:** r99 — sale-tile elevation (presence, sheen, drift, glow) + D-REVEAL-LIFT defect fix (all revealed home cards' hover lifts were dead under motion-ready)
+- **PAT note:** the owner's PAT (supplied r96 session) works; r93–r99 all on GitHub. If push 401s, ask for a new PAT (do NOT store it in any file — pass inline only, never commit it).
 - **Known recurring cost:** sandbox recycle wipes `db.sqlite3`/`.venv`/daemon between sessions (restore recipe: `.agents/memory/lessons.md`)
 - **Preview:** up on ports 3000/81 inside the sandbox; public URL `https://preview-chat-32c380a6-f37c-48b2-a3b0-ee41938bc50c.space-z.ai` works only while this sandbox instance lives
 
@@ -45,6 +45,18 @@ What I verified (command + output):
 What I did NOT do:
 Next concrete step:
 ```
+
+### Handoff — 2026-11-15 · ZCode (r99 — sale-tile elevation + reveal-lift defect fix)
+What I did:
+- Owner round sixteen: "the card is well styled but not that great" → elevation pass on the same tile, CSS-only: resting ambient espresso shadow + inset hairline ring + VLM-tuned grain weave; hover sheen sweep (transform-only, no repaint); ghost-numeral drift + warm; chip glow ring; keyline brightens .45→.75; serif cap 1.65rem. All r98 pins kept.
+- DEFECT (D-REVEAL-LIFT) found live and fixed: `html.motion-ready [data-reveal].is-visible` (0,3,1) pinned translateY(0) over every revealed card's :hover (0,2,0) — ALL home market + nearby card hover lifts were dead under motion-ready since the reveal system landed. Added reveal-proof `html.motion-ready … .is-visible:hover` overrides (6 card families + nearby img). Live-verified: tile -4, feature -4, stay -5, nearby img -5.
+What I verified (command + output):
+- `pytest -q` → `1177 passed, 628 warnings in 136.69s` · `bash scripts/gate.sh` → `GATE GREEN` · FINAL_EXIT:0.
+- Live: 1920 real-mouse hover (sheen swept, numeral (6,-10), tile -4, chip burnt + glow ring); 1440 + iPhone 413 (contained, hover:none safe) + fx=none (presence rests, nothing animates). VLM: resting "premium, ~8/10"; grain confirmed visible after tuning (.045 alpha, 1px/5px).
+What I did NOT do:
+- No markup/JS changes; other sections' cards (hero, bento) untouched — their hover patterns were audited and unaffected (listing-card never pairs with data-reveal).
+Next concrete step:
+- Owner preview review (hard-refresh); if the sheen should be brighter/slower or the grain quieter, each is one value in the r99 block of home.css.
 
 ### Handoff — 2026-11-15 · ZCode (r98 — "Full sale list" tile upgrade)
 What I did:

@@ -1,6 +1,12 @@
 # STATUS — Gabriel Homes
 
-Current loop: 12 · Current task: done (r98 full-sale-list tile upgrade) · Gate: GATE GREEN · Next: owner preview review
+Current loop: 13 · Current task: done (r99 tile elevation + reveal-lift defect fix) · Gate: GATE GREEN · Next: owner preview review
+
+## Loop 13 plan
+- Task: r99 (M) — owner round sixteen: "the card is well styled but not that great". Elevation pass on the full-sale-list tile: resting ambient shadow + inset hairline ring + grain weave (VLM-tuned to visibility), hover sheen sweep (transform-only), numeral drift + warm, chip glow ring, keyline brighten, serif cap 1.65rem. CSS only; all r98 pins kept (suite extended, not rewritten).
+- DEFECT fixed en route (D-REVEAL-LIFT): the site-wide reveal rule was out-specifying every revealed card's :hover transform — all home market/nearby hover lifts were dead under motion-ready. Reveal-proof overrides added for 6 card families + nearby img.
+- Files: static/css/home.css only; tests extended in apps/core/tests/test_r98_sale_tile_upgrade.py.
+- Proof: RED first (6 elevation + 1 defect pin); pytest -q → 1177 passed; gate.sh → GATE GREEN exit 0. Live: 1920/1440/413/fx=none + real-mouse hover verified; VLM: resting "premium ~8/10" with grain confirmed after tuning. Receipts: .agents/reports/test-evidence.md.
 
 ## Loop 12 plan
 - Task: r98 (M) — owner round fifteen: the full sale list card (.market-rail__more, group 01's closing tile) needed its styling upgraded "building on the style it has". The sibling closer (.market-stay--more) already had the r18.1 language — ghost numeral, sand keyline, chip affordance; the sale tile was the plain one. Now: ghost "01" contained top-right, sand keyline over the eyebrow, circular arrow chip that fills burnt on hover, warm radial glow over the kept espresso gradient, bottom-anchored content, mobile-sized numeral. Markup untouched.

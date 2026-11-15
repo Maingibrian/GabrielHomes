@@ -15,6 +15,14 @@ markup change): ghost "01" numeral (contained), the r18.1 sand keyline
 treatment on the eyebrow, the bare "→" becomes a circular chip that
 fills burnt on hover, and a warm radial glow layer joins the espresso
 gradient so the tall tile reads lit, not empty.
+
+r99 (owner round sixteen: "the card is well styled but not that
+great") elevates the same tile from detailed to premium, still
+CSS-only and markup-untouched: resting presence (ambient shadow +
+inset hairline ring + grain weave over the espresso), a diagonal
+sheen sweep on hover, the ghost numeral drifting alive, a glow ring
+joining the chip fill, the keyline brightening, and a larger serif
+cap so the tall tile's line carries its weight.
 """
 import re
 from pathlib import Path
@@ -164,3 +172,127 @@ def test_mobile_watermark_contained():
         "the numeral's mobile floor must be well under the desktop 5rem")
     assert re.search(r"\.market-rail__more::before\s*\{[^}]*top: 6px", block), (
         "the mobile numeral tucks closer to the corner")
+
+
+# ===========================================================================
+# r99 — owner round sixteen: "the card is well styled but not that great".
+# The r98 detailing was correct but the tile read flat next to its
+# photographed siblings: no resting shadow, a static light, a dead
+# surface. These pins hold the elevation pass.
+# ===========================================================================
+
+def test_resting_presence():
+    """Every sibling card in the section casts a resting shadow; the
+    tile now does too (r98 shipped none). Plus the r95 bento treatment:
+    an inset hairline ring so the dark surface has an edge to catch
+    light, and a faint grain weave so the espresso reads material."""
+    tile = _rule(".market-rail__more")
+    assert "box-shadow" in tile and "rgba(28, 21, 17" in tile, (
+        "ambient espresso-tinted resting shadow")
+    assert "inset" in tile, "the inner hairline ring (r95 bento language)"
+    grain = _rule(".market-rail__more::after")
+    assert "repeating-linear-gradient" in grain, "the grain weave layer"
+    assert "pointer-events: none" in grain, "the weave never eats clicks"
+    assert grain.count("position: absolute") == 1, (
+        "the weave is pinned inside the tile (clipped by its overflow)")
+
+
+def test_hover_sheen_sweep():
+    """A diagonal sheen band sweeps across the tile on hover — the
+    classic premium-card cue. It lives on the existing ::after grain
+    element (no markup), as a transform-only overlay band so the sweep
+    animates without repaint; the grain stays as the resting surface."""
+    grain = _rule(".market-rail__more::after")
+    assert "linear-gradient" in grain and "115deg" in grain, (
+        "a diagonal sheen band on the tile's own pseudo")
+    assert "scaleX(" in grain, (
+        "the band ships pre-scaled flat, ready for a transform-only sweep")
+    hover = _rule(".market-rail__more:hover::after")
+    assert "scaleX(" in hover and "translateX(" in hover, (
+        "hover sweeps the band across by transform alone")
+    assert "transition" in grain, "the sweep eases"
+    for rule in (grain, hover):
+        assert "rotate(" not in rule, "no rotation — band stays diagonal"
+
+
+def test_numeral_gains_life():
+    """The ghost numeral is the tile's signature; on hover it drifts
+    up-and-out (transform-only, clipped by the tile's overflow:hidden
+    so it reads as dissolving past the corner) and gains a whisper of
+    warmth. A transition joins it so the drift eases."""
+    before = _rule(".market-rail__more::before")
+    assert "transition" in before, "the numeral's drift eases"
+    hover = _rule(".market-rail__more:hover::before")
+    assert "translate(" in hover and "-1" in hover, (
+        "hover sends the numeral drifting up/out")
+    assert "rgba(250, 248, 244" in hover and ".12" in hover, (
+        "the ghost warms a step (from .07) while it drifts")
+
+
+def test_chip_gains_a_glow_ring():
+    """Hover on the chip now pairs the burnt fill with a soft outer
+    glow ring — the tile's own mini sunrise — and the fill keeps the
+    r98 nudge."""
+    hover = _rule(".market-rail__more:hover span[aria-hidden]")
+    assert "box-shadow" in hover and "0 0" in hover, (
+        "a soft outer glow joins the fill")
+    assert "var(--burnt" in hover, "the burnt fill stays"
+    assert "translateX(5px)" in hover, "the nudge stays"
+
+
+def test_keyline_and_weight():
+    """On hover the sand keyline brightens (its rgba alpha steps up)
+    and the serif line gets a larger cap (1.5rem -> 1.65rem) so the
+    tall tile's promise carries its weight."""
+    hover = _rule(".market-rail__more:hover small")
+    assert "rgba(217, 162, 126" in hover and ".45" not in hover, (
+        "the keyline brightens on hover")
+    tile = _rule(".market-rail__more")
+    assert "clamp(1.2rem, 1.7vw, 1.65rem)" in tile, (
+        "the serif cap grows to carry the tall tile")
+
+
+def test_elevation_is_fx_safe():
+    """Everything r99 adds must be static-safe: under fx=none (and
+    reduced motion via the site-wide gate) the tile keeps its resting
+    presence — shadow, ring, grain — and simply does not animate.
+    Nothing may rely on animation to be visible."""
+    tile = _rule(".market-rail__more")
+    assert "animation" not in tile, "no keyframe dependencies on the tile"
+    grain = _rule(".market-rail__more::after")
+    assert "animation" not in grain, "the sheen is hover-only, never looping"
+    before = _rule(".market-rail__more::before")
+    assert "animation" not in before, "the numeral drifts only on hover"
+
+
+def test_hover_lifts_survive_the_reveal_system():
+    """DEFECT (found live in r99 verification): the site-wide reveal
+    rule `html.motion-ready [data-reveal].is-visible` (0,3,1) pins
+    transform: translateY(0) and out-specifies every revealed card's
+    :hover lift (0,2,0) — under motion-ready the home page's market
+    cards + nearby cards never actually lift (verified identity in the
+    live DOM while hovered). Each card needs an override that starts
+    with html.motion-ready (>= 0,4,1) and carries its own lift amount."""
+    lifts = {
+        ".market-feature": "-4px",
+        ".market-banner": "-4px",
+        ".market-rail__card": "-3px",
+        ".market-stay": "-5px",
+        ".market-rail__more": "-4px",
+    }
+    for sel, lift in lifts.items():
+        override = re.findall(
+            r"(html\.motion-ready\s+" + re.escape(sel)
+            + r"\.is-visible:hover)\s*\{([^}]*)\}", _strip_media(HOME_CSS))
+        assert override, (
+            f"missing reveal-proof hover override for {sel}")
+        body = override[-1][1]
+        assert f"translateY({lift})" in body, (
+            f"{sel} override must carry its own lift {lift}")
+    # nearby-card's hover lifts its img (not itself) — the override
+    # must carry that same translateY(-5px) on the img.
+    nearby = re.findall(
+        r"html\.motion-ready\s+\.nearby-card\.is-visible:hover\s+img\s*\{([^}]*)\}",
+        _strip_media(HOME_CSS))
+    assert nearby and "translateY(-5px)" in nearby[-1], (
+        "missing reveal-proof hover override for .nearby-card img")
