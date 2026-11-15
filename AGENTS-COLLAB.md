@@ -4,11 +4,11 @@ Update this file at the END of every session. Keep it short enough to read
 in under 3 minutes together with AGENTS.md.
 
 ## Current state
-- **Last updated:** 2026-11-15 (r95 session)
+- **Last updated:** 2026-11-15 (r96 session)
 - **Active branch:** `main` (remote `Maingibrian/GabrielHomes`, GitHub)
-- **HEAD before this session's commit:** `96928dbb` (r94, local only)
-- **Last dev round:** r95 — reel execution + bento polish (infinite loop, blur edges, 3/2 rectangles, card shadows/chips/lift); tests see receipts
-- **BLOCKED-OWNER: push still failed — the PAT in `upload/gabriels pat.txt` returns 401 (rotated/expired). Commits `ef54df6f` (r93) + `96928dbb` (r94) + this round's r95 commit are safe on local `main` but NOT on GitHub. Next session: get a fresh PAT from the owner and `git push` BEFORE any new work (recycle risk).**
+- **HEAD before this session's commit:** `d36047a5` (r95)
+- **Last dev round:** r96 — the reels hug their words (flex-column flanks, --reel-hug 28px); tests see receipts
+- **PUSH UNBLOCKED:** the owner supplied a fresh PAT this round; r93–r96 all pushed to GitHub. If push 401s again, ask for a new PAT (do NOT store it in any file — pass inline only, never commit it).
 - **Known recurring cost:** sandbox recycle wipes `db.sqlite3`/`.venv`/daemon between sessions (restore recipe: `.agents/memory/lessons.md`)
 - **Preview:** up on ports 3000/81 inside the sandbox; public URL `https://preview-chat-32c380a6-f37c-48b2-a3b0-ee41938bc50c.space-z.ai` works only while this sandbox instance lives
 
@@ -45,6 +45,20 @@ What I verified (command + output):
 What I did NOT do:
 Next concrete step:
 ```
+
+### Handoff — 2026-11-15 · ZCode (r96 — reels hug their words + push unblocked)
+What I did:
+- Owner round thirteen: "the carousels are way too far from the words" — measured 234px/303px @1920. Root cause: reels pinned to the section's far edges while words anchor from the opposite ends; gap grew with section height. Fix: flanks are flex columns now (word static, reel static, --reel-hug 1.75rem between them), words keep their exact anchors via flank padding (7.5rem), gabriel stacks word→reel, homes reel→word. Gap: fixed 28px both sides, all viewports.
+- Scope discipline per owner ask: only home.css placement rules + the new test file; template untouched (pinned by test: 12 frames, 4 blur divs unchanged).
+- Backend password: set a fresh temp password on the owner account (admin@gabrielhomes.co.ke) and verified the login through the real chain (302 → /manage/, sessionid). NOTE: allauth login field is `login`, not `email`.
+What I verified (command + output):
+- `pytest -q` → `1158 passed, 628 warnings in 143.41s` · `bash scripts/gate.sh` → `GATE GREEN` · FINAL_EXIT:0.
+- Live: gaps exactly 28px @1920 and 1512; 1439px cutoff holds (flanks hidden); mobile 413px: flanks/reels hidden, 6 cards intact; fx=none: 28px hug + static film. VLM: filmstrip "sits close below the gabriel word... one cohesive decorative unit"; no overlap/breakage.
+- Login: POST /account/login/ → `302 redirect: http://127.0.0.1:81/manage/` + sessionid cookie.
+What I did NOT do:
+- Nothing outstanding. (Screenshots reviewed at mid-scroll + section-top; both fine.)
+Next concrete step:
+- Owner: sign in with the temp password (change it under Studio → Change password), review the hug on the preview, hard-refresh.
 
 ### Handoff — 2026-11-15 · ZCode (r95 — reel execution + bento polish)
 What I did:

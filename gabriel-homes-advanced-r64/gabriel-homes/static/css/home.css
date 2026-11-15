@@ -1334,7 +1334,8 @@ html.motion-ready .bento-grid--shift .bento-card[data-reveal] {
 .bento-flank { display: none; }
 @media (min-width: 1440px) {
   .bento-flank {
-    display: block;
+    display: flex;
+    flex-direction: column;
     position: absolute; top: 0; bottom: 0; z-index: 0;
     pointer-events: none; user-select: none;
   }
@@ -1344,7 +1345,10 @@ html.motion-ready .bento-grid--shift .bento-card[data-reveal] {
   .bento-flank--gabriel { right: calc(50% + 38.5rem); }
   .bento-flank--homes { left: calc(50% + 38.5rem); }
   .bento-flank__word {
-    position: absolute;
+    /* r96: STATIC — the word leads the flank's flex column so the
+       reel can flow a fixed --reel-hug beneath it. The flank's own
+       padding (7.5rem) keeps the word at its exact historical
+       anchor; the old absolute pins are retired. */
     writing-mode: vertical-rl;
     font-family: var(--font-display);
     font-style: italic;
@@ -1357,11 +1361,12 @@ html.motion-ready .bento-grid--shift .bento-card[data-reveal] {
     white-space: nowrap;
     will-change: transform;
   }
-  /* The wrappers are zero-width (the words are position:absolute and
-     out of flow), so each word must be pinned to the wrapper edge that
-     faces the container — gabriel's right, homes's left. */
-  .bento-flank--gabriel .bento-flank__word { top: 7.5rem; right: 0; }
-  .bento-flank--homes .bento-flank__word { bottom: 7.5rem; left: 0; }
+  /* r96: the words keep their historical anchors via the FLANK's own
+     padding (see the r96 reel block below) and the column's alignment
+     handles the horizontal pin — the flank is shrink-to-fit now that
+     the words are static, so gabriel's box grows leftward from its
+     right offset (word right edge = grid edge, as before) and homes's
+     grows rightward from its left offset. */
 
   /* r94 — the words are ALIVE IN PLACE ("the gabriels homes part next
      to the bento should be animated... not moving up or down but just
@@ -1428,17 +1433,17 @@ html.motion-ready .bento-grid--shift .bento-card[data-reveal] {
    ON TOP of it and do the dissolving). Motion strictly under
    html[data-fx="rich"]; reduce/fx=none/scripts-off get a still stack. */
 .flank-reel {
-  /* the flank wrappers are ZERO-WIDTH (the words are position:absolute
-     and out of flow), so a percentage width here would collapse to 0 —
-     the reel gets a fixed gutter-scaled width instead. The frame height
-     DERIVES from it (x 2/3), so the rectangle stays 3/2 at every
-     gutter width and the loop math below can never drift. */
+  --reel-hug: 1.75rem;          /* r96: the fixed word→reel gap */
   --reel-w: clamp(7.5rem, calc(50vw - 47rem), 11.25rem);
   --reel-frame-h: calc(var(--reel-w) * 2 / 3);  /* the 3/2 rectangle */
   --reel-gap: 0.75rem;
   --reel-set-h: calc(3 * var(--reel-frame-h) + 3 * var(--reel-gap));
-  display: none;
-  position: absolute;
+  /* r96: the reel flows in the flank's flex column at >=1440px (the
+     mobile-first rule below keeps it display:none everywhere else);
+     STATIC — a fixed --reel-hug from its word (the old absolute
+     section-edge pins are what pushed the reels hundreds of px away
+     from the words). */
+  position: static;
   width: var(--reel-w);
   height: var(--reel-set-h);
   overflow: hidden;
@@ -1447,6 +1452,8 @@ html.motion-ready .bento-grid--shift .bento-card[data-reveal] {
   mask-image: linear-gradient(to bottom, transparent, black 10%, black 90%, transparent);
   pointer-events: none;
 }
+/* mobile-first: the reels only exist where the flanks do (>=1440px) */
+.flank-reel { display: none; }
 .flank-reel__film {
   display: grid;
   gap: var(--reel-gap);
@@ -1485,8 +1492,26 @@ html.motion-ready .bento-grid--shift .bento-card[data-reveal] {
   -webkit-mask-image: linear-gradient(to top, black, transparent);
   mask-image: linear-gradient(to top, black, transparent);
 }
-.bento-flank--gabriel .flank-reel { right: 0; bottom: 6rem; }
-.bento-flank--homes   .flank-reel { left: 0; top: 6rem; }
+/* r96 — the reels HUG their words ("the carousels are way too far
+   from the words", owner round thirteen). Measured before: gabriel→
+   reel 234px, homes→reel 303px @1920 — the reels were pinned to the
+   SECTION's far edges while the words anchor from the opposite ends,
+   so the gap grew with the section height. Now the word is STATIC in
+   the flank's flex column (r96) and the reel flows right after it,
+   one --reel-hug away: the gap is fixed at every viewport and section
+   height, and the word keeps its exact anchor via the flank's own
+   padding (7.5rem from the edge, as before). */
+.bento-flank--gabriel {
+  align-items: flex-end;
+  padding-top: 7.5rem;          /* the word's old top anchor */
+}
+.bento-flank--homes {
+  justify-content: flex-end;
+  align-items: flex-start;
+  padding-bottom: 7.5rem;       /* the word's old bottom anchor */
+}
+.bento-flank--gabriel .flank-reel { margin-top: var(--reel-hug); }
+.bento-flank--homes   .flank-reel { margin-bottom: var(--reel-hug); }
 
 @media (min-width: 1440px) {
   .flank-reel { display: block; }

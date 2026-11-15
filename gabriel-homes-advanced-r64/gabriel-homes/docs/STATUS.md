@@ -1,6 +1,11 @@
 # STATUS — Gabriel Homes
 
-Current loop: 9 · Current task: done (r95 reel execution + bento polish) · Gate: GATE GREEN · Next: owner preview review
+Current loop: 10 · Current task: done (r96 reels hug their words) · Gate: GATE GREEN · Next: owner preview review
+
+## Loop 10 plan
+- Task: r96 (M) — owner round thirteen: "the carousels are way too far from the words" (measured 234px/303px @1920). The reels were pinned to the section's far edges while the words anchor from the opposite ends — the gap grew with section height. Fix: flanks become flex columns (word static, reel static, --reel-hug 1.75rem between); words keep their exact anchors via flank padding (7.5rem); gabriel stacks word→reel, homes reel→word. Gap now fixed 28px at every height/viewport.
+- Files: static/css/home.css; NEW apps/core/tests/test_r96_reel_hug.py. Template untouched (scope check per owner: only the placement CSS changed).
+- Proof: RED first (4 failures on the intended change); pytest -q → 1158 passed; gate.sh → GATE GREEN exit 0. Live: 28px both sides @1920+1512, 1439px cutoff holds, mobile hidden, fx=none static, VLM confirms cohesion. Receipts: .agents/reports/test-evidence.md. Owner backend login verified through the chain (302 → /manage/). Push: fresh PAT provided by owner — r93-r96 pushed to GitHub this round.
 
 ## Loop 9 plan
 - Task: r95 (M) — owner round twelve: reel execution + bento presentation. (1) Infinite reel: r94 shipped one set of 3 frames but translated a full loop height, so the reel "ended" — the set is now shipped TWICE in the markup (6 frames/reel) and the loop distance equals exactly one set height (frame 1 reappears where its duplicate was). (2) Blur before/after: `.flank-reel__blur--top/--bottom` strips (backdrop-filter blur 7px with fading masks) dissolve the frames entering/leaving the window. (3) Rectangular frames: 3/2 landscape, height DERIVED from the reel width (`--reel-frame-h: calc(var(--reel-w) * 2 / 3)`) so the ratio and the loop math share one source and can never drift (live-caught: aspect-ratio rendered 120px while the loop var assumed 136px). (4) Bento polish: resting espresso shadow + cream hairline ring, hover lift via the `translate` property (FLIP-safe — bento-shift.js owns `transform`), bed/bath facts as frosted glass chips (middot ::before retired for facts, kept for location), price enlarged + sand-tinted, index quieter.
