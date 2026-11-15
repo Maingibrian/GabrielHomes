@@ -4,11 +4,11 @@ Update this file at the END of every session. Keep it short enough to read
 in under 3 minutes together with AGENTS.md.
 
 ## Current state
-- **Last updated:** 2026-11-15 (r93 session)
+- **Last updated:** 2026-11-15 (r94 session)
 - **Active branch:** `main` (remote `Maingibrian/GabrielHomes`, GitHub)
-- **HEAD before this session's commit:** `6aebb81c` (r92, pushed)
-- **Last dev round:** r93 — listings edit pages (data bug + visual overhaul of /dashboard/listings/<pk>/edit/, wizard selects, /manage/listings/ desktop rows); tests see receipts
-- **BLOCKED-OWNER: push failed — the PAT in `upload/gabriels pat.txt` returns 401 (rotated/expired). Commit `ef54df6f` (r93) is safe on local `main` but NOT on GitHub. Next session: get a fresh PAT from the owner and `git push` BEFORE any new work (recycle risk).**
+- **HEAD before this session's commit:** `0ee21015` (r93 note, local only)
+- **Last dev round:** r94 — front-page motion (palms stagnant, phone-bento scroll drift, flank words breathing in place, gutter image reels); tests see receipts
+- **BLOCKED-OWNER: push still failed — the PAT in `upload/gabriels pat.txt` returns 401 (rotated/expired). Commits `ef54df6f` (r93) + this round's r94 commit are safe on local `main` but NOT on GitHub. Next session: get a fresh PAT from the owner and `git push` BEFORE any new work (recycle risk).**
 - **Known recurring cost:** sandbox recycle wipes `db.sqlite3`/`.venv`/daemon between sessions (restore recipe: `.agents/memory/lessons.md`)
 - **Preview:** up on ports 3000/81 inside the sandbox; public URL `https://preview-chat-32c380a6-f37c-48b2-a3b0-ee41938bc50c.space-z.ai` works only while this sandbox instance lives
 
@@ -45,6 +45,21 @@ What I verified (command + output):
 What I did NOT do:
 Next concrete step:
 ```
+
+### Handoff — 2026-11-15 · ZCode (r94 — front-page motion)
+What I did:
+- Owner round eleven, four front-page asks. (1) Palms STAGNANT: deleted the r62 wind sway/flutter block from search.css — trees, sticky placement, fx gate untouched (the SVG is generator-owned, never edited). (2) Phone bento: the H3 swipe rail now also drifts LEFT as the page scrolls (`h3-rail-drift`, animation-timeline: scroll(), @supports-gated; native swipe + snap untouched as fallback; reduce block stops it). (3) "gabriel"/"homes" flank words ALIVE IN PLACE: `r94-flank-breathe` (letter-spacing + skew lean, NO translate of any kind) replaces the vertical parallax; js/bento-flank.js no longer loads (file kept for history). (4) Gutter white space: `flank-reel` vertical carousels — 3 soft-masked coastal photos rising (`r94-reel-rise`) below "gabriel" and above "homes", ≥1440px only, decorative.
+- Bug caught in live verify: flank wrappers are ZERO-WIDTH, so the reel's percentage width collapsed to 0px — now `clamp(7.5rem, calc(50vw - 47rem), 11.25rem)`.
+- Belt-and-braces reduce block added: reels + words stop under prefers-reduced-motion even when the fx gate is emulated.
+- Tests: NEW test_r94_front_page_motion.py (14, RED first); retired/rewrote the r62 wind pins in test_c1_palm_sentinels.py and the r44 parallax-script pin in test_r44_bento_unpack.py.
+What I verified (command + output):
+- `pytest -q` → `1144 passed, 628 warnings in 194.31s` · EXIT:0 · `bash scripts/gate.sh` → `GATE GREEN` · EXIT:0
+- Live DOM 1920px fx=rich: word animationName `r94-flank-breathe`, reel `r94-reel-rise`, reels 180×544px both gutters (VLM: stacks visible, no overlap, no breakage). iPhone 413px: rail drift measured −6.6px → −42.6px across section travel. Reduced-motion emulation: rail/reels/words all `animation: none`.
+What I did NOT do:
+- The reel shows 2 fully-visible frames + 2 dissolving at the mask edges by design (3-frame window with 18% top/bottom fade); if the owner wants 3 crisp frames, raise the mask stops from 18%/82% to ~8%/92%.
+- Push NOT RUN successfully — PAT still 401. r93+r94 sit on local main only.
+Next concrete step:
+- Owner reviews the preview (same URL, hard-refresh for new CSS). Fresh PAT → push both rounds.
 
 ### Handoff — 2026-11-15 · ZCode (r93 — listings edit pages)
 What I did:

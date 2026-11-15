@@ -240,34 +240,34 @@ def test_search_css_still_carries_zero_hex():
     assert not re.findall(r"#[0-9a-fA-F]{3,8}", SEARCH_CSS)
 
 
-def test_wind_is_gated_to_rich():
-    """r62 ("make them move in the wind"): the palm block carries a
-    two-layer sway — but EVERY animation declaration sits inside a
-    rule gated on html[data-fx="rich"] (D-FX-GATE contract). fx=none
-    (reduced motion), lite (Save-Data) and scripts blocked (no
-    attribute — fails closed) all get the same palms, standing still;
-    the placement itself stays pure CSS."""
+def test_palms_stand_still_r94():
+    """r94 ("make the palm leaves svg just stagnant", owner round
+    eleven): the r62 wind sway is retired. No sway/flutter keyframes,
+    no animation on any palm part — the trees stand still at every fx
+    level. (The r62 gating test is superseded: there is no longer any
+    animation to gate.)"""
     block = SEARCH_CSS[SEARCH_CSS.index("r60 (owner round ten)"):]
-    assert "@keyframes palm-sway" in block
-    assert "@keyframes palm-flutter" in block
+    assert "@keyframes palm-sway" not in block
+    assert "@keyframes palm-flutter" not in block
     for m in re.finditer(r"animation[a-z-]*\s*:", block):
         opener = block.rindex("{", 0, m.start())
         head = block[:opener]
         selector = head[max(head.rfind("}"), head.rfind(";")) + 1:]
-        assert 'data-fx="rich"' in selector, (
-            f"ungated animation in palm block: {selector.strip()!r}")
+        raise AssertionError(
+            f"r94: the palms must be stagnant, found animation in: "
+            f"{selector.strip()!r}")
 
 
-def test_wind_sways_around_the_base_out_of_lockstep():
-    """The wind pivot is the base of the trunk (transform-origin at
-    50% 100%), and the two trees run at different periods with
-    negative delays — wind never moves two trees in lockstep."""
+def test_tree_keeps_its_grounding_rules():
+    """r94: the sway is gone but the tree's static grounding stays —
+    the base pivot transform-origin (a harmless leftover that keeps
+    the drop-shadow anchored) and the colour fills of every part."""
     tree = re.search(r"\.palm-tree\s*\{[^}]*\}", SEARCH_CSS).group(0)
     assert "transform-origin: 50% 100%" in tree
     block = SEARCH_CSS[SEARCH_CSS.index("r60 (owner round ten)"):]
-    assert "animation: palm-sway 8.6s ease-in-out -2.4s infinite" in block
-    assert "animation-duration: 10.2s" in block   # right tree: slower
-    assert "animation-delay: -6.1s" in block       # and out of phase
+    assert "animation: palm-sway" not in block   # r94: sway retired
+    assert "animation-duration: 10.2s" not in block
+    assert "animation-delay: -6.1s" not in block
 
 
 def test_template_is_generator_owned():

@@ -1009,6 +1009,36 @@ html.motion-ready .hero__search:focus-within {
   }
 }
 
+/* r94 — scroll drift on the phone ("those cards go off screen and one
+   has to scroll to see them... when one scrolls down it triggers a
+   scrolling animation where the cards move left", owner round eleven).
+   The rail itself stays exactly as H3 built it (native swipe, snap,
+   keyboard); what is added is a PAGE-scroll-driven leftward drift:
+   as the section travels up the viewport, the rail's content glides
+   left so the cards walk across the screen on their own. A modest
+   12% drift keeps each card within reach of the snap points, so the
+   native swipe fallback still lands where the thumb expects.
+   @supports-gated (scroll-driven animations) and stops dead under
+   prefers-reduced-motion; both fallbacks are the plain H3 rail. */
+@supports (animation-timeline: scroll()) {
+  @media (max-width: 1020px) {
+    .bento-grid--shift {
+      animation: h3-rail-drift linear both;
+      animation-timeline: scroll();
+      /* the section's own travel through the viewport is the dial:
+         enter bottom -> exit top. Card order reads left-to-right, so
+         a negative X drift moves the NEXT cards in from the right. */
+      animation-range: entry 0% exit 80%;
+    }
+  }
+  @keyframes h3-rail-drift {
+    from { transform: translateX(0); }
+    to   { transform: translateX(-12%); }
+  }
+}
+/* reduce stops the drift — the rail still swipes (merged into the H3
+   reduce block below so one block governs all bento motion) */
+
 /* Reveal transition restated for the shift cards so the corner radius
    animates too. Matches components.css's reveal timing. */
 html.motion-ready .bento-grid--shift .bento-card[data-reveal] {
@@ -1034,6 +1064,7 @@ html.motion-ready .bento-grid--shift .bento-card[data-reveal] {
 
 @media (prefers-reduced-motion: reduce) {
   .bento-grid--shift .bento-card { transition: none; animation: none; /* stops h3-card-grow too */ }
+  .bento-grid--shift { animation: none; /* r94: stops h3-rail-drift — the rail still swipes */ }
   .bento-grid--shift.is-live .bento-card .bento-card__bg { transition: none; }
   html.motion-ready .bento-grid--shift .bento-card[data-reveal] {
     transition: none;
@@ -1250,6 +1281,112 @@ html.motion-ready .bento-grid--shift .bento-card[data-reveal] {
      faces the container — gabriel's right, homes's left. */
   .bento-flank--gabriel .bento-flank__word { top: 7.5rem; right: 0; }
   .bento-flank--homes .bento-flank__word { bottom: 7.5rem; left: 0; }
+
+  /* r94 — the words are ALIVE IN PLACE ("the gabriels homes part next
+     to the bento should be animated... not moving up or down but just
+     have animated motion", owner round eleven). The old vertical
+     parallax (js/bento-flank.js translate3d) is retired; in its place
+     a slow typographic breath: the letter-spacing eases open a touch
+     and the italic leans a half-degree and back. In-place only — no
+     translate of any kind, so the words never drift off their anchors.
+     Gated on html[data-fx="rich"] per the D-FX-GATE contract; under
+     fx=none/lite/scripts-off the words simply sit (the anchors below
+     are the resting state the animation breathes around). */
+  html[data-fx="rich"] .bento-flank__word {
+    animation: r94-flank-breathe 9s ease-in-out -3s infinite;
+  }
+  html[data-fx="rich"] .bento-flank--homes .bento-flank__word {
+    animation-duration: 11s;
+    animation-delay: -7s;   /* the two words never breathe in lockstep */
+  }
+}
+
+@keyframes r94-flank-breathe {
+  from {
+    letter-spacing: var(--track-wordmark);
+    font-variation-settings: "ital" 1;
+    transform: skewX(0deg);
+  }
+  50% {
+    /* a whisper of air: tracking opens, the italic leans a touch —
+       the word shimmers without ever leaving its spot */
+    letter-spacing: calc(var(--track-wordmark) + 0.035em);
+    font-variation-settings: "ital" 1;
+    transform: skewX(-0.6deg);
+  }
+  to {
+    letter-spacing: var(--track-wordmark);
+    font-variation-settings: "ital" 1;
+    transform: skewX(0deg);
+  }
+}
+
+/* r94 — the gutter reels. The owner asked for the white space below
+   "gabriel" and above "homes" (the flanks' empty stretches) to carry
+   a carousel of three images moving upwards. Each reel is a vertical
+   window: exactly three stacked frames visible, soft-masked at the
+   top and bottom so the film reads as emerging and dissolving rather
+   than clipping. The film is the three frames repeated once and the
+   whole strip translates UP by exactly one loop height (3 frames),
+   so the seam lands where frame 1 reappears — an endless rise.
+   Base rule: display:none (mobile-first; the flanks themselves only
+   exist at >=1440px). Motion strictly under html[data-fx="rich"];
+   reduce/fx=none/scripts-off get a still, masked stack of three. */
+.flank-reel {
+  display: none;
+  position: absolute;
+  /* the flank wrappers are ZERO-WIDTH (the words are position:absolute
+     and out of flow), so a percentage width here would collapse to 0 —
+     the reel gets a fixed gutter-scaled width instead. */
+  width: clamp(7.5rem, calc(50vw - 47rem), 11.25rem);
+  height: 34rem;
+  overflow: hidden;
+  /* soft dissolve at both ends of the window */
+  -webkit-mask-image: linear-gradient(to bottom, transparent, black 18%, black 82%, transparent);
+  mask-image: linear-gradient(to bottom, transparent, black 18%, black 82%, transparent);
+  pointer-events: none;
+}
+.flank-reel__film {
+  display: grid;
+  gap: 0.75rem;
+}
+.flank-reel__frame {
+  width: 100%;
+  height: 10.83rem;             /* 3 frames + 2 gaps = 34rem window */
+  object-fit: cover;
+  border-radius: 12px;
+  display: block;
+}
+.bento-flank--gabriel .flank-reel { right: 0; bottom: 6rem; }
+.bento-flank--homes   .flank-reel { left: 0; top: 6rem; }
+
+@media (min-width: 1440px) {
+  .flank-reel { display: block; }
+}
+
+/* the rise: gated to rich fx only. One loop = one film height
+   (3 frames + their gaps); the duplicate frame set underneath makes
+   the wrap seamless. */
+html[data-fx="rich"] .flank-reel__film {
+  animation: r94-reel-rise 36s linear infinite;
+}
+html[data-fx="rich"] .bento-flank--homes .flank-reel__film {
+  animation-duration: 44s;
+  animation-delay: -18s;        /* the two reels never rise in lockstep */
+}
+
+@keyframes r94-reel-rise {
+  from { transform: translateY(0); }
+  to   { transform: translateY(calc(-1 * (3 * 10.83rem + 3 * 0.75rem))); }
+}
+
+/* r94 belt-and-braces: reduced motion stops the reels too. The fx
+   gate normally already handles this (fx-gate.js sets data-fx="none"
+   for reduced-motion users), but CSS must hold on its own when the
+   gate is emulated/slow — the reels become still, masked stacks. */
+@media (prefers-reduced-motion: reduce) {
+  .flank-reel__film { animation: none; }
+  .bento-flank__word { animation: none; }
 }
 
 /* r44 reduced motion: the drawer/affordance snap instead of

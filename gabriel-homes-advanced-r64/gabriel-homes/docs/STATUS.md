@@ -1,6 +1,11 @@
 # STATUS — Gabriel Homes
 
-Current loop: 7 · Current task: done (r93 listings edit pages) · Gate: GATE GREEN · Next: owner preview review
+Current loop: 8 · Current task: done (r94 front-page motion) · Gate: GATE GREEN · Next: owner preview review
+
+## Loop 8 plan
+- Task: r94 (M) — front-page motion, owner round eleven: (1) palm sentinels stagnant — r62 wind sway/flutter deleted from search.css (trees, sticky placement, fx gate all kept); (2) phone bento — page-scroll-driven leftward drift `h3-rail-drift` (animation-timeline: scroll(), @supports-gated, reduce-safe; the native swipe rail untouched as fallback) so cards move left as you scroll down without hunting for them; (3) "gabriel"/"homes" flank words — ALIVE IN PLACE: `r94-flank-breathe` (tracking + lean, no translate) replaces the vertical parallax; js/bento-flank.js retired from the page; (4) gutter white space — `flank-reel` vertical carousels (3 masked frames rising, `r94-reel-rise`, fx-gated) below "gabriel" and above "homes" at ≥1440px. Zero-width-wrapper trap: flank wrappers are zero-width, so reel width must be a clamp() against the viewport, never a percentage (collapsed to 0px in the first pass).
+- Files: static/css/search.css; static/css/home.css; templates/core/home.html; apps/manage/views.py? NO — view untouched this round. NEW apps/core/tests/test_r94_front_page_motion.py; test_c1_palm_sentinels.py + test_r44_bento_unpack.py pins retired/rewritten for the new behavior; docs/STATUS.md.
+- Proof: RED first (10 failures on the intended changes); r94 suite 14 green; full `pytest -q` → 1144 passed; `gate.sh` → GATE GREEN exit 0. Live DOM 1920px: breathe + reel-rise animating, reels 180×544px visible in both gutters (VLM: no overlap); iPhone 413px: rail drift measured −6.6px → −42.6px across the section travel; reduced-motion emulation: all three animations none. Receipts: .agents/reports/test-evidence.md.
 
 ## Loop 7 plan
 - Task: r93 (M) — "iterate to improve only the listings page edit in the back end.. the page end page of listings page looks horrible" (owner). Audit + fix of every screen the listings edit flow touches.

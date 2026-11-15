@@ -241,27 +241,25 @@ def test_brand_wordmarks_flank_the_bento():
     assert "font-size: clamp(3.75rem, 40vw - 30rem, 20rem)" in flank_block
 
 
-def test_flank_parallax_script_fails_closed():
-    """js/bento-flank.js lags the words behind the scroll (the stagnant
-    parallax) and refuses to run without the fx gate, under reduced
-    motion, or below the 1440px breakpoint. bento-shift.js untouched."""
-    js = FLANK_JS.read_text(encoding="utf-8")
-    assert 'getAttribute("data-fx")' in js
-    assert '=== "none"' in js
-    # F2: the gate is the ONLY reduced-motion check in JS — the CSS
-    # reduce block does the belt-and-braces pinning instead.
-    assert "prefers-reduced-motion" not in js
-    assert "(min-width: 1440px)" in js
-    assert "requestAnimationFrame" in js
-    assert "translate3d" in js
-    # H3 constraint bleed: this file is not the carousel either
-    assert "scroll-snap" not in js and "carousel" not in js.lower()
-
-    # registered on the home page with a cache-busting version
+def test_flank_words_are_animated_in_place_r94():
+    """r94 (owner round eleven): the words are "alive in motion... not
+    moving up or down". The r44 vertical parallax script is RETIRED
+    from the page (its file stays for history but never loads); the
+    motion is now the fx-gated r94-flank-breathe CSS animation, which
+    never translates the words. The reduce block keeps its
+    belt-and-braces pin."""
+    # the parallax script no longer loads on the home page (comments
+    # may mention it; a <script> tag must not)
     html = HOME_HTML.read_text(encoding="utf-8")
-    assert "js/bento-flank.js" in html
+    assert '<script src="{% staticv \'js/bento-flank.js\' %}"' not in html, (
+        "r94: the vertical word parallax script must not load")
+    # bento-shift.js (desktop shape-shift) is untouched
+    assert "js/bento-shift.js" in html
 
-    # reduced motion also pins the words in CSS (!important beats the
-    # JS inline style)
     css = HOME_CSS.read_text(encoding="utf-8")
+    assert "r94-flank-breathe" in css, "the in-place animation must exist"
+    assert re.search(
+        r'html\[data-fx="rich"\][^{]*\.bento-flank__word[^{]*\{[^}]*'
+        r'r94-flank-breathe', css), "it must be gated on data-fx=rich"
+    # reduced motion still pins the words in CSS
     assert ".bento-flank__word { transform: none !important; }" in css

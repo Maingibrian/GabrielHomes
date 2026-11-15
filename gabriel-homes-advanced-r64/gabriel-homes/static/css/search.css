@@ -925,53 +925,9 @@ html:not([data-fx]) .listing-row.row-armed {
 .palm-mound--shade { fill: color-mix(in srgb, var(--sand) 55%, var(--taupe)); }
 .palm-grass        { fill: color-mix(in srgb, var(--green-deep) 72%, var(--cream)); }
 
-/* r62 — the wind ("make them move in the wind", owner round ten,
-   third pass). Two layers of motion: the whole tree sways a little
-   around its base, and the sun-lit frond layers flutter on top of
-   that (the back layer stays still — depth). Strictly gated to
-   html[data-fx="rich"] per the D-FX-GATE contract: reduced motion
-   (fx=none), Save-Data (lite) and scripts blocked (no attribute —
-   fails closed) all get the same palms, standing perfectly still;
-   the stagnant-parallax placement itself stays pure CSS and holds
-   with JS off. Transform-only and GPU-composited — two trees plus
-   four frond groups, cheap on four cores (the r58 gate philosophy).
-   The two trees deliberately run at different periods with
-   negative delays: wind never moves two trees in lockstep. */
-@keyframes palm-sway {
-  from { transform: rotate(-0.9deg); }
-  55%  { transform: rotate(1.2deg); }
-  to   { transform: rotate(-0.9deg); }
-}
-@keyframes palm-flutter {
-  from { transform: rotate(-0.55deg); }
-  55%  { transform: rotate(0.7deg); }
-  to   { transform: rotate(-0.55deg); }
-}
-.palm-frond--mid,
-.palm-frond--front {
-  transform-box: fill-box;
-  transform-origin: 50% 92%;
-}
-html[data-fx="rich"] .palm-tree {
-  animation: palm-sway 8.6s ease-in-out -2.4s infinite;
-}
-html[data-fx="rich"] .palm-sentinel--right .palm-tree {
-  animation-duration: 10.2s;
-  animation-delay: -6.1s;
-}
-html[data-fx="rich"] .palm-frond--mid,
-html[data-fx="rich"] .palm-frond--front {
-  animation: palm-flutter 5.4s ease-in-out -1.2s infinite;
-}
-html[data-fx="rich"] .palm-sentinel--left  .palm-frond--front {
-  animation-duration: 4.3s;
-  animation-delay: -0.6s;
-}
-html[data-fx="rich"] .palm-sentinel--right .palm-frond--mid {
-  animation-duration: 4.9s;
-  animation-delay: -3.1s;
-}
-html[data-fx="rich"] .palm-sentinel--right .palm-frond--front {
-  animation-duration: 5.8s;
-  animation-delay: -2.2s;
-}
+/* r94 — the wind is RETIRED ("make the palm leaves svg just stagnant",
+   owner round eleven). The r62 sway/flutter keyframes and every
+   animation on the trees are deleted: the palms stand perfectly still
+   at all fx levels now. The trees themselves, their sticky placement,
+   the base transform-origin (harmless without an animation) and the
+   colour fills all stay exactly as they were. */

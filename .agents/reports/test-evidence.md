@@ -144,3 +144,15 @@ above); live preview login (no application change to verify live).
 - `bash scripts/gate.sh` → `GATE GREEN` · EXIT:0 (stages: check / makemigrations --check / pytest 1130 / G-DEPLOY / G-SAFE / G-CDN / G-STATIC / G-COV)
 - Live DOM via :81 + :8000: wizard selects computed style `rgb(250,248,244)` bg / 8px radius / appearance:none / custom chevron (was `rgb(239,239,239)` / 0px / native). Editor: 24 amenity checkboxes (0 before), 0 `<footer>`, 5 section fieldsets. Listings: 20/20 rows with thumbs at desktop; `.manage-row__thumb` base `display:none` (mobile stack unchanged — verified in stylesheet rules; headless window min 1280px prevented a pixel screenshot at 390px).
 - VLM screenshot review (desktop): listings rows "compact single-line-plus-meta cards… scannable", editor "selects match the inputs… no duplicated labels… no marketing footer", no overlap/misalignment/broken areas.
+
+## r94 — front-page motion (2026-11-15)
+
+- Owner asks: palms stagnant; phone bento scroll-triggered leftward card motion; "gabriel/homes" flank words alive in place (no up/down); gutter white space gets a 3-image upward carousel.
+- RED first: NEW `apps/core/tests/test_r94_front_page_motion.py` → 10 failed on exactly the intended changes (sway present, no drift, no breathe, script loaded, no reels).
+- After fixes: r94 suite 14 passed. Retired pins updated: `test_c1_palm_sentinels.py` (r62 wind tests → stagnant tests), `test_r44_bento_unpack.py` (parallax script contract → in-place animation contract).
+- Full suite (after final reel CSS fix): `.venv/bin/python -m pytest -q` → `1144 passed, 628 warnings in 194.31s` · EXIT:0 (1130 r93 baseline + 14 new).
+- `bash scripts/gate.sh` → `GATE GREEN` · EXIT:0.
+- Live DOM (1920×1080, data-fx=rich): `.bento-flank__word` animationName `r94-flank-breathe`; `.flank-reel__film` animationName `r94-reel-rise`, reels 180px wide × 544px (fixed a zero-width bug: flank wrappers are zero-width so percentage widths collapse — reel now uses `clamp(7.5rem, calc(50vw - 47rem), 11.25rem)`).
+- Mobile (iPhone 14 emulation, 413px): rail `h3-rail-drift` with `animation-timeline: scroll()`; measured transform −6.6px at section entry → −42.6px near page end (monotonic leftward drift driven by page scroll); reels/words display:none below 1440px.
+- Reduced motion (media emulation): rail, reels, and words all `animation: none`.
+- VLM (1920px): reels visible in both gutters, soft-faded edges, no overlap with bento cards or words; layout intact.

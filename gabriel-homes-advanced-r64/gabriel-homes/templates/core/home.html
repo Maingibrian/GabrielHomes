@@ -210,12 +210,26 @@
     r44: the brand split around the bento — "gabriel" runs down the left
     gutter from the top, "homes" down the right gutter to the bottom.
     Book-spine vertical setting (fits the gutters at display size);
-    js/bento-flank.js lags them behind the scroll ("stagnant parallax").
+    r94: the words are alive in PLACE now — the fx-gated
+    r94-flank-breathe CSS animation (home.css) breathes their tracking
+    and lean; the old scroll-lag script is retired.
     Decorative only: aria-hidden + pointer-events none, hidden under
     1440px where the gutters vanish. The bento itself keeps its exact
     size. (Multi-line note: {# #} renders literally — use this block.)
   {% endcomment %}
-  <div class="bento-flank bento-flank--gabriel" aria-hidden="true"><span class="bento-flank__word">gabriel</span></div>
+  <div class="bento-flank bento-flank--gabriel" aria-hidden="true">
+    <span class="bento-flank__word">gabriel</span>
+    {# r94: the white space below "gabriel" gets a quiet vertical reel — #}
+    {# three coastal frames rising slowly. Decorative only (the flank #}
+    {# wrapper is already aria-hidden); pure CSS, fx-gated motion. #}
+    <div class="flank-reel">
+      <div class="flank-reel__film">
+        <img class="flank-reel__frame" src="{% staticv 'img/real/real-08-aerial.jpg' %}" alt="" loading="lazy" width="180" height="240">
+        <img class="flank-reel__frame" src="{% staticv 'img/real/real-10-sea-light.jpg' %}" alt="" loading="lazy" width="180" height="240">
+        <img class="flank-reel__frame" src="{% staticv 'img/real/real-11-slow-mornings.jpg' %}" alt="" loading="lazy" width="180" height="240">
+      </div>
+    </div>
+  </div>
   <span class="visually-hidden">{% if showcase_listings %}HOMES · A small, chosen collection of coastal homes.{% else %}HOW WE CHECK · Five checks before anything goes live. We check who has the right to let or sell.{% endif %}</span>
   <div class="container">
     <div class="featured__header">
@@ -341,7 +355,18 @@
       </a>
     </div>
   </div>
-  <div class="bento-flank bento-flank--homes" aria-hidden="true"><span class="bento-flank__word">homes</span></div>
+  <div class="bento-flank bento-flank--homes" aria-hidden="true">
+    {# r94: the white space above "homes" gets the same rising reel, #}
+    {# so both gutters breathe while the words hold their anchors. #}
+    <div class="flank-reel">
+      <div class="flank-reel__film">
+        <img class="flank-reel__frame" src="{% staticv 'img/real/real-09-golden-hour.jpg' %}" alt="" loading="lazy" width="180" height="240">
+        <img class="flank-reel__frame" src="{% staticv 'img/real/real-04-bedroom-sea.jpg' %}" alt="" loading="lazy" width="180" height="240">
+        <img class="flank-reel__frame" src="{% staticv 'img/real/real-06-living-terrace.jpg' %}" alt="" loading="lazy" width="180" height="240">
+      </div>
+    </div>
+    <span class="bento-flank__word">homes</span>
+  </div>
 </section>
 
 {% comment %} Curated Mombasa presentation listings. Owner-replaceable demo data. r13: each market gets its own editorial layout — sale = feature + rail, rent = wide banners, short stays = staggered portraits — instead of twin side-by-side cards. {% endcomment %}
@@ -501,6 +526,9 @@
 {% block scripts %}
   {{ block.super }}
   <script src="{% staticv 'js/bento-shift.js' %}" defer></script>
-  <script src="{% staticv 'js/bento-flank.js' %}" defer></script>
+  {# r94: js/bento-flank.js retired — the owner asked for the words to #}
+  {# be "alive in motion... not moving up or down", so the vertical #}
+  {# parallax script is gone; the in-place r94-flank-breathe CSS #}
+  {# animation (home.css, fx-gated) animates the words instead. #}
   <script src="{% staticv 'js/hero-card.js' %}" defer></script>
 {% endblock %}
