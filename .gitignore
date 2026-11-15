@@ -1,2 +1,10 @@
 skills/
 node_modules/
+
+# r102: never track credentials. The platform auto-commits upload/ snapshots
+# between sessions; token-shaped files there (PAT text, keys, .pem) must never
+# be staged. Keep the owner's uploaded artifacts, exclude secret patterns.
+upload/*pat*.txt
+upload/*.pem
+upload/*.key
+upload/*token*
