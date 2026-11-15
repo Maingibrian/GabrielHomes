@@ -1,6 +1,12 @@
 # STATUS — Gabriel Homes
 
-Current loop: 6 · Current task: done (r92 dashboard polish) · Tool calls used: 28/30 · Gate: GATE GREEN · Next: owner preview review
+Current loop: 7 · Current task: done (r93 listings edit pages) · Gate: GATE GREEN · Next: owner preview review
+
+## Loop 7 plan
+- Task: r93 (M) — "iterate to improve only the listings page edit in the back end.. the page end page of listings page looks horrible" (owner). Audit + fix of every screen the listings edit flow touches.
+- Findings: (1) DATA BUG — /dashboard/listings/<pk>/edit/ rendered amenities as orphan <option> tags (SelectMultiple auto-widget iterated as checkboxes) → POST carried no amenities key → every Save wiped them. (2) Same page extended base.html: public marketing navbar + giant footer on a backend screen, form uncapped (~1000px inputs), land/service fields rendered as unlabeled visible inputs. (3) manage.css .manage-field rule missed <select> → 4 raw OS dropdowns on wizard step 1. (4) /manage/listings/ still in the r91 44rem column — wall of text cards, half the desktop empty.
+- Files: apps/agents/views.py (PropertyFormMixin: widgets + get_form_class override — ModelFormMixin.get_form_class() ignores a class-level widgets attr, it must go through modelform_factory); templates/agents/dashboard_listing_form.html (header/footer/scripts blocks emptied; sections; hidden fields); static/css/dashboard.css (r93 block); static/css/manage.css (select rule + r93 listings block); apps/manage/views.py (cover prefetch); templates/manage/listings.html (thumb markup); NEW apps/agents/tests/test_r93_listing_edit_pages.py + apps/manage/tests/test_r93_listings_screen.py; docs/STATUS.md.
+- Proof: RED first — 6 failures on the real bugs (amenities `assert [] == [20, 18, 1, 5]`, `<footer` present, select missing, no width cap); then 12 new tests green; `pytest -q` → 1130 passed; `bash scripts/gate.sh` → GATE GREEN exit 0. Live DOM: 24 amenity checkboxes (was 0), 0 footer, wizard select computed style cream/8px/chevron (was native gray/0px), 20/20 rows with thumbs, thumb base rule display:none (mobile untouched). Receipts: .agents/reports/test-evidence.md.
 
 ## Loop 6 plan
 - Task: r92 (M) — visual polish of the r91 owner-portal dashboard, owner-requested ("the design of the dashboard can be more well designed"). Layout only: tokens only, no JS, mobile stack untouched, stats.py shapes pinned.

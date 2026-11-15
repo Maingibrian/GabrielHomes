@@ -134,3 +134,13 @@ above); live preview login (no application change to verify live).
 - `curl -s -o /dev/null -w "%{http_code}" http://127.0.0.1:81/` → 200 (gateway)
 - Public URL `https://preview-chat-32c380a6-f37c-48b2-a3b0-ee41938bc50c.space-z.ai/account/login/` → 200
 - Playwright end-to-end through the public URL: owner login → `/manage/` portal (nav: Home / Enquiries / Listings / Site content / SEO), enquiries screen rendering seeded rows, homepage Portal link visible; no JS errors.
+
+## r93 — listings edit pages (2026-11-15)
+
+- `.venv/bin/python manage.py check` → `System check identified no issues (0 silenced).`
+- RED phase (before fixes): `apps/agents/tests/test_r93_listing_edit_pages.py` → 6 failed on the real bugs: amenities wiped (`assert [] == [20, 18, 1, 5]`), marketing `<footer>` in editor HTML, orphan `<option>` tags, select missing from manage.css rule, no width cap on .dashboard-form, visible land/service inputs.
+- After fixes: `9 passed` (edit pages) + `3 passed` (listings screen) = 12 new r93 tests.
+- Full suite: `.venv/bin/python -m pytest -q` → `1130 passed, 628 warnings in 137.84s` · EXIT:0 (1118 r92 baseline + 12 new)
+- `bash scripts/gate.sh` → `GATE GREEN` · EXIT:0 (stages: check / makemigrations --check / pytest 1130 / G-DEPLOY / G-SAFE / G-CDN / G-STATIC / G-COV)
+- Live DOM via :81 + :8000: wizard selects computed style `rgb(250,248,244)` bg / 8px radius / appearance:none / custom chevron (was `rgb(239,239,239)` / 0px / native). Editor: 24 amenity checkboxes (0 before), 0 `<footer>`, 5 section fieldsets. Listings: 20/20 rows with thumbs at desktop; `.manage-row__thumb` base `display:none` (mobile stack unchanged — verified in stylesheet rules; headless window min 1280px prevented a pixel screenshot at 390px).
+- VLM screenshot review (desktop): listings rows "compact single-line-plus-meta cards… scannable", editor "selects match the inputs… no duplicated labels… no marketing footer", no overlap/misalignment/broken areas.

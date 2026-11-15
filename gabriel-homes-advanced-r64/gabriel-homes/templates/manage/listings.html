@@ -47,6 +47,16 @@
         <li class="manage-row manage-row--listing">
           <input class="manage-row__check" type="checkbox" name="ids" value="{{ property.pk }}"
                  form="bulk-form" aria-label="Select {{ property.title }}">
+          {# r93: cover thumbnail — desktop rows read as property cards, #}
+          {# not text blocks. Mobile keeps the text-only stack. #}
+          {% if property.cover_images %}
+            <a class="manage-row__thumb" href="{{ property.get_absolute_url }}" tabindex="-1"
+               aria-hidden="true" target="_blank" rel="noopener">
+              <img src="{{ property.cover_images.0.image.url }}" alt="" loading="lazy" width="72" height="72">
+            </a>
+          {% else %}
+            <span class="manage-row__thumb manage-row__thumb--empty" aria-hidden="true"></span>
+          {% endif %}
           <div class="manage-row__main">
             <span class="manage-row__who">{{ property.title }}{% if property.is_demo %} <span class="manage-pill manage-pill--sample">Sample</span>{% endif %}{% if property.is_featured %} <span class="manage-pill manage-pill--featured">★ Featured</span>{% endif %}</span>
             <span class="manage-row__meta">

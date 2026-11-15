@@ -4,10 +4,10 @@ Update this file at the END of every session. Keep it short enough to read
 in under 3 minutes together with AGENTS.md.
 
 ## Current state
-- **Last updated:** 2026-11-13 (r92 session)
+- **Last updated:** 2026-11-15 (r93 session)
 - **Active branch:** `main` (remote `Maingibrian/GabrielHomes`, GitHub)
-- **HEAD before this session's commit:** `e88c1b6a` (r91, pushed)
-- **Last dev round:** r92 — dashboard visual polish (espresso hero KPI + grounded enquiry sparkline, dark checklist anchor, compact quick tiles); tests see receipts
+- **HEAD before this session's commit:** `6aebb81c` (r92, pushed)
+- **Last dev round:** r93 — listings edit pages (data bug + visual overhaul of /dashboard/listings/<pk>/edit/, wizard selects, /manage/listings/ desktop rows); tests see receipts
 - **Blocked-on:** nothing. Known recurring cost: sandbox recycle wipes `db.sqlite3`/`.venv`/daemon between sessions (restore recipe: `.agents/memory/lessons.md`)
 - **Preview:** up on ports 3000/81 inside the sandbox; public URL `https://preview-chat-32c380a6-f37c-48b2-a3b0-ee41938bc50c.space-z.ai` works only while this sandbox instance lives
 
@@ -17,6 +17,7 @@ in under 3 minutes together with AGENTS.md.
 - Coordination files live at git root; the Django tree keeps its own `docs/AGENT-BRIEF.md` protocol — both apply, AGENTS.md reading order first.
 - r91: portal desktop shell keys on `body.page-manage` at `min-width: 64rem`; mobile chrome (topbar + chip nav) stays in the DOM and is only hidden by CSS. Both nav variants render from `templates/manage/_nav.html` — edit that one file, never one variant alone.
 - r92: the dashboard's visual hierarchy is expressed with additive classes on the r91 zones — `manage-kpi--hero` (first KPI, espresso, owns the 30-day sparkline because `stats.per_day` counts ENQUIRIES) and `manage-check--dark` (espresso anchor). Mobile keeps the r91 stack: these classes restyle, they do not move DOM. Undo buttons inside the dark card use `btn--light-outline`.
+- r93: `PropertyFormMixin.get_form_class()` now passes `widgets` through `modelform_factory` — Django's `ModelFormMixin.get_form_class()` silently ignores a class-level `widgets` attr when only `fields` is set; any future widget on that form goes in `PropertyFormMixin.widgets`, never as a bare class attr. The dashboard editor/create/images templates override `header`/`footer`/`scripts` blocks to empty — backend screens must not grow marketing chrome again. `.manage-field select` styling is pinned by test; new portal form controls get it for free.
 
 ## Traps (do not repeat)
 - POST forms 403 through any gateway unless its Origin is in `CSRF_TRUSTED_ORIGINS` → traps.md #1
@@ -43,6 +44,25 @@ What I verified (command + output):
 What I did NOT do:
 Next concrete step:
 ```
+
+### Handoff — 2026-11-15 · ZCode (r93 — listings edit pages)
+What I did:
+- Owner: "iterate to improve only the listings page edit in the back end.. the page end page of listings page looks horrible". Audited every screen in the flow (wizard steps, /manage/listings/, the row Edit target /dashboard/listings/<pk>/edit/) with screenshots + VLM + computed styles.
+- Fixed a DATA BUG first: the editor's amenities were a SelectMultiple iterated as checkboxes in the template → orphan <option> tags ("Lift Lift") and no amenities key in the POST → every Save silently wiped amenities. Fix: `PropertyFormMixin.widgets = {amenities: CheckboxSelectMultiple, land_size_acres/service_charge: HiddenInput}` + `get_form_class()` override (Django's ModelFormMixin.get_form_class() IGNORES a class-level widgets attr — it must pass through modelform_factory). Hidden fields now ride along hidden instead of rendering as two unlabeled inputs.
+- Editor visuals: header/footer/scripts blocks emptied (no marketing chrome on backend screens), form capped at 56rem, fields grouped into 5 labelled section fieldsets, selects get custom chevron matching inputs, amenities as readable checkbox tiles, sticky save bar.
+- Portal-wide: `.manage-field select` added to the shared control rule (wizard step 1's four raw OS dropdowns now match the inputs; computed style went native gray/0px → cream/8px/chevron).
+- /manage/listings/ desktop: rows get cover thumbnails (prefetched covers, to_attr=cover_images, no N+1; pinned by a query-count test), 72rem board cap, tools column flattened, tighter rows. Mobile stack untouched (thumb base rule display:none, verified in stylesheet rules).
+- NEW tests: apps/agents/tests/test_r93_listing_edit_pages.py (9) + apps/manage/tests/test_r93_listings_screen.py (3), written RED first — 6 initial failures were the real bugs (amenities `assert [] == [20, 18, 1, 5]`, `<footer` present, select missing from CSS, no width cap).
+What I verified (command + output):
+- `manage.py check` → `System check identified no issues (0 silenced).`
+- `pytest -q` → `1130 passed, 628 warnings in 137.84s` · EXIT:0 (1118 r92 baseline + 12 new)
+- `bash scripts/gate.sh` → `GATE GREEN` · EXIT:0
+- Live DOM: editor 24 amenity checkboxes (0 before), 0 `<footer>`; wizard select cream/8px/appearance:none; listings 20/20 rows with thumbs; mobile thumb rule display:none. VLM: "selects match the inputs… no duplicated labels… compact single-line-plus-meta cards… scannable".
+What I did NOT do:
+- Did not touch the wizard's own flow/views (only its CSS); did not restyle enquiries/SEO screens; the listings row action links stay text links (a future round could button-ize them).
+- Mobile screenshots at 390px NOT RUN in pixels — headless window floors at 1280px; mobile safety verified via stylesheet rule inspection + the CSS-only mobile-first diff instead.
+Next concrete step:
+- Owner reviews the preview (same URL). If the empty-thumb placeholder reads odd, the fallback is hiding `.manage-row__thumb--empty` (one CSS line) — no template change.
 
 ### Handoff — 2026-11-13 · ZCode (r92 — dashboard visual polish)
 What I did:

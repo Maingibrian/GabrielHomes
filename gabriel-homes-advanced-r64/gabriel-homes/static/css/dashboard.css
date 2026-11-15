@@ -540,3 +540,71 @@
   margin-bottom: 0.35rem;
 }
 .import-result__error { color: var(--burnt); font-size: var(--text-sm); margin: 0.2rem 0; }
+
+/* =============================================================
+   r93 — listing editor fixes: the form was an unbounded wall of
+   fields on a ~1000px column with marketing chrome around it.
+   Tokens only, no JS. (Everything above is r90 and earlier.)
+   ============================================================= */
+
+/* Cap the wall: an editor reads best around 2/3 card width, left-aligned
+   so the header stays visually connected to the form. */
+.dashboard-form {
+  max-width: 56rem;
+}
+
+/* Section fieldsets: the flat stack becomes grouped, scannable blocks. */
+.dashboard-form__section {
+  display: grid;
+  gap: 1rem;
+  margin: 0;
+  padding: 1.25rem;
+  border: 1px solid var(--sand-60);
+  border-radius: var(--radius-card, 0.75rem);
+  background: var(--white);
+}
+.dashboard-form__legend {
+  font-family: var(--font-mono);
+  font-weight: 600;
+  font-size: var(--text-xs);
+  letter-spacing: var(--track-tight);
+  text-transform: uppercase;
+  color: var(--taupe);
+  padding: 0 0.4rem;
+}
+
+/* Selects match the inputs: same fill, radius, height, and a custom
+   chevron so no native OS arrow clashes inside the card. */
+.dashboard-form__select {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5 6 6.5 11 1.5' fill='none' stroke='%236b5e53' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.85rem center;
+  padding-right: 2.4rem;
+  min-height: 2.75rem;
+}
+
+/* Amenities grid: readable tiles, not a cramped auto-fill. */
+.dashboard-form__checkboxes {
+  grid-template-columns: repeat(auto-fill, minmax(11rem, 1fr));
+  gap: 0.55rem 0.75rem;
+  max-height: none;
+}
+.dashboard-form__checkbox {
+  padding: 0.5rem 0.65rem;
+  border: 1px solid var(--sand-60);
+  border-radius: var(--radius-sm);
+  background: var(--cream);
+  min-height: 2.5rem;
+}
+.dashboard-form__checkbox:hover { border-color: var(--burnt); }
+
+/* Sticky save bar: the actions stay reachable on long forms. */
+.dashboard-form__actions {
+  position: sticky;
+  bottom: 0;
+  padding: 0.85rem 0;
+  background: color-mix(in srgb, var(--cream) 92%, transparent);
+  backdrop-filter: blur(8px);
+  border-top: 1px solid var(--sand-60);
+}

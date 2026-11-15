@@ -24,7 +24,7 @@ from datetime import date
 
 from django.contrib import messages
 from django.core.exceptions import PermissionDenied
-from django.db.models import Count
+from django.db.models import Count, Prefetch
 from django.http import Http404, HttpResponse
 from django.shortcuts import get_object_or_404, redirect
 from django.template.response import TemplateResponse
@@ -480,8 +480,18 @@ class PortalListingsView(OwnerRequiredMixin, PortalNavMixin, ListView):
     paginate_by = 20
 
     def get_queryset(self):
-        qs = Property.objects.select_related("property_type", "location").order_by(
-            "-updated_at"
+        qs = (
+            Property.objects.select_related("property_type", "location")
+            .order_by("-updated_at")
+            # r93: rows show their cover photo on desktop — one query for
+            # all covers on the page, no N+1 in the loop.
+            .prefetch_related(
+                Prefetch(
+                    "images",
+                    queryset=PropertyImage.objects.filter(is_cover=True),
+                    to_attr="cover_images",
+                )
+            )
         )
         status = LISTING_TABS.get(self.request.GET.get("tab", "all"))
         if status is not None:

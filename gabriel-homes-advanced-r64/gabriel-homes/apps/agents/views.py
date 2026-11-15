@@ -17,7 +17,7 @@ from django import forms
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.db.models import Q
-from django.forms import inlineformset_factory
+from django.forms import inlineformset_factory, modelform_factory
 from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse, reverse_lazy
@@ -25,7 +25,7 @@ from django.views.generic import CreateView, DetailView, ListView, TemplateView,
 
 from apps.accounts.models import User
 from apps.inquiries.models import Inquiry
-from apps.listings.models import Property, PropertyImage, PropertyType
+from apps.listings.models import Amenity, Property, PropertyImage, PropertyType
 from apps.locations.models import Location
 
 from .models import AgencyProfile
@@ -199,7 +199,39 @@ class PropertyFormMixin:
         "furnishing", "parking_spaces", "year_built", "service_charge",
         "amenities", "status", "is_featured", "description",
     ]
+    # r93: amenities is a M2M — the auto widget is SelectMultiple, which the
+    # template renders as checkbox subwidgets. That emitted orphan <option>
+    # tags AND dropped the amenities key from the POST, silently clearing a
+    # listing's amenities on every save. CheckboxSelectMultiple is what the
+    # template has assumed all along.
+    widgets = {
+        "amenities": forms.CheckboxSelectMultiple,
+        # r93: land/service fields have no UI on this form; they rendered as
+        # two unlabeled inputs ("dead weight" in the visual audit). Hidden
+        # widgets preserve their values through a save instead.
+        "land_size_acres": forms.HiddenInput,
+        "service_charge": forms.HiddenInput,
+    }
     template_name = "agents/dashboard_listing_form.html"
+
+    def get_form_class(self):
+        """Build the ModelForm WITH our widgets.
+
+        ModelFormMixin.get_form_class() calls modelform_factory(model,
+        fields=...) without widgets — a class-level `widgets` attr on the
+        view is silently ignored there (it only applies via form_class).
+        """
+        return modelform_factory(
+            self.model, fields=self.fields, widgets=self.widgets
+        )
+
+    def get_form(self, form_class=None):
+        form = super().get_form(form_class)
+        # Keep the checkbox grid ordered by category, matching the wizard.
+        form.fields["amenities"].queryset = Amenity.objects.order_by(
+            "category", "name"
+        )
+        return form
 
 
 class DashboardListingCreate(AgentRequiredMixin, PropertyFormMixin, CreateView):
