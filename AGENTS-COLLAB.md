@@ -4,9 +4,10 @@ Update this file at the END of every session. Keep it short enough to read
 in under 3 minutes together with AGENTS.md.
 
 ## Current state
-- **Last updated:** 2026-11-15 (r102 security incident session)
+- **Last updated:** 2026-11-15 (r103 listing-detail bench round)
 - **Active branch:** `main` (remote `Maingibrian/GabrielHomes`, GitHub)
-- **HEAD before this session's commit:** `c7db02cf` (r101)
+- **HEAD before this session's commit:** `954ff5fe` (r102)
+- **Last dev round:** r103 — listing detail whole-page review + benchmark: 40-criterion bench (apps/listings/tests/test_r103_detail_bench.py, 4 groups × 10, baseline 16/40 → 40/40), one continuous pass over every major component (bracket labels retired everywhere incl. footer/enquiry/cover-tag chips, facts bar with semantic icons, |linebreaks description + empty state, fluid amenities/similar grids + orphan-proof rail + browse link, sidebar price recap + response microcopy + 44px inputs, gallery 3/2 aspect, seeded-preview brand contacts via launch_preview.py only). Full suite 1227 passed. Recycling recovery recipe worked (ff to origin/main + venv + full seed).
 - **r102 SECURITY INCIDENT (read before pushing anything):** platform auto-commit `15a2e2d2` (Nov 13) snapshotted `upload/gabriels pat.txt` — the owner's GitHub PAT — into the repo tree; the r101 push shipped it to a PUBLIC repo (raw.githubusercontent serves it 200 unauthenticated). Purged in `5e6075c5`: file removed from the tree (owner's disk copy untouched), `.gitignore` now blocks token-shaped uploads. History NOT rewritten (AGENTS.md rule 7 + the token is burned by the public exposure regardless) — the old commit still serves the file until GitHub GC. **The owner was told to REVOKE the PAT** (github.com/settings/tokens). New mandatory pre-push gate: `scripts/push_safety_check.sh` — exits 1 on any secret pattern in the push range / HEAD tree, tracked token files, or git config stores; run before EVERY push (also `--verify-clean` / `--audit-pat` modes).
 - **Last dev round:** r100 — hero video retired for a directed Ken Burns slideshow (80s cycle, per-slide character), mobile hero recropped (62svh portrait window), sale tile's bold move (polaroid fan + live count); D-RNG-POLLUTION defect fixed (seed_demo RNG moved into handle — full-suite coast-chip starvation)
 - **r101 incident (no code round):** owner reported "progress lost + images not loading". Diagnosis: NO code lost — HEAD/served page/CSS were exactly r100. The sandbox had been recycled; a restore reseeded the DB WITHOUT images/enquiries (80 listings, 0 PropertyImage rows) → photoless cards, tile fan gone (its image guards skip), empty portal inbox. Fixed by reseeding fully (`seed_demo --clear --with-enquiries`): 109 image rows (0 missing on disk), 43/43 sale covers, 34 enquiries. Verified: 21/21 page images 200 through :81 AND the public chain, fan 3/3 + rail 2/2 loaded in live DOM, count stat 43. Also learned: the public gateway 403s non-browser UAs (the initial "images broken" alarm) — always verify with a browser UA. Prevention + health-check scripts: `scripts/verify_after_reseed.py`, `scripts/diagnose_preview.py` (repo root).
@@ -47,6 +48,20 @@ What I verified (command + output):
 What I did NOT do:
 Next concrete step:
 ```
+
+
+### Handoff — 2026-11-15 · ZCode (r103 — listing detail page bench round)
+What I did:
+- Whole-page review (VLM 5 slices + code audit): baseline desktop 6/10, mobile-bottom 2/10. Every major component mapped; data gaps (1-2 imgs/listing, blank brand contacts) distinguished from structural styling gaps.
+- 40-criterion benchmark committed (spec: specs/active/r103-listing-detail-benchmark.md; tests: apps/listings/tests/test_r103_detail_bench.py). RED baseline 16/40 verified before implementation.
+- One continuous implementation round (no per-section agent loops): template (type chip, pin+location, negotiable badge, facts icons, linebreaks + empty state, semantic amenity icons ×13 kinds, sidebar price recap + meta line, similar browse-all link), CSS (~200 lines: typography floors, fluid grids, hover lifts, touch targets, focus rings), footer/enquiry/cover-tag bracket labels retired, gallery 16/7→3/2 aspect, pluralization fixed (land/commercial-property special cases).
+What I verified (command + output):
+- Bench: TOTAL 40/40 (scorecard: download/r103-bench-score.txt). Full suite: `1227 passed, 672 warnings in 152.48s`. Live: 14/14 functional checks PASS through :81 (chips, icons, 5 thumbs, counter, price recap, 3 contact buttons, meta, mobile bar, linebreaks, browse link, no brackets).
+- VLM after: desktop slice 8/10 ("nails the prior fixes... genuinely transactional sidebar"), map 8/10; flagged typos/brackets I then fixed (APARTMENTSS, [001] chips, presentation-data stub).
+What I did NOT do:
+- Footer dead-space redesign + © year (site-wide, out of scope). Map tile restyling (DECISIONS.md territory). Testimonials/nearby "Sample" copy is demo data by design (owner replaces at launch).
+Next concrete step:
+- Owner preview review (hard-refresh). Real photos per listing (current seed: 1-2) would let the gallery shine; fill BrandSettings contacts in /manage for real channels.
 
 ### Handoff — 2026-11-15 · ZCode (r102 — PAT exposure incident + push authorization)
 What I did:

@@ -739,7 +739,7 @@
 .detail-intro__price strong { color:var(--ink); font-size:1.5rem; font-variant-numeric:tabular-nums; }
 .detail-intro__actions { display:flex; align-items:center; gap:8px; }
 .gallery--revamp { margin-bottom:18px; gap:12px; }
-.gallery--revamp .gallery__main { aspect-ratio:16/7; min-height:320px; max-height:560px; border-radius:24px; background-color:#e8e2da; box-shadow:0 18px 50px rgba(45,31,23,.12); }
+.gallery--revamp .gallery__main { border-radius:24px; background-color:#e8e2da; box-shadow:0 18px 50px rgba(45,31,23,.12); }
 .gallery--revamp .gallery__main-tag { padding:9px 13px; background:rgba(28,21,17,.72); }
 .gallery--revamp .gallery__thumbs { gap:10px; padding:2px 2px 8px; }
 .gallery--revamp .gallery__thumb { flex-basis:76px; width:76px; aspect-ratio:1.25; border-radius:10px; }
@@ -912,4 +912,283 @@ html[data-fx="none"] .lightbox__nav { transition: none; }
 @media (prefers-reduced-motion: reduce) {
   .lightbox, .lightbox.is-open,
   .gallery__expand, .lightbox__close, .lightbox__nav { transition: none; }
+}
+
+/* ============================================================
+   r103 — listing detail whole-page bench pass.
+   One continuous round over every major component; the bracket
+   labels retire, the facts bar gains icons and real contrast,
+   grids go fluid, the sidebar gets its conversion moment back,
+   and the similar rail can never strand an orphan card again.
+   (Criteria: apps/listings/tests/test_r103_detail_bench.py)
+   ============================================================ */
+
+/* -- Shared section eyebrow (replaces [ BRACKET ] syntax) -- */
+.detail-section__eyebrow,
+.detail-video__tag,
+.detail-description__title,
+.amenities__title {
+  margin-bottom: 12px;
+  color: var(--burnt);
+  font: 700 13px var(--font-mono);
+  letter-spacing: .14em;
+  text-transform: uppercase;
+}
+.detail-section__eyebrow::before,
+.detail-video__tag::before {
+  content: "";
+  display: inline-block;
+  width: 22px;
+  height: 1px;
+  margin: 0 10px 4px 0;
+  background: var(--burnt);
+  vertical-align: middle;
+}
+
+/* -- A. Intro: chip eyebrow, price row, negotiable badge -- */
+.detail-intro__type-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 5px 12px;
+  border: 1px solid color-mix(in srgb, var(--burnt) 30%, transparent);
+  border-radius: var(--radius-pill);
+  background: color-mix(in srgb, var(--burnt) 8%, var(--white));
+  color: var(--brown);
+  font: 600 13px var(--font-mono);
+  letter-spacing: .1em;
+  text-transform: uppercase;
+}
+.detail-intro__eyebrow { gap: 10px; }
+.detail-intro__location {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.detail-intro__location svg { color: var(--burnt); flex: none; }
+.detail-intro__negotiable {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 9px;
+  margin-left: 2px;
+  border-radius: var(--radius-pill);
+  background: color-mix(in srgb, var(--green-deep) 10%, var(--white));
+  color: var(--green-deep);
+  font: 600 13px var(--font-mono);
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+.detail-intro__actions .detail-header__action { min-height: 38px; }
+
+/* -- B. Gallery: kinder aspect for 4/3 photography (16/7 letterboxed
+      portrait-ish photos on tall screens; 3/2 keeps the hero stately) -- */
+.gallery--revamp .gallery__main {
+  aspect-ratio: 3/2;
+  min-height: 300px;
+  max-height: 640px;
+}
+
+/* -- B. Facts bar: icon + label + value, real contrast, nowrap units -- */
+.facts-bar--revamp { padding: 22px 8px; }
+.facts-bar--revamp .facts-bar__fact {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.facts-bar__icon {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--burnt) 9%, var(--white));
+  border: 1px solid color-mix(in srgb, var(--burnt) 16%, transparent);
+  color: var(--burnt);
+}
+.facts-bar__label {
+  display: block;
+  font-weight: 600;
+  font-size: 13px;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--taupe);
+}
+.facts-bar__value {
+  display: block;
+  font-weight: 600;
+  font-size: 16px;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+@media (max-width: 809px) {
+  .facts-bar--revamp .facts-bar__fact { padding: 14px 10px; }
+  .facts-bar__icon { width: 34px; height: 34px; border-radius: 10px; }
+  .facts-bar__icon svg { width: 15px; height: 15px; }
+}
+
+/* -- C. Description: editorial body, honest empty state -- */
+.detail-layout--revamp .detail-description__body {
+  max-width: 68ch;
+  font-size: 17px;
+  line-height: 1.75;
+  color: var(--ink);
+}
+.detail-description__body--empty {
+  padding: 18px 20px;
+  border-left: 2px solid var(--sand);
+  background: color-mix(in srgb, var(--sand) 30%, var(--white));
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  color: var(--taupe);
+}
+
+/* -- C. Amenities: fluid grid (no fixed 2-col stretch), hover lift -- */
+.detail-layout--revamp .amenities__grid {
+  grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+  gap: 10px;
+}
+.detail-layout--revamp .amenities__item {
+  min-height: 52px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: var(--white);
+  transition: transform var(--t-fast) var(--ease),
+              box-shadow var(--t-fast) var(--ease),
+              border-color var(--t-fast) var(--ease);
+}
+@media (hover: hover) {
+  .detail-layout--revamp .amenities__item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(45, 31, 23, .10);
+    border-color: color-mix(in srgb, var(--burnt) 34%, transparent);
+  }
+}
+.detail-layout--revamp .amenities__item-icon {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 30px;
+  height: 30px;
+  border-radius: 9px;
+  background: color-mix(in srgb, var(--burnt) 10%, var(--white));
+  color: var(--burnt);
+}
+.detail-layout--revamp .amenities__item-icon svg { width: 16px; height: 16px; }
+
+/* -- C. Nearby + map: quiet mono meta, aligned headings -- */
+.nearby-amenities__meta,
+.detail-map__approx {
+  flex: none;
+  color: var(--taupe);
+  font: 600 13px var(--font-mono);
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+.nearby-amenities__note {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  letter-spacing: .02em;
+  opacity: .85;
+}
+.detail-map__note {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  letter-spacing: .02em;
+  opacity: .85;
+}
+
+/* -- D. Sidebar: price recap, meta line, touch-safe inputs -- */
+.agent-card-sticky__header {
+  align-items: flex-start;
+  position: relative;
+  gap: 12px;
+}
+.agent-card-sticky__price {
+  margin-left: auto;
+  display: flex;
+  align-items: baseline;
+  gap: 3px;
+  padding: 6px 12px;
+  border-radius: var(--radius-pill);
+  background: var(--espresso);
+  color: var(--cream);
+  white-space: nowrap;
+}
+.agent-card-sticky__price strong {
+  font-size: 15px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+.agent-card-sticky__price span { font-size: 13px; opacity: .8; }
+.agent-card-sticky__meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: -2px 0 -6px;
+  color: var(--taupe);
+  font-size: 13px;
+}
+.agent-card-sticky__meta-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 999px;
+  background: var(--green-deep);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--green-deep) 18%, transparent);
+}
+.enquiry-form .form__input,
+.enquiry-form .form__textarea {
+  min-height: 44px;
+}
+.enquiry-form .form__input:focus,
+.enquiry-form .form__textarea:focus {
+  outline: 2px solid var(--burnt);
+  outline-offset: 1px;
+  border-color: var(--burnt);
+}
+@media (max-width: 1199px) {
+  .agent-card-sticky__price strong { font-size: 14px; }
+}
+
+/* -- D. Similar rail: fluid grid + orphan-proof single card + browse CTA -- */
+.similar__grid {
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 1.5rem;
+}
+.similar__grid > div:only-child { grid-column: 1 / -1; max-width: 420px; }
+.similar__browse {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 2rem;
+  padding: 11px 20px;
+  border: 1px solid color-mix(in srgb, var(--burnt) 34%, transparent);
+  border-radius: var(--radius-pill);
+  color: var(--brown);
+  font: 600 13px var(--font-mono);
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  text-decoration: none;
+  transition: background var(--t-fast) var(--ease),
+              color var(--t-fast) var(--ease),
+              transform var(--t-fast) var(--ease);
+}
+@media (hover: hover) {
+  .similar__browse:hover {
+    background: var(--burnt);
+    color: var(--white);
+    transform: translateY(-1px);
+  }
+}
+.similar__browse:focus-visible {
+  outline: 2px solid var(--burnt);
+  outline-offset: 2px;
+}
+
+/* -- D. Mobile bar: 44px touch targets -- */
+.mobile-contact-bar__btn { min-height: 44px; }
+
+/* r103 A4: share action focus ring (was hover-only) */
+.detail-header__action:focus-visible {
+  outline: 2px solid var(--burnt);
+  outline-offset: 2px;
 }

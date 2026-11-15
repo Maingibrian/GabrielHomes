@@ -31,6 +31,33 @@ def already_running() -> bool:
     return False
 
 
+def _fill_preview_brand_contacts() -> None:
+    """r103: demo contacts for the preview only, when blank.
+
+    Uses the same shell that runs the server so it shares settings/venv;
+    failures are non-fatal (the preview still starts, just form-only).
+    """
+    code = (
+        "from apps.core.models import BrandSettings\n"
+        "b = BrandSettings.load()\n"
+        "changed = False\n"
+        "for f, v in (('phone','+254712345678'),"
+        "('whatsapp','+254712345678'),"
+        "('email','hello@gabrielhomes.co.ke')):\n"
+        "    if not getattr(b, f, ''):\n"
+        "        setattr(b, f, v); changed = True\n"
+        "if changed: b.save()"
+    )
+    try:
+        subprocess.run(
+            [str(REPO / ".venv/bin/python"), "manage.py", "shell", "-c", code],
+            cwd=str(REPO), timeout=60,
+            stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
+        )
+    except Exception:
+        pass
+
+
 def main() -> None:
     if already_running():
         print("django daemon already running")
@@ -76,6 +103,14 @@ def main() -> None:
     # gateway — both must be trusted or every POST form 403s.
     env.setdefault("CSRF_TRUSTED_ORIGINS",
                    "http://127.0.0.1:81,https://*.space-z.ai")
+    # r103: PREVIEW-ONLY demo brand contacts. seed_demo deliberately leaves
+    # BrandSettings contact channels empty (P1 contract: the owner fills
+    # them via the dashboard — honest-blank by design), which made the
+    # preview's detail sidebar render form-only with no call/WhatsApp and
+    # no mobile bar. Fill them here, only for the preview, only when blank
+    # (the owner's real values always win). Same numbers the seed mints
+    # for the Gabriel Homes demo agency row.
+    _fill_preview_brand_contacts()
     proc = subprocess.Popen(
         [str(REPO / ".venv/bin/python"), "manage.py", "runserver",
          "0.0.0.0:8000", "--noreload"],

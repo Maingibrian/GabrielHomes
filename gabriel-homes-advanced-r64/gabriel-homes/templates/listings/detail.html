@@ -81,16 +81,19 @@
   <div class="detail-page-v2">
     <header class="detail-intro">
       <div class="detail-intro__eyebrow">
-        <span>{{ property.get_listing_type_display }}{% if property.is_short_stay %} · SHORT STAY{% endif %}</span>
+        <span class="detail-intro__type-chip">{{ property.get_listing_type_display }}{% if property.is_short_stay %} · short stay{% endif %}</span>
         {% if property.is_verified %}<span class="detail-intro__checked">✓ Checked listing</span>{% endif %}
       </div>
       <h1 class="detail-intro__title">{{ property.title }}</h1>
       <div class="detail-intro__bottom">
-        <p class="detail-intro__location">{{ property.location.full_path }}</p>
+        <p class="detail-intro__location">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+          {{ property.location.full_path }}
+        </p>
         <div class="detail-intro__price">
           <strong>{{ property.price|kes }}</strong>
           {% if property.price_period == "monthly" %}<span>/ month</span>{% elif property.price_period == "nightly" %}<span>/ night</span>{% endif %}
-          {% if property.price_negotiable %}<span>· negotiable</span>{% endif %}
+          {% if property.price_negotiable %}<span class="detail-intro__negotiable">Negotiable</span>{% endif %}
         </div>
         <div class="detail-intro__actions">
           {% if request.user.is_authenticated %}<span id="save-btn-{{ property.pk }}">{% include "accounts/_save_button.html" with property=property variant="detail" %}</span>{% endif %}
@@ -116,10 +119,22 @@
       </div>{% endif %}
     </div>
     <div class="facts-bar facts-bar--revamp">
-      <div class="facts-bar__fact"><span class="facts-bar__label">Bedrooms</span><span class="facts-bar__value">{{ property.bedrooms|default:"—" }}</span></div>
-      <div class="facts-bar__fact"><span class="facts-bar__label">Bathrooms</span><span class="facts-bar__value">{{ property.bathrooms|default:"—" }}</span></div>
-      <div class="facts-bar__fact"><span class="facts-bar__label">Floor / land area</span><span class="facts-bar__value">{% if property.size_sqm %}{{ property.size_sqm }} m²{% elif property.land_size_acres %}{{ property.land_size_acres }} acres{% else %}—{% endif %}</span></div>
-      <div class="facts-bar__fact"><span class="facts-bar__label">Furnishing</span><span class="facts-bar__value">{{ property.get_furnishing_display }}</span></div>
+      <div class="facts-bar__fact">
+        <span class="facts-bar__icon" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 4v16"></path><path d="M2 8h18a2 2 0 0 1 2 2v10"></path><path d="M2 17h20"></path><path d="M6 8v9"></path></svg></span>
+        <div><span class="facts-bar__label">Bedrooms</span><span class="facts-bar__value">{{ property.bedrooms|default:"—" }}</span></div>
+      </div>
+      <div class="facts-bar__fact">
+        <span class="facts-bar__icon" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h16a2 2 0 0 1 2 2v6"></path><path d="M2 20v-6a2 2 0 0 1 2-2"></path><path d="M7 12v8"></path><path d="M13 12v8"></path><path d="M2 20h20"></path><path d="M20 12V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v6"></path></svg></span>
+        <div><span class="facts-bar__label">Bathrooms</span><span class="facts-bar__value">{{ property.bathrooms|default:"—" }}</span></div>
+      </div>
+      <div class="facts-bar__fact">
+        <span class="facts-bar__icon" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"></rect><path d="M3 12h18"></path><path d="M12 3v18"></path></svg></span>
+        <div><span class="facts-bar__label">{% if property.land_size_acres and not property.size_sqm %}Land area{% else %}Floor area{% endif %}</span><span class="facts-bar__value">{% if property.size_sqm %}{{ property.size_sqm }} m²{% elif property.land_size_acres %}{{ property.land_size_acres }} acres{% else %}—{% endif %}</span></div>
+      </div>
+      <div class="facts-bar__fact">
+        <span class="facts-bar__icon" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 9V7a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v2"></path><path d="M2 11a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v2a2 2 0 0 1-2 2h-2v-4"></path><path d="M4 13v6a1 1 0 0 0 1 1h1a1 1 0 0 0 1-1v-1"></path><path d="M17 13v6a1 1 0 0 0 1 1h1a1 1 0 0 0 1-1v-1"></path></svg></span>
+        <div><span class="facts-bar__label">Furnishing</span><span class="facts-bar__value">{{ property.get_furnishing_display }}</span></div>
+      </div>
     </div>
   </div>
 
@@ -131,7 +146,7 @@
       {# Walkthrough video (owner-supplied) #}
       {% if property.video %}
       <div class="detail-video">
-        <p class="detail-video__tag">[ VIDEO TOUR ]</p>
+        <p class="detail-video__tag detail-section__eyebrow">Video tour</p>
         <video class="detail-video__player" controls preload="metadata" playsinline
                src="{{ property.video.url }}"></video>
       </div>
@@ -139,19 +154,57 @@
 
       {# Description #}
       <div class="detail-description">
-        <p class="detail-description__title">[ DESCRIPTION ]</p>
-        <div class="detail-description__body">{{ property.description }}</div>
+        <p class="detail-description__title detail-section__eyebrow">About this home</p>
+        {% if property.description %}
+        <div class="detail-description__body">{{ property.description|linebreaks }}</div>
+        {% else %}
+        <div class="detail-description__body detail-description__body--empty">
+          <p>The owner hasn't added a written description for this home yet.
+          Everything in the photos and the facts above is current — send an
+          enquiry below and Gabriel Homes will answer specifics the same day.</p>
+        </div>
+        {% endif %}
       </div>
 
       {# Amenities #}
       {% if property.amenities.all %}
       <div class="amenities">
-        <p class="amenities__title">[ AMENITIES ]</p>
+        <p class="amenities__title detail-section__eyebrow">What's included</p>
         <div class="amenities__grid">
           {% for amenity in property.amenities.all %}
             <div class="amenities__item">
               <span class="amenities__item-icon" aria-hidden="true">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                {# r103: semantic glyphs per amenity kind — the r64 single #}
+                {# checkmark read as a list template, not a homes language #}
+                {% with icon=amenity.name|lower %}
+                {% if 'pool' in icon %}
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 16c.6.5 1.2 1 2.5 1 2.5 0 2.5-2 5-2 1.3 0 1.9.5 2.5 1 .6.5 1.2 1 2.5 1 2.5 0 2.5-2 5-2 1.3 0 1.9.5 2.5 1"></path><path d="M2 20c.6.5 1.2 1 2.5 1 2.5 0 2.5-2 5-2 1.3 0 1.9.5 2.5 1 .6.5 1.2 1 2.5 1 2.5 0 2.5-2 5-2 1.3 0 1.9.5 2.5 1"></path><path d="M9 8a7 7 0 0 1 7-7"></path><path d="M16 8a7 7 0 0 0-7-7"></path><circle cx="12" cy="8" r="6"></circle></svg>
+                {% elif 'park' in icon or 'garden' in icon or 'outdoor' in icon or 'yard' in icon %}
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"></path><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"></path></svg>
+                {% elif 'security' in icon or 'guard' in icon or 'gate' in icon or 'alarm' in icon or 'cctv' in icon %}
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"></path><polyline points="9 12 11 14 15 10"></polyline></svg>
+                {% elif 'wifi' in icon or 'internet' in icon %}
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13a10 10 0 0 1 14 0"></path><path d="M8.5 16.5a5 5 0 0 1 7 0"></path><path d="M2 8.82a15 15 0 0 1 20 0"></path><line x1="12" y1="20" x2="12.01" y2="20"></line></svg>
+                {% elif 'parking' in icon or 'garage' in icon %}
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"></rect><path d="M9 17V7h4a3 3 0 0 1 0 6H9"></path></svg>
+                {% elif 'balcon' in icon or 'terrace' in icon %}
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8h18v3H3z"></path><path d="M5 11v10"></path><path d="M19 11v10"></path><path d="M9 11v6"></path><path d="M15 11v6"></path><path d="M12 8V4l8 2"></path></svg>
+                {% elif 'air' in icon or 'ac' == icon|slice:":2" or 'fan' in icon %}
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2z"></path><path d="M9 14h6"></path><circle cx="9" cy="10" r="1"></circle><circle cx="12" cy="12" r="1"></circle><circle cx="15" cy="10" r="1"></circle></svg>
+                {% elif 'water' in icon or 'borehole' in icon or 'tank' in icon %}
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22a7 7 0 0 0 7-7c0-2-1-3.9-3-5.5s-3.5-4-4-6.5c-.5 2.5-2 4.9-4 6.5C6 11.1 5 13 5 15a7 7 0 0 0 7 7z"></path></svg>
+                {% elif 'gym' in icon or 'fitness' in icon %}
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6.5 6.5 17.5 17.5"></path><path d="M21 21l-1-1"></path><path d="M3 3l1 1"></path><path d="M18 22l4-4"></path><path d="M2 6l4-4"></path><path d="M3 10l7-7"></path><path d="M14 21l7-7"></path></svg>
+                {% elif 'lift' in icon or 'elevator' in icon %}
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2"></rect><path d="M12 6v4"></path><path d="m8 10 4-4 4 4"></path><path d="m8 16 4 4 4-4"></path></svg>
+                {% elif 'solar' in icon or 'power' in icon or 'generator' in icon or 'electric' in icon %}
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2"></path><path d="M12 20v2"></path><path d="m4.93 4.93 1.41 1.41"></path><path d="m17.66 17.66 1.41 1.41"></path><path d="M2 12h2"></path><path d="M20 12h2"></path><path d="m6.34 17.66-1.41 1.41"></path><path d="m19.07 4.93-1.41 1.41"></path></svg>
+                {% elif 'pet' in icon or 'dog' in icon or 'cat' in icon %}
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="4" r="2"></circle><circle cx="18" cy="8" r="2"></circle><circle cx="4" cy="8" r="2"></circle><path d="M11.5 20a7 7 0 0 0 7-7c0-2-1-3.9-3-5.5s-3.5-4-4-6.5c-.5 2.5-2 4.9-4 6.5C5.5 9.1 4.5 11 4.5 13a7 7 0 0 0 7 7z"></path></svg>
+                {% else %}
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                {% endif %}
+                {% endwith %}
               </span>
               {{ amenity.name }}
             </div>
@@ -163,8 +216,8 @@
       {% if nearby_amenities or property.is_demo %}
       <section class="nearby-amenities" aria-labelledby="nearby-title">
         <div class="nearby-amenities__heading">
-          <div><p class="nearby-amenities__eyebrow">THE NEIGHBOURHOOD</p><h2 id="nearby-title">Nearby amenities</h2></div>
-          <span>Malls · resorts · conference venues</span>
+          <div><p class="nearby-amenities__eyebrow">The neighbourhood</p><h2 id="nearby-title">Nearby amenities</h2></div>
+          <span class="nearby-amenities__meta">Malls · resorts · conference venues</span>
         </div>
         {% if property.is_demo %}<p class="nearby-amenities__note">Example places and drive times for this presentation listing; confirm details before publishing.</p>{% endif %}
         <div class="nearby-amenities__grid">
@@ -186,7 +239,7 @@
       {# Map #}
       {% if property.lat and property.lng %}
       <div class="detail-map">
-        <div class="detail-map__heading"><div><p class="detail-map__title">LOCATION</p><h2>Find it in {{ property.location.name }}</h2></div><span>Approximate location</span></div>
+        <div class="detail-map__heading"><div><p class="detail-map__title">Location</p><h2>Find it in {{ property.location.name }}</h2></div><span class="detail-map__approx">Approximate location</span></div>
         <div class="detail-map__frame">
           <div id="detail-map" data-lat="{{ property.lat }}" data-lng="{{ property.lng }}" data-label="{{ property.location.name }} — approximate location" data-maplibre-src="{% staticv 'vendor/maplibre-gl/maplibre-gl.mjs' %}" role="application" aria-label="OpenStreetMap-based map showing the approximate property location"><p>Loading the location map…</p></div>
         </div>
@@ -215,6 +268,10 @@
             <div class="agent-card-sticky__name">{{ SITE_NAME }}</div>
             <div class="agent-card-sticky__role">Owner-direct</div>
           </div>
+          <div class="agent-card-sticky__price" aria-label="Listing price">
+            <strong>{{ property.price|kes_short }}</strong>
+            {% if property.price_period == "monthly" %}<span>/mo</span>{% elif property.price_period == "nightly" %}<span>/night</span>{% endif %}
+          </div>
         </div>
 
         <div class="agent-card-sticky__contact">
@@ -240,6 +297,11 @@
           {% endif %}
         </div>
 
+        <p class="agent-card-sticky__meta">
+          <span class="agent-card-sticky__meta-dot" aria-hidden="true"></span>
+          Typically responds within the hour
+        </p>
+
         {# Enquiry form (HTMX target) — the partial reads `form`, so bind it explicitly #}
         <div id="enquiry-form-container">
           {% include "inquiries/_enquiry_form.html" with form=enquiry_form %}
@@ -260,6 +322,10 @@
         <div>{% include "includes/_listing_card.html" with index=forloop.counter %}</div>
       {% endfor %}
     </div>
+    <a class="similar__browse" href="{% if property.listing_type == 'sale' %}{% url 'search_type_sale' type_slug=property.property_type.slug_plural %}{% else %}{% url 'search_type_rent' type_slug=property.property_type.slug_plural %}{% endif %}">
+      Browse all {% if property.property_type.name|lower == "land" %}land plots{% elif property.property_type.name|lower == "commercial property" %}commercial property{% else %}{{ property.property_type.name|lower }}{% if property.property_type.name|lower|slice:"-1:" != "s" %}s{% endif %}{% endif %}
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+    </a>
   </div>
 </section>
 {% endif %}

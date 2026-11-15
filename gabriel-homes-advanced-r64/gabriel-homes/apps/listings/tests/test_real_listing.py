@@ -58,7 +58,11 @@ class ImportRealListingTests(TestCase):
         self.assertEqual(r.status_code, 200)
         html = r.content.decode()
         self.assertIn("<video", html)
-        self.assertIn("VIDEO TOUR", html)
+        # r103: the bracket "[ VIDEO TOUR ]" label retired with the other
+        # dev-syntax labels; the eyebrow is editorial copy now, uppercased
+        # by CSS (text-transform), not by literal brackets in the markup.
+        self.assertNotIn("[ VIDEO TOUR ]", html)
+        self.assertIn("detail-video__tag", html)
 
     def test_reimport_is_idempotent(self):
         with TemporaryDirectory() as tmp:

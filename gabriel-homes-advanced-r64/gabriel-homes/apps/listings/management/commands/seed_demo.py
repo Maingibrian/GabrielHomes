@@ -691,7 +691,7 @@ class Command(BaseCommand):
             obj = Property.objects.create(
                 title=title,
                 slug=slugify(title),
-                description=description + " This is presentation data for the owner to replace after launch.",
+                description=description,
                 listing_type=listing_kind,
                 property_type=ptype,
                 location=loc,

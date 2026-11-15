@@ -1,0 +1,114 @@
+===== rv-desktop-a =====
+```json
+{"components":[
+{"name":"header/intro","score":8,"weakness":"Eyebrow chips and breadcrumb are clean and dev-syntax-free, but the title row is left-anchored while price/share float right, leaving an awkward empty band under the headline; actions lack a save/favorite."},
+{"name":"gallery","score":9,"weakness":"Strong hero, clean nav arrows, zoom and counter; the five visible thumbs are near-identical duplicates of the hero, so thumbnail variety looks staged rather than real listing photography."},
+{"name":"facts bar","score":9,"weakness":"Icons, labels and values are legible with good contrast and dividers; values sit slightly left of center under their icons, giving faint vertical misalignment."},
+{"name":"description / amenities / nearby","score":7,"weakness":"Description admits 'presentation data for the owner to replace after launch' — placeholder copy shipped live is a credibility killer; amenities are only four sparse chips and no nearby-places section is visible in this slice."},
+{"name":"map section","score":0,"weakness":"Not visible in this slice; no evidence of a map or location card."},
+{"name":"sidebar contact card","score":9,"weakness":"Excellent fix: logo, price chip, call/WhatsApp/Email buttons and response-time note are all present and well styled; only the phone number reads as a placeholder pattern (+254712345678)."},
+{"name":"similar properties rail + browse link","score":0,"weakness":"Not visible in this slice; cannot verify the stranded-rail fix."}
+],
+"overall":8,
+"notes":"Against a world-class boutique standard (e.g. Sotheby's-style detail pages), this slice nails the prior fixes: no bracket-label syntax, a high-contrast facts bar, a genuinely transactional sidebar, and a polished gallery. The remaining credibility gap is the live placeholder description copy and thin amenities/nearby content — real owner copy and location context would push this into top-tier territory."}
+```
+===== rv-desktop-b =====
+```json
+{
+  "components": [
+    {
+      "name": "header/intro (eyebrow chips, title, location, price, actions)",
+      "score": 0,
+      "weakness": "Not visible in this slice; cannot score."
+    },
+    {
+      "name": "gallery (main image, thumbs, nav, counter)",
+      "score": 0,
+      "weakness": "Not visible in this slice; cannot score."
+    },
+    {
+      "name": "facts bar (beds/baths/area/furnishing with icons)",
+      "score": 0,
+      "weakness": "Not visible in this slice; cannot score."
+    },
+    {
+      "name": "description / amenities / nearby cards",
+      "score": 8,
+      "weakness": "Nearby amenities cards are clean, iconed and specific, but all four entries are placeholder 'Sample' data — real venue names/times are needed before launch. 'Conference & Events' repeats the mall icon instead of a distinct one."
+    },
+    {
+      "name": "map section",
+      "score": 8,
+      "weakness": "Good attribution, zoom controls, approximate-location disclaimer and OSM outbound link; only nit is the single static pin with no contextual hover card or neighbourhood boundary."
+    },
+    {
+      "name": "sidebar contact card (logo, price chip, call/WhatsApp buttons, form)",
+      "score": 6,
+      "weakness": "Form fields, prefilled message and CTA are fine, but this slice shows the form-only tail: no logo, price chip, or call/WhatsApp quick actions visible, and the enquiry heading is orphaned at the top of the crop."
+    },
+    {
+      "name": "similar properties rail + browse link",
+      "score": 5,
+      "weakness": "The bracket dev labels '[001]'/'[002]' are STILL leaking into production — exactly what the redesign was supposed to kill. Card two's image failed to load (bare beige block), and there's no 'Browse all properties' link visible."
+    }
+  ],
+  "overall": 6,
+  "notes": "The amenity and map sections now read like a credible boutique coastal listing, with proper attribution and honest 'sample data' caveats. But shipping blockers remain: the [00N] bracket IDs are still live on the similar-rail cards and one card image is broken, so the QA pass is incomplete."
+}
+```
+===== rv-desktop-c =====
+{"components":[
+{"name":"header/intro (eyebrow chips, title, location, price, actions)","score":0,"weakness":"Not visible in this slice; only the tail of the similar-properties section (browse CTA) and footer appear, so no verdict possible."},
+{"name":"gallery (main image, thumbs, nav, counter)","score":0,"weakness":"Not present in this slice."},
+{"name":"facts bar (beds/baths/area/furnishing with icons)","score":0,"weakness":"Not present in this slice."},
+{"name":"description / amenities / nearby cards","score":0,"weakness":"Not present in this slice."},
+{"name":"map section","score":0,"weakness":"Not present in this slice."},
+{"name":"sidebar contact card (logo, price chip, call/WhatsApp buttons, form)","score":0,"weakness":"Not present in this slice."},
+{"name":"similar properties rail + browse link","score":5,"weakness":"Only the very bottom of the cards peeks into frame (two rounded card edges) plus the 'BROWSE ALL FLATS & APARTMENTSS' pill — which contains a blatant typo ('APARTMENTSS'). The cards themselves are cut off, so layout, imagery and metadata cannot be judged; the browse pill is left-aligned and stranded with no rail context."},
+{"name":"footer","score":7,"weakness":"Handsome editorial footer: clean column structure, useful browse-by-location/type taxonomies, strong serif wordmark, clear legal line. Weaknesses: massive dead vertical whitespace above and below the content (~700px of empty dark space), the 'How we choose homes' link wraps awkwardly to three lines, contact details are plain text with no tappable tel:/mailto:/WhatsApp links, and '© 2026' is a future date."}
+],"overall":4,
+"notes":"This slice only exposes the browse CTA and the footer, so the redesigned listing components cannot be scored. The footer is genuinely close to world-class boutique standard — refined serif wordmark, disciplined typography, useful link taxonomy — but is undermined by enormous empty vertical space and small bugs (the 'APARTMENTSS' typo above it, future copyright year, non-clickable contact links)."}
+===== rv-mobile-a =====
+```json
+{
+  "components": [
+    {
+      "name": "header/intro (eyebrow chips, title, location, price, actions)",
+      "score": 8,
+      "weakness": "Chips, breadcrumb, serif title and share action are all clean; but the descriptive copy still leaks dev placeholder ('presentation data for the owner to replace after launch') and the FOR SALE / CHECKED chips feel slightly undersized versus the price hierarchy."
+    },
+    {
+      "name": "gallery (main image, thumbs, nav, counter)",
+      "score": 7,
+      "weakness": "Strong hero with category badge, arrows and zoom, but there is no photo counter (e.g. 1/12), only 5 thumbs with no 'view all N photos' affordance, and the active-thumb border is subtle on small screens."
+    },
+    {
+      "name": "facts bar (beds/baths/area/furnishing with icons)",
+      "score": 6,
+      "weakness": "The sticky Call/WhatsApp bar sits directly on top of the facts grid, clipping the beds/baths icons and their labels — a real layout collision. Beds/baths values are also not visible in this slice; floor area and furnishing read well once clear of the overlay."
+    },
+    {
+      "name": "description / amenities / nearby cards",
+      "score": 7,
+      "weakness": "Amenities grid and Nearby amenities cards are rich, well-typed and icon-led — big improvement; but the description is literally placeholder copy, and the nearby 'Sample · about 6 min' strings are lorem-grade filler that must be replaced before launch."
+    },
+    {
+      "name": "map section",
+      "score": 7,
+      "weakness": "Real OpenStreetMap embed with pin, zoom controls and an 'Open in OpenStreetMap' link is solid; however the attribution line overlaps the map edge awkwardly and there's no street-view/gallery-lite or transit context beyond one caption line."
+    },
+    {
+      "name": "sidebar contact card (logo, price chip, call/WhatsApp buttons, form)",
+      "score": 8,
+      "weakness": "Excellent mobile treatment: GH monogram, KES 19M chip, triple contact CTAs, response-time reassurance and a pre-filled enquiry form. Only nit: the textarea placeholder is close to overflow and there's no visible privacy/consent microcopy under the submit button."
+    },
+    {
+      "name": "similar properties rail + browse link",
+      "score": 5,
+      "weakness": "The rail is present but the card shows a literal dev bracket label '[ 001 ]' as its top-left chip — the exact syntax this redesign was meant to remove — and the card is cut off with no visible browse-all link in this slice."
+    }
+  ],
+  "overall": 7,
+  "notes": "Versus a world-class boutique listing page (e.g. a top coastal-villa agency), the typography, warm palette and sticky contact card are genuinely close to flagship quality; what holds it back is launch hygiene — placeholder description and sample nearby data, the sticky bar clipping the facts grid, the surviving '[ 001 ]' bracket label on the similar card, and no photo counter/count."
+}
+```

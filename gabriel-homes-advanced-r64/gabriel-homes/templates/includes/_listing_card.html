@@ -19,7 +19,7 @@
            decoding="async">
     {% endif %}
     {% if index %}
-      <span class="listing-card__cover-tag">[ {{ index|stringformat:"03d" }} ]</span>
+      <span class="listing-card__cover-tag">{{ index|stringformat:"03d" }}</span>
     {% endif %}
     {% if property.is_featured %}
       <span class="listing-card__featured">Featured</span>

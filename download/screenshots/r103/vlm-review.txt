@@ -1,0 +1,72 @@
+===== rv-desktop-a =====
+```json
+{"components":[{"name":"header/intro","score":7,"weakness":"Breadcrumb and eyebrow share the same narrow left column as the title but the price/share row hangs awkwardly off the title's left-aligned axis, creating a right-heavy ragged baseline; the price needs equal visual anchoring to the title block, not a floating pill."},{"name":"gallery","score":6,"weakness":"No thumbnails, no prev/next arrows and no image counter are visible — just a lone zoom button and a redundant 'HOUSES' tag; for a 3.8M-KES listing the gallery feels like a single static hero, not a browsable gallery."},{"name":"facts bar","score":7,"weakness":"Four-column layout with thin dividers is fine, but label/value contrast is weak — tiny grey uppercase labels under 16px values read as footnote-level, and 'Floor / Land Area' wording is ambiguous when only area is shown."},{"name":"description block","score":5,"weakness":"Two sentences of placeholder copy ('presentation data for the owner to replace') sitting in a huge whitespace void — the block is under-scoped and the bracket-style '[ DESCRIPTION ]' labels feel more like a dev template than editorial typography."},{"name":"amenities grid","score":6,"weakness":"Two wide single-column boxes per row waste half the card width; four items in a 2x2 of stretched pills reads sparse — use a denser 3-4 column grid or inline checkmark list."},{"name":"nearby amenities cards","score":4,"weakness":"Only the section header is visible and it already announces 'Example places... confirm details before publishing' — placeholder copy leaking into the art direction, plus the header row (title left, category list right) is misaligned vertically."},{"name":"sidebar contact card","score":7,"weakness":"Form is fine but the CTA button is cut off and there's no visible phone/WhatsApp direct-contact alternative; the GH monogram circle is generic and the 'OWNER-DIRECT' badge lacks styling differentiation."},{"name":"map section","score":0,"weakness":"Not visible in this slice."},{"name":"similar properties rail","score":0,"weakness":"Not visible in this slice."}],"overall":6,"notes":"Coherent warm coastal palette, strong serif display type and clean nav, but the page is visibly half-built: placeholder copy in the description and neighbourhood sections, a gallery without thumbs/nav/counter, and sparse low-density amenity cards. Solid art direction skeleton, unfinished content execution."}
+```
+===== rv-desktop-b =====
+```json
+{"components":[
+{"name":"nearby amenities cards","score":7,"weakness":"All four cards read 'Sample · about X min by car' — placeholder copy shipped to production kills credibility; icons are tiny and generic."},
+{"name":"map section","score":7,"weakness":"Map is only ~760px wide in a 1920px layout, leaving a large dead grey gutter on the right where the sidebar should continue; 'APPROXIMATE LOCATION' label floats awkwardly mid-air, unaligned with anything."},
+{"name":"sidebar contact card","score":4,"weakness":"Card is cut off with just an orphaned 'Send enquiry' button stranded at the top of an empty column — poor sticky positioning that visually collapses."},
+{"name":"similar properties rail","score":6,"weakness":"Only one card in a 3–4 slot rail — the row looks broken and unbalanced; card image is a flat beige placeholder with no real photo, and there's no horizontal scroll affordance or CTA."},
+{"name":"header/intro","score":0,"weakness":"Not visible in this slice."},
+{"name":"gallery","score":0,"weakness":"Not visible in this slice."},
+{"name":"facts bar","score":0,"weakness":"Not visible in this slice."},
+{"name":"description block","score":0,"weakness":"Not visible in this slice."},
+{"name":"amenities grid","score":0,"weakness":"Not visible in this slice."}
+],
+"overall":6,
+"notes":"Warm terracotta-on-cream palette and serif headings give a tasteful boutique feel, but the lower half of the page feels unfinished: placeholder 'Sample' copy, a single-card similar rail, and a vast empty right column next to the map undermine polish. Typography and spacing discipline are good; content completeness and layout balance are not."}
+```
+===== rv-desktop-c =====
+{"components":[{"name":"footer (only section visible)","score":5,"weakness":"Enormous dead vertical space between the link columns and the brand wordmark — the brown block runs ~1000px taller than its content warrants, and links have weak contrast/hover hierarchy with no contact info, phone, or social icons."}],"overall":4,"notes":"This slice shows no listing-page components at all — only the site footer (tagline, sitemap columns, giant 'Homes' wordmark, copyright). Footer itself is elegantly typed with a nice serif wordmark, but the dead space bloats the page and none of the requested listing components can be scored here."}
+===== rv-mobile-a =====
+```json
+{"components":[
+{"name":"header/intro","score":8,"weakness":"Breadcrumb and title hierarchy are fine, but the share button is orphaned far right of the price with no primary 'Enquire' CTA visible inline on desktop — action placement wastes the conversion moment."},
+{"name":"gallery","score":6,"weakness":"Single lonely image with no thumbnails, no counter, no arrows — a listing this expensive needs a real gallery; the HOUSES badge overlaps at an odd cropping angle."},
+{"name":"facts bar","score":7,"weakness":"Two-column grid feels sparse and unbalanced on desktop; hairline dividers are faint and the label/value type contrast is weak (small caps labels nearly same weight as values)."},
+{"name":"description block","score":6,"weakness":"The bracket '[ DESCRIPTION ]' label gimmick reads as unfinished template syntax rather than intentional styling; body text is a short two-line stub with no typography richness."},
+{"name":"amenities grid","score":5,"weakness":"One amenity per full-width pill is a wasteful vertical stack — should be a 2-3 column grid; identical rows create a monotonous scroll of empty space."},
+{"name":"nearby amenities cards","score":8,"weakness":"Cards are clean but the placeholder 'Sample · about X min' copy is unstyled filler noise; type category row (MALLS · RESORTS...) is cramped against the heading."},
+{"name":"map section","score":7,"weakness":"Bland default grey OpenStreetMap tiles clash with the warm terracotta palette — needs custom styled tiles; attribution bar looks unbranded."},
+{"name":"sidebar contact card","score":7,"weakness":"Form inputs are ultra-minimal with barely visible 1px borders on beige, hurting affordance; no phone/WhatsApp quick-contact alternative despite coastal-market norms."},
+{"name":"similar properties rail","score":4,"weakness":"Only a sliver visible — '[ 001 ]' and FEATURED chip floating with no card imagery or structure; the bracket-tag pattern again looks like a broken template."}
+],
+"overall":6,
+"notes":"Clean, warm coastal palette with good type hierarchy in the hero, but the page is clearly rendering a single narrow column that ignores the 1920px canvas — vast empty margins and stacked single-item lists make it feel like a mobile layout stretched onto desktop. Replace the bracket-label gimmick and build out the real gallery and amenity grid for polish."}
+```
+===== rv-mobile-b =====
+```json
+{
+  "components": [
+    {
+      "name": "header/intro",
+      "score": 5,
+      "weakness": "Price, title and breadcrumb are stacked in a narrow white card with no CTA buttons visible — action hierarchy is missing and the card feels like a mobile fragment pasted onto desktop; eyebrow/status chip ('CHECKED') is tiny and orphaned."
+    },
+    {
+      "name": "facts bar",
+      "score": 6,
+      "weakness": "Beds/baths/area icons are cramped into one thin left-aligned row with no dividers or background separation, so the three facts read as an afterthought under the breadcrumb."
+    },
+    {
+      "name": "gallery",
+      "score": 1,
+      "weakness": "Main image is a blank beige gradient placeholder with zero thumbs, nav arrows, or counter — the single most important element on a listing page is empty."
+    },
+    {
+      "name": "footer (not a listed component, scored as description-adjacent block)",
+      "score": 4,
+      "weakness": "The dark footer is a 2000px-tall single-column link dump — EXPLORE/LEGAL/COMPANY/TALK TO US/BROWSE sections collapse into a monotonous stack with no 4-column grid, and 'Talk to us > Contact page' duplicates the Contact link."
+    },
+    {
+      "name": "similar properties rail",
+      "score": 0,
+      "weakness": "Not visible in this slice — instead an enormous empty dark void dominates the middle of the page where content should be."
+    }
+  ],
+  "overall": 2,
+  "notes": "This slice shows a floating white summary card and then a colossal, mostly-empty dark footer with a typographic 'Homes' sign-off; the actual listing content (gallery, description, amenities, map, sidebar) is absent, and the giant dead brown space between the card and footer text is a catastrophic layout failure. Whatever exists is competently typeset but reads as a footer, not a property detail page."
+}
+```

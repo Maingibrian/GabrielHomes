@@ -1,0 +1,170 @@
+{
+  "desktop-1920": {
+    ".detail-intro": {
+      "x": 435,
+      "y": 143.7,
+      "width": 1050,
+      "height": 156.7
+    },
+    ".gallery--revamp": {
+      "x": 360,
+      "y": 322.5,
+      "width": 1200,
+      "height": 722.8
+    },
+    ".facts-bar--revamp": {
+      "x": 360,
+      "y": 1063.3,
+      "width": 1200,
+      "height": 133.1
+    },
+    ".detail-description": {
+      "x": 360,
+      "y": 1238.4,
+      "width": 760,
+      "height": 88.5
+    },
+    ".amenities": {
+      "x": 360,
+      "y": 1364.9,
+      "width": 760,
+      "height": 85
+    },
+    ".nearby-amenities": {
+      "x": 360,
+      "y": 1493.9,
+      "width": 760,
+      "height": 352.9
+    },
+    ".detail-map": {
+      "x": 360,
+      "y": 1888.8,
+      "width": 760,
+      "height": 483.3
+    },
+    ".agent-card-sticky": {
+      "x": 1200,
+      "y": 1238.4,
+      "width": 360,
+      "height": 628.6
+    },
+    ".similar": {
+      "x": 0,
+      "y": 2428.1,
+      "width": 1920,
+      "height": 676.5
+    }
+  },
+  "laptop-1440": {
+    ".detail-intro": {
+      "x": 195,
+      "y": 143.7,
+      "width": 1050,
+      "height": 156.7
+    },
+    ".gallery--revamp": {
+      "x": 118.4,
+      "y": 322.5,
+      "width": 1203.2,
+      "height": 722.8
+    },
+    ".facts-bar--revamp": {
+      "x": 118.4,
+      "y": 1063.3,
+      "width": 1203.2,
+      "height": 133.1
+    },
+    ".detail-description": {
+      "x": 118.4,
+      "y": 1238.4,
+      "width": 763.2,
+      "height": 88.5
+    },
+    ".amenities": {
+      "x": 118.4,
+      "y": 1364.9,
+      "width": 763.2,
+      "height": 85
+    },
+    ".nearby-amenities": {
+      "x": 118.4,
+      "y": 1493.9,
+      "width": 763.2,
+      "height": 352.9
+    },
+    ".detail-map": {
+      "x": 118.4,
+      "y": 1888.8,
+      "width": 763.2,
+      "height": 483.3
+    },
+    ".agent-card-sticky": {
+      "x": 961.6,
+      "y": 1238.4,
+      "width": 360,
+      "height": 628.6
+    },
+    ".similar": {
+      "x": 0,
+      "y": 2428.1,
+      "width": 1440,
+      "height": 655.5
+    }
+  },
+  "mobile-413": {
+    ".detail-intro": {
+      "x": 17.9,
+      "y": 146.4,
+      "width": 377.3,
+      "height": 195.2
+    },
+    ".gallery--revamp": {
+      "x": 17.9,
+      "y": 357.5,
+      "width": 377.3,
+      "height": 373.2
+    },
+    ".facts-bar--revamp": {
+      "x": 17.9,
+      "y": 748.7,
+      "width": 377.3,
+      "height": 265.2
+    },
+    ".detail-description": {
+      "x": 17.9,
+      "y": 1043.9,
+      "width": 377.3,
+      "height": 148
+    },
+    ".amenities": {
+      "x": 17.9,
+      "y": 1229.9,
+      "width": 377.3,
+      "height": 151
+    },
+    ".nearby-amenities": {
+      "x": 17.9,
+      "y": 1424.9,
+      "width": 377.3,
+      "height": 566.5
+    },
+    ".detail-map": {
+      "x": 17.9,
+      "y": 2033.4,
+      "width": 377.3,
+      "height": 417.4
+    },
+    ".agent-card-sticky": {
+      "x": 17.9,
+      "y": 2478.8,
+      "width": 377.3,
+      "height": 628.6
+    },
+    ".similar": {
+      "x": 0,
+      "y": 3163.4,
+      "width": 413,
+      "height": 1241.2
+    }
+  }
+}

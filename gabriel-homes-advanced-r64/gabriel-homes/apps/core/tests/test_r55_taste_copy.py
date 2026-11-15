@@ -211,8 +211,12 @@ def test_cta_band_tag_contrast_bumped():
 # ---------------------------------------------------------------------------
 def test_footer_tag_is_a_place_line_and_note_rewritten():
     body = _page("/")  # rendered: the template comment quotes the old label
-    assert "[ MOMBASA · KENYA ]" in body
+    # r103: the bracket labels ("[ MOMBASA · KENYA ]", "[ GET IN TOUCH ]")
+    # retired with the rest of the dev-syntax eyebrows — the place line
+    # itself stays, uppercased by CSS instead of literal brackets.
+    assert "Mombasa · Kenya" in body
     assert "[ FOOTER ]" not in body
+    assert "[ MOMBASA" not in body and "KENYA ]" not in body
     assert "whenever ten new homes have gone up" in body
     assert "once ten new listings have been published" not in body
 
