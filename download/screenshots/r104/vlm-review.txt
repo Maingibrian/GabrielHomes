@@ -1,0 +1,38 @@
+===== rv-desktop-a =====
+```json
+{"elements":[{"name":"page shell (sidebar, header, title area)","score":6,"weakness":"Sidebar is a vast empty dark column with only a logo and one link — wasted navigation space and no context (listing name, save state) up top; '[ EDIT ]' placeholder tag reads like unshipped scaffolding."},{"name":"form sections/legends (grouping, card treatment)","score":7,"weakness":"Fieldset legends sit awkwardly ON the card border ('THE PRICE', 'THE SPECS' clipped at slice bottom), and the two-column card grid leaves a large empty right gutter that makes the layout feel unbalanced."},{"name":"field rows (labels, inputs, selects, spacing)","score":7,"weakness":"Price input shows raw '19500000.00' with no thousands formatting or KES prefix in-field, and dependent logic is unhandled visually — 'Total' period next to a per-night short-stay checkbox with no conditional state."},{"name":"textarea/description field","score":6,"weakness":"No character count, helper text, or formatting hints; the fixed ~4-row height with resize handle is arbitrary and the label gives no guidance on tone/length for a marketing-critical field."},{"name":"checkbox tiles (amenities)","score":0,"weakness":"Amenities tiles are not visible in this slice — only a lone unstyled 'negotiable' checkbox and the short-stay checkbox, which have no tile treatment at all."},{"name":"actions bar (save/cancel)","score":0,"weakness":"No actions bar visible in this slice; Save/Cancel controls are absent from the viewport."}],"overall":6,"notes":"Clean, on-brand editing surface with good mono labeling and sensible fieldset grouping, but it's clearly a partial form: no visible save actions, placeholder '[ EDIT ]' tag, unformatted price, and huge dead zones in sidebar and right column undermine daily-owner usability."}
+```
+===== rv-desktop-b =====
+```json
+{"elements":[
+{"name":"page shell (sidebar, header, title area)","score":6,"weakness":"The dark sidebar strip is completely empty and a huge ghosted 'Save changes / Cancel' watermark bleeds through the content background — looks like a rendering artifact, not intentional design."},
+{"name":"form sections/legends (grouping, card treatment)","score":7,"weakness":"Section labels (AMENITIES, VISIBILITY) float awkwardly on the card border with no context or description, and the Amenities card sits in a double-nested box with excess padding."},
+{"name":"field rows (labels, inputs, selects, spacing)","score":7,"weakness":"YEAR BUILT is a free-text input instead of a constrained number/year select, and its label sits inside a separate card fragment while the row above is orphaned mid-scroll."},
+{"name":"textarea/description field","score":0,"weakness":"Not visible in this slice."},
+{"name":"checkbox tiles (amenities)","score":9,"weakness":"Selected tiles are distinguished only by the terracotta checkbox fill — no background/border change on the tile itself makes scanned states weak at a glance."},
+{"name":"actions bar (save/cancel)","score":4,"weakness":"Buttons are stranded mid-page between two cards instead of in a persistent sticky bar, so after scrolling to Amenities the user has no visible save affordance."}
+],"overall":6,"notes":"Clean warm-brand details and a genuinely good amenity tile grid, but the floating mid-page action bar, ghosted watermark artifact, and empty sidebar make the shell feel unfinished. Fix sticky actions and state styling for a daily-use editor."}
+```
+===== rv-mobile-a =====
+```json
+{"elements":[
+{"name":"page shell (sidebar, header, title area)","score":5,"weakness":"Sticky action bar overlaps and cuts the 'PRICE (KES)' legend mid-card, so the save buttons float detached from their form context on scroll."},
+{"name":"form sections/legends (grouping, card treatment)","score":7,"weakness":"Legends sit awkwardly half-outside the card border ('THE BASICS'), reading like a rendering glitch rather than an intentional inset style."},
+{"name":"field rows (labels, inputs, selects, spacing)","score":7,"weakness":"Everything is a full-width single column of uniform boxes — long, monotonous, and numeric fields (bedrooms, size, year) waste width that a 2-col grid would reclaim."},
+{"name":"textarea/description field","score":6,"weakness":"No visible character count or helper hint, and it's very tall with no formatting affordances — feels like dead space."},
+{"name":"checkbox tiles (amenities)","score":5,"weakness":"Only bare checkbox rows visible ('negotiable', 'short-stay') — no tile/card treatment, inconsistent sizing, and the long-label checkbox wraps confusingly."},
+{"name":"actions bar (save/cancel)","score":4,"weakness":"Sticky bar is mid-page with no container, no unsaved-changes state, and 'Cancel' destination is ambiguous — it visually collides with the form card behind it."}
+],"overall":5,"notes":"Solid, on-brand typography and consistent input styling, but the sticky save bar cuts through the form card and sections lose polish via the clipped legends and endless single-column stack."}
+```
+===== rv-mobile-b =====
+```json
+{"elements":[
+{"name":"page shell (sidebar, header, title area)","score":0,"weakness":"Not visible in this slice — no score possible."},
+{"name":"form sections/legends (grouping, card treatment)","score":6,"weakness":"Legend labels ('AMENITIES', 'VISIBILITY') sit outside/above the cards, creating ambiguous ownership; double-nesting (outer card + inner bordered tile) wastes vertical space and reads as boxes-in-boxes."},
+{"name":"field rows (labels, inputs, selects, spacing)","score":7,"weakness":"Geist mono uppercase labels are consistent, but full-width inputs ~500px wide make LATITUDE/LONGITUDE scans worse than needed — two short numeric fields should share a row; no units/help text."},
+{"name":"textarea/description field","score":0,"weakness":"Not visible in this slice."},
+{"name":"checkbox tiles (amenities)","score":3,"weakness":"~24 amenities stacked one-per-row force a near-bottomless scroll — should be a multi-column grid or grouped by category (power/water/security/leisure); checked state relies only on a small terracotta checkbox with no tile-level emphasis."},
+{"name":"actions bar (save/cancel)","score":0,"weakness":"Not visible in this slice — critical for a daily-use editor, so its absence here is itself a layout concern."}
+],"overall":5,
+"notes":"Consistent, on-brand typography and inputs, but the single-column amenity checklist is the dominant UX failure — a 24-item vertical pile in the most-scrolled part of the form. Nested card treatments and missing actions bar further weaken the editor's efficiency."}
+```

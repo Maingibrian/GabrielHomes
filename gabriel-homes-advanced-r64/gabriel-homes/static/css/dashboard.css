@@ -263,6 +263,7 @@
   display: grid;
   grid-template-columns: 1fr;
   gap: 1rem;
+  align-items: start;
 }
 @media (min-width: 810px) {
   .dashboard-form__row--2 { grid-template-columns: 1fr 1fr; }
@@ -599,12 +600,152 @@
 }
 .dashboard-form__checkbox:hover { border-color: var(--burnt); }
 
-/* Sticky save bar: the actions stay reachable on long forms. */
+/* Sticky save bar: the actions stay reachable on long forms.
+   r104: opaque + elevated — the translucent blur version ghosted
+   through the card borders behind it while scrolling (VLM 3/10). */
 .dashboard-form__actions {
   position: sticky;
   bottom: 0;
-  padding: 0.85rem 0;
-  background: color-mix(in srgb, var(--cream) 92%, transparent);
-  backdrop-filter: blur(8px);
-  border-top: 1px solid var(--sand-60);
+  z-index: 5;
+  padding: 0.85rem 1rem;
+  margin: 0 -1rem;
+  background: var(--cream);
+  border: 1px solid var(--sand-60);
+  border-radius: var(--radius-card, 0.75rem) var(--radius-card, 0.75rem) 0 0;
+  box-shadow: 0 -10px 30px rgba(45, 31, 23, 0.16);
+}
+
+/* ============================================================
+   r104 — Edit-listing form polish (whole-page round).
+   VLM before: 6/6/5/5. Fixes: header context, legend clipping,
+   ghosting sticky bar, tile selected state, mobile amenity grid,
+   helper text, input height parity.
+   ============================================================ */
+
+/* -- Header: crumb + meta strip (context the VLM found missing) -- */
+.dashboard-header--form { align-items: flex-start; }
+.dashboard-header__crumb {
+  margin: 0 0 0.4rem;
+  font-family: var(--font-mono);
+  font-weight: 600;
+  font-size: var(--text-xs);
+  letter-spacing: var(--track-tight);
+  text-transform: uppercase;
+  color: var(--taupe);
+}
+.dashboard-header__crumb a { color: var(--burnt); text-decoration: none; }
+.dashboard-header__crumb a:hover { text-decoration: underline; }
+.dashboard-header__view { color: var(--burnt); font-weight: 600; }
+.dashboard-header__meta {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+.dashboard-header__meta-item {
+  padding: 0.35rem 0.8rem;
+  border: 1px solid var(--sand-60);
+  border-radius: var(--radius-pill);
+  background: var(--white);
+  font-family: var(--font-mono);
+  font-weight: 600;
+  font-size: var(--text-xs);
+  letter-spacing: var(--track-tight);
+  text-transform: uppercase;
+  color: var(--taupe);
+  white-space: nowrap;
+}
+
+/* -- Sidebar: not a dead column — brand block + context footer -- */
+.dashboard-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+.dashboard-sidebar__nav { flex: 1; }
+.dashboard-sidebar__foot {
+  padding-top: 1rem;
+  border-top: 1px solid color-mix(in srgb, var(--cream) 70%, transparent);
+  font-family: var(--font-mono);
+  font-weight: 600;
+  font-size: var(--text-xs);
+  letter-spacing: var(--track-tight);
+  text-transform: uppercase;
+  color: var(--taupe);
+  line-height: 1.8;
+}
+
+/* -- Legends: lead the card from inside as its first row (the
+      on-the-border float clipped when text wrapped) -- */
+.dashboard-form__section { padding-top: 1.1rem; }
+.dashboard-form__legend {
+  padding: 0 0 0.35rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--brown);
+  border-bottom: 0;
+  width: 100%;
+}
+.dashboard-form__legend::before {
+  content: "";
+  width: 20px;
+  height: 1px;
+  background: var(--burnt);
+  flex: none;
+}
+
+/* -- Field parity: every control the same touch height -- */
+.dashboard-form__input,
+.dashboard-form__select { min-height: 2.75rem; }
+.dashboard-form__checkbox { min-height: 2.5rem; }
+
+/* -- Helper text under controls -- */
+.dashboard-form__help {
+  margin: 0;
+  font-size: var(--text-xs);
+  color: var(--taupe);
+  letter-spacing: 0.01em;
+  line-height: 1.5;
+}
+.dashboard-form__help--row { margin-top: -0.2rem; }
+
+/* -- Amenities: selected tiles read at a glance (VLM: state only in the
+      tiny checkbox) + 2 columns even on phones (was 1-per-row pile) -- */
+.dashboard-form__checkbox:has(input:checked) {
+  border-color: var(--burnt);
+  border-width: 1.5px;
+  background: color-mix(in srgb, var(--burnt) 14%, var(--white));
+  color: var(--brown);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--burnt) 25%, transparent);
+}
+.dashboard-form__checkboxes { gap: 0.5rem; }
+@media (max-width: 560px) {
+  .dashboard-form__checkboxes {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* -- Sticky actions: phone safe-area on top of the opaque bar -- */
+.dashboard-form__actions {
+  padding-bottom: calc(0.85rem + env(safe-area-inset-bottom, 0px));
+}
+
+/* -- Mobile form rhythm: reclaim width on short numeric fields -- */
+@media (max-width: 809px) {
+  .dashboard-form__row--3 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .dashboard-form__row--3 .dashboard-form__field:first-child:last-child,
+  .dashboard-form__row--3 > .dashboard-form__field:nth-child(3) {
+    grid-column: 1 / -1;
+  }
+  .dashboard-header__meta { margin-top: 0.5rem; }
+  .dashboard-main { padding: 1.25rem 1rem 2rem; }
+}
+
+/* r104 round-2: section-level helper (sits under its fieldset card,
+   visually attached to the section, not orphaned inside it) */
+.dashboard-form__help--section {
+  margin: -0.4rem 0 0 1.4rem;
+  max-width: 60ch;
 }

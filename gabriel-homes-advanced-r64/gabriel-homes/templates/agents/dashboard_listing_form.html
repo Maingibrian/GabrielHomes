@@ -21,14 +21,32 @@
     <nav class="dashboard-sidebar__nav" aria-label="Dashboard">
       <a class="dashboard-sidebar__link" href="{% url 'agents:dashboard_home' %}">← Back to listings</a>
     </nav>
+    <div class="dashboard-sidebar__foot">
+      {% if object and object.pk %}Editing{% else %}Creating{% endif %}<br>
+      {% if object and object.pk %}{{ object.get_status_display }}{% else %}Draft{% endif %}
+    </div>
   </aside>
 
   <main class="dashboard-main">
-    <div class="dashboard-header">
+    <div class="dashboard-header dashboard-header--form">
       <div>
+        <p class="dashboard-header__crumb"><a href="{% url 'agents:dashboard_home' %}">Listings</a> / {% if is_create %}New{% else %}Edit{% endif %}</p>
         <h1 class="dashboard-header__title">{% if is_create %}New listing{% else %}Edit listing{% endif %}</h1>
-        <p class="dashboard-header__subtitle">[ {% if is_create %}CREATE{% else %}EDIT{% endif %} ]</p>
+        {% if object and object.pk %}
+        <p class="dashboard-header__subtitle">
+          {{ object.title }} · {{ object.get_status_display }}{% if object.is_published %} · <a class="dashboard-header__view" href="{{ object.get_absolute_url }}" target="_blank" rel="noopener">View on site ↗</a>{% endif %}
+        </p>
+        {% else %}
+        <p class="dashboard-header__subtitle">Draft — nothing goes live until you publish.</p>
+        {% endif %}
       </div>
+      {% if object and object.pk %}
+      <div class="dashboard-header__meta">
+        <span class="dashboard-header__meta-item">{{ object.views_count }} views</span>
+        <span class="dashboard-header__meta-item">{{ object.images.count }} photos</span>
+        <span class="dashboard-header__meta-item">Updated {{ object.updated_at|date:"j M Y" }}</span>
+      </div>
+      {% endif %}
     </div>
 
     <form class="dashboard-form" method="post" enctype="multipart/form-data">
@@ -55,6 +73,7 @@
           <label class="dashboard-form__label" for="id_description">Description</label>
           <textarea class="dashboard-form__textarea" name="description" id="id_description"
                     placeholder="Describe the property...">{{ form.description.value|default:'' }}</textarea>
+            <p class="dashboard-form__help">2–3 short paragraphs read best; blank lines start new paragraphs on the listing page.</p>
           {% if form.description.errors %}<ul class="dashboard-form__errorlist">{% for e in form.description.errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
         </div>
 
@@ -108,6 +127,7 @@
             <label class="dashboard-form__label" for="id_price">Price (KES)</label>
             <input class="dashboard-form__input" type="number" name="price" id="id_price"
                    value="{{ form.price.value|default:'' }}" min="0" step="50000" required>
+            <p class="dashboard-form__help">Total for sales, per period for rent — e.g. 19,500,000</p>
           </div>
           <div class="dashboard-form__field">
             <label class="dashboard-form__label" for="id_price_period">Price period</label>
@@ -195,6 +215,7 @@
           </div>
         </div>
       </fieldset>
+      <p class="dashboard-form__help dashboard-form__help--section">Address stays private on the site — only the neighbourhood shows publicly. Coordinates place the map pin; paste from Google Maps (e.g. -3.997, 39.708).</p>
 
       {# ---- Section: amenities ---- #}
       <fieldset class="dashboard-form__section">

@@ -1,0 +1,100 @@
+===== rv-desktop-a =====
+```json
+{
+  "elements": [
+    {
+      "name": "page shell (sidebar, header, title area)",
+      "score": 7,
+      "weakness": "Sidebar is a dead shell — just a logo and one back link, no nav anchors to form sections (Basics/Price/Specs) on a long form, and stat pills (views/photos/updated) crowd the header far from context."
+    },
+    {
+      "name": "form sections/legends (grouping, card treatment)",
+      "score": 6,
+      "weakness": "Card borders have a clipped-corner notch where the legend dash meets the top edge, and 'THE SPECS' section header is cut off by the slice — the legend treatment reads as a rendering bug, not a design choice."
+    },
+    {
+      "name": "field rows (labels, inputs, selects, spacing)",
+      "score": 8,
+      "weakness": "Two-column select grid collapses left column much wider than the right, creating uneven gutters; labels are bare caps with no help text where it matters (e.g. Status, Location)."
+    },
+    {
+      "name": "textarea/description field",
+      "score": 8,
+      "weakness": "Generous and has help text, but the helper line sits below the resize handle and the textarea gives no character guidance or count for a field that drives listing quality."
+    },
+    {
+      "name": "checkbox tiles (amenities)",
+      "score": 0,
+      "weakness": "No amenity tiles are visible in this slice — only two lone checkboxes (negotiable, short-stay) whose unchecked state is faint and whose tile treatment differs from each other."
+    },
+    {
+      "name": "actions bar (save/cancel)",
+      "score": 0,
+      "weakness": "Not visible in this slice — nothing to score, and its absence on a form this tall means save state is unknown for the whole viewport."
+    }
+  ],
+  "overall": 6,
+  "notes": "Clean typography and solid field help text show real progress, but the notched/clipped card legends look broken and the dead sidebar wastes prime nav space on a long form. The previously-flagged actions bar and amenity tiles simply aren't in this slice."
+}
+```
+===== rv-desktop-b =====
+```json
+{
+  "elements": [
+    {
+      "name": "page shell (sidebar, header, title area)",
+      "score": 3,
+      "weakness": "The sticky actions bar is floating mid-content and overlaps/cuts off the field row above it — inputs and even parts of the row of unlabeled fields behind it are visually sliced, proving the sticky layer still ghosts over content."
+    },
+    {
+      "name": "form sections/legends (grouping, card treatment)",
+      "score": 8,
+      "weakness": "Legends ('AMENITIES', 'VISIBILITY') sit OUTSIDE their cards rather than on the border, and the address privacy helper text is orphaned at the card's very bottom edge, disconnected from the fields it explains."
+    },
+    {
+      "name": "field rows (labels, inputs, selects, spacing)",
+      "score": 6,
+      "weakness": "A full row of fields has NO visible labels — it's completely hidden behind the sticky bar, and numeric fields (lat/long, size) lack units/help text beyond one long paragraph."
+    },
+    {
+      "name": "textarea/description field",
+      "score": 0,
+      "weakness": "Not visible in this slice."
+    },
+    {
+      "name": "checkbox tiles (amenities)",
+      "score": 8,
+      "weakness": "Selected tiles still rely on a faint pink tint + border that's low-contrast; selected and unselected tiles read nearly identical at a glance (compare 'Family Room' vs 'Ensuite Bedrooms')."
+    },
+    {
+      "name": "actions bar (save/cancel)",
+      "score": 4,
+      "weakness": "The bar floats inline over form content instead of docking cleanly — it clips the row above it and there's no visible divider/shadow/backdrop separating it from the content it covers."
+    }
+  ],
+  "overall": 5,
+  "notes": "Amenities grid and section legends are genuinely improved, but the sticky actions bar actively clips form content and hides a label row — a blocking defect. Selected-tile states also need stronger contrast than the current pale-pink fill."
+}
+```
+===== rv-mobile-a =====
+```json
+{"elements":[
+{"name":"page shell (sidebar, header, title area)","score":8,"weakness":"Sticky actions bar floats mid-page over the STATUS field, visually splitting the card and orphaning its label — the ghosting problem is only half-fixed."},
+{"name":"form sections/legends (grouping, card treatment)","score":8,"weakness":"Legend treatment ('— THE BASICS') is nice, but section cards run edge-to-edge with near-zero gutter from screen edge, making card boundaries feel accidental."},
+{"name":"field rows (labels, inputs, selects, spacing)","score":8,"weakness":"Selects and inputs are solid, but price input shows raw '19500000.00' with no thousands formatting — a money field this unformatted reads as a bug."},
+{"name":"textarea/description field","score":9,"weakness":"Good help text, but the textarea lacks a visible character count or min-height affordance, so expected length is guessable only via the hint."},
+{"name":"checkbox tiles (amenities)","score":6,"weakness":"Only plain checkbox rows are visible here — no tile grid or selected-tile state shown in this slice, so the redesign's headline fix is unverifiable; the full-width stacked rows waste space on desktop."},
+{"name":"actions bar (save/cancel)","score":7,"weakness":"Sticky bar has no shadow/blur separation or border, so it reads as floating content rather than a fixed toolbar and collides with the form field beneath it."}
+],"overall":7.5,"notes":"Typography, breadcrumbs, help text, and section legends are genuinely improved. The remaining blocker is the sticky actions bar: it renders inline mid-scroll without elevation, slicing through the STATUS field and undermining trust in the fix."}
+```
+===== rv-mobile-b =====
+```json
+{"elements":[
+{"name":"field rows (labels, inputs, selects, spacing)","score":7,"weakness":"Address input truncates 'Minutes from City Ma…' with no width balancing or title/ellipsis handling — the label promises public-safe data the field can't display."},
+{"name":"textarea/description field","score":5,"weakness":"The address helper paragraph is plain floating text outside any field container, visually orphaned from the inputs it explains and easily read as body copy."},
+{"name":"form sections/legends (grouping, card treatment)","score":8,"weakness":"Legend markers are tiny dashes left of 'AMENITIES'/'VISIBILITY' — the accent tick is so subtle the section headers under-read as plain labels."},
+{"name":"checkbox tiles (amenities)","score":8,"weakness":"Inconsistent tile heights and awkward two-line wrapping (Ensuite Bedrooms, CCTV Surveillance) break the grid rhythm; selected state is good but relies on color alone plus a checkbox."},
+{"name":"actions bar (save/cancel)","score":0,"weakness":"Not visible in this slice — no sticky or inline Save/Cancel reachable here, so the longest scroll stretch ends with no way to commit."},
+{"name":"page shell (sidebar, header, title area)","score":0,"weakness":"Not visible in this slice; cannot score shell, header, or title area."}
+],"overall":6,"notes":"Strong amenities grid with clear selected-tile states and good per-field help text, but the address field truncation and the absent actions bar across this long scroll are real usability gaps. Sections are well grouped yet the legend accents under-communicate hierarchy."}
+```
