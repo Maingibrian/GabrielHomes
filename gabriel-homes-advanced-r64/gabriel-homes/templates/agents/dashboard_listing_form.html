@@ -5,13 +5,16 @@
 
 {% block styles %}
   <link rel="stylesheet" href="{% staticv 'css/dashboard.css' %}">
+  <link rel="stylesheet" href="{% staticv 'vendor/maplibre-gl/maplibre-gl.css' %}">
 {% endblock %}
 
 {# r93: a backend editor is not a marketing page — no public navbar, #}
 {# no giant footer. Only the flash stack + content matter here. #}
 {% block header %}{% endblock %}
 {% block footer %}{% endblock %}
-{% block scripts %}{% endblock %}
+{% block scripts %}
+  <script src="{% staticv 'js/pin-picker.js' %}" defer></script>
+{% endblock %}
 
 {% block content %}
 
@@ -214,8 +217,19 @@
                    value="{{ form.lng.value|default:'' }}" step="0.000001">
           </div>
         </div>
+        <div id="pin-map"
+             class="dashboard-form__pinmap"
+             data-lat="{{ object.lat|default_if_none:'' }}"
+             data-lng="{{ object.lng|default_if_none:'' }}"
+             data-maplibre-src="{% staticv 'vendor/maplibre-gl/maplibre-gl.mjs' %}"
+             data-lat-input="id_lat"
+             data-lng-input="id_lng"
+             role="application"
+             aria-label="Map for setting this listing's approximate pin">
+          <p class="dashboard-form__pinmap-note">Loading the map…</p>
+        </div>
+        <p class="dashboard-form__help">Tap the map to drop the pin, or drag it to fine-tune — the numbers above follow. No map? Type the coordinates by hand. The address stays private; only the neighbourhood shows publicly.</p>
       </fieldset>
-      <p class="dashboard-form__help dashboard-form__help--section">Address stays private on the site — only the neighbourhood shows publicly. Coordinates place the map pin; paste from Google Maps (e.g. -3.997, 39.708).</p>
 
       {# ---- Section: amenities ---- #}
       <fieldset class="dashboard-form__section">

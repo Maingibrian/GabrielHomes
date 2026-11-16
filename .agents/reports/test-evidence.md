@@ -216,3 +216,11 @@ above); live preview login (no application change to verify live).
 - DEFECT found + fixed en route (D-RNG-POLLUTION): the first two full-suite runs failed on r65's coast-chip test (location page with zero listings) — deterministic in full-suite order, green in isolation. Root cause: seed_demo's RNG was seeded at MODULE level, so its state depended on how many earlier suites had run seed_demo in the same process; the random spread of listings across neighbourhoods differed by call order and could starve a chip location (Shanzu/Mtwapa). Fix: random.seed(42) moved into Command.handle() so every invocation is deterministic on its own; polluted pairs verified green, then the full suite.
 - Also en route (F1 latent bug): the count font's first pass used 12.5px — below the 13px floor — and the F1 allowlist test's int(px) crashed on the decimal before it could report it. Font raised to 13px AND the test's allowlist comparison made decimal-safe (round(float(px))).
 - Final receipts: pytest -q → 1186 passed, 631 warnings (206.19s); bash scripts/gate.sh → GATE GREEN, exit 0. No edits during the final runs.
+
+## r105 — 2026-11-16 (agencies cleanup + edit-page pin picker)
+- `manage.py check`: 0 issues (0 silenced)
+- `pytest apps/agents apps/manage -q`: 291 passed (1 label-pin updated: test_owner_inquiries_see_all_agencies asserts "All inquiries" — the "[ ALL AGENCIES ]" bracket label was retired; behaviour unchanged)
+- FULL SUITE `pytest -q`: **1227 passed, 672 warnings in 156.53s (0:02:36)** — 0 failed
+- `scripts/gate.sh`: GATE GREEN
+- Live through :81 (scripts/r105_live_verify.py): 16/16 PASS — agencies UI absent from dashboard + all-listings, /dashboard/agencies/ still 200, edit page pin-map div + pin-picker.js + rendered canvas, map click fills id_lat/id_lng with Mombasa-range coords, Studio↔workspace cross-links both directions, mobile 413 map renders
+- Public chain (browser UA): login 200 → /dashboard/; edit page has pin-map; dashboard has Studio link, no Agencies label

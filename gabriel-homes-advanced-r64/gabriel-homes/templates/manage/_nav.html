@@ -27,6 +27,10 @@
      href="{% url 'manage:seo' %}">
     <span class="manage-side__index" aria-hidden="true">05</span>SEO
   </a>
+  {# r105 — cross-link to the listings workspace (Edit/images tools live there) #}
+  <a class="manage-side__link" href="{% url 'agents:dashboard_home' %}">
+    <span class="manage-side__index" aria-hidden="true">06</span>Listings workspace
+  </a>
 {% else %}
   <a class="manage-nav__link {% if request.path == '/manage/' %}is-current{% endif %}"
      href="{% url 'manage:home' %}">Home</a>
@@ -40,4 +44,5 @@
      href="{% url 'manage:site_content' %}">Site content</a>
   <a class="manage-nav__link {% if '/seo' in request.path %}is-current{% endif %}"
      href="{% url 'manage:seo' %}">SEO</a>
+  <a class="manage-nav__link" href="{% url 'agents:dashboard_home' %}">Listings workspace</a>
 {% endif %}

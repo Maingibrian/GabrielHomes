@@ -2,7 +2,7 @@
 {% load core_tags static %}
 
 {% block title %}All listings — Owner dashboard{% endblock %}
-{% block meta_description %}Every listing across every agency.{% endblock %}
+{% block meta_description %}Every listing in the workspace.{% endblock %}
 {% block body_class %}page-dashboard{% endblock %}
 
 {% block styles %}
@@ -20,7 +20,7 @@
       <a class="dashboard-sidebar__link" href="{% url 'agents:dashboard_home' %}">Overview</a>
       <a class="dashboard-sidebar__link is-active" href="{% url 'agents:owner_listings' %}">All listings</a>
       <a class="dashboard-sidebar__link" href="{% url 'agents:dashboard_inquiries' %}">Inquiries</a>
-      <a class="dashboard-sidebar__link" href="{% url 'agents:owner_agencies' %}">Agencies</a>
+      <a class="dashboard-sidebar__link" href="{% url 'manage:home' %}">Studio</a>
       <a class="dashboard-sidebar__link" href="{% url 'agents:owner_import' %}">Import listings</a>
       <a class="dashboard-sidebar__link" href="/admin/">Advanced</a>
       <a class="dashboard-sidebar__link" href="/">View site</a>
@@ -31,7 +31,7 @@
     <div class="dashboard-header">
       <div>
         <h1 class="dashboard-header__title">All listings</h1>
-        <p class="dashboard-header__subtitle">[ EVERY AGENCY ]</p>
+        <p class="dashboard-header__subtitle">The full catalogue</p>
       </div>
       <a class="btn btn--primary btn--sm" href="{% url 'agents:dashboard_listing_create' %}">New listing</a>
     </div>
@@ -41,15 +41,6 @@
       <div class="dashboard-form__field dashboard-form__field--grow">
         <label class="dashboard-form__label" for="f-q">Search</label>
         <input class="dashboard-form__input" type="search" id="f-q" name="q" value="{{ current.q }}" placeholder="Title or slug">
-      </div>
-      <div class="dashboard-form__field">
-        <label class="dashboard-form__label" for="f-agency">Agency</label>
-        <select class="dashboard-form__select" id="f-agency" name="agency">
-          <option value="">All agencies</option>
-          {% for agency in agencies %}
-          <option value="{{ agency.pk }}" {% if current.agency == agency.pk|stringformat:"s" %}selected{% endif %}>{{ agency.name }}</option>
-          {% endfor %}
-        </select>
       </div>
       <div class="dashboard-form__field">
         <label class="dashboard-form__label" for="f-status">Status</label>
@@ -80,7 +71,6 @@
       <thead>
         <tr>
           <th>Title</th>
-          <th>Agency</th>
           <th>Type</th>
           <th>Status</th>
           <th>Data</th>
@@ -94,7 +84,6 @@
           <td class="listing-table__title">
             <a href="{% url 'agents:dashboard_listing_edit' property.pk %}">{{ property.title|truncatechars:42 }}</a>
           </td>
-          <td>{{ property.agent.name }}</td>
           <td>{{ property.property_type.name }}</td>
           <td>
             <span class="status-badge status-badge--{{ property.status }}">{{ property.get_status_display }}</span>
@@ -125,7 +114,7 @@
     {% if is_paginated %}
     <div class="owner-table-note">
       Page {{ page_obj.number }} of {{ paginator.num_pages }} &middot; {{ paginator.count }} listing{{ paginator.count|pluralize }}
-      {% if page_obj.has_next %}&middot; <a href="?{% if current.q %}q={{ current.q|urlencode }}&amp;{% endif %}agency={{ current.agency }}&amp;status={{ current.status }}&amp;demo={{ current.demo }}&amp;page={{ page_obj.next_page_number }}">Next &rarr;</a>{% endif %}
+      {% if page_obj.has_next %}&middot; <a href="?{% if current.q %}q={{ current.q|urlencode }}&amp;{% endif %}status={{ current.status }}&amp;demo={{ current.demo }}&amp;page={{ page_obj.next_page_number }}">Next &rarr;</a>{% endif %}
     </div>
     {% endif %}
     {% else %}

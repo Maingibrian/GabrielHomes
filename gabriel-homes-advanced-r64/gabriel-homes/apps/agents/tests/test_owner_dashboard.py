@@ -138,10 +138,13 @@ def test_agent_cannot_edit_other_agencys_listing():
 # Inquiries — owner sees all agencies
 # ---------------------------------------------------------------------------
 def test_owner_inquiries_see_all_agencies():
+    # r105: the "[ ALL AGENCIES ]" bracket label was retired; the pin now
+    # asserts the behaviour it actually cared about — the owner sees
+    # every agency's inquiries (a foreign listing's title shows up).
     _, c = _owner_client()
     r = c.get("/dashboard/inquiries/")
     assert r.status_code == 200
-    assert "ALL AGENCIES" in r.content.decode()
+    assert "All inquiries" in r.content.decode()
 
 
 # ---------------------------------------------------------------------------

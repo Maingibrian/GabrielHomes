@@ -749,3 +749,28 @@
   margin: -0.4rem 0 0 1.4rem;
   max-width: 60ch;
 }
+
+/* r105 — pin picker on the Edit-listing form (same stack as the wizard's
+   2C screen: self-hosted MapLibre, OpenFreeMap positron, no key). The
+   map sits inside the specs card under the lat/lng row; pin-picker.js
+   syncs both directions with the number inputs. */
+.dashboard-form__pinmap {
+  position: relative;
+  height: 18rem;
+  border: 1px solid var(--sand-60);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  background: var(--map-stage, var(--cream));
+}
+.dashboard-form__pinmap-note {
+  display: grid;
+  place-items: center;
+  height: 100%;
+  margin: 0;
+  font-size: var(--text-sm);
+  color: var(--taupe);
+}
+.dashboard-form__pinmap .maplibregl-ctrl-attrib { font-size: var(--text-xs); }
+@media (max-width: 560px) {
+  .dashboard-form__pinmap { height: 14rem; }
+}
